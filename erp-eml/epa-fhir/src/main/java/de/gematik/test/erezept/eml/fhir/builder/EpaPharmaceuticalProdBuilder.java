@@ -18,7 +18,7 @@
  * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
-package de.gematik.test.erezept.eml.fhir.r4;
+package de.gematik.test.erezept.eml.fhir.builder;
 
 import static de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef.PHARMACEUTICAL_PROD;
 import static de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems.BFARM_CS_MED_REF;
@@ -28,6 +28,7 @@ import de.gematik.bbriccs.fhir.de.value.ASK;
 import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationVersion;
 import de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems;
+import de.gematik.test.erezept.eml.fhir.r4.EpaPharmaceuticalProduct;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

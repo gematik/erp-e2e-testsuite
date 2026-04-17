@@ -18,7 +18,7 @@
  * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
-package de.gematik.test.erezept.eml.fhir.r4;
+package de.gematik.test.erezept.eml.fhir.builder;
 
 import static de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems.SNOMED_SCT;
 import static java.text.MessageFormat.format;
@@ -26,9 +26,10 @@ import static java.text.MessageFormat.format;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.GemEpaIngredientComponentBuilder;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationVersion;
-import de.gematik.test.erezept.eml.fhir.r4.componentbuilder.GemEpaIngredientComponentBuilder;
+import de.gematik.test.erezept.eml.fhir.r4.EpaMedPznIngredient;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.AccessLevel;

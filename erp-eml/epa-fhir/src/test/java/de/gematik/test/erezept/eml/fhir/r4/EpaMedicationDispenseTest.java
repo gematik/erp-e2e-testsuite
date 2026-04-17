@@ -20,8 +20,11 @@
 
 package de.gematik.test.erezept.eml.fhir.r4;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import java.util.List;
 import java.util.Optional;
 import lombok.val;
@@ -50,5 +53,16 @@ class EpaMedicationDispenseTest {
     val medicationDispense = new EpaMedicationDispense();
     medicationDispense.setMedication(new Reference().setReference(testString));
     assertEquals(testString, medicationDispense.getEpaMedicationReference());
+  }
+
+  @Test
+  void shouldGetDgMPs() {
+    val dgmp = DosageDgMPBuilder.dosageBuilder(12, BmpDosiereinheit.MG).text("1-0-1").build();
+    val medDisp = new EpaMedicationDispense();
+    medDisp.addDosageInstruction(dgmp);
+    medDisp.addDosageInstruction(dgmp);
+    medDisp.addDosageInstruction(dgmp);
+    assertNotNull(medDisp.getDosageInstructionDgMPs());
+    assertEquals(3, medDisp.getDosageInstructionDgMPs().size());
   }
 }

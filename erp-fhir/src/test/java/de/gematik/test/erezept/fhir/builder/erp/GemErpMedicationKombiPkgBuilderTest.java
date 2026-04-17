@@ -28,9 +28,9 @@ import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.bbriccs.fhir.de.value.PZN;
-import de.gematik.test.erezept.eml.fhir.r4.EpaPharmaceuticalProdBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.EpaPharmaceuticalProdBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.GemEpaIngredientComponentBuilder;
 import de.gematik.test.erezept.eml.fhir.r4.EpaPharmaceuticalProduct;
-import de.gematik.test.erezept.eml.fhir.r4.componentbuilder.GemEpaIngredientComponentBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
@@ -224,8 +224,7 @@ class GemErpMedicationKombiPkgBuilderTest extends ErpFhirParsingTest {
             .fake();
     val gemMecicationKPG = getKombipackungFrom(kbvMedication);
     assertEquals(2, gemMecicationKPG.getContained().size());
-    val validResult =
-        ValidatorUtil.encodeAndValidate(parser, gemMecicationKPG, EncodingType.XML, true, true);
+    val validResult = ValidatorUtil.encodeAndValidate(parser, gemMecicationKPG, EncodingType.XML);
     assertTrue(validResult.isSuccessful());
   }
 

@@ -20,27 +20,24 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
+import static de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem.EMP_IDENTIFIER;
 import static de.gematik.test.erezept.fhir.builder.dgmp.RenderedDosageInstructionUtil.createGeneratorExtension;
 import static de.gematik.test.erezept.fhir.builder.dgmp.RenderedDosageInstructionUtil.render;
-import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef.*;
+import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef.PRESCRIBER_ID;
 import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef.SER_EXTENSION;
 import static de.gematik.test.erezept.fhir.profiles.systems.CommonCodeSystem.UCUM;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
-import de.gematik.test.erezept.fhir.builder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.extensions.kbv.TeratogenicExtension;
 import de.gematik.test.erezept.fhir.profiles.definitions.DgMPStructDef;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
-import de.gematik.test.erezept.fhir.r4.dgmp.DosageDgMP;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
+import de.gematik.test.erezept.fhir.r4.kbv.*;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.MedicationType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
@@ -86,6 +83,7 @@ public class KbvErpMedicationRequestBuilder
 
   private String note;
   private boolean isTPrescription = false;
+  private Identifier basedOnEMP;
 
   public static KbvErpMedicationRequestBuilder forPatient(KbvPatient patient) {
     val mrb = new KbvErpMedicationRequestBuilder();
@@ -268,6 +266,11 @@ public class KbvErpMedicationRequestBuilder
     return this;
   }
 
+  public KbvErpMedicationRequestBuilder basedOnEMP(String basedOnEMPId) {
+    this.basedOnEMP = EMP_IDENTIFIER.asIdentifier(basedOnEMPId);
+    return this;
+  }
+
   @SuppressWarnings({"java:S3776"})
   @Override
   public KbvErpMedicationRequest build() {
@@ -374,6 +377,9 @@ public class KbvErpMedicationRequestBuilder
       // .resource.substitution.exists().not()
       medReq.setSubstitution(null);
     }
+
+    Optional.ofNullable(basedOnEMP).ifPresent(id -> medReq.addBasedOn().setIdentifier(id));
+
     return medReq;
   }
 

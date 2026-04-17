@@ -28,6 +28,7 @@ import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.eml.tasks.CheckEpaOpProvidePrescriptionWithTask;
+import de.gematik.test.eml.tasks.CheckEpaOpProvidePrescriptionsRenderedDosageInstructionValues;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.*;
 import de.gematik.test.erezept.actors.DoctorActor;
@@ -37,6 +38,9 @@ import de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
+import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
@@ -48,8 +52,10 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import org.hl7.fhir.r4.model.Timing;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -115,6 +121,110 @@ public class ProvidePrescriptionWithConsentIT extends ErpTest {
     epaFhirChecker.attemptsTo(
         CheckEpaOpProvidePrescriptionWithTask.forPrescription(
             kbvBundle, doc.getSmcbTelematikId(), doc.getHbaTelematikId()));
+  }
+
+  @Test
+  @TestcaseId("EML_PROVIDE_PRESCRIPTION_WITH_CONSENT_DECISION_APPLY_02")
+  @DisplayName(
+      "Es muss geprüft werden, dass nach der Übertragung der der Informationen an das EPA-AS auch"
+          + " ein entsprechendes AuditEvent mit der Information über die Übertragung der Verordnung"
+          + " in die Patientenakte erzeugt wird")
+  void checkAuditEventAfterSubmittedPrescription() throws InterruptedException {
+
+    val epaFhirChecker = new GemaTestActor("epaFhirChecker");
+    this.config.equipWithEpaMockClient(epaFhirChecker);
+
+    patient.changePatientInsuranceType(InsuranceTypeDe.GKV);
+    val activation =
+        doc.performs(
+            IssuePrescription.forPatient(patient)
+                .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                .withKbvBundleFrom(
+                    KbvErpBundleFaker.builder()
+                        .withMedication(getMedication(MEDICATION_PZN))
+                        .toBuilder()));
+
+    // verifies correct activated prescription and get KbvErpBundle for validation step
+    val task = activation.getExpectedResponse();
+
+    val prescr =
+        patient.performs(
+            GetPrescriptionById.withTaskId(task.getTaskId()).withAccessCode(task.getAccessCode()));
+
+    // performs the resource-content validation
+    val kbvBundle = prescr.getExpectedResponse().getKbvBundle().orElseThrow();
+    epaFhirChecker.attemptsTo(
+        CheckEpaOpProvidePrescriptionWithTask.forPrescription(
+            kbvBundle, doc.getSmcbTelematikId(), doc.getHbaTelematikId()));
+
+    // waiting for computing and store AuditEvent for Patient
+    Thread.sleep(2000); // NOSONAR
+
+    // patient checks auditEvent content
+    val searchParams =
+        IQueryParameter.search()
+            .withAuthoredOnAndFilter(LocalDate.now(), SearchPrefix.EQ)
+            .sortedBy("date", SortOrder.DESCENDING)
+            .createParameter();
+    val auditEvents = patient.performs(DownloadAuditEvent.withQueryParams(searchParams));
+
+    patient.attemptsTo(
+        Verify.that(auditEvents)
+            .withExpectedType()
+            .and(
+                bundleContainsLogFor(
+                    prescr.getExpectedResponse().getTask().getPrescriptionId(),
+                    "Die Verordnung wurde in die Patientenakte übertragen"))
+            .isCorrect());
+  }
+
+  @Test
+  @TestcaseId("EML_PROVIDE_PRESCRIPTION_WITH_CONSENT_DECISION_APPLY_03")
+  @DisplayName(
+      "Es muss geprüft werden, dass nach der Übertragung der der Informationen an das EPA-AS auch"
+          + " die strukturierten Dosierinformationen korrekt gemapped wurden")
+  void checkStructuredDusageInstructionAfterSubmittPrescription() throws InterruptedException {
+
+    val epaFhirChecker = new GemaTestActor("epaFhirChecker");
+    this.config.equipWithEpaMockClient(epaFhirChecker);
+
+    patient.changePatientInsuranceType(InsuranceTypeDe.GKV);
+
+    val dosagDGMP =
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(3)
+                    .frequency(1)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+
+    val activation =
+        doc.performs(
+            IssuePrescription.forPatient(patient)
+                .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                .withKbvBundleFrom(
+                    KbvErpBundleFaker.builder()
+                        .withMedication(getMedication(MEDICATION_PZN))
+                        .withDosageDgmp(dosagDGMP)
+                        .toBuilder()));
+
+    // verifies correct activated prescription and get KbvErpBundle for validation step
+    val task = activation.getExpectedResponse();
+
+    val prescr =
+        patient.performs(
+            GetPrescriptionById.withTaskId(task.getTaskId()).withAccessCode(task.getAccessCode()));
+
+    // performs the resource-content validation
+    val kbvBundle = prescr.getExpectedResponse().getKbvBundle().orElseThrow();
+    epaFhirChecker.attemptsTo(
+        CheckEpaOpProvidePrescriptionsRenderedDosageInstructionValues.forPrescription(kbvBundle));
+
+    // waiting for computing and store AuditEvent for Patient
+    Thread.sleep(2000); // NOSONAR
 
     // patient checks auditEvent content
     val searchParams =

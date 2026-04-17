@@ -20,11 +20,17 @@
 
 package de.gematik.test.erezept.eml.fhir.r4;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
+import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import java.util.Date;
+import lombok.val;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.Timing;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -34,11 +40,22 @@ class EpaMedicationRequestTest {
 
   @BeforeAll
   static void setup() {
+    val dosageDGMP =
+        DosageDgMPBuilder.dosageBuilder(3, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.MON)
+                    .period(3)
+                    .build())
+            .build();
     medRequest
         .setAuthoredOn(new Date(1737500400000L))
         .setDispenseRequest(
             new MedicationRequest.MedicationRequestDispenseRequestComponent()
                 .setQuantity(Quantity.fromUcum("1", "{Package}")))
+        .addDosageInstruction(dosageDGMP)
+        .addDosageInstruction(dosageDGMP)
         .setStatus(MedicationRequest.MedicationRequestStatus.ACTIVE);
   }
 
@@ -57,5 +74,11 @@ class EpaMedicationRequestTest {
   void shouldGetDispenseRequest() {
     assertNotNull(medRequest.getEmlDisReqQuantity());
     assertEquals(1, medRequest.getEmlDisReqQuantity().getValue().intValue());
+  }
+
+  @Test
+  void shouldGetDosageDgmp() {
+    assertNotNull(medRequest.getDosageInstructionDgMPs());
+    assertEquals(2, medRequest.getDosageInstructionDgMPs().size());
   }
 }

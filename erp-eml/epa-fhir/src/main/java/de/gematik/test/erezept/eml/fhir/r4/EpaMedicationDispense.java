@@ -20,6 +20,8 @@
 
 package de.gematik.test.erezept.eml.fhir.r4;
 
+import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
+import java.util.List;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.MedicationDispense;
 import org.hl7.fhir.r4.model.Reference;
@@ -30,6 +32,10 @@ public class EpaMedicationDispense extends MedicationDispense {
   public Optional<String> getEpaPerformer() {
     return Optional.ofNullable(
         this.getPerformer().stream().findFirst().orElseThrow().getActor().getReference());
+  }
+
+  public List<DosageDgMP> getDosageInstructionDgMPs() {
+    return this.getDosageInstruction().stream().map(DosageDgMP::fromDosage).toList();
   }
 
   public String getEpaMedicationReference() {

@@ -20,22 +20,16 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerAmount;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDosage;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
+import de.gematik.test.erezept.fhir.r4.kbv.*;
 import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
@@ -52,7 +46,6 @@ import org.hl7.fhir.r4.model.MedicationRequest;
 public class KbvErpMedicationRequestFaker {
 
   private final KbvItaErpVersion erpVersion;
-  private final KbvItaForVersion forVersion;
   private AccidentExtension accident;
 
   private boolean isTPrescription = false;
@@ -63,7 +56,6 @@ public class KbvErpMedicationRequestFaker {
 
   private KbvErpMedicationRequestFaker(KbvItaErpVersion erpVersion, KbvItaForVersion forVersion) {
     this.erpVersion = erpVersion;
-    this.forVersion = forVersion;
     if (erpVersion.compareTo(KbvItaErpVersion.V1_1_0) <= 0) {
       this.withBvg(fakerBool());
     } else {
@@ -79,7 +71,6 @@ public class KbvErpMedicationRequestFaker {
             KbvCoverageFaker.builder(forVersion)
                 .withInsuranceType(kbvPatient.getInsuranceType())
                 .fake())
-        .withDosageInstruction(fakerDosage())
         .withAuthorDate(new Date())
         .withSubstitution(fakerBool())
         .withDispenseQuantity(fakerAmount());
@@ -231,13 +222,19 @@ public class KbvErpMedicationRequestFaker {
     return this;
   }
 
+  public KbvErpMedicationRequestFaker withDgmp(DosageDgMP dosageDgMP) {
+    builderConsumers.put("dosageDgmp", b -> b.dgmp(dosageDgMP));
+    return this;
+  }
+
   public KbvErpMedicationRequest fake() {
     return this.toBuilder().build();
   }
 
   public KbvErpMedicationRequestBuilder toBuilder() {
     val builder = KbvErpMedicationRequestBuilder.forPatient(kbvPatient).version(erpVersion);
-
+    if (builderConsumers.get("dosageDgmp") == null && builderConsumers.get("dosage") == null)
+      this.withDosageInstruction(fakerDosage());
     if (accident != null
             && accident.toString().equals(AccidentCauseType.ACCIDENT_AT_WORK.getDisplay())
         || accident != null

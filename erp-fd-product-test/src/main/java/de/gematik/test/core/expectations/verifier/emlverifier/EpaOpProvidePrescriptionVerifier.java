@@ -31,6 +31,7 @@ import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationVersion;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
+import de.gematik.test.erezept.fhir.profiles.definitions.DgMPStructDef;
 import de.gematik.test.erezept.fhir.profiles.systems.CommonCodeSystem;
 import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
@@ -761,6 +762,43 @@ public class EpaOpProvidePrescriptionVerifier {
                 "Die EpaMedication muss die MedicationCategory {0} enthalten",
                 category.getDisplay()))
         .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<EpaOpProvidePrescription>
+      provPrescriptionHasCorrectGeneratedDosageExtension(
+          KbvErpMedicationRequest medicationRequest) {
+    val renderedDosageInstructions = medicationRequest.getRenderedDosageInstruction();
+    Predicate<EpaOpProvidePrescription> predicate =
+        prescription ->
+            prescription.getEpaMedicationRequest().getExtension().stream()
+                .filter(DgMPStructDef.MR_RENDERED_DOSAGE_INSTRUCTION::matches)
+                .map(ext -> ext.getValue().primitiveValue())
+                .findFirst()
+                .equals(renderedDosageInstructions);
+    return new VerificationStep.StepBuilder<EpaOpProvidePrescription>(
+            EmlAfos.A_25949.getRequirement(),
+            format(
+                "Der EpaMedicationRequest muss die errechnete Dosierinformation {0} enthalten",
+                renderedDosageInstructions))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<EpaOpProvidePrescription>
+      provPrescriptionHasCorrectDosageComponent(KbvErpMedicationRequest medicationRequest) {
+
+    Predicate<EpaOpProvidePrescription> dgMPContentValidation =
+        prescription ->
+            prescription
+                .getEpaMedicationRequest()
+                .getDosageInstructionDgMPs()
+                .equals(medicationRequest.getDosageInstructionDgMPs());
+
+    return new VerificationStep.StepBuilder<EpaOpProvidePrescription>(
+            EmlAfos.A_25949.getRequirement(),
+            "Der EpaMedicationRequest muss die Dosierinformation der DosageDgMP enthalten")
+        .predicate(dgMPContentValidation)
         .accept();
   }
 

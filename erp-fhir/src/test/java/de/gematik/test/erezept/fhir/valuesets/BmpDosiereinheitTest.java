@@ -22,10 +22,12 @@ package de.gematik.test.erezept.fhir.valuesets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
+import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import lombok.val;
 import org.hl7.fhir.r4.model.Coding;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class BmpDosiereinheitTest {
 
@@ -38,21 +40,29 @@ class BmpDosiereinheitTest {
 
   @Test
   void codeSystemShouldWork() {
-    assertEquals(KbvCodeSystem.SFHIR_BMP_DOSIEREINHEIT, BmpDosiereinheit.MG.getCodeSystem());
+    assertNotEquals(BmpDosiereinheit.APPLIKATORFUELLUNG.getCode(), BmpDosiereinheit.MG.getCode());
   }
 
   @Test
   void codeAndDisplayShouldWorkCorrect() {
-    BmpDosiereinheit einheit = BmpDosiereinheit.MG;
+    de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit einheit =
+        de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit.MG;
     assertEquals("v", einheit.getCode());
     assertEquals("mg", einheit.getDisplay());
   }
 
   @Test
   void shouldBuildAsExtCorrect() {
-    BmpDosiereinheit einheit = BmpDosiereinheit.MG;
+    de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit einheit =
+        de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit.MG;
     val ext = einheit.asExtension();
     assertEquals(einheit.getCode(), ((Coding) ext.getValue()).getCode());
     assertEquals(einheit.getCodeSystem().getCanonicalUrl(), ext.getUrl());
+  }
+
+  @ParameterizedTest
+  @CsvSource({"'Stück', '1'", "Messbecher, 0", "Messlöffel, #", "cm, q", "Likörglas, i"})
+  void shouldGetDisplay(String display, String code) {
+    assertEquals(code, BmpDosiereinheit.fromDisplay(display).getCode());
   }
 }

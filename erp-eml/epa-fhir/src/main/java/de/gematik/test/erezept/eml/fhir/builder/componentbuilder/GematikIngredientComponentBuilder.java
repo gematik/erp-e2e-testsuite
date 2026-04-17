@@ -18,7 +18,7 @@
  * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
-package de.gematik.test.erezept.eml.fhir.r4.componentbuilder;
+package de.gematik.test.erezept.eml.fhir.builder.componentbuilder;
 
 import static de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef.INGREDIENT_DARREICHUNGSFORM;
 import static de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems.UCUM;

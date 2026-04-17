@@ -1,5 +1,31 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 1.4.0
+
+* epa-fhir:
+    - move DosageDgmp to Epa-FHIR and Implement equals() to compare Values contained in DosageAndRate an
+      TimimngComponent
+    - move DosageDgmpBuilder to Epa-FHIR and adapt it to handle DosageAndRate and TimingComponent with several values
+      and
+      boundsDuration
+    - move TimingRepeatBuilder to Epa-FHIR and adapt it to handle TimingRepeat with several Values and boundsDuration
+    
+
+* erp-fd-product-test:
+    * add Verifier and Tests for DosageDgmp Values in Epa-FHIR-Objects
+    * add Testcases for DosageDgmp in Epa-FHIR-Object
+
+## Release 1.3.0
+
+* erp-fhir:
+    - implememt TimingRepeatBuilder and Adapt DosageDgmpBuilder to handle TimingRepeat with several Values and
+      boundsDuration
+
+* primsys-bbd:
+
+- adapt PrescriptionDataMapper to handle DosageInstructions in Kbv.ita.erp Version 1.4.x with several
+  DosageInstruction-TimingRepeats with several values and boundsDuration
+
 ## Release 1.3.0
 
 * erp-fhir:
@@ -13,7 +39,7 @@
 * erp-fd-product-test:
     - Implement test cases for create t-rezept prescription
     - Implement test cases for activate t-rezept prescription
-    - Adapt IssuePrescription to activate FlowType 166 
+    - Adapt IssuePrescription to activate FlowType 166
     - Implement testcases for dispense t-rezept prescription
     - Implement testcases for send t-rezept communication
     - Implement testcases for exporting T-Prescriptions to EpaAS

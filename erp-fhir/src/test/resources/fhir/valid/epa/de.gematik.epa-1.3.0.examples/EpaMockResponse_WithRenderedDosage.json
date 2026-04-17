@@ -1,0 +1,328 @@
+{
+  "meta": {
+    "profile": [
+      "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-op-provide-prescription-erp-input-parameters|1.3"
+    ]
+  },
+  "resourceType": "Parameters",
+  "id": "577289b8-6046-4ad8-9604-2b60e0f5ba4e",
+  "parameter": [
+    {
+      "name": "rxPrescription",
+      "part": [
+        {
+          "name": "prescriptionId",
+          "valueIdentifier": {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "160.000.120.396.112.48"
+          }
+        },
+        {
+          "name": "authoredOn",
+          "valueDate": "2026-04-08"
+        },
+        {
+          "name": "medicationRequest",
+          "resource": {
+            "resourceType": "MedicationRequest",
+            "id": "3d52d933-938e-4b12-b04d-b6ef93192a02",
+            "meta": {
+              "versionId": "1",
+              "profile": [
+                "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-request|1.3"
+              ]
+            },
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/indicator-ser-extension",
+                "valueBoolean": false
+              },
+              {
+                "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/multiple-prescription-extension",
+                "extension": [
+                  {
+                    "url": "indicator",
+                    "valueBoolean": false
+                  }
+                ]
+              },
+              {
+                "url": "http://ig.fhir.de/igs/medication/StructureDefinition/GeneratedDosageInstructionsMeta",
+                "extension": [
+                  {
+                    "url": "algorithmVersion",
+                    "valueString": "1.0.1"
+                  },
+                  {
+                    "url": "language",
+                    "valueCode": "de-DE"
+                  }
+                ]
+              },
+              {
+                "url": "http://hl7.org/fhir/5.0/StructureDefinition/extension-MedicationRequest.renderedDosageInstruction",
+                "valueMarkdown": "alle 3 Tage: 08:00 Uhr — je 2 mg"
+              }
+            ],
+            "status": "active",
+            "intent": "filler-order",
+            "medicationReference": {
+              "reference": "Medication/2a3c3173-9a7a-4fe4-8d40-1a6d93ce0a14"
+            },
+            "subject": {
+              "identifier": {
+                "system": "http://fhir.de/sid/gkv/kvid-10",
+                "value": "X110645443"
+              }
+            },
+            "authoredOn": "2026-04-08",
+            "dosageInstruction": [
+              {
+                "timing": {
+                  "repeat": {
+                    "frequency": 1,
+                    "period": 3,
+                    "periodUnit": "d",
+                    "timeOfDay": [
+                      "08:00:00"
+                    ]
+                  }
+                },
+                "doseAndRate": [
+                  {
+                    "doseQuantity": {
+                      "value": 2,
+                      "unit": "mg",
+                      "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_BMP_DOSIEREINHEIT",
+                      "code": "v"
+                    }
+                  }
+                ]
+              }
+            ],
+            "dispenseRequest": {
+              "quantity": {
+                "value": 7,
+                "unit": "Packung",
+                "code": "{Package}",
+                "system": "http://unitsofmeasure.org"
+              }
+            },
+            "substitution": {
+              "allowedBoolean": false
+            }
+          }
+        },
+        {
+          "name": "medication",
+          "resource": {
+            "resourceType": "Medication",
+            "id": "2a3c3173-9a7a-4fe4-8d40-1a6d93ce0a14",
+            "meta": {
+              "versionId": "1",
+              "profile": [
+                "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication|1.3"
+              ]
+            },
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/drug-category-extension",
+                "valueCoding": {
+                  "system": "https://gematik.de/fhir/epa-medication/CodeSystem/epa-drug-category-cs",
+                  "code": "00"
+                }
+              },
+              {
+                "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension",
+                "valueBoolean": true
+              },
+              {
+                "url": "http://fhir.de/StructureDefinition/normgroesse",
+                "valueCode": "N1"
+              },
+              {
+                "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-type-extension",
+                "valueCoding": {
+                  "system": "http://snomed.info/sct",
+                  "code": "781405001",
+                  "display": "Medicinal product package (product)"
+                }
+              }
+            ],
+            "code": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/ifa/pzn",
+                  "code": "47803769"
+                }
+              ],
+              "text": "IBU-ratiopharm 400mg akut Schmerztabletten"
+            },
+            "form": {
+              "coding": [
+                {
+                  "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM",
+                  "code": "KON"
+                }
+              ]
+            },
+            "amount": {
+              "numerator": {
+                "extension": [
+                  {
+                    "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-packaging-size-extension",
+                    "valueString": "50"
+                  }
+                ],
+                "unit": "Tablet"
+              },
+              "denominator": {
+                "value": 1
+              }
+            },
+            "ingredient": [
+              {
+                "itemCodeableConcept": {
+                  "text": "Hoggar® Night Globuli"
+                },
+                "strength": {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/data-absent-reason",
+                      "valueCode": "unknown"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "name": "organization",
+          "resource": {
+            "resourceType": "Organization",
+            "id": "154fe719-9b56-48ce-9e44-f103f6d177f5",
+            "meta": {
+              "versionId": "1",
+              "profile": [
+                "https://gematik.de/fhir/directory/StructureDefinition/OrganizationDirectory|1.0.1"
+              ],
+              "tag": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/Origin",
+                  "code": "ldap"
+                }
+              ]
+            },
+            "name": "Arztpraxis Bernd Rosenstrauch TEST-ONLY",
+            "telecom": [
+              {
+                "system": "phone",
+                "value": "(0208) 887908550"
+              },
+              {
+                "system": "email",
+                "value": "pit.horak@wilts.name"
+              }
+            ],
+            "address": [
+              {
+                "type": "both",
+                "line": [
+                  "Erlenweg 13a"
+                ],
+                "city": "Vanessaberg",
+                "postalCode": "54831",
+                "country": "D"
+              }
+            ],
+            "type": [
+              {
+                "coding": [
+                  {
+                    "system": "https://gematik.de/fhir/directory/CodeSystem/OrganizationProfessionOID",
+                    "code": "1.2.276.0.76.4.50"
+                  }
+                ]
+              }
+            ],
+            "identifier": [
+              {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "1-2-ARZTPRAXIS-BerndRosenstrauch01"
+              }
+            ]
+          }
+        },
+        {
+          "name": "practitioner",
+          "resource": {
+            "resourceType": "Practitioner",
+            "id": "e9cb3fd8-7be6-4a78-97e9-e5801a33cb28",
+            "meta": {
+              "versionId": "1",
+              "profile": [
+                "https://gematik.de/fhir/directory/StructureDefinition/PractitionerDirectory|1.0.1"
+              ],
+              "tag": [
+                {
+                  "system": "https://gematik.de/fhir/directory/CodeSystem/Origin",
+                  "code": "ldap"
+                }
+              ]
+            },
+            "identifier": [
+              {
+                "type": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                      "code": "LANR"
+                    }
+                  ]
+                },
+                "system": "https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR",
+                "value": "792562637"
+              },
+              {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "1-HBA-Testkarte-883110000161759"
+              }
+            ],
+            "name": [
+              {
+                "use": "official",
+                "family": "Gunther",
+                "_family": {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/humanname-own-name",
+                      "valueString": "Gunther"
+                    }
+                  ]
+                },
+                "given": [
+                  "Gündüla"
+                ],
+                "prefix": [
+                  "Dr."
+                ],
+                "_prefix": [
+                  {
+                    "extension": [
+                      {
+                        "url": "http://hl7.org/fhir/StructureDefinition/iso21090-EN-qualifier",
+                        "valueCode": "AC"
+                      }
+                    ]
+                  }
+                ],
+                "text": "AC Dr. Gündüla Gunther"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

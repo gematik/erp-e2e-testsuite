@@ -33,7 +33,10 @@ import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.EmlAfos;
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
+import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
@@ -49,10 +52,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.val;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.MedicationRequest;
-import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -69,6 +69,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithIngredient;
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithCompounding;
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithFreeText;
+  private static EpaOpProvidePrescription epaOpProvidePrescriptionWithRenderedDosage;
 
   private static FhirCodec epaFhir;
   private static KbvItaErpVersion kbvItaErpVersion = KbvItaErpVersion.V1_4_0;
@@ -103,6 +104,11 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
                 "fhir/forunittests/providePrescrFromEpaMockAsMedIngredient.json"));
+    epaOpProvidePrescriptionWithRenderedDosage =
+        epaFhir.decode(
+            EpaOpProvidePrescription.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/valid/epa/de.gematik.epa-1.3.0.examples/EpaMockResponse_WithRenderedDosage.json"));
   }
 
   private static Stream<Arguments>
@@ -647,14 +653,14 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldValidateEpaMedicationWithMedicationFreeTextCorrect() {
-    val compoundingMed =
+    val medFreeText =
         KbvErpMedicationFreeTextFaker.builder(kbvItaErpVersion)
             .withCategory(MedicationCategory.C_00) // Mapped to 'Medication.extension:drugCategory'
             .withDosageForm("Zäpfchen, viel Spaß")
             .withVaccine(false)
             .withFreeText("Hier ist der mentale Meilenstein des LE")
             .fake();
-    val step = emlMedicationMapsTo(compoundingMed);
+    val step = emlMedicationMapsTo(medFreeText);
     assertDoesNotThrow(() -> step.apply(epaOpProvidePrescriptionWithFreeText));
   }
 
@@ -662,14 +668,144 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
   @MethodSource
   void shouldThrowWhileValidateEpaMedicationWithMedicationFreeTextWithWrongValues(
       MedicationCategory category, String dosage, boolean isvVaccine, String freeText) {
-    val compoundingMed =
+    val medFreeText =
         KbvErpMedicationFreeTextFaker.builder(kbvItaErpVersion)
             .withCategory(category) // Mapped to 'Medication.extension:drugCategory'
             .withDosageForm(dosage)
             .withVaccine(isvVaccine)
             .withFreeText(freeText)
             .fake();
-    val step = emlMedicationMapsTo(compoundingMed);
+    val step = emlMedicationMapsTo(medFreeText);
     assertThrows(AssertionError.class, () -> step.apply(epaOpProvidePrescriptionWithFreeText));
+  }
+
+  @Test
+  void shouldValidateEpaMedicationRenderedDosageCorrect() {
+    val dgmp =
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .frequency(1)
+                    .period(3)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+    // requires minimum Kbv.ita.erp. 1.4
+    val medRequ =
+        KbvErpMedicationRequestFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withDgmp(dgmp)
+            .fake();
+    val step = provPrescriptionHasCorrectGeneratedDosageExtension(medRequ);
+    assertDoesNotThrow(() -> step.apply(epaOpProvidePrescriptionWithRenderedDosage));
+  }
+
+  @Test
+  void shouldThrowWhileValidateEpaMedicationRenderedDosage() {
+    val dgmp =
+        DosageDgMPBuilder.dosageBuilder(3, BmpDosiereinheit.DOSIERBRIEFCHEN)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .frequency(1)
+                    .period(3)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+    // requires minimum Kbv.ita.erp 1.4 / ita.for 1.3 to generate renderedDosageIntruction
+    val edReq =
+        KbvErpMedicationRequestFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withDgmp(dgmp)
+            .fake();
+    val step = provPrescriptionHasCorrectGeneratedDosageExtension(edReq);
+    assertThrows(
+        AssertionError.class, () -> step.apply(epaOpProvidePrescriptionWithRenderedDosage));
+  }
+
+  @Test
+  void shouldValidateEpaMedicationDosageTimingCorrect() {
+    val dgmp =
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .frequency(1)
+                    .period(3)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+    // requires minimum Kbv.ita.erp. 1.4
+    val medReq =
+        KbvErpMedicationRequestFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withDgmp(dgmp)
+            .fake();
+    val step = provPrescriptionHasCorrectDosageComponent(medReq);
+    assertDoesNotThrow(() -> step.apply(epaOpProvidePrescriptionWithRenderedDosage));
+  }
+
+  @Test
+  void shouldThrowWhileValidateEpaMedicationDosageTimingPeriod() {
+    val dgmp =
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .frequency(1)
+                    .period(4)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+    // requires minimum Kbv.ita.erp 1.4 / ita.for 1.3 to generate renderedDosageIntruction
+    val medReq =
+        KbvErpMedicationRequestFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withDgmp(dgmp)
+            .fake();
+    val step = provPrescriptionHasCorrectDosageComponent(medReq);
+    assertThrows(
+        AssertionError.class, () -> step.apply(epaOpProvidePrescriptionWithRenderedDosage));
+  }
+
+  @Test
+  void shouldThrowWhileValidateEpaMedicationDosageTimingFrequency() {
+    val dgmp =
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .frequency(2)
+                    .period(3)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+    // requires minimum Kbv.ita.erp 1.4 / ita.for 1.3 to generate renderedDosageIntruction
+    val medReq =
+        KbvErpMedicationRequestFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withDgmp(dgmp)
+            .fake();
+    val step = provPrescriptionHasCorrectDosageComponent(medReq);
+    assertThrows(
+        AssertionError.class, () -> step.apply(epaOpProvidePrescriptionWithRenderedDosage));
+  }
+
+  @Test
+  void shouldThrowWhileValidateEpaMedicationDosageTimingPeriodUnity() {
+    val dgmp =
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .frequency(1)
+                    .period(3)
+                    .periodUnit(Timing.UnitsOfTime.WK)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+    // requires minimum Kbv.ita.erp 1.4 / ita.for 1.3 to generate renderedDosageIntruction
+    val medReq =
+        KbvErpMedicationRequestFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withDgmp(dgmp)
+            .fake();
+    val step = provPrescriptionHasCorrectDosageComponent(medReq);
+    assertThrows(
+        AssertionError.class, () -> step.apply(epaOpProvidePrescriptionWithRenderedDosage));
   }
 }

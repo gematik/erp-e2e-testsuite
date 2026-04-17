@@ -18,7 +18,7 @@
  * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
-package de.gematik.test.erezept.fhir.builder.dgmp;
+package de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp;
 
 import java.util.stream.Stream;
 import lombok.Getter;
@@ -26,23 +26,23 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum UnitsOfTimeDE {
-  SEKUNDE("s", "Sekunde", "Sekunden"),
-  MINUTE("min", "Minute", "Minuten"),
-  STUNDE("h", "Stunde", "Stunden"),
-  TAG("d", "Tag", "Tage"),
-  WOCHE("wk", "Woche", "Wochen"),
-  MONAT("mo", "Monat", "Monate"),
-  JAHR("a", "Jahr", "Jahre");
+public enum DayOfWeekDE {
+  MONDAY("mon", "montags"),
+  TUESDAY("tue", "dienstags"),
+  WEDNESDAY("wed", "mittwochs"),
+  THURSDAY("thu", "donnerstags"),
+  FRIDAY("fri", "freitags"),
+  SATURDAY("sat", "samstags"),
+  SUNDAY("sun", "sonntags"),
+  ;
 
   private final String code;
-  private final String singular;
-  private final String plural;
+  private final String translation;
 
-  public static UnitsOfTimeDE fromCode(String code) {
-    return Stream.of(UnitsOfTimeDE.values())
+  public static DayOfWeekDE fromCode(String code) {
+    return Stream.of(DayOfWeekDE.values())
         .filter(it -> it.getCode().equals(code))
         .findFirst()
-        .orElseThrow(() -> new IllegalArgumentException("Unknown GermanTimeUnit code: " + code));
+        .orElseThrow(() -> new IllegalArgumentException("Unknown DayOfWeek code: " + code));
   }
 }

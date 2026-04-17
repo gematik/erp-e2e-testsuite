@@ -18,11 +18,14 @@
  * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
-package de.gematik.test.erezept.fhir.valuesets;
+package de.gematik.test.erezept.eml.fhir.valuesets;
+
+import static de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems.DOSIEREINHEIT;
 
 import de.gematik.bbriccs.fhir.coding.FromValueSet;
 import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
-import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
+import de.gematik.test.erezept.eml.fhir.profile.UseFulCodeSystems;
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.Extension;
@@ -64,7 +67,7 @@ public enum BmpDosiereinheit implements FromValueSet {
   KG("u", "kg", false, 21),
   MG("v", "mg", false, 10);
 
-  public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.SFHIR_BMP_DOSIEREINHEIT;
+  public static final UseFulCodeSystems CODE_SYSTEM = DOSIEREINHEIT;
   public static final String CANONICAL_URL = CODE_SYSTEM.getCanonicalUrl();
 
   private final String code;
@@ -73,14 +76,22 @@ public enum BmpDosiereinheit implements FromValueSet {
   private final int sortierung;
 
   public static BmpDosiereinheit fromCode(String code) {
-    return java.util.Arrays.stream(BmpDosiereinheit.values())
+    return Arrays.stream(BmpDosiereinheit.values())
         .filter(e -> e.code.equals(code))
         .findFirst()
         .orElseThrow(() -> new InvalidValueSetException(BmpDosiereinheit.class, code));
   }
 
+  public static BmpDosiereinheit fromDisplay(String display) {
+
+    return Arrays.stream(BmpDosiereinheit.values())
+        .filter(e -> e.display.equals(display))
+        .findFirst()
+        .orElseThrow(() -> new InvalidValueSetException(BmpDosiereinheit.class, display));
+  }
+
   @Override
-  public KbvCodeSystem getCodeSystem() {
+  public UseFulCodeSystems getCodeSystem() {
     return CODE_SYSTEM;
   }
 

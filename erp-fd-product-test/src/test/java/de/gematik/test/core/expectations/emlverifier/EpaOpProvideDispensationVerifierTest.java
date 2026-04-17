@@ -31,9 +31,14 @@ import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier;
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
+import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
+import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
 import de.gematik.test.erezept.fhir.date.DateConverter;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
@@ -47,6 +52,7 @@ import java.util.function.Predicate;
 import lombok.val;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.MedicationDispense;
+import org.hl7.fhir.r4.model.Timing;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -54,6 +60,7 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
   private static final Date testDate_22_01_2025 =
       DateConverter.getInstance().localDateToDate(LocalDate.of(2025, Month.JANUARY, 22));
   private static EpaOpProvideDispensation validEpaOpProvideDispensation;
+  private static EpaOpProvideDispensation epaOpProvideDispensationFromMock;
 
   @BeforeAll
   static void setup() {
@@ -64,6 +71,11 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
             EpaOpProvideDispensation.class,
             ResourceLoader.readFileFromResource(
                 "fhir/valid/parameters/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json"));
+    epaOpProvideDispensationFromMock =
+        fhir.decode(
+            EpaOpProvideDispensation.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/valid/parameters/1.3.0/epaOpProvDispenseInputFromEpaMock.json"));
   }
 
   private static GemErpMedication getMedication() {
@@ -400,5 +412,113 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
   void shoulThrowWhiledValidateEpaMedicationCategoryCorrect() {
     val step = emlMedicationHasCategory(MedicationCategory.C_01);
     assertThrows(AssertionError.class, () -> step.apply(validEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shouldValidateEpaMedicationRenderedDosageCorrect() {
+    val dgmp =
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .frequency(1)
+                    .period(3)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+
+    val medDisp = ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6).withDgmp(dgmp).fake();
+    val step = emlMedDispenseHasEqualGeneratedDosageInstrWith(medDisp);
+    assertDoesNotThrow(() -> step.apply(epaOpProvideDispensationFromMock));
+  }
+
+  @Test
+  void shouldThrowWhileValidateEpaMedicationRenderedDosage() {
+    val dgmp =
+        DosageDgMPBuilder.dosageBuilder(3, BmpDosiereinheit.DOSIERBRIEFCHEN)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .frequency(1)
+                    .period(3)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+
+    val medDisp = ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6).withDgmp(dgmp).fake();
+    val step = emlMedDispenseHasEqualGeneratedDosageInstrWith(medDisp);
+    assertThrows(AssertionError.class, () -> step.apply(epaOpProvideDispensationFromMock));
+  }
+
+  @Test
+  void shouldValidateEpaMedicationDosageTimingCorrect() {
+    val dgmp =
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .frequency(1)
+                    .period(3)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+
+    val medDisp = ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6).withDgmp(dgmp).fake();
+    val step = provDispensationHasCorrectDosageComponent(medDisp);
+    assertDoesNotThrow(() -> step.apply(epaOpProvideDispensationFromMock));
+  }
+
+  @Test
+  void shouldThrowWhileValidateEpaMedicationDosageTimingPeriod() {
+    val dgmp =
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .frequency(1)
+                    .period(4)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+
+    val medDisp = ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6).withDgmp(dgmp).fake();
+    val step = provDispensationHasCorrectDosageComponent(medDisp);
+    assertThrows(AssertionError.class, () -> step.apply(epaOpProvideDispensationFromMock));
+  }
+
+  @Test
+  void shouldThrowWhileValidateEpaMedicationDosageTimingFrequency() {
+    val dgmp =
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .frequency(2)
+                    .period(3)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+
+    val medDisp = ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6).withDgmp(dgmp).fake();
+    val step = provDispensationHasCorrectDosageComponent(medDisp);
+    assertThrows(AssertionError.class, () -> step.apply(epaOpProvideDispensationFromMock));
+  }
+
+  @Test
+  void shouldThrowWhileValidateEpaMedicationDosageTimingPeriodUnity() {
+    val dgmp =
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .frequency(1)
+                    .period(3)
+                    .periodUnit(Timing.UnitsOfTime.WK)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+
+    val medDisp = ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6).withDgmp(dgmp).fake();
+    val step = provDispensationHasCorrectDosageComponent(medDisp);
+    assertThrows(AssertionError.class, () -> step.apply(epaOpProvideDispensationFromMock));
   }
 }

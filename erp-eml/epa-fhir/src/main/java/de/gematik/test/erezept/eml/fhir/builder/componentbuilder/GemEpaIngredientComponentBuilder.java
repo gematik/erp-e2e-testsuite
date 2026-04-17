@@ -18,28 +18,19 @@
  * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
  */
 
-package de.gematik.test.erezept.fhir.r4.dgmp;
+package de.gematik.test.erezept.eml.fhir.builder.componentbuilder;
 
-import ca.uhn.fhir.model.api.annotation.DatatypeDef;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.hl7.fhir.r4.model.Dosage;
+import de.gematik.test.erezept.eml.fhir.r4.EpaIngredientComponent;
 
-/**
- * Implementation Guide: <a href="https://ig.fhir.de/igs/medication/index.html">Medication IG DE</a>
- */
-@Slf4j
-@DatatypeDef(name = "Dosage")
-@SuppressWarnings({"java:S110"})
-public class DosageDgMP extends Dosage {
+public class GemEpaIngredientComponentBuilder
+    extends GematikIngredientComponentBuilder<
+        EpaIngredientComponent, GemEpaIngredientComponentBuilder> {
 
-  public static DosageDgMP fromDosage(Dosage adaptee) {
-    if (adaptee instanceof DosageDgMP dosageDgMP) {
-      return dosageDgMP;
-    } else {
-      val dosageDgMp = new DosageDgMP();
-      adaptee.copyValues(dosageDgMp);
-      return dosageDgMp;
-    }
+  private GemEpaIngredientComponentBuilder() {
+    super(new EpaIngredientComponent());
+  }
+
+  public static GemEpaIngredientComponentBuilder builder() {
+    return new GemEpaIngredientComponentBuilder();
   }
 }

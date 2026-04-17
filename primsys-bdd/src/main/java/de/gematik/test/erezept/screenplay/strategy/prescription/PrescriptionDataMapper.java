@@ -21,21 +21,23 @@
 package de.gematik.test.erezept.screenplay.strategy.prescription;
 
 import com.google.common.base.Strings;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
+import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.r4.kbv.*;
+import de.gematik.test.erezept.fhir.valuesets.MedicationType;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.util.FlowTypeUtil;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -104,7 +106,7 @@ public abstract class PrescriptionDataMapper {
   private Pair<KbvErpBundleBuilder, PrescriptionFlowType> createKbvBundle(
       KbvPractitioner practitioner,
       KbvMedicalOrganization organization,
-      KbvPatient patient,
+      KbvPatient kbvPatient,
       KbvCoverage insurance,
       Map<String, String> medMap) {
 
@@ -113,7 +115,6 @@ public abstract class PrescriptionDataMapper {
     val substitution =
         Boolean.parseBoolean(
             medMap.getOrDefault("Substitution", GemFaker.getFaker().bool().toString()));
-    val dosage = medMap.getOrDefault("Dosierung", GemFaker.fakerDosage());
     val amount = medMap.getOrDefault("Menge", "1");
     val emergencyServiceFee =
         Boolean.parseBoolean(
@@ -155,11 +156,10 @@ public abstract class PrescriptionDataMapper {
     val medication = getKbvErpMedication(medMap);
 
     val medicationRequestBuilder =
-        KbvErpMedicationRequestBuilder.forPatient(patient)
+        KbvErpMedicationRequestBuilder.forPatient(kbvPatient)
             .insurance(insurance)
             .requester(practitioner)
             .medication(medication)
-            .dosage(dosage)
             .dispenseRequestQuantity(Integer.decode(amount))
             .status("active")
             .intent("order")
@@ -168,10 +168,21 @@ public abstract class PrescriptionDataMapper {
             .hasEmergencyServiceFee(emergencyServiceFee)
             .substitution(substitution)
             .coPaymentStatus(StatusCoPayment.fromCode(paymentStatus));
-
+    // T-Prescription behavior
     Optional.ofNullable(medMap.get("Reichdauer in Wochen"))
         .ifPresent(
             it -> medicationRequestBuilder.expectedSupplyDurationInWeeks(Float.parseFloat(it)));
+    // eMP ID-Link behavior
+    Optional.ofNullable(this.patient.recall("emp-identifier"))
+        .filter(String.class::isInstance)
+        .map(String.class::cast)
+        .ifPresent(medicationRequestBuilder::basedOnEMP);
+
+    // rendered and structured Dosage instructions behavior
+    val isMedCompounding =
+        medication.getMedicationType().stream()
+            .anyMatch(mT -> mT.equals(MedicationType.COMPOUNDING));
+    computeDosage(medMap, medicationRequestBuilder, isMedCompounding);
 
     // create and return the KBV Bundle
     val kbvBuilder =
@@ -179,11 +190,55 @@ public abstract class PrescriptionDataMapper {
             .statusKennzeichen(statusKennzeichen, practitioner)
             .practitioner(practitioner)
             .medicalOrganization(organization)
-            .patient(patient)
+            .patient(kbvPatient)
             .insurance(insurance)
             .medicationRequest(medicationRequestBuilder.build()) // what is the medication
             .medication(medication);
 
     return Pair.of(kbvBuilder, this.getFlowType(medMap));
+  }
+
+  private static void computeDosage(
+      Map<String, String> medMap,
+      KbvErpMedicationRequestBuilder medicationRequestBuilder,
+      boolean isMedicationCompounding) {
+
+    val frequency = medMap.get("frequency");
+    val period = medMap.get("period");
+    val value = Optional.ofNullable(medMap.get("value")).map(Long::parseLong);
+    val unit = medMap.getOrDefault("unit", "Stück");
+    val dayOfWeek = medMap.get("dayOfWeek");
+    val when = medMap.get("when");
+    val dosageText = medMap.get("Dosierung");
+
+    val isAllNull =
+        Stream.of(frequency, period, dayOfWeek, when, dosageText)
+            .filter(Objects::nonNull)
+            .toList()
+            .isEmpty();
+    if (isAllNull && isMedicationCompounding && value.isEmpty())
+      medicationRequestBuilder.dosage(GemFaker.fakerDosage() + " jeweils ein Löffel");
+
+    Optional.ofNullable(dosageText).ifPresent(medicationRequestBuilder::dosage);
+
+    val timing =
+        TimingBuilder.forRepeatComp()
+            .periodUnit(medMap.get("periodUnit"))
+            .timeOfDay(medMap.get("timeOfDay"))
+            .dayOfWeek(dayOfWeek)
+            .when(when);
+
+    if (frequency != null) {
+      timing.frequency(Integer.parseInt(frequency));
+    }
+    if (period != null) {
+      timing.period(Integer.parseInt(period));
+    }
+    value.ifPresent(
+        v ->
+            medicationRequestBuilder.dgmp(
+                DosageDgMPBuilder.dosageBuilder(value.get(), BmpDosiereinheit.fromDisplay(unit))
+                    .timing(timing.build())
+                    .build()));
   }
 }

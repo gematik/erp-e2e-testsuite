@@ -33,6 +33,7 @@ public enum UseFulCodeSystems implements WithCodeSystem {
       "https://terminologieserver.bfarm.de/fhir/CodeSystem/arzneimittel-referenzdaten-pharmazeutisches-produkt"),
   SNOMED_SCT("http://snomed.info/sct"),
   UCUM("http://unitsofmeasure.org"), // Unified Code for Units of Measure
+  DOSIEREINHEIT("https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_BMP_DOSIEREINHEIT"),
   ;
 
   private final String canonicalUrl;

@@ -23,8 +23,8 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerFutureExpirationDate;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
 
+import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import java.util.Date;

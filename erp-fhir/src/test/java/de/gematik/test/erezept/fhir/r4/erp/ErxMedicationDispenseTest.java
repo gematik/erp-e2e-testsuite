@@ -20,11 +20,14 @@
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
+import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
+import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
+import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -32,6 +35,7 @@ import java.time.ZonedDateTime;
 import lombok.val;
 import org.hl7.fhir.r4.model.MedicationDispense;
 import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.Timing;
 import org.junit.jupiter.api.Test;
 
 class ErxMedicationDispenseTest extends ErpFhirParsingTest {
@@ -74,5 +78,55 @@ class ErxMedicationDispenseTest extends ErpFhirParsingTest {
     val erxMedicationDispense = parser.decode(ErxMedicationDispense.class, content);
     assertNotNull(erxMedicationDispense);
     assertEquals("DE12345678901234", erxMedicationDispense.getRedeemCode().get().getValue());
+  }
+
+  @Test
+  void shouldGetDosageInstructionText() {
+    val dosage = DosageDgMPBuilder.dosageBuilder(4, BmpDosiereinheit.MIO_E).text("1-0-0-0").build();
+    val medDisp = ErxMedicationDispenseFaker.builder().withDgmp(dosage).fake();
+    assertEquals("1-0-0-0", medDisp.getDosageInstructionTextFirstRep());
+  }
+
+  @Test
+  void shouldGetDosageInstructionDoseUnit() {
+    val dosage =
+        DosageDgMPBuilder.dosageBuilder(4, BmpDosiereinheit.MIO_E)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(2)
+                    .periodUnit(Timing.UnitsOfTime.H)
+                    .timeOfDay("0800")
+                    .frequency(5)
+                    .build())
+            .build();
+    val medDisp =
+        ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6).withDgmp(dosage).fake();
+    assertEquals(
+        "Mio E",
+        medDisp
+            .getDosageInstructionDgMPs()
+            .get(0)
+            .getDoseAndRateFirstRep()
+            .getDoseQuantity()
+            .getUnit());
+  }
+
+  @Test
+  void shouldGetRenderedDosageInstructionOptional() {
+    val dosage =
+        DosageDgMPBuilder.dosageBuilder(4, BmpDosiereinheit.MIO_E)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(2)
+                    .periodUnit(Timing.UnitsOfTime.H)
+                    .timeOfDay("0800")
+                    .frequency(5)
+                    .build())
+            .build();
+    val medDisp =
+        ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6).withDgmp(dosage).fake();
+
+    assertEquals(
+        "alle 2 h: 0800 — je 4 Mio E", medDisp.getRenderedDosageInstructionOptional().get());
   }
 }

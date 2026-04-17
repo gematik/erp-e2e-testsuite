@@ -20,14 +20,15 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerAmount;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.mvo;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
+import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.fhir.builder.ReferenceFeatureToggle;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
@@ -43,10 +44,7 @@ import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.val;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.MedicationRequest;
-import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -181,6 +179,30 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
     val result = ValidatorUtil.encodeAndValidate(parser, bundle);
     assertTrue(result.isSuccessful());
     assertEquals("note", bundle.getMedicationRequest().getNoteText().orElse(""));
+  }
+
+  @Test
+  void buildFakeKbvErpBundleWitDosageDgMP() {
+    val dosagDGMP =
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(3)
+                    .frequency(1)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("08:00:00")
+                    .build())
+            .build();
+
+    val bundle =
+        KbvErpBundleFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withDosageDgmp(dosagDGMP)
+            .fake();
+    val result = ValidatorUtil.encodeAndValidate(parser, bundle);
+    assertTrue(result.isSuccessful());
+    assertEquals(
+        "alle 3 Tage: 08:00 Uhr — je 2 mg",
+        bundle.getMedicationRequest().getRenderedDosageInstruction().get());
   }
 
   @Test
