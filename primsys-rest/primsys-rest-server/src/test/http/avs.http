@@ -22,6 +22,14 @@ apikey: {{apikey}}
 POST {{host}}/pharm/{{pharmacy}}/dispense?taskId={{prescriptionId}}&secret={{secret}}
 apikey: {{apikey}}
 
+### close prescription as
+< {%
+  request.variables.set("prescriptionId", client.global.get("prescriptionId"))
+  request.variables.set("secret", client.global.get("secret"))
+%}
+POST {{host}}/pharm/{{pharmacy}}/close?taskId={{prescriptionId}}&secret={{secret}}
+apikey: {{apikey}}
+
 ### abort prescription as
 < {%
     request.variables.set("prescriptionId", client.global.get("prescriptionId"))

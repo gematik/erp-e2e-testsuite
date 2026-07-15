@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ package de.gematik.test.erezept.fhirdump;
 
 import static java.text.MessageFormat.format;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import io.cucumber.java.Scenario;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -39,6 +37,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.thucydides.model.domain.TestOutcome;
+import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 public class FhirDumper {
@@ -60,7 +59,7 @@ public class FhirDumper {
     try (val fileStream = Files.walk(this.basePath)) {
       fileStream.sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
     } catch (IOException e) {
-      log.warn(format("Not able to clear base path for FHIR dumps"));
+      log.warn("Not able to clear base path for FHIR dumps");
     }
 
     basePath.toFile().mkdirs();
@@ -77,9 +76,9 @@ public class FhirDumper {
 
   public void finishScenario(TestOutcome testOutcome) {
     log.info(
-        format(
-            "Finish Scenario {0} with result {1}",
-            this.currentScenario.getName(), testOutcome.getResult().getLabel()));
+        "Finish Scenario {} with result {}",
+        this.currentScenario.getName(),
+        testOutcome.getResult().getLabel());
     val summary = new ScenarioSummary();
     summary.setName(this.currentScenario.getName());
     summary.setId(this.currentScenario.getId());
@@ -106,7 +105,7 @@ public class FhirDumper {
           try (val writer = new BufferedWriter(new FileWriter(file))) {
             writer.write(content);
           } catch (IOException ioe) {
-            log.error(format("Error while writing {0}", fileName), ioe);
+            log.error("Error while writing {}", fileName, ioe);
           }
         });
   }
@@ -151,7 +150,7 @@ public class FhirDumper {
 
   @SneakyThrows
   public void writeDumpSummary() {
-    val mapper = new ObjectMapper().registerModule(new Jdk8Module());
+    val mapper = new ObjectMapper();
     val objectWriter = mapper.writerWithDefaultPrettyPrinter();
     val indexFile = basePath.resolve("fhir_dump.json").toFile();
     this.index.setRecorded(new Date());

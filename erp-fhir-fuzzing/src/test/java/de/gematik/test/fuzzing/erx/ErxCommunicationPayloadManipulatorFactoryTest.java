@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 
 package de.gematik.test.fuzzing.erx;
 
-import static de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef.PRESCRIPTION_TYPE_12;
+import static de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef.PRESCRIPTION_TYPE;
 import static de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef.SUPPLY_OPTIONS_TYPE;
-import static de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowCodeSystem.FLOW_TYPE_12;
+import static de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowCodeSystem.FLOW_TYPE;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JacksonException;
@@ -63,26 +63,31 @@ class ErxCommunicationPayloadManipulatorFactoryTest extends ErpFhirBuildingTest 
 
   @Test
   void shouldManipulateCommunicationReplyPayload() {
-    val manipulator =
+
+    val manipulators =
         ErxCommunicationPayloadManipulatorFactory.getCommunicationPayloadManipulators();
 
     val mapper = new ObjectMapper().configure(MapperFeature.ALLOW_COERCION_OF_SCALARS, false);
-    manipulator.forEach(
+
+    manipulators.forEach(
         m -> {
           val cRM =
-              new CommunicationReplyMessage(
-                  1,
-                  SupplyOptionsType.createDefault().getLabel(),
-                  GemFaker.fakerCommunicationInfoReqMessage(),
-                  "http://www.asdasd.de",
-                  "12345678",
-                  "123ewrßiokx-mclöv90ß-2331");
+              CommunicationReplyMessage.forV1()
+                  .supplyOptionsType(SupplyOptionsType.createDefault())
+                  .infoText(GemFaker.fakerCommunicationInfoReqMessage())
+                  .url("http://www.asdasd.de")
+                  .pickUpCodeHR("12345678")
+                  .pickUpCodeDMC("123ewrßiokx-mclöv90ß-2331")
+                  .build();
 
           val comRepl =
               ErxCommunicationBuilder.asReply(cRM).basedOn("test", "Test2").receiver("!").build();
+
           m.getParameter().accept(comRepl);
+
           val cont = comRepl.getPayloadFirstRep().getContent();
           val stringCont = cont.castToString(cont).getValue();
+
           assertThrows(
               JacksonException.class,
               () -> mapper.readValue(stringCont, CommunicationReplyMessage.class));
@@ -93,31 +98,36 @@ class ErxCommunicationPayloadManipulatorFactoryTest extends ErpFhirBuildingTest 
   @ValueSource(
       strings = {
         "Systems Manipulator, that changes Extension URL from PrescType to TelematikId",
-        "Systems Manipulator, that changes Extension URL from PrescType to old PrescriptionType"
-            + " Version",
       })
   void shouldManipulateExtensionUrl(String manipulatorDescription) {
+
     val manipulators =
         ErxCommunicationPayloadManipulatorFactory.getCommunicationDspRequestSystemsManipulators();
+
     val cRM =
-        new CommunicationDisReqMessage(
-            1,
-            SupplyOptionsType.createDefault().getLabel(),
-            GemFaker.fakerCommunicationInfoReqMessage(),
-            List.of("http://www.asdasd.de"),
-            "12345678",
-            "123ewrßiokx-mclöv90ß-2331");
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(SupplyOptionsType.createDefault())
+            .name(GemFaker.fakerCommunicationInfoReqMessage())
+            .addressLines(List.of("http://www.asdasd.de"))
+            .phone("12345678")
+            .hint("123ewrßiokx-mclöv90ß-2331")
+            .build();
+
     val dispRequest =
         ErxCommunicationBuilder.forDispenseRequest(cRM)
             .flowType(PrescriptionFlowType.FLOW_TYPE_200)
             .basedOn(TaskId.random().getValue(), "Test2")
             .receiver("!")
             .build();
+
     val manipulator = findManipulator(manipulators, manipulatorDescription);
+
     assertNotNull(manipulator, "Manipulator for wrong FlowType should exist");
+
     manipulator.getParameter().accept(dispRequest);
+
     assertNotEquals(
-        PRESCRIPTION_TYPE_12.getCanonicalUrl(),
+        PRESCRIPTION_TYPE.getCanonicalUrl(),
         dispRequest.getExtension().stream().findFirst().orElseThrow().getUrl(),
         "No Fitting ExtensionUrl contained");
   }
@@ -129,33 +139,38 @@ class ErxCommunicationPayloadManipulatorFactoryTest extends ErpFhirBuildingTest 
             + " TelematikId",
         "Systems Manipulator, that changes Extension.valueCoding.system from FlowType to"
             + " PrescriptionType",
-        "Systems Manipulator, that changes Extension.valueCoding.system from FlowType to Older"
-            + " FLowTypeVersion",
-        "Systems Manipulator, that changes Extension.valueCoding.system from FlowType to old"
+        "Systems Manipulator, that changes Extension.valueCoding.system from FlowType to"
             + " PrescriptionType Version"
       })
   void shouldManipulateExtensionValueCodingSystem(String manipulatorDescription) {
+
     val manipulators =
         ErxCommunicationPayloadManipulatorFactory.getCommunicationDspRequestSystemsManipulators();
+
     val cRM =
-        new CommunicationDisReqMessage(
-            1,
-            SupplyOptionsType.createDefault().getLabel(),
-            GemFaker.fakerCommunicationInfoReqMessage(),
-            List.of("http://www.asdasd.de"),
-            "12345678",
-            "123ewrßiokx-mclöv90ß-2331");
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(SupplyOptionsType.createDefault())
+            .name(GemFaker.fakerCommunicationInfoReqMessage())
+            .addressLines(List.of("http://www.asdasd.de"))
+            .phone("12345678")
+            .hint("123ewrßiokx-mclöv90ß-2331")
+            .build();
+
     val dispRequest =
         ErxCommunicationBuilder.forDispenseRequest(cRM)
             .flowType(PrescriptionFlowType.FLOW_TYPE_200)
             .basedOn(TaskId.random().getValue(), "Test2")
             .receiver("!")
             .build();
+
     val manipulator = findManipulator(manipulators, manipulatorDescription);
+
     assertNotNull(manipulator, "Manipulator for wrong FlowType should exist");
+
     manipulator.getParameter().accept(dispRequest);
+
     assertNotEquals(
-        FLOW_TYPE_12.getCanonicalUrl(),
+        FLOW_TYPE.getCanonicalUrl(),
         dispRequest.getExtension().stream()
             .findFirst()
             .orElseThrow()
@@ -171,29 +186,36 @@ class ErxCommunicationPayloadManipulatorFactoryTest extends ErpFhirBuildingTest 
         "Systems Manipulator, that changes Recipient-System to PrescriptionType",
       })
   void shouldManipulateRecipientSystemInDispRequest(String manipulatorDescription) {
+
     val manipulators =
         ErxCommunicationPayloadManipulatorFactory.getCommunicationDspRequestSystemsManipulators();
+
     val cRM =
-        new CommunicationDisReqMessage(
-            1,
-            SupplyOptionsType.createDefault().getLabel(),
-            GemFaker.fakerCommunicationInfoReqMessage(),
-            List.of("http://www.asdasd.de"),
-            "12345678",
-            "123ewrßiokx-mclöv90ß-2331");
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(SupplyOptionsType.createDefault())
+            .name(GemFaker.fakerCommunicationInfoReqMessage())
+            .addressLines(List.of("http://www.asdasd.de"))
+            .phone("12345678")
+            .hint("123ewrßiokx-mclöv90ß-2331")
+            .build();
+
     val dispRequest =
         ErxCommunicationBuilder.forDispenseRequest(cRM)
             .flowType(PrescriptionFlowType.FLOW_TYPE_200)
             .basedOn(TaskId.random().getValue(), "Test2")
             .receiver("!")
             .build();
+
     val manipulator = findManipulator(manipulators, manipulatorDescription);
+
     assertNotNull(manipulator, "Manipulator for wrong FlowType should exist");
+
     manipulator.getParameter().accept(dispRequest);
+
     assertNotEquals(
         TelematikID.random().getSystem(),
         dispRequest.getRecipientFirstRep().getIdentifier().getSystem(),
-        "No Fitting Extension.valueCoding.system contained");
+        "No fitting recipient system contained");
   }
 
   @ParameterizedTest
@@ -202,26 +224,32 @@ class ErxCommunicationPayloadManipulatorFactoryTest extends ErpFhirBuildingTest 
         "Systems Manipulator, who set TelematikId-System into recipient.identifier.system",
       })
   void shouldManipulateRecipientSystem(String manipulatorDescription) {
+
     val manipulators =
         ErxCommunicationPayloadManipulatorFactory.getCommunicationReplySystemsManipulators();
+
     val cRM =
-        new CommunicationReplyMessage(
-            1,
-            SupplyOptionsType.createDefault().getLabel(),
-            GemFaker.fakerCommunicationInfoReqMessage(),
-            "http://www.asdasd.de",
-            "12345678",
-            "123ewrßiokx-mclöv90ß-2331");
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(SupplyOptionsType.createDefault())
+            .infoText(GemFaker.fakerCommunicationInfoReqMessage())
+            .url("http://www.asdasd.de")
+            .pickUpCodeHR("12345678")
+            .pickUpCodeDMC("123ewrßiokx-mclöv90ß-2331")
+            .build();
+
     val comRepl =
         ErxCommunicationBuilder.asReply(cRM).basedOn("test", "Test2").receiver("!").build();
 
     val manipulator = findManipulator(manipulators, manipulatorDescription);
+
     assertNotNull(manipulator);
+
     manipulator.getParameter().accept(comRepl);
+
     assertNotEquals(
         KVNR.random().getSystem(),
         comRepl.getRecipient().stream().findFirst().orElseThrow().getIdentifier().getSystem(),
-        "No Fitting FlowType-System contained");
+        "No fitting recipient system contained");
   }
 
   @ParameterizedTest
@@ -230,26 +258,32 @@ class ErxCommunicationPayloadManipulatorFactoryTest extends ErpFhirBuildingTest 
         "Systems Manipulator, who set payload.extension.url into sender-System",
       })
   void shouldManipulateTelematikIdSystem(String manipulatorDescription) {
+
     val manipulators =
         ErxCommunicationPayloadManipulatorFactory.getCommunicationReplySystemsManipulators();
+
     val cRM =
-        new CommunicationReplyMessage(
-            1,
-            SupplyOptionsType.createDefault().getLabel(),
-            GemFaker.fakerCommunicationInfoReqMessage(),
-            "http://www.asdasd.de",
-            "12345678",
-            "123ewrßiokx-mclöv90ß-2331");
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(SupplyOptionsType.createDefault())
+            .infoText(GemFaker.fakerCommunicationInfoReqMessage())
+            .url("http://www.asdasd.de")
+            .pickUpCodeHR("12345678")
+            .pickUpCodeDMC("123ewrßiokx-mclöv90ß-2331")
+            .build();
+
     val comRepl =
         ErxCommunicationBuilder.asReply(cRM).basedOn("test", "Test2").receiver("!").build();
 
     val manipulator = findManipulator(manipulators, manipulatorDescription);
+
     assertNotNull(manipulator);
+
     manipulator.getParameter().accept(comRepl);
+
     assertNotEquals(
         TelematikID.random().getSystem(),
         comRepl.getSender().getIdentifier().getSystem(),
-        "No Fitting FlowType-System contained");
+        "No fitting TelematikID system contained");
   }
 
   @ParameterizedTest
@@ -257,27 +291,33 @@ class ErxCommunicationPayloadManipulatorFactoryTest extends ErpFhirBuildingTest 
       strings = {
         "Systems Manipulator, who set TelematikId into payload.extension.url",
       })
-  void shouldManipulatePyloadSystem(String manipulatorDescription) {
+  void shouldManipulatePayloadSystem(String manipulatorDescription) {
+
     val manipulators =
         ErxCommunicationPayloadManipulatorFactory.getCommunicationReplySystemsManipulators();
+
     val cRM =
-        new CommunicationReplyMessage(
-            1,
-            SupplyOptionsType.createDefault().getLabel(),
-            GemFaker.fakerCommunicationInfoReqMessage(),
-            "http://www.asdasd.de",
-            "12345678",
-            "123ewrßiokx-mclöv90ß-2331");
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(SupplyOptionsType.createDefault())
+            .infoText(GemFaker.fakerCommunicationInfoReqMessage())
+            .url("http://www.asdasd.de")
+            .pickUpCodeHR("12345678")
+            .pickUpCodeDMC("123ewrßiokx-mclöv90ß-2331")
+            .build();
+
     val comRepl =
         ErxCommunicationBuilder.asReply(cRM).basedOn("test", "Test2").receiver("!").build();
 
     val manipulator = findManipulator(manipulators, manipulatorDescription);
+
     assertNotNull(manipulator);
+
     manipulator.getParameter().accept(comRepl);
+
     assertNotEquals(
         SUPPLY_OPTIONS_TYPE.getCanonicalUrl(),
         comRepl.getPayloadFirstRep().getExtensionFirstRep().getUrl(),
-        "No Fitting FlowType-System contained");
+        "No fitting SupplyOption system contained");
   }
 
   /**

@@ -1,4 +1,4 @@
-FROM bellsoft/liberica-openjdk-alpine:17
+FROM bellsoft/liberica-openjdk-alpine:21
 
 ARG COMMIT_HASH
 ARG VERSION

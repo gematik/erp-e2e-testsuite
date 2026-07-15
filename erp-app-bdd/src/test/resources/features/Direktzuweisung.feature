@@ -39,9 +39,9 @@ Funktionalität: E-Rezepte als Direktzuweisung
     Wenn die Ärztin Dr. Schraßer der Versicherten Alice ein Medikament verschreibt und der Apotheke Am Flughafen direkt zuweist
     Und der Versicherten Alice das letzte E-Rezept in der App angezeigt wird
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
-    Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensiert
-    Dann hat die Apotheke genau eine Quittung vorliegen
-    # TODO: check prescription archive as Alice
+    Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt an Alice dispensiert
+    Dann hat die Apotheke Am Flughafen genau eine Quittung vorliegen
+    Und hat die Versicherte Alice das letzte E-Rezept elektronisch erhalten
 
   @TCID:ERP_FDV_GKV_DIREKTZUWEISUNG_02
   @Versicherung:PKV
@@ -53,9 +53,9 @@ Funktionalität: E-Rezepte als Direktzuweisung
     Wenn die Ärztin Dr. Schraßer der Versicherten Alice ein Medikament verschreibt und der Apotheke Am Flughafen direkt zuweist
     Und der Versicherten Alice das letzte E-Rezept in der App angezeigt wird
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
-    Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt dispensiert
-    Dann hat die Apotheke genau eine Quittung vorliegen
-    # TODO: check prescription archive as Alice
+    Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt an Alice dispensiert
+    Dann hat die Apotheke Am Flughafen genau eine Quittung vorliegen
+    Und hat die Versicherte Alice das letzte E-Rezept elektronisch erhalten
 
   @TCID:ERP_FDV_GKV_DIREKTZUWEISUNG_03
   @Funktionalität:Löschen

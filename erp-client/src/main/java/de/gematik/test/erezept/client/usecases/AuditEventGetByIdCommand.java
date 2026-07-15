@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,18 +24,11 @@ import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import java.util.Optional;
-import org.hl7.fhir.r4.model.Resource;
 
-public class AuditEventGetByIdCommand extends BaseCommand<ErxAuditEventBundle> {
+public class AuditEventGetByIdCommand extends ErpBaseCommand<ErxAuditEventBundle> {
 
   public AuditEventGetByIdCommand(PrescriptionId prescriptionId) {
     super(ErxAuditEventBundle.class, HttpRequestMethod.GET, "Task", prescriptionId.getValue());
     queryParameters.add(new QueryParameter("_revinclude", "AuditEvent:entity.what"));
-  }
-
-  @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.empty();
   }
 }

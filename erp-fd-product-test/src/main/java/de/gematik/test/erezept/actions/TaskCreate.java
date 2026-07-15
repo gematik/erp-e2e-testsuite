@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,8 @@ public class TaskCreate extends ErpAction<ErxTask> {
   @Step("{0} erstellt einen neuen Task mit FlowType #flowType")
   public ErpInteraction<ErxTask> answeredBy(Actor actor) {
     val cmd = new TaskCreateCommand(flowType);
-    cmd.getRequestBody().ifPresent(body -> manipulator.forEach(m -> m.accept((Parameters) body)));
+    val body = cmd.getRequestBody();
+    manipulator.forEach(m -> m.accept((Parameters) body));
     return this.performCommandAs(cmd, actor);
   }
 

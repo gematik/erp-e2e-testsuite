@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,10 @@
 
 package de.gematik.test.erezept.fhir.values.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import tools.jackson.databind.ObjectMapper;
 
 public interface CommunicationStructuredMessage {
-
-  int DEFAULT_VERSION = 1;
 
   @SneakyThrows
   default String asJson() {

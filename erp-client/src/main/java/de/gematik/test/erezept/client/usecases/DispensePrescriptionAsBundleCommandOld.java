@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import java.util.List;
-import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
 /**
@@ -75,7 +74,7 @@ import org.hl7.fhir.r4.model.Resource;
  */
 @Deprecated(since = "Fachdienst 1.21.0")
 public class DispensePrescriptionAsBundleCommandOld
-    extends BaseCommand<ErxMedicationDispenseBundle> {
+    extends ErpBaseCommand<ErxMedicationDispenseBundle> {
   private List<ErxMedicationDispense> medicationDispenses;
   private GemDispenseOperationParameters dispenseParameters;
 
@@ -134,11 +133,12 @@ public class DispensePrescriptionAsBundleCommandOld
    * otherwise builds an {@link ErxMedicationDispenseBundle} from provided resources.
    */
   @Override
-  public Optional<Resource> getRequestBody() {
+  public Resource getRequestBody() {
     // for newer profiles the closeParameters are used and preferred here
     if (dispenseParameters != null) {
-      return Optional.of(dispenseParameters);
+      return dispenseParameters;
+    } else {
+      return ErxMedicationDispenseBundleBuilder.of(medicationDispenses).build();
     }
-    return Optional.of(ErxMedicationDispenseBundleBuilder.of(medicationDispenses).build());
   }
 }

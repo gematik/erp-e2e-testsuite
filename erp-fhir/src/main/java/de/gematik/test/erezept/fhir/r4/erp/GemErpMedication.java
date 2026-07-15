@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,16 @@ import org.hl7.fhir.r4.model.*;
 @SuppressWarnings({"java:S110"})
 public class GemErpMedication extends Medication implements ErpFhirResource {
 
+  /**
+   * Erstellt eine {@link GemErpMedication} aus einer gegebenen {@link Medication}.
+   *
+   * <p>Wenn {@code adaptee} bereits eine {@link GemErpMedication} ist, wird dieselbe Instanz
+   * zurückgegeben. Andernfalls wird eine neue {@link GemErpMedication} erzeugt und mit {@link
+   * Medication#copyValues(org.hl7.fhir.r4.model.Resource)} aus {@code adaptee} befüllt.
+   *
+   * @param adaptee die zu adaptierende Medication (darf nicht {@code null} sein)
+   * @return eine {@link GemErpMedication} Instanz mit den Werten aus {@code adaptee}
+   */
   public static GemErpMedication fromMedication(Medication adaptee) {
     if (adaptee instanceof GemErpMedication erpMedication) {
       return erpMedication;
@@ -63,6 +73,15 @@ public class GemErpMedication extends Medication implements ErpFhirResource {
     }
   }
 
+  /**
+   * Convenience-Overload für {@link #fromMedication(Medication)}.
+   *
+   * <p>Erwartet, dass {@code adaptee} vom Typ {@link Medication} ist.
+   *
+   * @param adaptee die zu adaptierende Resource (muss eine {@link Medication} sein)
+   * @return eine {@link GemErpMedication} Instanz mit den Werten aus {@code adaptee}
+   * @throws ClassCastException falls {@code adaptee} keine {@link Medication} ist
+   */
   public static GemErpMedication fromMedication(Resource adaptee) {
     return fromMedication((Medication) adaptee);
   }
@@ -70,8 +89,9 @@ public class GemErpMedication extends Medication implements ErpFhirResource {
   /**
    * this Method mocks the second medication in KombiPackung by duplicate the first one
    *
-   * @param medication
-   * @return GemMedication containing 2 medications
+   * @param medication die Basis-Medikation, die für beide Komponenten der Kombipackung dupliziert
+   *     wird
+   * @return {@link GemErpMedication} als Kombipackung, die zwei Medikamente enthält
    */
   public static GemErpMedication getKombipackungFrom(KbvErpMedication medication) {
     return getKombipackungFrom(medication, medication);

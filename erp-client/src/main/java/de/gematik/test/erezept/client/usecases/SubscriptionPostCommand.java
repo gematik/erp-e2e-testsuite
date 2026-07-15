@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,11 @@ package de.gematik.test.erezept.client.usecases;
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.builder.erp.SubscriptionBuilder;
 import java.util.Arrays;
-import java.util.Optional;
 import lombok.NonNull;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Subscription;
 
-public class SubscriptionPostCommand extends BaseCommand<Subscription> {
+public class SubscriptionPostCommand extends ErpBaseCommand<Subscription> {
 
   public enum CRITERIA {
     COMMUNICATION;
@@ -54,7 +53,7 @@ public class SubscriptionPostCommand extends BaseCommand<Subscription> {
   }
 
   @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.of(SubscriptionBuilder.forCriteria(this.criteria).build());
+  public Resource getRequestBody() {
+    return SubscriptionBuilder.forCriteria(this.criteria).build();
   }
 }

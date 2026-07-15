@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifie
 import static de.gematik.test.core.expectations.verifier.pki.OCSPRespVerifier.*;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.konnektor.SoftKonSigner;
+import de.gematik.bbriccs.konnektor.utils.OcspTokenGenerator;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -39,8 +41,6 @@ import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.screenplay.abilities.UseHBA;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.toggle.PkiQesRsaEnableToggle;
-import de.gematik.test.konnektor.soap.mock.LocalSigner;
-import de.gematik.test.konnektor.soap.mock.utils.OcspTokenGenerator;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -73,7 +73,7 @@ class ActivateTaskQesIT extends ErpTest {
   void activateQesWithoutOcspResp() {
     val hba = SafeAbility.getAbility(doctor, UseHBA.class).getHba();
     Function<String, byte[]> signingFunc =
-        data -> LocalSigner.signQES(hba, CryptoSystem.ECC_256).signDocument(false, data);
+        data -> SoftKonSigner.signQES(hba, CryptoSystem.ECC_256).signDocument(false, data);
     val activateResp =
         doctor.performs(
             IssuePrescription.forPatient(sina)
@@ -97,7 +97,7 @@ class ActivateTaskQesIT extends ErpTest {
             .asOnlineToken();
     Function<String, byte[]> signingFunc =
         data ->
-            LocalSigner.signQES(hba, CryptoSystem.ECC_256)
+            SoftKonSigner.signQES(hba, CryptoSystem.ECC_256)
                 .signDocument(List.of(ocspToken), data.getBytes(StandardCharsets.UTF_8));
     val activateResp =
         doctor.performs(
@@ -124,7 +124,7 @@ class ActivateTaskQesIT extends ErpTest {
     val isRsaEnable = featureConf.getToggle(new PkiQesRsaEnableToggle());
     val hba = SafeAbility.getAbility(doctor, UseHBA.class).getHba();
     Function<String, byte[]> signingFunc =
-        data -> LocalSigner.signQES(hba, CryptoSystem.RSA_2048).signDocument(false, data);
+        data -> SoftKonSigner.signQES(hba, CryptoSystem.RSA_2048).signDocument(false, data);
     val activateResp =
         doctor.performs(
             IssuePrescription.forPatient(sina)
@@ -160,7 +160,7 @@ class ActivateTaskQesIT extends ErpTest {
             .asSelfSignedToken(ZonedDateTime.now(), ZonedDateTime.now().minusDays(5));
     Function<String, byte[]> signingFunc =
         data ->
-            LocalSigner.signQES(hba, CryptoSystem.ECC_256)
+            SoftKonSigner.signQES(hba, CryptoSystem.ECC_256)
                 .signDocument(List.of(ocspToken), data.getBytes(StandardCharsets.UTF_8));
     val activateResp =
         doctor.performs(
@@ -194,7 +194,7 @@ class ActivateTaskQesIT extends ErpTest {
             .asOnlineToken();
     Function<String, byte[]> signingFunc =
         data ->
-            LocalSigner.signQES(hba, CryptoSystem.ECC_256)
+            SoftKonSigner.signQES(hba, CryptoSystem.ECC_256)
                 .signDocument(List.of(ocspToken), data.getBytes(StandardCharsets.UTF_8));
     val activateResp =
         doctor.performs(
@@ -226,7 +226,7 @@ class ActivateTaskQesIT extends ErpTest {
             .asSelfSignedRevokedToken(ZonedDateTime.now(), ZonedDateTime.now().minusDays(5));
     Function<String, byte[]> signingFunc =
         data ->
-            LocalSigner.signQES(hba, CryptoSystem.ECC_256)
+            SoftKonSigner.signQES(hba, CryptoSystem.ECC_256)
                 .signDocument(List.of(ocspToken), data.getBytes(StandardCharsets.UTF_8));
     val activateResp =
         doctor.performs(

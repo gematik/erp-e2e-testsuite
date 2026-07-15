@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ package de.gematik.test.erezept.screenplay.util;
 
 import static java.text.MessageFormat.format;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -41,6 +40,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 public class DataMatrixCodeGenerator {
@@ -87,7 +87,6 @@ public class DataMatrixCodeGenerator {
     }
   }
 
-  @SneakyThrows
   public static BitMatrix generateDmc(String taskId, AccessCode accessCode) {
     val taskReference = format("Task/{0}/$accept?ac={1}", taskId, accessCode.getValue());
     val obj = new DmcContent();

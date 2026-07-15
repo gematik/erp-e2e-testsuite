@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,19 +29,39 @@ import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.client.usecases.AuditEventGetCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import java.util.Map;
 import lombok.val;
+import org.hl7.fhir.r4.model.OperationOutcome;
 import org.junit.jupiter.api.Test;
 
 class DownloadAuditEventTest extends ErpFhirBuildingTest {
+
+  @Test
+  void shouldHandleNonBundleResponse() {
+    val useErpClient = mock(UseTheErpClient.class);
+
+    val patient = new PatientActor("sina");
+    patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.from("X123456789"), patient.getName()));
+    patient.can(useErpClient);
+
+    val resource = new OperationOutcome();
+
+    val response =
+        FhirBResponse.forPayload(ErxAuditEventBundle.class, resource)
+            .withStatusCode(200)
+            .andValidationResult(createEmptyValidationResult());
+
+    when(useErpClient.request(any(AuditEventGetCommand.class))).thenReturn(response);
+
+    assertDoesNotThrow(() -> patient.performs(DownloadAuditEvent.orderByDateDesc()));
+  }
 
   @Test
   void shouldPerformCorrectCommand() {
@@ -56,9 +76,8 @@ class DownloadAuditEventTest extends ErpFhirBuildingTest {
 
     val resource = createErxAuditEventBundle(agentId, agentName);
     val response =
-        ErpResponse.forPayload(resource, ErxAuditEventBundle.class)
+        FhirBResponse.forPayload(ErxAuditEventBundle.class, resource)
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(AuditEventGetCommand.class))).thenReturn(response);
 
@@ -78,9 +97,8 @@ class DownloadAuditEventTest extends ErpFhirBuildingTest {
 
     val resource = createErxAuditEventBundle(agentId, agentName);
     val response =
-        ErpResponse.forPayload(resource, ErxAuditEventBundle.class)
+        FhirBResponse.forPayload(ErxAuditEventBundle.class, resource)
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(AuditEventGetCommand.class))).thenReturn(response);
 

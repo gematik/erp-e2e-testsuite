@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,12 @@ import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.MedicationDispenseDetails;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionTechnicalInformation;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionsViewElement;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.MedicationDispenseSearchByIdCommand;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
@@ -53,7 +53,6 @@ import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -84,9 +83,8 @@ class HasReceivedDispensedMedicationTest extends ErpFhirParsingTest {
 
     // make sure the teardown does not run into an NPE
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, createOperationOutcome())
             .withStatusCode(404)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(erpClientAbility.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
   }
@@ -136,14 +134,12 @@ class HasReceivedDispensedMedicationTest extends ErpFhirParsingTest {
                     .fake()));
 
     val getTaskResponse =
-        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, prescriptionBundle)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
 
     val medicationDispenseResponse =
-        ErpResponse.forPayload(medicationDispenses, ErxMedicationDispenseBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxMedicationDispenseBundle.class, medicationDispenses)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
 
@@ -199,14 +195,12 @@ class HasReceivedDispensedMedicationTest extends ErpFhirParsingTest {
                     .fake()));
 
     val getTaskResponse =
-        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, prescriptionBundle)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
 
     val medicationDispenseResponse =
-        ErpResponse.forPayload(medicationDispenses, ErxMedicationDispenseBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxMedicationDispenseBundle.class, medicationDispenses)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
 
@@ -231,8 +225,7 @@ class HasReceivedDispensedMedicationTest extends ErpFhirParsingTest {
     val dispensedMedications = actor.abilityTo(ReceiveDispensedDrugs.class);
     dispensedMedications.append(PrescriptionId.random(), Instant.now());
     val getTaskResponse =
-        ErpResponse.forPayload(createOperationOutcome(), ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, createOperationOutcome())
             .withStatusCode(404)
             .andValidationResult(createEmptyValidationResult());
 
@@ -272,14 +265,12 @@ class HasReceivedDispensedMedicationTest extends ErpFhirParsingTest {
     when(kbvBundle.getMedicationRequest().isMultiple()).thenReturn(false);
 
     val getTaskResponse =
-        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, prescriptionBundle)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
 
     val medicationDispenseResponse =
-        ErpResponse.forPayload(createOperationOutcome(), ErxMedicationDispenseBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxMedicationDispenseBundle.class, createOperationOutcome())
             .withStatusCode(404)
             .andValidationResult(createEmptyValidationResult());
 

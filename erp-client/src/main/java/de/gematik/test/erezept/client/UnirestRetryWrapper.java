@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ package de.gematik.test.erezept.client;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.toggle.FeatureToggle;
 import de.gematik.test.erezept.client.vau.VauException;
 import java.io.IOException;
 import java.net.http.HttpConnectTimeoutException;
@@ -35,7 +36,8 @@ import lombok.val;
 public class UnirestRetryWrapper {
 
   private static final int MAX_CONNECT_ATTEMPTS = 12;
-  public static final int CONNECT_TIMEOUT = 10; // in seconds
+  public static final int CONNECT_TIMEOUT =
+      FeatureToggle.getIntegerToggle("vau.connection.timeout", 10); // in seconds
 
   /**
    * due to issues while executing on jenkins we need to retry the request because of sporadic {@see

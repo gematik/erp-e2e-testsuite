@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import de.gematik.test.erezept.app.mobile.elements.OperatingSystem;
 import de.gematik.test.erezept.app.questions.HasSentDispReq;
 import de.gematik.test.erezept.app.questions.MovingToPrescription;
 import de.gematik.test.erezept.app.task.EnsureTheCorrectProfile;
+import de.gematik.test.erezept.app.task.RefreshPrescriptions;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
@@ -64,9 +65,8 @@ public class AssignPrescriptionToPharmacyOnIos implements Task {
         format(
             "{0} überprüft die Darstellung von dem {1} ausgestellten E-Rezept",
             actor.getName(), deque));
-    app.tap(Mainscreen.REFRESH_BUTTON);
-    // Note: we wait a long time here to make sure the prescription is created and loaded
-    app.longPauseApp();
+
+    actor.attemptsTo(RefreshPrescriptions.byTap());
 
     val prescriptionBundle =
         actor

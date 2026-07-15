@@ -7,7 +7,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.4.0</version>
+        <version>1.6.0</version>
     </parent>
 
     <artifactId>erp-tools</artifactId>
@@ -19,14 +19,8 @@
     </modules>
     <packaging>pom</packaging>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencyManagement>
-
         <dependencies>
             <dependency>
                 <groupId>org.slf4j</groupId>

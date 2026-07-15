@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,7 @@
 
 package de.gematik.test.erezept.toggle;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.toggle.BooleanToggle;
 import java.util.stream.Stream;
@@ -62,7 +60,8 @@ class BooleanToggleTest {
         Arguments.of(new AnrValidationConfigurationIsErrorToggle()),
         Arguments.of(new EgkPharmacyAcceptPN3Toggle()),
         Arguments.of(new FhirCloseSlicingToggle()),
-        Arguments.of(new ErpDarreichungsformAprilActive()),
+        Arguments.of(new KbvDmpKennzeichenOktober26()),
+        Arguments.of(new ErpDarreichungsformJuly26Active()),
         Arguments.of(new EgkPharmacyEnforceHcvCheck()),
         Arguments.of(new ErpEnableCheckExclusionPayor()),
         Arguments.of(new PkiQesRsaEnableToggle()),

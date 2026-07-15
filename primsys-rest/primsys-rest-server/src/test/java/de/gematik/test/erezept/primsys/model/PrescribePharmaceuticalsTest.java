@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.EncodingType;
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
@@ -53,7 +54,6 @@ import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import lombok.val;
@@ -86,15 +86,13 @@ class PrescribePharmaceuticalsTest extends TestWithActorContext {
     when(draftErxTask.getAccessCode()).thenReturn(accessCode);
 
     val createResponse =
-        ErpResponse.forPayload(draftErxTask, ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, draftErxTask)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     val activateResponse =
-        ErpResponse.forPayload(activatedErxTask, ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, activatedErxTask)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
@@ -119,6 +117,7 @@ class PrescribePharmaceuticalsTest extends TestWithActorContext {
     val doctor = ctx.getDoctors().get(0);
     val mockClient = doctor.getClient();
 
+    val customKvnr = KVNR.random().getValue();
     val accessCode = AccessCode.random();
     val taskId = TaskId.from("123");
     val activatedErxTask = new ErxTask();
@@ -135,15 +134,13 @@ class PrescribePharmaceuticalsTest extends TestWithActorContext {
     when(draftErxTask.getAccessCode()).thenReturn(accessCode);
 
     val createResponse =
-        ErpResponse.forPayload(draftErxTask, ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, draftErxTask)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     val activateResponse =
-        ErpResponse.forPayload(activatedErxTask, ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, activatedErxTask)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
@@ -156,7 +153,10 @@ class PrescribePharmaceuticalsTest extends TestWithActorContext {
     val kbvBundle = KbvErpBundleFaker.builder().withPractitioner(practitioner).fake();
     val kbvBundleXml = parser.encode(kbvBundle, EncodingType.XML);
     try (val response =
-        PrescribePharmaceuticals.as(doctor).asDirectAssignment().withKbvBundle(kbvBundleXml)) {
+        PrescribePharmaceuticals.as(doctor)
+            .forCustomKvnr(customKvnr)
+            .asDirectAssignment()
+            .withKbvBundle(kbvBundleXml)) {
       val resMap = (PrescriptionDto) response.getEntity();
       assertTrue(response.hasEntity());
       assertEquals(taskId.getValue(), resMap.getTaskId());
@@ -228,8 +228,7 @@ class PrescribePharmaceuticalsTest extends TestWithActorContext {
     prescribeRequest.setPatient(patientDto);
 
     val createResponse =
-        ErpResponse.forPayload(createOperationOutcome(), ErxTask.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxTask.class, createOperationOutcome())
             .withStatusCode(401)
             .andValidationResult(createEmptyValidationResult());
 
@@ -272,15 +271,13 @@ class PrescribePharmaceuticalsTest extends TestWithActorContext {
     when(draftErxTask.getAccessCode()).thenReturn(accessCode);
 
     val createResponse =
-        ErpResponse.forPayload(draftErxTask, ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, draftErxTask)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     val activateResponse =
-        ErpResponse.forPayload(activatedErxTask, ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, activatedErxTask)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
@@ -319,15 +316,13 @@ class PrescribePharmaceuticalsTest extends TestWithActorContext {
     when(erxTask.getAccessCode()).thenReturn(accessCode);
 
     val createResponse =
-        ErpResponse.forPayload(erxTask, ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, erxTask)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     val activateResponse =
-        ErpResponse.forPayload(erxTask, ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, erxTask)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);

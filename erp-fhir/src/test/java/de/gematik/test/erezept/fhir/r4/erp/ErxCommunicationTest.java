@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.val;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Communication;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.ResourceType;
@@ -175,6 +177,31 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
                   communication.getBasedOnAccessCodeString().orElseThrow());
               assertEquals(
                   TaskId.from("160.000.033.491.280.78"), communication.getBasedOnReferenceId());
+            });
+  }
+
+  /**
+   * HAPI appears to drop the leading resource path (/Task/...) when decoding communication bundles.
+   * This test covers the bundle case and the workaround {@link
+   * de.gematik.test.erezept.fhir.parser.FhirParser#fixBeforeDecode(String)}; the single resource
+   * case is covered by {@link #shouldMatchBasedOnReference()}.
+   */
+  @Test
+  void shouldProperlyDecodeBasedOnReferences() {
+    val content =
+        ResourceLoader.readFileFromResource(
+            "fhir/valid/erp/1.5.0/communicationbundle/Bundle-3102c63c-1f98-41b7-96e2-4e4b7dc2a8b9.xml");
+
+    val bundle = parser.decode(Bundle.class, content);
+
+    bundle.getEntry().stream()
+        .map(BundleEntryComponent::getResource)
+        .filter(it -> it.getResourceType().equals(ResourceType.Communication))
+        .map(it -> (ErxCommunication) it)
+        .forEach(
+            resource -> {
+              val pid = resource.getBasedOnReferenceId().toPrescriptionId();
+              assertTrue(pid.check());
             });
   }
 

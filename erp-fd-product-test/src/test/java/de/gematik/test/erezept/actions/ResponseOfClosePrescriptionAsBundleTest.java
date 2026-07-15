@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,20 @@
 
 package de.gematik.test.erezept.actions;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.konnektor.SoftKonSigner;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
@@ -49,9 +47,7 @@ import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.konnektor.soap.mock.LocalSigner;
 import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
@@ -65,7 +61,7 @@ class ResponseOfClosePrescriptionAsBundleTest extends ErpFhirBuildingTest {
   @BeforeAll
   public static void setUp() {
     val hba = SmartcardArchive.fromResources().getHbaByICCSN("80276001011699901501");
-    exampleQes = LocalSigner.signQES(hba, CryptoSystem.ECC_256).signDocument(false, "Empty");
+    exampleQes = SoftKonSigner.signQES(hba, CryptoSystem.ECC_256).signDocument(false, "Empty");
   }
 
   @Test
@@ -83,25 +79,23 @@ class ResponseOfClosePrescriptionAsBundleTest extends ErpFhirBuildingTest {
     val manipulatedKvnr = KVNR.from("Z123123123");
 
     doAnswer(
-            (Answer<ErpResponse<ErxReceipt>>)
+            (Answer<FhirBResponse<ErxReceipt>>)
                 invovation -> {
                   val args = invovation.getArguments();
                   val cmd = (CloseTaskCommand) args[0];
-                  assertTrue(cmd.getRequestBody().isPresent());
+                  assertNotNull(cmd.getRequestBody());
 
-                  assertInstanceOf(
-                      GemCloseOperationParameters.class, cmd.getRequestBody().orElseThrow());
+                  assertInstanceOf(GemCloseOperationParameters.class, cmd.getRequestBody());
 
-                  return ErpResponse.forPayload(createOperationOutcome(), ErxReceipt.class)
+                  return FhirBResponse.forPayload(ErxReceipt.class, createOperationOutcome())
                       .withStatusCode(404)
-                      .withHeaders(Map.of())
                       .andValidationResult(createEmptyValidationResult());
                 })
         .when(useErpClient)
         .request(any(CloseTaskCommand.class));
 
     val mockAcceptBundle = mock(ErxAcceptBundle.class);
-    val mockResponse = (ErpResponse<ErxAcceptBundle>) mock(ErpResponse.class);
+    val mockResponse = (FhirBResponse<ErxAcceptBundle>) mock(FhirBResponse.class);
     val mockAcceptInteraction = new ErpInteraction<>(mockResponse);
     val mockTask = mock(ErxTask.class);
     val hba = SmartcardArchive.fromResources().getHbaByICCSN("80276001011699901501");
@@ -112,7 +106,7 @@ class ResponseOfClosePrescriptionAsBundleTest extends ErpFhirBuildingTest {
     when(mockAcceptBundle.getTask()).thenReturn(mockTask);
     when(mockAcceptBundle.getSignedKbvBundle()).thenReturn(exampleQes);
     when(mockAcceptBundle.getSignedKbvBundle())
-        .thenReturn(LocalSigner.signQES(hba, CryptoSystem.ECC_256).signDocument(false, "Empty"));
+        .thenReturn(SoftKonSigner.signQES(hba, CryptoSystem.ECC_256).signDocument(false, "Empty"));
     when(mockTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
     when(mockTask.getForKvnr()).thenReturn(Optional.of(KVNR.from("X123456789")));
     when(useErpClient.decode(eq(KbvErpBundle.class), any()))
@@ -138,7 +132,7 @@ class ResponseOfClosePrescriptionAsBundleTest extends ErpFhirBuildingTest {
     pharmacy.can(useSmcb);
 
     val mockAcceptBundle = mock(ErxAcceptBundle.class);
-    val mockResponse = (ErpResponse<ErxAcceptBundle>) mock(ErpResponse.class);
+    val mockResponse = (FhirBResponse<ErxAcceptBundle>) mock(FhirBResponse.class);
     val mockAcceptInteraction = new ErpInteraction<>(mockResponse);
     val mockTask = mock(ErxTask.class);
 
@@ -171,7 +165,7 @@ class ResponseOfClosePrescriptionAsBundleTest extends ErpFhirBuildingTest {
     pharmacy.can(useSmcb);
 
     val mockAcceptBundle = mock(ErxAcceptBundle.class);
-    val mockResponse = (ErpResponse<ErxAcceptBundle>) mock(ErpResponse.class);
+    val mockResponse = (FhirBResponse<ErxAcceptBundle>) mock(FhirBResponse.class);
     val mockAcceptInteraction = new ErpInteraction<>(mockResponse);
     val mockTask = mock(ErxTask.class);
 
@@ -203,7 +197,7 @@ class ResponseOfClosePrescriptionAsBundleTest extends ErpFhirBuildingTest {
     pharmacy.can(useSmcb);
 
     val mockAcceptBundle = mock(ErxAcceptBundle.class);
-    val mockResponse = (ErpResponse<ErxAcceptBundle>) mock(ErpResponse.class);
+    val mockResponse = (FhirBResponse<ErxAcceptBundle>) mock(FhirBResponse.class);
     val mockAcceptInteraction = new ErpInteraction<>(mockResponse);
     val mockTask = mock(ErxTask.class);
 

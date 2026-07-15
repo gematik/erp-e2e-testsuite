@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,25 +20,18 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import lombok.val;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
 class ErxMedicationDispenseBundleBuilderTest extends ErpFhirParsingTest {
 
@@ -82,35 +75,18 @@ class ErxMedicationDispenseBundleBuilderTest extends ErpFhirParsingTest {
     assertEquals(2, bundle.getEntry().size());
   }
 
-  @Disabled("no validation profiles for erp-workflow:1.3") // TODO: remove test
-  @ParameterizedTest
-  @MethodSource
-  void shouldHaveProfileForOldProfiles(
-      ErpWorkflowVersion erpWorkflowVersion, KbvItaErpVersion kbvItaErpVersion) {
-    val kvnr = KVNR.random();
-    val performerId = GemFaker.fakerTelematikId();
-    val prescriptionId = PrescriptionId.random();
-    val builder = ErxMedicationDispenseBundleBuilder.empty().version(erpWorkflowVersion);
-
-    IntStream.range(0, 3)
-        .forEach(
-            idx ->
-                builder.add(
-                    ErxMedicationDispenseFaker.builder(erpWorkflowVersion)
-                        .withKvnr(kvnr)
-                        .withPerformer(performerId)
-                        .withPrescriptionId(prescriptionId)
-                        .withMedication(KbvErpMedicationPZNFaker.builder(kbvItaErpVersion).fake())
-                        .fake()));
-
-    val bundle = builder.build();
-
-    assertTrue(ValidatorUtil.encodeAndValidate(parser, bundle).isSuccessful());
-    assertFalse(bundle.getMeta().getProfile().isEmpty());
-    assertTrue(ErpWorkflowStructDef.CLOSE_OPERATION_BUNDLE.matches(bundle.getMeta()));
-  }
-
-  static Stream<Arguments> shouldHaveProfileForOldProfiles() {
-    return Stream.of(Arguments.of(ErpWorkflowVersion.V1_3, KbvItaErpVersion.V1_1_0));
+  @Test
+  void shouldSetCorrectVersion() {
+    val bundle = ErxMedicationDispenseBundleFaker.build(ErpWorkflowVersion.V1_6).fake();
+    assertTrue(
+        bundle
+            .getEntry()
+            .get(0)
+            .getResource()
+            .getMeta()
+            .getProfile()
+            .get(0)
+            .getValue()
+            .endsWith("|1.6"));
   }
 }

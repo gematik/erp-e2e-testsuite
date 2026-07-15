@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,15 @@
 
 package de.gematik.test.erezept.fhir.parser;
 
+import static java.text.MessageFormat.format;
+
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import com.google.common.base.Strings;
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import de.gematik.bbriccs.fhir.codec.FhirCodec;
+import de.gematik.bbriccs.fhir.codec.exceptions.FhirCodecException;
 import de.gematik.bbriccs.fhir.validation.ProfileExtractor;
 import de.gematik.bbriccs.fhir.validation.ValidatorFhir;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
@@ -37,9 +41,9 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
-public class FhirParser {
+public class FhirParser implements FhirCodec {
 
-  @Getter private final FhirContext ctx;
+  @Getter private final FhirContext context;
   private final ProfileExtractor profileExtractor;
   @Delegate private final ValidatorFhir validator;
   private IParser xmlParser;
@@ -50,7 +54,7 @@ public class FhirParser {
   }
 
   public FhirParser(ValidatorType validatorType) {
-    this.ctx = ProfileFhirParserFactory.createDecoderContext();
+    this.context = ProfileFhirParserFactory.createDecoderContext();
     this.profileExtractor = new ProfileExtractor();
     this.validator = ProfileFhirParserFactory.getValidatorFor(validatorType);
   }
@@ -63,16 +67,23 @@ public class FhirParser {
   @SuppressWarnings("unchecked")
   public synchronized <T extends Resource> T decode(
       Class<T> expectedClass, String content, EncodingType encoding) {
-
-    val isEmptyContent = Strings.isNullOrEmpty(content) || StringUtils.isBlank(content);
-    if (expectedClass == EmptyResource.class && isEmptyContent) {
-      // if the content is expected to be empty, there is no need to bother HAPI and just simply
-      // return an EmptyResource
+    content = Strings.nullToEmpty(content);
+    if (StringUtils.isBlank(content) && EmptyResource.class.equals(expectedClass)) {
+      // if the content is empty, there is no need to bother HAPI and just simply return an
+      // EmptyResource
       return (T) new EmptyResource();
     }
-
     val parser = encoding.chooseAppropriateParser(this::getXmlParser, this::getJsonParser);
-    return parser.parseResource(expectedClass, fixBeforeDecode(content));
+
+    try {
+      return parser.parseResource(expectedClass, fixBeforeDecode(content));
+    } catch (Throwable t) {
+      log.error("Unable to decode content as {}-FHIR:\n{}", encoding.name(), content);
+      throw new FhirCodecException(
+          format(
+              "Error while decoding content of length {0} as {1}", content.length(), expectedClass),
+          t);
+    }
   }
 
   public Resource decode(String content) {
@@ -104,14 +115,14 @@ public class FhirParser {
 
   private IParser getXmlParser() {
     if (this.xmlParser == null) {
-      this.xmlParser = ctx.newXmlParser().setOverrideResourceIdWithBundleEntryFullUrl(false);
+      this.xmlParser = context.newXmlParser().setOverrideResourceIdWithBundleEntryFullUrl(false);
     }
     return this.xmlParser;
   }
 
   private IParser getJsonParser() {
     if (this.jsonParser == null) {
-      this.jsonParser = ctx.newJsonParser().setOverrideResourceIdWithBundleEntryFullUrl(false);
+      this.jsonParser = context.newJsonParser().setOverrideResourceIdWithBundleEntryFullUrl(false);
     }
     return this.jsonParser;
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 
 package de.gematik.test.erezept;
 
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.core.expectations.ErpResponseExpectation;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.OperationOutcome;
@@ -31,9 +31,9 @@ import org.hl7.fhir.r4.model.Resource;
 @Getter
 public class ErpInteraction<R extends Resource> {
 
-  private final ErpResponse<R> response;
+  private final FhirBResponse<R> response;
 
-  public ErpInteraction(ErpResponse<R> response) {
+  public ErpInteraction(FhirBResponse<R> response) {
     this.response = response;
   }
 

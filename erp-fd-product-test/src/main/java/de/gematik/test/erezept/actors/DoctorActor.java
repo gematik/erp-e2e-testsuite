@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ package de.gematik.test.erezept.actors;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
@@ -59,6 +60,11 @@ public class DoctorActor extends ErpActor {
   public TelematikID getSmcbTelematikId() {
     val smcbAbility = SafeAbility.getAbility(this, UseSMCB.class);
     return TelematikID.from(smcbAbility.getTelematikID());
+  }
+
+  public void setVersion(KbvItaForVersion kbvItaForVersion) {
+    val bd = SafeAbility.getAbility(this, ProvideDoctorBaseData.class);
+    bd.setVersion(kbvItaForVersion);
   }
 
   public void changeQualificationType(QualificationType type) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 package de.gematik.test.eml.tasks;
 
 import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlMedDispenseHasEqualGeneratedDosageInstrWith;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.provDispensationHasCorrectDosageComponent;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.provDispensationHasCorrectDosageDgMPComponent;
 
 import de.gematik.test.core.expectations.requirements.EmlAfos;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
@@ -83,7 +83,7 @@ public class CheckEpaOpProvideDispensationsRenderedDosageInstruction implements 
     verifiers.addAll(
         List.of(
             emlMedDispenseHasEqualGeneratedDosageInstrWith(mdPair.getLeft()),
-            provDispensationHasCorrectDosageComponent(mdPair.getLeft())));
+            provDispensationHasCorrectDosageDgMPComponent(mdPair.getLeft())));
 
     request.forEach(r -> verifiers.forEach(v -> v.apply(r)));
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,5 +33,6 @@ import org.junit.platform.suite.api.*;
     value = "de.gematik.test.erezept.lei.steps,de.gematik.test.erezept.lei.hooks")
 @ConfigurationParameter(
     key = PLUGIN_PROPERTY_NAME,
-    value = "io.cucumber.core.plugin.SerenityReporter") // SerenityReporterParallel not working
+    value = "net.serenitybdd.cucumber.core.plugin.SerenityReporter") // SerenityReporterParallel not
+// working
 public class CompleteDumpingTestSuite {}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,10 +117,13 @@ class GetMessagesIT extends ErpTest {
             SendMessages.to(woodlandPharma)
                 .forTask(task)
                 .asDispenseRequest(
-                    new CommunicationDisReqMessage(
-                        supplyOptionsType,
-                        "Nachricht zum testen des ErpFD bezüglich Communication: Ist das Medikament"
-                            + " No.1 heute noch verfügbar, liebe Apo woodlandPharma?")));
+                    CommunicationDisReqMessage.forV1()
+                        .supplyOptionsType(supplyOptionsType)
+                        .hint(
+                            "Nachricht zum testen des ErpFD bezüglich Communication: Ist das"
+                                + " Medikament No.1 heute noch verfügbar, liebe Apo"
+                                + " woodlandPharma?")
+                        .build()));
     val airportRequest =
         airportApo.performs(
             GetMessage.byId(
@@ -144,9 +147,6 @@ class GetMessagesIT extends ErpTest {
                 CommunicationBundleVerifier.containsCommunicationWithId(
                     dispRequest.getExpectedResponse().getIdPart(), ErpAfos.A_19520))
             .isCorrect());
-    // cleanup
-    airportApo.performs(
-        ClosePrescription.acceptedWith(airportApo.performs(AcceptPrescription.forTheTask(task))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_GET_02")
@@ -189,9 +189,6 @@ class GetMessagesIT extends ErpTest {
                 CommunicationBundleVerifier.containsCountOfCommunication(
                     expectation, ErpAfos.A_19521))
             .isCorrect());
-    // cleanup
-    airportApo.performs(
-        ClosePrescription.acceptedWith(airportApo.performs(AcceptPrescription.forTheTask(task))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_GET_03")
@@ -206,19 +203,26 @@ class GetMessagesIT extends ErpTest {
       PrescriptionAssignmentKind assignmentKind,
       SupplyOptionsType supplyOptionsType,
       InsuranceTypeDe insuranceType) {
+
     sina.changePatientInsuranceType(insuranceType);
     val task = prescribe(assignmentKind, sina);
+
     val replyMessage =
-        new CommunicationReplyMessage(
-            supplyOptionsType, "don´t worry, your medicine is ready for take of ;-)");
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .infoText("don´t worry, your medicine is ready for take of ;-)")
+            .build();
+
     val reqMessageResponse =
         woodlandPharma.performs(
             SendMessages.to(hanna).forTask(task).asReply(replyMessage, woodlandPharma));
+
     woodlandPharma.attemptsTo(
         Verify.that(reqMessageResponse).withExpectedType().has(emptyReceivedElement()).isCorrect());
 
     val getReqMessageResponse =
         hanna.performs(GetMessage.byId(reqMessageResponse.getExpectedResponse()));
+
     hanna.attemptsTo(
         Verify.that(getReqMessageResponse)
             .withExpectedType()
@@ -229,6 +233,7 @@ class GetMessagesIT extends ErpTest {
 
     val getReqMessageResponseAsSina =
         sina.performs(GetMessage.byId(reqMessageResponse.getExpectedResponse()));
+
     sina.attemptsTo(
         Verify.that(getReqMessageResponseAsSina)
             .withOperationOutcome()
@@ -237,9 +242,6 @@ class GetMessagesIT extends ErpTest {
                 operationOutcomeContainsInDetailText(
                     "no Communication found for id", ErpAfos.A_19520))
             .isCorrect());
-    // cleanup
-    airportApo.performs(
-        ClosePrescription.acceptedWith(airportApo.performs(AcceptPrescription.forTheTask(task))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_GET_04")
@@ -272,9 +274,6 @@ class GetMessagesIT extends ErpTest {
             .hasResponseWith(returnCode(200))
             .and(containsCountOfCommunication(expactation, ErpAfos.A_19520))
             .isCorrect());
-    // cleanup
-    airportApo.performs(
-        ClosePrescription.acceptedWith(airportApo.performs(AcceptPrescription.forTheTask(task))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_GET_05")
@@ -298,14 +297,20 @@ class GetMessagesIT extends ErpTest {
             SendMessages.to(sina)
                 .forTask(task)
                 .asReply(
-                    new CommunicationReplyMessage(supplyOptionsType, "how much is the fish?"),
+                    CommunicationReplyMessage.forV1()
+                        .supplyOptionsType(supplyOptionsType)
+                        .infoText("how much is the fish?")
+                        .build(),
                     woodlandPharma));
     woodlandPharma.attemptsTo(Verify.that(reply).isFromExpectedType());
     sina.performs(
         SendMessages.to(woodlandPharma)
             .forTask(task)
             .asDispenseRequest(
-                new CommunicationDisReqMessage(supplyOptionsType, "how much is the fish, now?")));
+                CommunicationDisReqMessage.forV1()
+                    .supplyOptionsType(supplyOptionsType)
+                    .hint("how much is the fish, now?")
+                    .build()));
     val messagesFromSinaForSina =
         sina.performs(
             GetMessages.fromServerWith(
@@ -328,9 +333,6 @@ class GetMessagesIT extends ErpTest {
                 CommunicationBundleVerifier.containsOnlyRecipientWith(
                     sina.getKvnr().getValue(), ErpAfos.A_19522))
             .isCorrect());
-    // cleanup
-    airportApo.performs(
-        ClosePrescription.acceptedWith(airportApo.performs(AcceptPrescription.forTheTask(task))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_GET_06")
@@ -355,8 +357,10 @@ class GetMessagesIT extends ErpTest {
                     SendMessages.to(woodlandPharma)
                         .forTask(task)
                         .asDispenseRequest(
-                            new CommunicationDisReqMessage(
-                                supplyOptionsType, "nope, we´ll get SMOK!"))))
+                            CommunicationDisReqMessage.forV1()
+                                .supplyOptionsType(supplyOptionsType)
+                                .hint("nope, we´ll get SMOK!")
+                                .build())))
             .isFromExpectedType());
     woodlandPharma.attemptsTo(
         Verify.that(
@@ -364,8 +368,10 @@ class GetMessagesIT extends ErpTest {
                     SendMessages.to(sina)
                         .forTask(task)
                         .asReply(
-                            new CommunicationReplyMessage(
-                                supplyOptionsType, "We can deliver a mask, too"),
+                            CommunicationReplyMessage.forV1()
+                                .supplyOptionsType(supplyOptionsType)
+                                .infoText("We can deliver a mask, too")
+                                .build(),
                             woodlandPharma)))
             .isFromExpectedType());
     val woodMessagesFromSina =
@@ -387,9 +393,6 @@ class GetMessagesIT extends ErpTest {
             .withExpectedType()
             .has(onlySenderWith(woodlandPharma.getTelematikId()))
             .isCorrect());
-    // cleanup
-    airportApo.performs(
-        ClosePrescription.acceptedWith(airportApo.performs(AcceptPrescription.forTheTask(task))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_GET_07")
@@ -412,10 +415,12 @@ class GetMessagesIT extends ErpTest {
             SendMessages.to(airportApo)
                 .forTask(task)
                 .asDispenseRequest(
-                    new CommunicationDisReqMessage(
-                        supplyOptionsType,
-                        "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey"
-                            + " patient, how are you? does the medicine takes an effect??")));
+                    CommunicationDisReqMessage.forV1()
+                        .supplyOptionsType(supplyOptionsType)
+                        .hint(
+                            "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey"
+                                + " patient, how are you? does the medicine takes an effect??")
+                        .build()));
     val dispReqId = disRequest.getExpectedResponse().getIdPart();
     val disReq2 = sina.performs(GetMessage.byId(new CommunicationGetByIdCommand(dispReqId)));
     sina.attemptsTo(
@@ -425,10 +430,6 @@ class GetMessagesIT extends ErpTest {
     val disReq3 = sina.performs(GetMessage.byId(new CommunicationGetByIdCommand(dispReqId)));
     sina.attemptsTo(
         Verify.that(disReq3).withExpectedType().has(presentReceivedElement()).isCorrect());
-
-    // cleanup
-    airportApo.performs(
-        ClosePrescription.acceptedWith(airportApo.performs(AcceptPrescription.forTheTask(task))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_GET_08")
@@ -453,10 +454,12 @@ class GetMessagesIT extends ErpTest {
             SendMessages.to(airportApo)
                 .forTask(task)
                 .asDispenseRequest(
-                    new CommunicationDisReqMessage(
-                        supplyOptionsType,
-                        "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey"
-                            + " patient, how are you? does the medicine takes an effect??")));
+                    CommunicationDisReqMessage.forV1()
+                        .supplyOptionsType(supplyOptionsType)
+                        .hint(
+                            "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey"
+                                + " patient, how are you? does the medicine takes an effect??")
+                        .build()));
     sina.attemptsTo(
         Verify.that(postDispRequest).withExpectedType().has(emptyReceivedElement()).isCorrect());
 
@@ -478,9 +481,10 @@ class GetMessagesIT extends ErpTest {
             SendMessages.to(sina)
                 .forTask(task)
                 .asReply(
-                    new CommunicationReplyMessage(
-                        supplyOptionsType,
-                        "Hey patient, how are you? does the medicine takes an effect??"),
+                    CommunicationReplyMessage.forV1()
+                        .supplyOptionsType(supplyOptionsType)
+                        .infoText("Hey patient, how are you? does the medicine takes an effect??")
+                        .build(),
                     airportApo));
     airportApo.attemptsTo(
         Verify.that(postReply).withExpectedType().has(emptyReceivedElement()).isCorrect());
@@ -505,10 +509,6 @@ class GetMessagesIT extends ErpTest {
     val getReply2 = airportApo.performs(GetMessage.byId(postReply.getExpectedResponse()));
     airportApo.attemptsTo(
         Verify.that(getReply2).withExpectedType().has(presentReceivedElement()).isCorrect());
-
-    // cleanup
-    airportApo.performs(
-        ClosePrescription.acceptedWith(airportApo.performs(AcceptPrescription.forTheTask(task))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_GET_09")
@@ -525,43 +525,46 @@ class GetMessagesIT extends ErpTest {
       PrescriptionAssignmentKind assignmentKind,
       SupplyOptionsType supplyOptionsType,
       InsuranceTypeDe insuranceType) {
+
     sina.changePatientInsuranceType(insuranceType);
     val task = prescribe(assignmentKind, sina);
 
-    // Patient und Apo können Nachrichten Senden / Empfangen
     val disRequest =
         sina.performs(
             SendMessages.to(airportApo)
                 .forTask(task)
                 .asDispenseRequest(
-                    new CommunicationDisReqMessage(
-                        supplyOptionsType,
-                        "Hey StammApotheke, mein Imodium ist alle, habt Ihr noch Vorräte vor Ort?"
-                            + " Und wenn nicht einen großen Korken ??")));
+                    CommunicationDisReqMessage.forV1()
+                        .supplyOptionsType(supplyOptionsType)
+                        .hint(
+                            "Hey StammApotheke, mein Imodium ist alle, habt Ihr noch Vorräte vor"
+                                + " Ort? Und wenn nicht einen großen Korken ??")
+                        .build()));
+
     val dispReqId = disRequest.getExpectedResponse().getIdPart();
     sina.attemptsTo(Verify.that(disRequest).withExpectedType().isCorrect());
 
-    // Task wird abgeschlossen
     airportApo.performs(
         ClosePrescription.acceptedWith(airportApo.performs(AcceptPrescription.forTheTask(task))));
 
     val capability =
         airportApo.asksFor(new ResponseOfGetCapabilityStatement()).getExpectedResponse();
+
     val version = capability.getSoftwareVersion();
 
     val communicationsOfPharmacy =
         airportApo.performs(GetMessage.byId(new CommunicationGetByIdCommand(dispReqId)));
+
     val communicationsOfPatient =
         sina.performs(GetMessage.byId(new CommunicationGetByIdCommand(dispReqId)));
 
-    // We should move the release versions to an enum so that we can compare them more easily, e.g.
-    // greaterThan, lessThan, ...
     if (version.equals(SUT_RELEASE_VERSION_1_19)) {
       airportApo.attemptsTo(
           Verify.that(communicationsOfPharmacy)
               .withOperationOutcome(ErpAfos.A_20513)
               .hasResponseWith(returnCode(404))
               .isCorrect());
+
       sina.attemptsTo(
           Verify.that(communicationsOfPatient)
               .withOperationOutcome(ErpAfos.A_20513)
@@ -573,6 +576,7 @@ class GetMessagesIT extends ErpTest {
               .withExpectedType(ErpAfos.A_20513)
               .hasResponseWith(returnCode(200))
               .isCorrect());
+
       sina.attemptsTo(
           Verify.that(communicationsOfPatient)
               .withExpectedType(ErpAfos.A_20513)
@@ -595,17 +599,21 @@ class GetMessagesIT extends ErpTest {
       ErxTask task,
       SupplyOptionsType supplyOptionsType,
       int numberOfMessages) {
+
     for (int i = 0; i < numberOfMessages; i++) {
       sender.performs(
           SendMessages.to(receiver)
               .forTask(task)
               .asDispenseRequest(
-                  new CommunicationDisReqMessage(
-                      supplyOptionsType,
-                      format(
-                          "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Ist das"
-                              + " Medikament No.1 heute noch verfügbar, liebe Apo woodlandPharma?",
-                          i))));
+                  CommunicationDisReqMessage.forV1()
+                      .supplyOptionsType(supplyOptionsType)
+                      .hint(
+                          format(
+                              "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Ist"
+                                  + " das Medikament No.1 heute noch verfügbar, liebe Apo"
+                                  + " woodlandPharma?",
+                              i))
+                      .build()));
     }
   }
 
@@ -620,12 +628,14 @@ class GetMessagesIT extends ErpTest {
           SendMessages.to(receiver)
               .forTask(task)
               .asReply(
-                  new CommunicationReplyMessage(
-                      supplyOptionsType,
-                      format(
-                          "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey"
-                              + " patient, how are you? does the medicine takes an effect??",
-                          i)),
+                  CommunicationReplyMessage.forV1()
+                      .supplyOptionsType(supplyOptionsType)
+                      .infoText(
+                          format(
+                              "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey"
+                                  + " patient, how are you? does the medicine takes an effect??",
+                              i))
+                      .build(),
                   sender));
     }
   }

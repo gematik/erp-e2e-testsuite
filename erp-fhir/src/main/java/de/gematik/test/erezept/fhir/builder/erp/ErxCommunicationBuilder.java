@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,14 +109,17 @@ public abstract class ErxCommunicationBuilder<B extends ErxCommunicationBuilder<
 
   protected ErxCommunication buildCommon(Supplier<CanonicalType> profileSupplier) {
     checkRequiredCommon();
+
     val com = this.createResource(ErxCommunication::new, profileSupplier.get());
 
     com.setStatus(status);
 
     if (message != null) {
       val payload = new Communication.CommunicationPayloadComponent(new StringType(message));
+
       com.setPayload(List.of(payload));
     }
+
     return com;
   }
 

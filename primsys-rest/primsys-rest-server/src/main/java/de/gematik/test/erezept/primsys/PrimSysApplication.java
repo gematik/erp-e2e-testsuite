@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,6 @@
 
 package de.gematik.test.erezept.primsys;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.jakarta.rs.xml.JacksonXMLProvider;
 import de.gematik.test.erezept.primsys.exceptions.GenericExceptionMapper;
 import de.gematik.test.erezept.primsys.exceptions.IdpClientExceptionMapper;
 import de.gematik.test.erezept.primsys.exceptions.JacksonExceptionMapper;
@@ -43,9 +39,10 @@ import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import io.swagger.v3.oas.annotations.servers.Server;
 import jakarta.ws.rs.ApplicationPath;
 import lombok.val;
-import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
+import tools.jackson.jakarta.rs.xml.JacksonXMLProvider;
 
 @OpenAPIDefinition(
     info =
@@ -87,14 +84,10 @@ public class PrimSysApplication extends ResourceConfig {
 
   public PrimSysApplication() {
     packages("de.gematik.test.erezept.primsys.controller");
-    val jsonMapper = new ObjectMapper();
-    jsonMapper.registerModule(new JavaTimeModule());
-    val jsonProvider = new JacksonJsonProvider(jsonMapper);
+    val jsonProvider = new JacksonJsonProvider();
     register(jsonProvider);
 
-    val xmlMapper = new XmlMapper();
-    xmlMapper.registerModule(new JavaTimeModule());
-    val xmlProvider = new JacksonXMLProvider(xmlMapper);
+    val xmlProvider = new JacksonXMLProvider();
     register(xmlProvider);
 
     register(new CORSFilter());

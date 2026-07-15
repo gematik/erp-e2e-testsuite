@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,9 +116,17 @@ class ErxMedicationDispenseFakerTest extends ErpFhirParsingTest {
   void buildSimpleDosage() {
 
     DosageDgMP dosage =
-        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG).text("1 Tablette morgens").build();
+        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(8, "Woche(n)", "wk")
+                    .frequency(1)
+                    .period(3)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .when("EVE")
+                    .build())
+            .build();
     assertNotNull(dosage);
-    assertEquals("1 Tablette morgens", dosage.getText());
     assertEquals(1, dosage.getDoseAndRate().size());
     assertEquals(
         "v", ((org.hl7.fhir.r4.model.Quantity) dosage.getDoseAndRate().get(0).getDose()).getCode());
@@ -240,5 +248,27 @@ class ErxMedicationDispenseFakerTest extends ErpFhirParsingTest {
             .getDoseAndRateFirstRep()
             .getDoseQuantity()
             .getCode());
+  }
+
+  @Test
+  void shouldSetDosageInstructionCorrect() {
+    val dosageText = "DosageText";
+    val medDisp =
+        ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6)
+            .withPrescriptionId(PrescriptionId.random().getValue())
+            .withDosageInstruction(dosageText)
+            .fake();
+    assertEquals(dosageText, medDisp.getDosageInstructionText().get(0));
+  }
+
+  @Test
+  void shouldSetPatientInstructionCorrect() {
+    val patientInstr = "PatientInstructionText";
+    val medDisp =
+        ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_5)
+            .withPrescriptionId(PrescriptionId.random().getValue())
+            .withPatientInstruction(patientInstr)
+            .fake();
+    assertEquals(patientInstr, medDisp.getDosageInstruction().get(0).getPatientInstruction());
   }
 }

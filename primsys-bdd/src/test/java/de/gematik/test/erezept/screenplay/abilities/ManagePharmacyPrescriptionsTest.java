@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.ErpClient;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
@@ -38,7 +38,6 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import java.util.Map;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
@@ -88,16 +87,14 @@ class ManagePharmacyPrescriptionsTest extends ErpFhirBuildingTest {
 
     if (flowType == PrescriptionFlowType.FLOW_TYPE_162) {
       val mockResponse =
-          ErpResponse.forPayload(createOperationOutcome(), ErxReceipt.class)
+          FhirBResponse.forPayload(ErxReceipt.class, createOperationOutcome())
               .withStatusCode(404)
-              .withHeaders(Map.of())
               .andValidationResult(createEmptyValidationResult());
       when(erpClient.request(any(CloseTaskCommand.class))).thenReturn(mockResponse);
     } else {
       val mockResponse =
-          ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
+          FhirBResponse.forPayload(EmptyResource.class, createOperationOutcome())
               .withStatusCode(404)
-              .withHeaders(Map.of())
               .andValidationResult(createEmptyValidationResult());
       when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
     }

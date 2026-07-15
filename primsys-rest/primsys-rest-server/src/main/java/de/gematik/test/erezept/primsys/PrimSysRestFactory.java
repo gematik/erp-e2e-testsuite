@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.primsys;
 
+import de.gematik.bbriccs.konnektor.Konnektor;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
@@ -28,8 +29,6 @@ import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.primsys.actors.Doctor;
 import de.gematik.test.erezept.primsys.actors.HealthInsurance;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
-import de.gematik.test.konnektor.Konnektor;
-import de.gematik.test.konnektor.cfg.KonnektorFactory;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -76,7 +75,7 @@ public class PrimSysRestFactory extends ConfiguredFactory {
 
   private Konnektor instantiateKonnektorClient(@Nullable String name) {
     val konName = Optional.ofNullable(name).orElse("Soft-Konn");
-    return KonnektorFactory.createKonnektor(this.getConfig(konName, dto.getKonnektors()));
+    return Konnektor.create(this.getConfig(konName, dto.getKonnektors()));
   }
 
   public static PrimSysRestFactory fromDto(PrimsysConfigurationDto dto, SmartcardArchive sca) {

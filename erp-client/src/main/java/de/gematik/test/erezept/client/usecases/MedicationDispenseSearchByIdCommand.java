@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,10 @@ import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import java.util.Optional;
 import lombok.val;
-import org.hl7.fhir.r4.model.Resource;
 
-public class MedicationDispenseSearchByIdCommand extends BaseCommand<ErxMedicationDispenseBundle> {
+public class MedicationDispenseSearchByIdCommand
+    extends ErpBaseCommand<ErxMedicationDispenseBundle> {
 
   public MedicationDispenseSearchByIdCommand(PrescriptionId prescriptionId) {
     super(ErxMedicationDispenseBundle.class, HttpRequestMethod.GET, "/MedicationDispense");
@@ -38,10 +37,5 @@ public class MedicationDispenseSearchByIdCommand extends BaseCommand<ErxMedicati
     // the format of the identifier is described in A_22070
     val identifier = format("{0}|{1}", prescriptionId.getSystemUrl(), prescriptionId.getValue());
     this.queryParameters.add(new QueryParameter("identifier", identifier));
-  }
-
-  @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.empty();
   }
 }

@@ -1,0 +1,131 @@
+<Parameters xmlns="http://hl7.org/fhir">
+    <id value="aafcccd3-8e16-40e3-b128-835b85ad62b8"/>
+    <meta>
+        <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_PAR_DispenseOperation_Input|1.5"/>
+    </meta>
+    <parameter>
+        <name value="rxDispensation"/>
+        <part>
+            <name value="medicationDispense"/>
+            <resource>
+                <MedicationDispense xmlns="http://hl7.org/fhir">
+                    <id value="95cff5fc-3f78-490d-8683-e972341e8040"/>
+                    <meta>
+                        <profile
+                                value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense|1.5"/>
+                    </meta>
+                    <identifier>
+                        <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                        <value value="160.000.007.374.991.08"/>
+                    </identifier>
+                    <status value="completed"/>
+                    <medicationReference>
+                        <reference value="9f6320e9-993a-4efd-990a-8e68b8dca104"/>
+                    </medicationReference>
+                    <subject>
+                        <identifier>
+                            <type>
+                                <coding>
+                                    <system value="http://fhir.de/CodeSystem/identifier-type-de-basis"/>
+                                    <code value="KVZ10"/>
+                                </coding>
+                            </type>
+                            <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                            <value value="X110645443"/>
+                        </identifier>
+                    </subject>
+                    <performer>
+                        <actor>
+                            <identifier>
+                                <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                                <value value="5-2-KH-APO-Waldesrand-01"/>
+                            </identifier>
+                        </actor>
+                    </performer>
+                    <whenHandedOver value="2026-05-20"/>
+                    <dosageInstruction>
+                        <text value="Dosieranweisung im Textfeld"/>
+                        <patientInstruction value="Dosieranweisung im PatientInstruction-field"/>
+                    </dosageInstruction>
+                </MedicationDispense>
+            </resource>
+        </part>
+        <part>
+            <name value="medication"/>
+            <resource>
+                <Medication xmlns="http://hl7.org/fhir">
+                    <id value="9f6320e9-993a-4efd-990a-8e68b8dca104"/>
+                    <meta>
+                        <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Medication|1.5"/>
+                    </meta>
+                    <contained>
+                        <Medication xmlns="http://hl7.org/fhir">
+                            <id value="548ae6f7-f396-4fde-aebe-d1352ab0960b"/>
+                            <meta>
+                                <profile
+                                        value="https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-pzn-ingredient"/>
+                            </meta>
+                            <extension
+                                    url="https://gematik.de/fhir/epa-medication/StructureDefinition/epa-medication-type-extension">
+                                <valueCoding>
+                                    <system value="http://snomed.info/sct"/>
+                                    <version value="http://snomed.info/sct/900000000000207008/version/20240201"/>
+                                    <code value="781405001"/>
+                                    <display value="Medicinal product package (product)"/>
+                                </valueCoding>
+                            </extension>
+                            <code>
+                                <coding>
+                                    <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                                    <code value="88"/>
+                                </coding>
+                            </code>
+                        </Medication>
+                    </contained>
+                    <extension url="https://gematik.de/fhir/epa-medication/StructureDefinition/drug-category-extension">
+                        <valueCoding>
+                            <system value="https://gematik.de/fhir/epa-medication/CodeSystem/epa-drug-category-cs"/>
+                            <code value="00"/>
+                        </valueCoding>
+                    </extension>
+                    <extension
+                            url="https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension">
+                        <valueBoolean value="true"/>
+                    </extension>
+                    <code>
+                        <coding>
+                            <system value="http://fhir.de/CodeSystem/bfarm/atc"/>
+                            <code value="(0010) 902194979"/>
+                        </coding>
+                        <coding>
+                            <system value="http://snomed.info/sct"/>
+                            <code value="+49-027-1097090"/>
+                        </coding>
+                        <coding>
+                            <system value="http://snomed.info/sct"/>
+                            <code value="+49-615-4108225"/>
+                        </coding>
+                    </code>
+                    <amount>
+                        <numerator>
+                            <value value="6"/>
+                            <unit value="mg"/>
+                        </numerator>
+                        <denominator>
+                            <value value="1"/>
+                        </denominator>
+                    </amount>
+                    <ingredient>
+                        <itemReference>
+                            <reference value="#548ae6f7-f396-4fde-aebe-d1352ab0960b"/>
+                        </itemReference>
+                    </ingredient>
+                    <batch>
+                        <lotNumber value="9226754429"/>
+                        <expirationDate value="2026-06-16T21:15:42+02:00"/>
+                    </batch>
+                </Medication>
+            </resource>
+        </part>
+    </parameter>
+</Parameters>

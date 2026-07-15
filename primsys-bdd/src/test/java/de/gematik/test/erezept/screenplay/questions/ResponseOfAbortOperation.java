@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ package de.gematik.test.erezept.screenplay.questions;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
@@ -59,7 +59,7 @@ public class ResponseOfAbortOperation extends FhirResponseQuestion<EmptyResource
   }
 
   @Override
-  public ErpResponse<EmptyResource> answeredBy(Actor actor) {
+  public FhirBResponse<EmptyResource> answeredBy(Actor actor) {
     val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
 
     val cmd =

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.ChargeItemPostCommand;
 import de.gematik.test.erezept.client.usecases.ChargeItemPutCommand;
-import de.gematik.test.erezept.client.usecases.ICommand;
+import de.gematik.test.erezept.client.usecases.ErpBaseCommand;
 import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenBuilder;
 import de.gematik.test.erezept.fhir.builder.dav.DavPkvDispensedMedicationBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemBuilder;
@@ -95,7 +95,7 @@ public class ChargeItemUseCase {
     return executeCommand(cmd);
   }
 
-  private Response executeCommand(ICommand<ErxChargeItem> cmd) {
+  private Response executeCommand(ErpBaseCommand<ErxChargeItem> cmd) {
     val erpResponse = pharmacy.erpRequest(cmd);
     val chargeItem = erpResponse.getExpectedResource();
 

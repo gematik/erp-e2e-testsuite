@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,32 +20,35 @@
 
 package de.gematik.test.erezept.actions;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.crypto.certificate.ProfessionOid;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.popp.PoppTokenGenerator;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.smartcards.EgkP12;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.bbriccs.smartcards.SmartcardOwnerData;
+import de.gematik.bbriccs.vsdm.VsdmExamEvidence;
+import de.gematik.bbriccs.vsdm.VsdmExamEvidenceResult;
+import de.gematik.bbriccs.vsdm.VsdmService;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTaskBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
+import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidenceResult;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
+import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -62,6 +65,13 @@ class DownloadReadyTaskTest extends ErpFhirBuildingTest {
     pharmacist = new PharmacyActor("PhaMoc");
     pharmacist.can(useErpClient);
 
+    val useSmcb = mock(UseSMCB.class);
+    val smcB = mock(de.gematik.bbriccs.smartcards.SmcBP12.class);
+    when(smcB.getTelematikId()).thenReturn("TelematikId");
+    when(smcB.getProfession()).thenReturn(ProfessionOid.APOTHEKER);
+    when(useSmcb.getSmcB()).thenReturn(smcB);
+    pharmacist.can(useSmcb);
+
     sina = new PatientActor("sina");
     val sca = SmartcardArchive.fromResources();
     val egk = sca.getEgkByKvnr("X110498565");
@@ -75,9 +85,8 @@ class DownloadReadyTaskTest extends ErpFhirBuildingTest {
             .build(VsdmExamEvidenceResult.NO_UPDATES);
 
     val mockResponse =
-        ErpResponse.forPayload(new ErxTaskBundle(), ErxTaskBundle.class)
+        FhirBResponse.forPayload(ErxTaskBundle.class, new ErxTaskBundle())
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(TaskGetByExamEvidenceCommand.class))).thenReturn(mockResponse);
   }
@@ -164,5 +173,17 @@ class DownloadReadyTaskTest extends ErpFhirBuildingTest {
             pharmacist.performs(
                 DownloadReadyTask.asPatient(
                     IQueryParameter.search().withOffset(5).createParameter())));
+  }
+
+  @Test
+  void withPoPPToken() {
+    val useSmcb = SafeAbility.getAbility(pharmacist, UseSMCB.class);
+
+    val poppTokenGenerator = mock(PoppTokenGenerator.class);
+    when(poppTokenGenerator.sign(any())).thenReturn("mocked-popp-token");
+
+    val request = PoppTokenGenerator.TokenGenerationRequest.with(useSmcb.getSmcB(), sina.getEgk());
+    val poppToken = poppTokenGenerator.sign(request);
+    assertDoesNotThrow(() -> pharmacist.performs(DownloadReadyTask.withPoppToken(poppToken)));
   }
 }

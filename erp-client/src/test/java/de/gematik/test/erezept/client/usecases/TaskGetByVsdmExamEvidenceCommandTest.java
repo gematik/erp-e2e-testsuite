@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ class TaskGetByVsdmExamEvidenceCommandTest {
   }
 
   @Test
-  void ShouldBuildAdditionalQuery() {
+  void shouldBuildAdditionalQuery() {
     val cmd =
         new TaskGetByExamEvidenceCommand("")
             .andAdditionalQuery(IQueryParameter.search().withOffset(5).createParameter());

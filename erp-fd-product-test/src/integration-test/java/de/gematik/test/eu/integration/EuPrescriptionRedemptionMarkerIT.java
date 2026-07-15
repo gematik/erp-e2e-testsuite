@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ package de.gematik.test.eu.integration;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLog;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
-import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.*;
+import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.hasRedeemableByPropertiesForBundlePrescription;
+import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.prescriptionInStatus;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
 import static java.text.MessageFormat.format;
 
@@ -31,6 +32,7 @@ import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
+import de.gematik.test.core.expectations.requirements.PrescriptionServiceVersion;
 import de.gematik.test.core.expectations.verifier.TaskVerifier;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.*;
@@ -45,6 +47,7 @@ import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCapabilityStatement;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
@@ -236,6 +239,9 @@ class EuPrescriptionRedemptionMarkerIT extends ErpTest {
 
     val m = kbvErpMedicationSupplier.get();
 
+    val interaction = sina.asksFor(new ResponseOfGetCapabilityStatement());
+    ErxCapabilityStatement cs = interaction.getResponse().getExpectedResource();
+
     InsuranceTypeDe insuranceType =
         flowType.isPkvType() ? InsuranceTypeDe.PKV : InsuranceTypeDe.GKV;
 
@@ -255,11 +261,23 @@ class EuPrescriptionRedemptionMarkerIT extends ErpTest {
     val taskId = activation.getExpectedResponse().getTaskId();
     val patchResponse = sina.performs(PatchPrescriptionForEuRedemption.of(taskId));
 
-    sina.attemptsTo(
-        Verify.that(patchResponse)
-            .withOperationOutcome(ErpAfos.A_27550)
-            .hasResponseWith(returnCode(403))
-            .isCorrect());
+    PrescriptionServiceVersion currentVersion =
+        PrescriptionServiceVersion.from(cs.getSoftwareVersion());
+
+    if (currentVersion.isLessThan(PrescriptionServiceVersion.V_1_22_0)) {
+      sina.attemptsTo(
+          Verify.that(patchResponse)
+              .withOperationOutcome(ErpAfos.A_27550)
+              .hasResponseWith(returnCode(403))
+              .isCorrect());
+
+    } else {
+      sina.attemptsTo(
+          Verify.that(patchResponse)
+              .withOperationOutcome(ErpAfos.A_27550)
+              .hasResponseWith(returnCode(409))
+              .isCorrect());
+    }
   }
 
   @Test
@@ -356,8 +374,7 @@ class EuPrescriptionRedemptionMarkerIT extends ErpTest {
     val pharmacy = this.getPharmacyNamed("Am Flughafen");
     val acceptBundle =
         pharmacy.performs(AcceptPrescription.forTheTask(erxTask)).getExpectedResponse();
-    val receipt =
-        pharmacy.performs(ClosePrescription.acceptedWith(acceptBundle)).getExpectedResponse();
+    pharmacy.performs(ClosePrescription.acceptedWith(acceptBundle)).getExpectedResponse();
 
     // check the prescription is completed
     val r = sina.performs(TheTask.withId(taskId));

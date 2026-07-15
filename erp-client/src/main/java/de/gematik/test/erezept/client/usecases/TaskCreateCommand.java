@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,12 @@ import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.builder.erp.FlowTypeBuilder;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
-public class TaskCreateCommand extends BaseCommand<ErxTask> {
+public class TaskCreateCommand extends ErpBaseCommand<ErxTask> {
 
   private final Parameters parameters;
 
@@ -55,7 +54,8 @@ public class TaskCreateCommand extends BaseCommand<ErxTask> {
     return this.getResourcePath() + "/$create";
   }
 
-  public Optional<Resource> getRequestBody() {
-    return Optional.of(parameters);
+  @Override
+  public Resource getRequestBody() {
+    return parameters;
   }
 }

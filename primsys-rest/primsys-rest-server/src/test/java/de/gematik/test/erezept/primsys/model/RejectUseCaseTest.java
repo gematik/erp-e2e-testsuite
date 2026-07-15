@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,13 @@ import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.TaskRejectCommand;
 import de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import jakarta.ws.rs.WebApplicationException;
-import java.util.Map;
 import lombok.val;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.hl7.fhir.r4.model.Resource;
@@ -54,9 +53,8 @@ class RejectUseCaseTest extends TestWithActorContext {
         ErxFhirTestResourceUtil.createErxAuditEvent(
             "testString", TelematikID.from("123"), "testName", AuditEvent.AuditEventAction.R);
     val mockResponse =
-        ErpResponse.forPayload(resource, EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, resource)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(TaskRejectCommand.class))).thenReturn(mockResponse);
     val useCase = new RejectUseCase(pharmacy);
@@ -72,9 +70,8 @@ class RejectUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), Resource.class)
+        FhirBResponse.forPayload(Resource.class, createOperationOutcome())
             .withStatusCode(500)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     doThrow(ErrorResponseBuilder.createFachdienstErrorException(mockResponse))
         .when(mockClient)
@@ -97,9 +94,8 @@ class RejectUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), Resource.class)
+        FhirBResponse.forPayload(Resource.class, createOperationOutcome())
             .withStatusCode(500)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     doThrow(ErrorResponseBuilder.createFachdienstErrorException(mockResponse))
         .when(mockClient)
@@ -122,9 +118,8 @@ class RejectUseCaseTest extends TestWithActorContext {
     val mockClient = ktr.getClient();
 
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), Resource.class)
+        FhirBResponse.forPayload(Resource.class, createOperationOutcome())
             .withStatusCode(400)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     doThrow(ErrorResponseBuilder.createFachdienstErrorException(mockResponse))
         .when(mockClient)

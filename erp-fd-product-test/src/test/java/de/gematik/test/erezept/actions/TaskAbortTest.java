@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
@@ -38,7 +38,6 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import java.util.Map;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
 import org.junit.jupiter.api.Test;
@@ -54,9 +53,8 @@ class TaskAbortTest {
     val erxTask = new ErxTask();
     erxTask.setId("123");
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, createOperationOutcome())
             .withStatusCode(404)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
 
@@ -76,9 +74,8 @@ class TaskAbortTest {
     erxTask.addIdentifier(accessCode.asIdentifier());
 
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, createOperationOutcome())
             .withStatusCode(404)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
 
@@ -97,9 +94,8 @@ class TaskAbortTest {
     erxTask.getMeta().addProfile(ErpWorkflowStructDef.TASK.getCanonicalUrl());
 
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, createOperationOutcome())
             .withStatusCode(404)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(useErpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);

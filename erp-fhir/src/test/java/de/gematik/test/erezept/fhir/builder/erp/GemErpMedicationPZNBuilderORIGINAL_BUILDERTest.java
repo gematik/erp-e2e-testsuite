@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR_PROFILES_TOGGLE;
+import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getUpdatedInJulyPlusKPG;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
@@ -174,7 +175,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
             .withSupplyForm(
                 GemFaker.fakerValueSet(
                     Darreichungsform.class,
-                    Darreichungsform.KPG)) // mapping Kombipackung not possible yet
+                    getUpdatedInJulyPlusKPG())) // mapping Kombipackung not possible yet
             .withAmount(3, "fl")
             .fake();
     val gemMedication =
@@ -199,7 +200,9 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
     val kbvMedicationFreeText =
         KbvErpMedicationFreeTextFaker.builder()
             .withFreeText(freitext)
-            .withDosageForm(GemFaker.fakerValueSet(Darreichungsform.class).getDisplay())
+            .withDosageForm(
+                GemFaker.fakerValueSet(Darreichungsform.class, getUpdatedInJulyPlusKPG())
+                    .getDisplay())
             .fake();
     val gemMedication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvMedicationFreeText)

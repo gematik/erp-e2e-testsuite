@@ -19,7 +19,7 @@
     },
     {
       "relation": "prev",
-      "url": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_count=50&__offset=20&_id=gt01eb9373-789e-7db8-0000-000000000000"
+      "url": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/AuditEvent?_count=50&_id=gt01eb9373-789e-7db8-0000-000000000000&__offset=20"
     },
     {
       "relation": "last",

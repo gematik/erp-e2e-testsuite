@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ package de.gematik.test.erezept.primsys.rest.response;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.codec.OperationOutcomeExtractor;
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
@@ -55,7 +55,7 @@ public class ErrorResponseBuilder {
     throw createInternalErrorException(statusCode, message);
   }
 
-  public static <R extends Resource> Response createFachdienstError(ErpResponse<R> erpResponse) {
+  public static <R extends Resource> Response createFachdienstError(FhirBResponse<R> erpResponse) {
     val message = extractErrorMessage(erpResponse);
     return Response.status(erpResponse.getStatusCode())
         .entity(ErrorDto.fachdienstError(message))
@@ -63,16 +63,16 @@ public class ErrorResponseBuilder {
   }
 
   public static <R extends Resource> WebApplicationException createFachdienstErrorException(
-      ErpResponse<R> erpResponse) {
+      FhirBResponse<R> erpResponse) {
     return new WebApplicationException(createFachdienstError(erpResponse));
   }
 
-  public static <R extends Resource> void throwFachdienstError(ErpResponse<R> erpResponse)
+  public static <R extends Resource> void throwFachdienstError(FhirBResponse<R> erpResponse)
       throws WebApplicationException {
     throw createFachdienstErrorException(erpResponse);
   }
 
-  private static <R extends Resource> String extractErrorMessage(ErpResponse<R> erpResponse) {
+  private static <R extends Resource> String extractErrorMessage(FhirBResponse<R> erpResponse) {
     if (erpResponse.isOperationOutcome()) {
       val oo = erpResponse.getAsOperationOutcome();
       return OperationOutcomeExtractor.extractFrom(oo);

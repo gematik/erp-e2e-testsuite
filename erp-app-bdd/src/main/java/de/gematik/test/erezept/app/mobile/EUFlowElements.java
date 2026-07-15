@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,30 +33,29 @@ import org.openqa.selenium.By;
 @Getter
 public enum EUFlowElements implements PageElement {
   GRANT_EU_CONSENT_BUTTON(
-      "Grant EU consent button", () -> AppiumBy.accessibilityId("rdm_btn_eu_consent_accept")),
+      "Grant EU consent button", () -> AppiumBy.accessibilityId("eurdm_btn_consent_accept")),
   SELECT_PRESCRIPTIONS_BUTTON(
-      "Select prescriptions button", () -> AppiumBy.xpath("(//XCUIElementTypeButton)[3]")),
-  SELECT_COUNTRY_BUTTON("Select country button", () -> AppiumBy.name("Land wählen")),
+      "Select prescriptions button",
+      () -> AppiumBy.accessibilityId("eurdm_btn_selection_prescriptions")),
+  SELECT_COUNTRY_BUTTON(
+      "Select country button",
+      () -> AppiumBy.accessibilityId("eurdm_txt_selection_country_no_selection")),
   SELECT_PRESCRIPTIONS_SCREEN_LEAVE_BUTTON(
       "Leave screen to select/deselect prescriptions button", () -> AppiumBy.name("Zurück")),
   COUNTRY_SEARCH_BAR_TEXT_FIELD(
       "Search bar text field for country",
       () -> AppiumBy.accessibilityId("ctl_txt_search_bar_field")),
   GENERATE_EU_REDEEM_CODE_BUTTON(
-      "Generate EU redeem code button", () -> AppiumBy.name("Einlösecode generieren")),
-  EU_REDEEM_BUTTON("EU redeem button", () -> AppiumBy.name("Einlösen")),
+      "Generate EU redeem code button",
+      () -> AppiumBy.accessibilityId("eurdm_btn_instructions_generate_code")),
+  EU_REDEEM_BUTTON(
+      "EU redeem button", () -> AppiumBy.accessibilityId("eurdm_btn_selection_redeem")),
   KVNR_TEXT_FIELD(
       "Displayed KVNR text field",
-      () ->
-          AppiumBy.xpath(
-              "//XCUIElementTypeStaticText[@name=\"Meine Krankenversicherungsnummer"
-                  + " ist:\"]/following-sibling::XCUIElementTypeStaticText[1]")),
+      () -> AppiumBy.accessibilityId("eurdm_code_txt_insurance_number")),
   EU_ACCESS_CODE_TEXT_FIELD(
       "Displayed EU-Access-Code text field",
-      () ->
-          AppiumBy.xpath(
-              "//XCUIElementTypeStaticText[@name=\"Mein Einlösecode"
-                  + " lautet:\"]/following-sibling::XCUIElementTypeStaticText[1]"));
+      () -> AppiumBy.accessibilityId("eurdm_code_txt_exchange_code"));
 
   private final String elementName;
   private final Supplier<By> iosLocator;
@@ -93,7 +92,7 @@ public enum EUFlowElements implements PageElement {
       return () ->
           AppiumBy.iOSNsPredicateString(
               MessageFormat.format(
-                  "type == \"XCUIElementTypeButton\" AND name CONTAINS" + " \"{0}\"",
+                  "type == \"XCUIElementTypeSwitch\" AND name CONTAINS" + " \"{0}\"",
                   prescriptionName));
     }
   }

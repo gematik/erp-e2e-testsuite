@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,6 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
-import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +33,6 @@ import org.hl7.fhir.r4.model.Enumeration;
 public class ErxMedicationDispenseBundleBuilder
     extends ResourceBuilder<Bundle, ErxMedicationDispenseBundleBuilder> {
 
-  private ErpWorkflowVersion erpWorkflowVersion = ErpWorkflowVersion.getDefaultVersion();
   private final List<ErxMedicationDispense> medicationDispenses;
 
   private ErxMedicationDispenseBundleBuilder() {
@@ -55,11 +52,6 @@ public class ErxMedicationDispenseBundleBuilder
     return new ErxMedicationDispenseBundleBuilder(medicationDispenses);
   }
 
-  public ErxMedicationDispenseBundleBuilder version(ErpWorkflowVersion version) {
-    this.erpWorkflowVersion = version;
-    return this;
-  }
-
   public ErxMedicationDispenseBundleBuilder add(ErxMedicationDispense medicationDispense) {
     this.medicationDispenses.add(medicationDispense);
     return self();
@@ -70,21 +62,6 @@ public class ErxMedicationDispenseBundleBuilder
     val bundleType =
         new Enumeration<>(new Bundle.BundleTypeEnumFactory(), Bundle.BundleType.COLLECTION);
     val mdBundle = new Bundle(bundleType);
-
-    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_3) <= 0) {
-      mdBundle
-          .getMeta()
-          .addProfile(
-              ErpWorkflowStructDef.CLOSE_OPERATION_BUNDLE.getVersionedUrl(erpWorkflowVersion));
-
-      // Note: HAPI seems to skip the tags on serialization, why?
-      mdBundle
-          .getMeta()
-          .addTag()
-          .setDisplay(
-              "MedicationDispense Bundle for $close-Operation on dispensation of multiple"
-                  + " medications");
-    }
 
     this.medicationDispenses.forEach(
         md -> {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ package de.gematik.test.erezept.screenplay.questions;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.CommunicationGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.search.CommunicationSearch;
@@ -51,7 +51,7 @@ public class ResponseOfGetCommunicationFrom extends FhirResponseQuestion<ErxComm
   }
 
   @Override
-  public ErpResponse<ErxCommunication> answeredBy(Actor actor) {
+  public FhirBResponse<ErxCommunication> answeredBy(Actor actor) {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val communicationsOracle = SafeAbility.getAbility(actor, ManageCommunications.class);
     val expectedCommunications =
@@ -68,13 +68,13 @@ public class ResponseOfGetCommunicationFrom extends FhirResponseQuestion<ErxComm
         .orElseGet(() -> fetchCommunicationByBasedOn(erpClient, com));
   }
 
-  private ErpResponse<ErxCommunication> fetchCommunicationById(
+  private FhirBResponse<ErxCommunication> fetchCommunicationById(
       UseTheErpClient erpClient, String id) {
     val cmd = new CommunicationGetByIdCommand(id);
     return erpClient.request(cmd);
   }
 
-  private ErpResponse<ErxCommunication> fetchCommunicationByBasedOn(
+  private FhirBResponse<ErxCommunication> fetchCommunicationByBasedOn(
       UseTheErpClient erpClient, ExchangedCommunication expectedCommunication) {
     // first find the expected communication
     val cmd =

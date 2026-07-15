@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
@@ -56,14 +56,20 @@ public class ResponseOfReplyAsKtr extends FhirResponseQuestion<ErxCommunication>
   }
 
   @Override
-  public ErpResponse<ErxCommunication> answeredBy(Actor actor) {
+  public FhirBResponse<ErxCommunication> answeredBy(Actor actor) {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val receiverId = SafeAbility.getAbility(receiver, ProvidePatientBaseData.class).getKvnr();
     val prescriptionPharmacyManager =
         SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
     val communicationManager = SafeAbility.getAbility(receiver, ManageCommunications.class);
+
     val acceptBundle = order.chooseFrom(prescriptionPharmacyManager.getAcceptedPrescriptions());
-    val replyMessage = new CommunicationReplyMessage(SupplyOptionsType.DELIVERY, message);
+
+    val replyMessage =
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(SupplyOptionsType.DELIVERY)
+            .infoText(message)
+            .build();
 
     val communication =
         ErxCommunicationBuilder.asReply(replyMessage)
@@ -75,12 +81,14 @@ public class ResponseOfReplyAsKtr extends FhirResponseQuestion<ErxCommunication>
 
     val cmd = new CommunicationPostCommand(communication);
     val resp = erpClient.request(cmd);
+
     if (resp.isOfExpectedType())
       communicationManager
           .getExpectedCommunications()
           .append(
               ExchangedCommunication.from(resp.getExpectedResource())
                   .withActorNames(actor, receiver));
+
     return resp;
   }
 

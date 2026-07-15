@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import de.gematik.test.erezept.primsys.PrimSysClientFactory
 import de.gematik.test.erezept.primsys.RestTest
 import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto
 import de.gematik.test.erezept.primsys.data.DispensedMedicationDto
+import de.gematik.test.erezept.primsys.data.PrescriptionDto
 import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto
 import de.gematik.test.erezept.primsys.data.PznMedicationDto
 import de.gematik.test.erezept.primsys.data.valuesets.SupplyFormDto
@@ -128,6 +129,18 @@ class PharmacyRequestsTest : RestTest() {
         )
     }
 
+    private fun setupPositiveGetPrescriptionsByPoppToken(): StubMapping {
+        return stubFor(
+            get(urlMatching("/pharm/([a-zA-Z0-9]*)/withPoppToken\\?poppToken=(.*)"))
+                .willReturn(
+                    aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("[]")
+                )
+        )
+    }
+
     @Test
     fun shouldAccept() {
         setupPositiveStubs()
@@ -143,6 +156,27 @@ class PharmacyRequestsTest : RestTest() {
             ).asExpectedPayload()
         }
         assertEquals("160.100.000.000.011.10", acceptResponse.prescriptionId)
+    }
+
+    @Test
+    fun shouldAbort() {
+        setupPositiveStubs()
+        val clientFactory = PrimSysClientFactory
+            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+
+        removeAllMappings()
+        setupPositiveAbort()
+
+        val pharm = clientFactory.getRandomPharmacyClient()
+        val prescription = AcceptedPrescriptionDto().apply {
+            prescriptionId = "160.100.000.000.011.10"
+            accessCode = "123123123"
+            secret = "secret"
+        }
+        val cmd = PharmacyRequests.abort(prescription)
+        assertDoesNotThrow {
+            pharm.performBlocking(cmd).asExpectedPayload()
+        }
     }
 
     @Test
@@ -303,6 +337,23 @@ class PharmacyRequestsTest : RestTest() {
                 PharmacyCommunicationRequests.delete("123123")
             ).asExpectedPayload()
         }
+    }
+
+    @Test
+    fun shouldGetPrescriptionsByPoppToken() {
+        setupPositiveStubs()
+        val clientFactory = PrimSysClientFactory
+            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+
+        removeAllMappings()
+        setupPositiveGetPrescriptionsByPoppToken()
+        val pharm = clientFactory.getRandomPharmacyClient()
+        val response = assertDoesNotThrow {
+            pharm.performBlocking(
+                PharmacyRequests.getPrescriptionsByPoppToken("dummy-popp-token")
+            ).asExpectedPayload()
+        }
+        assertEquals(0, response.size)
     }
 
     companion object TestDataProvider {

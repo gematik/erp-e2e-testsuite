@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ package de.gematik.test.erezept.client.cfg;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.rest.fd.MediaType;
 import de.gematik.test.erezept.client.ClientType;
-import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import java.util.Set;
 import lombok.*;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ package de.gematik.test.erezept.screenplay.questions;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
@@ -98,7 +98,7 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
   }
 
   @Override
-  public ErpResponse<ErxCommunication> answeredBy(Actor actor) {
+  public FhirBResponse<ErxCommunication> answeredBy(Actor actor) {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
 
     val communication = this.createCommunication(actor);
@@ -202,7 +202,12 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
           .flowType(prescription.getTask().getFlowType())
           .build();
     } else {
-      val message = new CommunicationDisReqMessage(SupplyOptionsType.ON_PREMISE, builder.message);
+
+      val message =
+          CommunicationDisReqMessage.forV1()
+              .supplyOptionsType(SupplyOptionsType.ON_PREMISE)
+              .hint(builder.message)
+              .build();
 
       val accessCode = prescription.getTask().getAccessCode();
       return ErxCommunicationBuilder.forDispenseRequest(message)
@@ -235,7 +240,12 @@ public class ResponseOfPostCommunication extends FhirResponseQuestion<ErxCommuni
         SafeAbility.getAbility(builder.receiver, ProvidePatientBaseData.class).getKvnr();
 
     val messageForResponse = this.fetchExpectedMessageFromBackend(actor);
-    val message = new CommunicationReplyMessage();
+
+    val message =
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(SupplyOptionsType.createDefault())
+            .infoText("auto-generated reply")
+            .build();
 
     return ErxCommunicationBuilder.asReply(message)
         .receiver(receiverId.getValue())

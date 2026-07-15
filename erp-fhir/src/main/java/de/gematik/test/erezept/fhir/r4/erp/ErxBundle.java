@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@
 package de.gematik.test.erezept.fhir.r4.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
 
 @Slf4j
@@ -52,5 +54,19 @@ public class ErxBundle extends Bundle {
     return this.getLink().stream()
         .map(BundleLinkComponent::getRelation)
         .anyMatch(s -> s.equalsIgnoreCase(named));
+  }
+
+  public Optional<Integer> getOffsetValueOfRelationLink(String relation) {
+    val url =
+        this.getLink().stream()
+            .filter(re -> re.getRelation().equalsIgnoreCase(relation))
+            .map(Bundle.BundleLinkComponent::getUrl)
+            .findFirst();
+    if (url.isEmpty() || !url.get().contains("offset")) return Optional.empty();
+    val offsetBegin = url.get().split("_offset=")[1];
+
+    if (!offsetBegin.matches("\\d+"))
+      return Optional.of(Integer.parseInt(offsetBegin.split("&")[0]));
+    return Optional.of(Integer.parseInt(offsetBegin));
   }
 }

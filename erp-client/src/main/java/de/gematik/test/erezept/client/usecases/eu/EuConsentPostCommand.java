@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,12 @@ package de.gematik.test.erezept.client.usecases.eu;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.rest.HttpRequestMethod;
-import de.gematik.test.erezept.client.usecases.BaseCommand;
+import de.gematik.test.erezept.client.usecases.ErpBaseCommand;
 import de.gematik.test.erezept.fhir.builder.eu.EuConsentBuilder;
 import de.gematik.test.erezept.fhir.r4.eu.EuConsent;
-import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
-public class EuConsentPostCommand extends BaseCommand<EuConsent> {
+public class EuConsentPostCommand extends ErpBaseCommand<EuConsent> {
 
   private final EuConsent requestBody;
 
@@ -41,14 +40,8 @@ public class EuConsentPostCommand extends BaseCommand<EuConsent> {
     this.requestBody = requestBody;
   }
 
-  /**
-   * Get the FHIR-Resource for the Request-Body (of the inner-HTTP)
-   *
-   * @return an Optional.of(FHIR-Resource) for the Request-Body or an empty Optional if Request-Body
-   *     is empty
-   */
   @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.of(requestBody);
+  public Resource getRequestBody() {
+    return requestBody;
   }
 }

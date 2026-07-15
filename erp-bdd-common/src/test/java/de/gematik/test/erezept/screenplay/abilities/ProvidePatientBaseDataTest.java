@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,13 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.de.value.IKNR;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
@@ -235,5 +232,21 @@ class ProvidePatientBaseDataTest extends ErpFhirParsingTest {
 
     assertTrue(result.isSuccessful());
     assertEquals(DmpKennzeichen.DM1, coverage.getDmpKennzeichen());
+  }
+
+  @Test
+  void shouldSetPatientVersionCorrect() {
+    val patient =
+        ProvidePatientBaseData.forGkvPatient(KVNR.from("X123456789"), "Fridolin Schraßer");
+    patient.setVersion(KbvItaForVersion.V1_3_0);
+    assertTrue(patient.getPatient().getMeta().getProfile().getFirst().getValue().endsWith("|1.3"));
+  }
+
+  @Test
+  void shouldSetPatientVersionCorrect2() {
+    val patient =
+        ProvidePatientBaseData.forGkvPatient(KVNR.from("X123456789"), "Fridolin Schraßer");
+    patient.setVersion(KbvItaForVersion.V1_3_0);
+    assertFalse(patient.getPatient().getMeta().getProfile().getFirst().getValue().endsWith("|1.2"));
   }
 }

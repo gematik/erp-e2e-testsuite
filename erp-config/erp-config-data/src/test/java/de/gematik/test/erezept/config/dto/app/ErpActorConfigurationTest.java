@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,6 @@ package de.gematik.test.erezept.config.dto.app;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import lombok.val;
@@ -32,6 +30,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import tools.jackson.databind.ObjectMapper;
 
 class ErpActorConfigurationTest {
 
@@ -86,8 +85,7 @@ class ErpActorConfigurationTest {
       String name,
       String device,
       Consumer<String> iccsnAssertion,
-      boolean hasVirtualEgk)
-      throws JsonProcessingException {
+      boolean hasVirtualEgk) {
     val mapper = new ObjectMapper();
     val conf = mapper.readValue(input, ErpActorConfiguration.class);
     assertEquals(name, conf.getName());

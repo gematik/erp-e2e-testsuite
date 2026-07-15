@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,13 @@ public class DosageDgMPBuilder extends ElementBuilder<DosageDgMP, DosageDgMPBuil
   }
 
   public static DosageDgMPBuilder dosageBuilder(long value, BmpDosiereinheit code) {
+    Quantity quantity = new Quantity();
+    quantity.setUnit(code.getDisplay()).setCode(code.getCode());
+    quantity.setValue(value);
+    return new DosageDgMPBuilder(quantity);
+  }
+
+  public static DosageDgMPBuilder dosageBuilder(double value, BmpDosiereinheit code) {
     Quantity quantity = new Quantity();
     quantity.setUnit(code.getDisplay()).setCode(code.getCode());
     quantity.setValue(value);

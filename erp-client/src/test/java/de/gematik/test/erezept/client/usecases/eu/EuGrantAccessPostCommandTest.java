@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,7 @@ import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
 import de.gematik.test.erezept.fhir.r4.eu.EuAccessPermission;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
 import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
-import java.util.Optional;
 import lombok.val;
-import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.Test;
 
 class EuGrantAccessPostCommandTest {
@@ -45,10 +43,9 @@ class EuGrantAccessPostCommandTest {
   void shouldCreateWithAccessPermissionResource() {
 
     val command = new EuGrantAccessPostCommand(euAccessPermission);
-    Optional<Resource> body = command.getRequestBody();
-    assertTrue(body.isPresent());
-    assertInstanceOf(EuAccessPermission.class, body.get());
-    assertTrue(GemErpEuStructDef.ACCESS_AUTHORIZATION_REQUEST.matches(body.get().getMeta()));
+    val body = command.getRequestBody();
+    assertInstanceOf(EuAccessPermission.class, body);
+    assertTrue(GemErpEuStructDef.ACCESS_AUTHORIZATION_REQUEST.matches(body.getMeta()));
   }
 
   @Test

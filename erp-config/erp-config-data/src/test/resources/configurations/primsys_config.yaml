@@ -59,26 +59,17 @@ environments:
       userAgent: eRp-Testsuite
 
 konnektors:
-  - name: KonSim@localhost
-    type: remote
-    profile: KONSIM
-    address: 127.0.0.1:9106
-    protocol: http
+  - name: "Soft-Kon"
     context:
-      mandantId: Mandant1
-      clientSystemId: CS1
-      workplaceId: WP1
-      userId: user1
-    tls:
-      keyStore: konsim_mandant1_keystore.p12
-      keyStorePassword: "00"
-      trustStore: konsim_truststore.jks
-      trustStorePassword: "gematik"
-    cats:
-      - ctId: CT_ID_0000
-        url: https://localhost/kon1/cats
-      - ctId: CT_ID_0001
-        url: https://localhost/kon2/cats2
+      mandantId: "Mandant1"
+      clientSystemId: "CS1"
+      workplaceId: "AP1"
+      userId: "user1"
+    service:
+      type: "Soft-Kon"
+      smartcards: "a/b/c"
+      vsdmConfiguration:
+        hMacKey: "123123123"
+        operator: S
+        version: 1
 
-  - name: Soft-Konn
-    type: local

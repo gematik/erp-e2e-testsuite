@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.screenplay.questions;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemDeleteCommand;
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
@@ -39,7 +39,7 @@ public class ResponseOfDeleteChargeItem extends FhirResponseQuestion<EmptyResour
   }
 
   @Override
-  public ErpResponse<EmptyResource> answeredBy(Actor actor) {
+  public FhirBResponse<EmptyResource> answeredBy(Actor actor) {
     val dispensedDrugs = SafeAbility.getAbility(actor, ReceiveDispensedDrugs.class);
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
 import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import java.util.Date;
 import lombok.val;
 import org.hl7.fhir.r4.model.Medication;
@@ -52,11 +51,6 @@ public class ErxMedicationDispenseFaker
     return new ErxMedicationDispenseFaker(erpWfVersion);
   }
 
-  public ErxMedicationDispenseFaker withMedication(KbvErpMedication medication) {
-    builderConsumers.put("medication", b -> b.medication(medication));
-    return this;
-  }
-
   public ErxMedicationDispenseFaker withPreparedDate(Date whenPrepared) {
     builderConsumers.put("preparedDate", b -> b.whenPrepared(whenPrepared));
     return this;
@@ -64,6 +58,22 @@ public class ErxMedicationDispenseFaker
 
   public ErxMedicationDispenseFaker withBatch(Medication.MedicationBatchComponent batch) {
     builderConsumers.put("batch", b -> b.batch(batch));
+    return this;
+  }
+
+  public ErxMedicationDispenseFaker withDosageInstruction(String dosageInstruction) {
+    builderConsumers.put("dosageInstruction", b -> b.dosageInstruction(dosageInstruction));
+    return this;
+  }
+
+  /**
+   * !!! this setter works only in ErpWorflowVersion 1,5 and below !!!
+   *
+   * @param patientInstruction
+   * @return faker()
+   */
+  public ErxMedicationDispenseFaker withPatientInstruction(String patientInstruction) {
+    builderConsumers.put("patientInstruction", b -> b.patientInstruction(patientInstruction));
     return this;
   }
 

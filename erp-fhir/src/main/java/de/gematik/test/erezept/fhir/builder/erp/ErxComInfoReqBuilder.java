@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,11 +46,11 @@ public class ErxComInfoReqBuilder extends ErxComPrescriptionBuilder<ErxComInfoRe
         buildCommon(() -> ErpWorkflowStructDef.COM_INFO_REQ.asCanonicalType(erpWorkflowVersion));
     val insuranceProvider = ErpWorkflowStructDef.INSURANCE_PROVIDER;
     val substitutionAllowedExt = ErpWorkflowStructDef.SUBSTITUTION_ALLOWED;
-    val prescriptionType = ErpWorkflowStructDef.PRESCRIPTION_TYPE_12;
+    val prescriptionType = ErpWorkflowStructDef.PRESCRIPTION_TYPE;
     val insuranceIdentifier = insuranceIknr.asIdentifier(DeBasisProfilNamingSystem.IKNR_SID);
     // hacky but should work fow now!
     val flowTypeCoding =
-        flowType.asCoding(true).setSystem(ErpWorkflowCodeSystem.FLOW_TYPE_12.getCanonicalUrl());
+        flowType.asCoding(true).setSystem(ErpWorkflowCodeSystem.FLOW_TYPE.getCanonicalUrl());
 
     // set sender and receiver
     com.addRecipient(

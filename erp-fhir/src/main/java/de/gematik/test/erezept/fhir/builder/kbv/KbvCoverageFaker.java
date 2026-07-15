@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,8 @@ public class KbvCoverageFaker {
   private KbvCoverageFaker(KbvItaForVersion version) {
     this.version = version;
     this.withPersonGroup(fakerValueSet(PersonGroup.class))
-        .withDmpKennzeichen(fakerValueSet(DmpKennzeichen.class))
+        .withDmpKennzeichen(
+            fakerValueSet(DmpKennzeichen.class, DmpKennzeichen.getUpdatedOktober26()))
         .withWop(fakerValueSet(Wop.class))
         .withInsuranceStatus(fakerValueSet(VersichertenStatus.class))
         .withBeneficiary(

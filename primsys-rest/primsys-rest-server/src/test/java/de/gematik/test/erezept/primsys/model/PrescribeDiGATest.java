@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.EncodingType;
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
@@ -45,7 +45,6 @@ import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.data.PrescriptionDto;
 import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -75,21 +74,20 @@ class PrescribeDiGATest extends TestWithActorContext {
     when(draftErxTask.getAccessCode()).thenReturn(accessCode);
 
     val createResponse =
-        ErpResponse.forPayload(draftErxTask, ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, draftErxTask)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     val activateResponse =
-        ErpResponse.forPayload(activatedErxTask, ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, activatedErxTask)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
     when(mockClient.request(any(TaskActivateCommand.class))).thenReturn(activateResponse);
 
     val patient = KbvPatientFaker.builder().fake();
+    val kvnr = patient.getKvnr().getValue();
     val practitioner = KbvPractitionerFaker.builder().fake();
     val coverage = KbvCoverageFaker.builder().fake();
     val evdgaBundle =
@@ -106,7 +104,7 @@ class PrescribeDiGATest extends TestWithActorContext {
             .build();
 
     val xml = parser.encode(evdgaBundle, EncodingType.XML);
-    try (val response = PrescribeDiGA.as(doctor).withEvdga(xml)) {
+    try (val response = PrescribeDiGA.as(doctor).forCustomKvnr(kvnr).build().withEvdga(xml)) {
       val resMap = (PrescriptionDto) response.getEntity();
       assertTrue(response.hasEntity());
       assertEquals(taskId.getValue(), resMap.getTaskId());

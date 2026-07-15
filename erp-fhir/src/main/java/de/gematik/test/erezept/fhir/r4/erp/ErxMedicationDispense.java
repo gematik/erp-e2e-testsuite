@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,6 +96,15 @@ public class ErxMedicationDispense extends ErxMedicationDispenseBase {
         .findFirst()
         .orElseThrow(
             () -> new MissingFieldException(ErxMedicationDispense.class, "DosageInstructionText"));
+  }
+
+  public String getDosageOrPatientInstruction() {
+    return this.getDosageInstruction().stream().map(Dosage::getText).toList().getFirst() != null
+        ? this.getDosageInstruction().stream().map(Dosage::getText).toList().getFirst()
+        : this.getDosageInstruction().stream()
+            .map(Dosage::getPatientInstruction)
+            .toList()
+            .getFirst();
   }
 
   public Optional<String> getRenderedDosageInstructionOptional() {

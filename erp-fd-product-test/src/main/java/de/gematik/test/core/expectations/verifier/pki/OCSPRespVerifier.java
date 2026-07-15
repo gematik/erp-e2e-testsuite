@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@
 
 package de.gematik.test.core.expectations.verifier.pki;
 
+import de.gematik.bbriccs.konnektor.SoftKonVerifier;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
-import de.gematik.test.erezept.actions.rawhttpactions.pki.*;
+import de.gematik.test.erezept.actions.rawhttpactions.pki.OCSPBodyWrapper;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
-import de.gematik.test.konnektor.soap.mock.LocalVerifier;
 import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPToken;
 import java.util.Arrays;
 import java.util.function.Predicate;
@@ -57,9 +57,9 @@ public class OCSPRespVerifier {
 
   public static VerificationStep<ErxAcceptBundle> isQesValid() {
     Predicate<ErxAcceptBundle> hasOcspTokens =
-        bundle -> !LocalVerifier.parse(bundle.getSignedKbvBundle()).getOcspTokens().isEmpty();
+        bundle -> !SoftKonVerifier.parse(bundle.getSignedKbvBundle()).getOcspTokens().isEmpty();
     Predicate<ErxAcceptBundle> verifyOcspTokens =
-        bundle -> LocalVerifier.parse(bundle.getSignedKbvBundle()).verify();
+        bundle -> SoftKonVerifier.parse(bundle.getSignedKbvBundle()).verify();
     val step =
         new VerificationStep.StepBuilder<ErxAcceptBundle>(
             ErpAfos.A_20159.getRequirement(), "Die QES enthält keine oder ungültige OcspResponses");
@@ -69,7 +69,7 @@ public class OCSPRespVerifier {
   public static VerificationStep<ErxAcceptBundle> replacedOcspResp(OCSPToken originOcspToken) {
     Predicate<ErxAcceptBundle> predicate =
         bundle -> {
-          val ocspTokens = LocalVerifier.parse(bundle.getSignedKbvBundle()).getOcspTokens();
+          val ocspTokens = SoftKonVerifier.parse(bundle.getSignedKbvBundle()).getOcspTokens();
           return ocspTokens.stream()
               .noneMatch(it -> Arrays.equals(it.getEncoded(), originOcspToken.getEncoded()));
         };
@@ -82,7 +82,7 @@ public class OCSPRespVerifier {
   public static VerificationStep<ErxAcceptBundle> containsOcspResp(OCSPToken originOcspToken) {
     Predicate<ErxAcceptBundle> predicate =
         bundle -> {
-          val ocspTokens = LocalVerifier.parse(bundle.getSignedKbvBundle()).getOcspTokens();
+          val ocspTokens = SoftKonVerifier.parse(bundle.getSignedKbvBundle()).getOcspTokens();
           return ocspTokens.stream()
               .anyMatch(it -> Arrays.equals(it.getEncoded(), originOcspToken.getEncoded()));
         };

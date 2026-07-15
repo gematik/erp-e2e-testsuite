@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ public class EpaOpProvidePrescription extends Parameters {
     return getRxPrescriptionParameter().getPart().stream()
         .filter(entry -> entry.getName().equals("medicationRequest"))
         .filter(entry -> EpaMedicationStructDef.EPA_MEDICATION_REQUEST.matches(entry.getResource()))
-        .map(entry -> (EpaMedicationRequest) entry.getResource())
+        .map(entry -> EpaMedicationRequest.fromEpaMedicationRequest(entry.getResource()))
         .findFirst()
         .orElseThrow();
   }
@@ -68,7 +68,7 @@ public class EpaOpProvidePrescription extends Parameters {
     return getRxPrescriptionParameter().getPart().stream()
         .filter(entry -> entry.getName().equals("organization"))
         .filter(entry -> GematikDirStrucDef.ORGANIZATION.matches(entry.getResource()))
-        .map(entry -> (EpaOrganisation) entry.getResource())
+        .map(entry -> EpaOrganisation.fromEpaOrganization(entry.getResource()))
         .findFirst()
         .orElseThrow();
   }

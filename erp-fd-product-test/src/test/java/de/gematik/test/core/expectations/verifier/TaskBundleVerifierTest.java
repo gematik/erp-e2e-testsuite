@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ class TaskBundleVerifierTest extends ErpFhirParsingTest {
     val task = new ErxTask();
     task.getMeta().addProfile(ErpWorkflowStructDef.TASK.getCanonicalUrl());
     task.addExtension()
-        .setUrl(ErpWorkflowStructDef.PRESCRIPTION_TYPE_12.getCanonicalUrl())
+        .setUrl(ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl())
         .setValue(PrescriptionFlowType.FLOW_TYPE_200.asCoding());
     erxTaskBundle1.addEntry().setResource(task);
 
@@ -106,7 +106,7 @@ class TaskBundleVerifierTest extends ErpFhirParsingTest {
     val dateType =
         new org.hl7.fhir.r4.model.DateType(
             new java.text.SimpleDateFormat("yyyy-MM-dd").format(expiryDate));
-    erxTask.addExtension(ErpWorkflowStructDef.EXPIRY_DATE_12.getCanonicalUrl(), dateType);
+    erxTask.addExtension(ErpWorkflowStructDef.EXPIRY_DATE.getCanonicalUrl(), dateType);
 
     val step = TaskBundleVerifier.doesNotContainExpiredTasks(ErpAfos.A_23452);
     step.apply(erxTaskBundle);
@@ -123,7 +123,7 @@ class TaskBundleVerifierTest extends ErpFhirParsingTest {
     val dateType =
         new org.hl7.fhir.r4.model.DateType(
             new java.text.SimpleDateFormat("yyyy-MM-dd").format(expiryDate));
-    erxTask.addExtension(ErpWorkflowStructDef.EXPIRY_DATE_12.getCanonicalUrl(), dateType);
+    erxTask.addExtension(ErpWorkflowStructDef.EXPIRY_DATE.getCanonicalUrl(), dateType);
 
     val step = TaskBundleVerifier.doesNotContainExpiredTasks(ErpAfos.A_23452);
     assertThrows(AssertionError.class, () -> step.apply(erxTaskBundle));
@@ -227,7 +227,7 @@ class TaskBundleVerifierTest extends ErpFhirParsingTest {
   @ParameterizedTest
   @EnumSource(PrescriptionFlowType.class)
   void shouldOnlyContainsTaskWithStatus(PrescriptionFlowType flowType) {
-    val step = TaskBundleVerifier.containsOnlyTasksWith(flowType, ErpAfos.A_23452);
+    val step = TaskBundleVerifier.containsOnlyTasksWith(ErpAfos.A_23452, flowType);
 
     val erxTaskBundle = new ErxTaskBundle();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,27 +20,26 @@
 
 package de.gematik.test.erezept.apimeasure;
 
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.ClientType;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.ICommand;
+import de.gematik.test.erezept.client.usecases.ErpBaseCommand;
+import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
 public interface ApiCallStopwatch {
 
   <T extends Resource> void measurement(
-      ClientType type, ICommand<T> command, ErpResponse<T> response);
+      ClientType type, ErpBaseCommand<T> command, FhirBResponse<T> response);
 
   void close();
 
-  default <T extends Resource> String getResourceType(ICommand<T> command) {
-    return command.getRequestBody().map(b -> b.getClass().getSimpleName()).orElse("none");
+  default <T extends Resource> String getResourceType(ErpBaseCommand<T> command) {
+    return Optional.of(command.getRequestBody())
+        .map(b -> b.getClass().getSimpleName())
+        .orElse("none");
   }
 
-  default <T extends Resource> String getResourceType(ErpResponse<T> response) {
-    if (response.getResourceType() != null) {
-      return response.getResourceType().getSimpleName();
-    } else {
-      return "none";
-    }
+  default <T extends Resource> String getResourceType(FhirBResponse<T> response) {
+    return Optional.ofNullable(response.getResourceType()).map(Class::getSimpleName).orElse("none");
   }
 }

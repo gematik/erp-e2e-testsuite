@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,18 @@
 package de.gematik.test.erezept.client.usecases.eu;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.test.erezept.fhir.r4.eu.EuConsent;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class EuConsentPostCommandTest extends ErpFhirBuildingTest {
 
-  private EuConsentPostCommand consentPostCommand =
+  private final EuConsentPostCommand consentPostCommand =
       new EuConsentPostCommand(KVNR.from("G995030567"));
 
   @Test
@@ -45,11 +46,6 @@ class EuConsentPostCommandTest extends ErpFhirBuildingTest {
   void getRequestBodyNotNull() {
     val request = consentPostCommand.getRequestBody();
     assertNotNull(request);
-  }
-
-  @Test
-  void getRequestBodyIsOptionalPresent() {
-    val request = consentPostCommand.getRequestBody();
-    assertTrue(request.isPresent());
+    assertInstanceOf(EuConsent.class, request);
   }
 }

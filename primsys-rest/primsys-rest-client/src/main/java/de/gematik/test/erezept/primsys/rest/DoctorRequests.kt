@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 
 package de.gematik.test.erezept.primsys.rest
 
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
+import tools.jackson.core.type.TypeReference
+import tools.jackson.databind.ObjectMapper
 import de.gematik.test.erezept.primsys.data.PrescribeRequestDto
 import de.gematik.test.erezept.primsys.data.PrescriptionDto
 import io.ktor.client.request.*
@@ -58,6 +58,17 @@ class PrescribeKbvBundleRequest(private val body: String, private val asDirectAs
     }
 }
 
+class AbortDoctorPrescriptionRequest(private val prescriptionId: String, private val accessCode: String) :
+    PrimSysBaseDoctorRequest<Unit>(object : TypeReference<Unit>() {}) {
+
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Delete
+        rb.url.appendEncodedPathSegments("abort")
+        rb.url.parameters.append("taskId", prescriptionId)
+        rb.url.parameters.append("ac", accessCode)
+    }
+}
+
 
 object DoctorRequests {
 
@@ -81,4 +92,11 @@ object DoctorRequests {
     @JvmStatic
     fun prescribe(body: PrescribeRequestDto, asDirectAssignment: Boolean = false) =
         PrescribeRequest(body, asDirectAssignment)
+
+    @JvmStatic
+    fun abort(prescriptionId: String, accessCode: String) =
+        AbortDoctorPrescriptionRequest(prescriptionId, accessCode)
+
+    @JvmStatic
+    fun abort(prescription: PrescriptionDto) = abort(prescription.taskId, prescription.accessCode)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,13 @@
 package de.gematik.test.erezept.client.usecases;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import lombok.val;
+import org.hl7.fhir.r4.model.Parameters;
 import org.junit.jupiter.api.Test;
 
 class TaskActivateCommandTest {
@@ -48,6 +49,6 @@ class TaskActivateCommandTest {
     val ac = AccessCode.from("thisIsASenslessLongStringAsPossibleAccsesscode@123456");
 
     val cmd = new TaskActivateCommand(taskId, ac, new byte[0]);
-    assertTrue(cmd.getRequestBody().isPresent());
+    assertInstanceOf(Parameters.class, cmd.getRequestBody());
   }
 }

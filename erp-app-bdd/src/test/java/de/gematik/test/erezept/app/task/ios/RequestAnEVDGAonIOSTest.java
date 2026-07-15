@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 package de.gematik.test.erezept.app.task.ios;
 
 import static de.gematik.test.erezept.app.mocker.EvdgaTestDummyFactory.*;
+import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -28,8 +29,11 @@ import static org.mockito.Mockito.times;
 
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.elements.EVDGADetails;
+import de.gematik.test.erezept.app.questions.MovingToEVDGAPrescription;
 import de.gematik.test.erezept.app.questions.MovingToPrescription;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
+import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
@@ -74,6 +78,11 @@ class RequestAnEVDGAonIOSTest {
 
     // Skip the VisibleStatus validation
     doNothing().when(theAppUser).attemptsTo(any(PerformableExpectation.class));
+    // Skip the question to move to the EVDGA prescription
+    val mockedEVDGABundle = mock(ErxPrescriptionBundle.class);
+    val mockedErxTask = mock(ErxTask.class);
+    when(mockedEVDGABundle.getTask()).thenReturn(mockedErxTask);
+    doReturn(mockedEVDGABundle).when(theAppUser).asksFor(MovingToEVDGAPrescription.with(any()));
     // skip the insurance selection step
     doNothing()
         .when(theAppUser)
@@ -93,6 +102,9 @@ class RequestAnEVDGAonIOSTest {
 
   @Test
   void shouldThrowPreconditionErrorOnMissingBundle() {
+    val app = mock(UseIOSApp.class);
+    givenThat(theAppUser).can(app);
+
     doReturn(Optional.empty()).when(theAppUser).asksFor(any(MovingToPrescription.class));
 
     val requestAnEvdga = RequestAnEVDGAonIOS.fromStack("erste").from(theInsurance);

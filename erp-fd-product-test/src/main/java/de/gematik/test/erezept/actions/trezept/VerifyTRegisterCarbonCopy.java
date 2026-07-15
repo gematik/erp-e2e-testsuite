@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ package de.gematik.test.erezept.actions.trezept;
 
 import static de.gematik.test.core.expectations.verifier.tprescriptionverifier.CarbonCopyVerifier.*;
 
+import de.gematik.test.core.expectations.verifier.tprescriptionverifier.CarbonCopyVerifier;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
@@ -31,6 +32,7 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.trezept.TRegisterLog;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -45,19 +47,30 @@ public class VerifyTRegisterCarbonCopy implements Performable {
   private final List<TRegisterLog> logs;
   private final PrescriptionId prescriptionId;
   private final ErxMedicationDispenseBundle medDispenseBundle;
+  private Boolean shouldCheckAuthHeadder = false;
 
   private VerifyTRegisterCarbonCopy(
       List<TRegisterLog> logs,
       PrescriptionId prescriptionId,
-      @Nullable ErxMedicationDispenseBundle medDispenseBundle) {
+      @Nullable ErxMedicationDispenseBundle medDispenseBundle,
+      @Nullable Boolean checkAuthHeadder) {
     this.logs = logs;
     this.prescriptionId = prescriptionId;
     this.medDispenseBundle = medDispenseBundle;
+    this.shouldCheckAuthHeadder = checkAuthHeadder;
+  }
+
+  public VerifyTRegisterCarbonCopy checkAccessToken() {
+    CarbonCopyVerifier.checkPresenceAccessToken().getPredicate().test(logs);
+    return this;
   }
 
   public static VerifyTRegisterCarbonCopy from(
-      List<TRegisterLog> logs, PrescriptionId prescriptionId, ErxMedicationDispenseBundle medDisp) {
-    return new VerifyTRegisterCarbonCopy(logs, prescriptionId, medDisp);
+      List<TRegisterLog> logs,
+      PrescriptionId prescriptionId,
+      ErxMedicationDispenseBundle medDisp,
+      @Nullable Boolean shouldCheckAuthHeadder) {
+    return new VerifyTRegisterCarbonCopy(logs, prescriptionId, medDisp, shouldCheckAuthHeadder);
   }
 
   @Override
@@ -71,19 +84,26 @@ public class VerifyTRegisterCarbonCopy implements Performable {
     val httpRequest = logs.get(0).request();
     val body = httpRequest.bodyAsString();
 
-    val carbCopy = new FhirParser().decode(ErpTPrescriptionCarbonCopy.class, body);
+    Optional.ofNullable(medDispenseBundle)
+        .ifPresent(
+            medDispBundle -> {
+              val carbCopy = new FhirParser().decode(ErpTPrescriptionCarbonCopy.class, body);
 
-    List<Pair<ErxMedicationDispense, GemErpMedication>> medDisp =
-        medDispenseBundle.getDispensePairBy(prescriptionId);
+              List<Pair<ErxMedicationDispense, GemErpMedication>> medDisp =
+                  medDispenseBundle.getDispensePairBy(prescriptionId);
 
-    val verifiers =
-        new ArrayList<>(
-            List.of(
-                checkPznFromGemMedication(medDisp),
-                checkMedicationName(medDisp),
-                checkPrescriptionId(medDisp),
-                checkDarreichungsformInPrescription(medDisp),
-                checkDarreichungsformInDispensation(medDisp)));
-    verifiers.forEach(v -> v.apply(carbCopy));
+              val verifiers =
+                  new ArrayList<>(
+                      List.of(
+                          checkPznFromGemMedication(medDisp),
+                          checkMedicationName(medDisp),
+                          checkPrescriptionId(medDisp),
+                          checkDarreichungsformInPrescription(medDisp),
+                          checkDarreichungsformInDispensation(medDisp)));
+              verifiers.forEach(v -> v.apply(carbCopy));
+            });
+    if (Boolean.TRUE.equals(shouldCheckAuthHeadder)) {
+      checkAccessToken();
+    }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,16 +27,15 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.DispensePrescriptionCommandNew;
+import de.gematik.test.erezept.client.usecases.DispensePrescriptionCommand;
 import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -65,12 +64,11 @@ class DispensePrescriptionNewTest extends ErpFhirBuildingTest {
             .withParameters(new GemDispenseOperationParameters());
 
     val response =
-        ErpResponse.forPayload(null, EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, null)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
-    doReturn(response).when(useErpClient).request(any(DispensePrescriptionCommandNew.class));
+    doReturn(response).when(useErpClient).request(any(DispensePrescriptionCommand.class));
 
     assertDoesNotThrow(() -> pharmacy.performs(action));
   }
@@ -84,12 +82,11 @@ class DispensePrescriptionNewTest extends ErpFhirBuildingTest {
     val action = DispensePrescriptionNew.withCredentials(taskId, secret).withParameters(params);
 
     val response =
-        ErpResponse.forPayload(null, EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, null)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
-    doReturn(response).when(useErpClient).request(any(DispensePrescriptionCommandNew.class));
+    doReturn(response).when(useErpClient).request(any(DispensePrescriptionCommand.class));
 
     assertDoesNotThrow(() -> pharmacy.performs(action));
   }

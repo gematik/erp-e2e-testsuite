@@ -203,14 +203,6 @@
     ]
   },
   {
-    "iccsn": "80276881040001935352",
-    "note": "Kassenidentität (TK) ohne gültigen Private Key",
-    "identifier": "T046142499",
-    "type": "EGK",
-    "ownerName": "Juliane Mustermann",
-    "stores": []
-  },
-  {
     "iccsn": "80276883110000154825",
     "note": "EML - Alice IBM",
     "identifier": "X110571801",

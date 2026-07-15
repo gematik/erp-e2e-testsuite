@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,12 @@
 package de.gematik.test.erezept.client.usecases;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.test.erezept.fhir.r4.erp.ErxConsent;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,6 +64,6 @@ class ConsentPostCommandTest extends ErpFhirBuildingTest {
   @Test
   void getRequestBodyIsOptionalPresent() {
     val request = consentPostCommand.getRequestBody();
-    assertTrue(request.isPresent());
+    assertInstanceOf(ErxConsent.class, request);
   }
 }

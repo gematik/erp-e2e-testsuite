@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@
 
 package de.gematik.test.erezept;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
+import de.gematik.bbriccs.rest.fd.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
-import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -35,9 +35,8 @@ class ErpInteractionTest {
   @Test
   void shouldBuildExpectation() {
     val response =
-        ErpResponse.forPayload(new ErxTask(), ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, new ErxTask())
             .withStatusCode(201)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     val interaction = new ErpInteraction<>(response);
 
@@ -48,9 +47,8 @@ class ErpInteractionTest {
   @Test
   void shouldProvideExpectedRessource() {
     val response =
-        ErpResponse.forPayload(new ErxTask(), ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, new ErxTask())
             .withStatusCode(201)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     val interaction = new ErpInteraction<>(response);
 
@@ -61,9 +59,8 @@ class ErpInteractionTest {
   @Test
   void shouldProvideOperationOutcomeExpectation() {
     val response =
-        ErpResponse.forPayload(new ErxTask(), ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, new ErxTask())
             .withStatusCode(201)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     val interaction = new ErpInteraction<>(response);
 
@@ -74,9 +71,8 @@ class ErpInteractionTest {
   @Test
   void shouldThrowOnUnexpected() {
     val response =
-        ErpResponse.forPayload(createOperationOutcome(), ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, createOperationOutcome())
             .withStatusCode(404)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     val interaction = new ErpInteraction<>(response);
 

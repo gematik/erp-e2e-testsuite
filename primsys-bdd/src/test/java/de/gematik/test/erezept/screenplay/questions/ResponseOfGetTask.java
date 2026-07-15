@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@
 package de.gematik.test.erezept.screenplay.questions;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.vsdm.types.VsdmPatient;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetCommand;
 import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
@@ -53,14 +53,14 @@ public class ResponseOfGetTask extends FhirResponseQuestion<ErxTaskBundle> {
   }
 
   @Override
-  public ErpResponse<ErxTaskBundle> answeredBy(Actor actor) {
+  public FhirBResponse<ErxTaskBundle> answeredBy(Actor actor) {
     if (ActorRole.PHARMACY.equals(role)) {
       return answeredByPharmacy(actor);
     }
     throw new FeatureNotImplementedException("Get /Task as patient");
   }
 
-  private ErpResponse<ErxTaskBundle> answeredByPharmacy(Actor pharmacy) {
+  private FhirBResponse<ErxTaskBundle> answeredByPharmacy(Actor pharmacy) {
     val erpClient = SafeAbility.getAbility(pharmacy, UseTheErpClient.class);
     val response = erpClient.request(cmd);
     val erxTaskBundle = response.getResourceOptional();

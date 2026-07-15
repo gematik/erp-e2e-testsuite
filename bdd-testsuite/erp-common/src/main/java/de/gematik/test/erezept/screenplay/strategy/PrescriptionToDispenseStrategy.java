@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ package de.gematik.test.erezept.screenplay.strategy;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.konnektor.SoftKonVerifier;
 import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
@@ -33,7 +34,6 @@ import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.konnektor.soap.mock.LocalVerifier;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -122,7 +122,7 @@ public class PrescriptionToDispenseStrategy {
   }
 
   public String getKbvBundleAsString() {
-    return LocalVerifier.parse(taskToDispense.getSignedKbvBundle()).getDocument();
+    return SoftKonVerifier.parse(taskToDispense.getSignedKbvBundle()).getDocument();
   }
 
   /**

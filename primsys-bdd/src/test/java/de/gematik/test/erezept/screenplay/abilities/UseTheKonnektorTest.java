@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,34 +20,31 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+import de.gematik.bbriccs.cardterminal.CardInfo;
 import de.gematik.bbriccs.crypto.BC;
 import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.konnektor.Konnektor;
+import de.gematik.bbriccs.konnektor.KonnektorImpl;
+import de.gematik.bbriccs.konnektor.KonnektorResponse;
+import de.gematik.bbriccs.konnektor.SofKonServicePort;
+import de.gematik.bbriccs.konnektor.cfg.KonnektorContextConfiguration;
+import de.gematik.bbriccs.konnektor.requests.ExternalAuthenticateRequest;
+import de.gematik.bbriccs.konnektor.requests.GetCardHandleRequest;
+import de.gematik.bbriccs.konnektor.requests.VerifyPinRequest;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.bbriccs.smartcards.SmartcardType;
-import de.gematik.test.cardterminal.CardInfo;
-import de.gematik.test.erezept.config.dto.konnektor.LocalKonnektorConfiguration;
+import de.gematik.bbriccs.vsdm.VsdmService;
 import de.gematik.test.erezept.exceptions.MissingSmartcardException;
 import de.gematik.test.erezept.exceptions.VerifyPinFailed;
-import de.gematik.test.konnektor.Konnektor;
-import de.gematik.test.konnektor.KonnektorResponse;
-import de.gematik.test.konnektor.cfg.KonnektorFactory;
-import de.gematik.test.konnektor.commands.ExternalAuthenticateCommand;
-import de.gematik.test.konnektor.commands.GetCardHandleCommand;
-import de.gematik.test.konnektor.commands.VerifyPinCommand;
+import de.gematik.ws.conn.cardservicecommon.v2.CardTypeType;
 import de.gematik.ws.conn.cardservicecommon.v2.PinResponseType;
 import de.gematik.ws.conn.cardservicecommon.v2.PinResultEnum;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.core.Serenity;
@@ -71,18 +68,25 @@ class UseTheKonnektorTest {
     sca = SmartcardArchive.fromResources();
   }
 
+  private Konnektor createTestKonnektor(SmartcardArchive smartcardArchive) {
+    val serviceProvider =
+        new SofKonServicePort(smartcardArchive, VsdmService.instantiateWithTestKey());
+    return new KonnektorImpl(
+        KonnektorContextConfiguration.getDefaultContextType(), serviceProvider, List.of());
+  }
+
   @Test
   void shouldThrowOnExternalAuthenticateWithMissingSmcb() {
     val hba = sca.getHba(0);
     val konnektor = mock(Konnektor.class);
     val hbaHandle =
         CardInfo.builder()
-            .type(SmartcardType.SMC_B)
+            .type(CardTypeType.HBA)
             .handle("handle")
             .iccsn(hba.getIccsn())
             .ctId("Ct01")
             .build();
-    when(konnektor.execute(any(GetCardHandleCommand.class)))
+    when(konnektor.execute(any(GetCardHandleRequest.class)))
         .thenReturn(new KonnektorResponse<>(hbaHandle));
 
     val ability = UseTheKonnektor.with(hba).on(konnektor);
@@ -98,16 +102,16 @@ class UseTheKonnektorTest {
 
     val smcbHandle =
         CardInfo.builder()
-            .type(SmartcardType.SMC_B)
+            .type(CardTypeType.SMC_B)
             .handle("handle")
             .ctId("Ct01")
             .iccsn(smcb.getIccsn())
             .build();
     val pinResponse = new PinResponseType();
     pinResponse.setPinResult(PinResultEnum.REJECTED);
-    when(konnektor.execute(any(VerifyPinCommand.class)))
+    when(konnektor.execute(any(VerifyPinRequest.class)))
         .thenReturn(new KonnektorResponse<>(pinResponse));
-    when(konnektor.execute(any(GetCardHandleCommand.class)))
+    when(konnektor.execute(any(GetCardHandleRequest.class)))
         .thenReturn(new KonnektorResponse<>(smcbHandle));
 
     val challenge = "test".getBytes(StandardCharsets.UTF_8);
@@ -122,18 +126,18 @@ class UseTheKonnektorTest {
 
     val smcbHandle =
         CardInfo.builder()
-            .type(SmartcardType.SMC_B)
+            .type(CardTypeType.SMC_B)
             .handle("handle")
             .ctId("Ct01")
             .iccsn(smcb.getIccsn())
             .build();
     val pinResponse = new PinResponseType();
     pinResponse.setPinResult(PinResultEnum.OK);
-    when(konnektor.execute(any(VerifyPinCommand.class)))
+    when(konnektor.execute(any(VerifyPinRequest.class)))
         .thenReturn(new KonnektorResponse<>(pinResponse));
-    when(konnektor.execute(any(GetCardHandleCommand.class)))
+    when(konnektor.execute(any(GetCardHandleRequest.class)))
         .thenReturn(new KonnektorResponse<>(smcbHandle));
-    when(konnektor.execute(any(ExternalAuthenticateCommand.class)))
+    when(konnektor.execute(any(ExternalAuthenticateRequest.class)))
         .thenReturn(new KonnektorResponse<>("world".getBytes(StandardCharsets.UTF_8)));
 
     val challenge = "test".getBytes(StandardCharsets.UTF_8);
@@ -146,7 +150,7 @@ class UseTheKonnektorTest {
   void shouldSignAndVerifyWithHba(CryptoSystem algorithm) {
     val smcb = sca.getSmcB(0);
     val hba = sca.getHba(0);
-    val konnektor = KonnektorFactory.createSoftKon();
+    val konnektor = createTestKonnektor(sca);
     val ability = UseTheKonnektor.with(smcb).and(hba).and(algorithm).on(konnektor);
 
     try (MockedStatic<Serenity> serenityMockedStatic = mockStatic(Serenity.class)) {
@@ -162,7 +166,7 @@ class UseTheKonnektorTest {
   @Test
   void shouldGetAuthCertificate() {
     val smcb = sca.getSmcB(0);
-    val konnektor = KonnektorFactory.createSoftKon();
+    val konnektor = createTestKonnektor(sca);
     val ability = UseTheKonnektor.with(smcb).on(konnektor);
 
     val authCertificate = ability.getSmcbAuthCertificate();
@@ -173,7 +177,7 @@ class UseTheKonnektorTest {
   void shouldRequestEvidenceForEgk() {
     val smcb = sca.getSmcB(0);
     val egk = sca.getEgk(0);
-    val konnektor = KonnektorFactory.createSoftKon();
+    val konnektor = createTestKonnektor(sca);
     val ability = UseTheKonnektor.with(smcb).on(konnektor);
 
     val evidence = ability.requestEvidenceForEgk(egk);
@@ -183,7 +187,7 @@ class UseTheKonnektorTest {
   @Test
   void shouldEncryptAndDecrypt() {
     val smcb = sca.getSmcbByICCSN("80276001011699901102");
-    val konnektor = KonnektorFactory.createSoftKon();
+    val konnektor = createTestKonnektor(sca);
     val ability = UseTheKonnektor.with(smcb).on(konnektor);
 
     val encrypted = ability.encrypt("Hello World").getPayload();
@@ -195,8 +199,8 @@ class UseTheKonnektorTest {
   void shouldCreateAbilityFromConfig() {
     val smcb = sca.getSmcB(0);
     val hba = sca.getHba(0);
-    val cfg = new LocalKonnektorConfiguration();
-    val ability = UseTheKonnektor.with(hba).and(smcb).on(cfg);
+    val konnektor = createTestKonnektor(sca);
+    val ability = UseTheKonnektor.with(hba).and(smcb).on(konnektor);
     assertDoesNotThrow(ability::toString);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ package de.gematik.test.erezept.lei.steps;
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
-import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
+import de.gematik.bbriccs.rest.fd.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.screenplay.questions.GetMedicationDispense;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfClosePrescriptionOperation;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfReDispenseMedication;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ package de.gematik.test.erezept.actors;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.smartcards.SmcB;
 import de.gematik.test.core.StopwatchProvider;
@@ -32,6 +31,7 @@ import de.gematik.test.erezept.ErpFdTestsuiteFactory;
 import de.gematik.test.erezept.actions.MockActorsUtils;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
@@ -113,5 +113,23 @@ class DoctorActorTest extends ErpFhirBuildingTest {
     val resp = doc.prescribeFor(patient);
 
     assertEquals(prescId, resp.getPrescriptionId());
+  }
+
+  @Test
+  void shouldSetVersionCorrect() {
+    val doctor = createDoc("Adelheid Ulmenwald");
+    doctor.setVersion(KbvItaForVersion.V1_3_0);
+    val bd = SafeAbility.getAbility(doctor, ProvideDoctorBaseData.class);
+    assertTrue(
+        bd.getMedicalOrganization().getMeta().getProfile().get(0).getValue().endsWith("|1.3"));
+  }
+
+  @Test
+  void shouldSetVersionCorrect2() {
+    val doctor = createDoc("Adelheid Ulmenwald");
+    doctor.setVersion(KbvItaForVersion.V1_3_0);
+    val bd = SafeAbility.getAbility(doctor, ProvideDoctorBaseData.class);
+    assertFalse(
+        bd.getMedicalOrganization().getMeta().getProfile().get(0).getValue().endsWith("|1.2"));
   }
 }

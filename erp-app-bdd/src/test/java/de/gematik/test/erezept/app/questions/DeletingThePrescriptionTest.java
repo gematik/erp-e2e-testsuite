@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionTechnicalInformation;
 import de.gematik.test.erezept.client.ErpClient;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
@@ -45,7 +45,6 @@ import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
-import java.util.Map;
 import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -83,19 +82,17 @@ class DeletingThePrescriptionTest extends ErpFhirParsingTest {
     val mockPrescriptionBundle = mock(ErxPrescriptionBundle.class);
     when(mockPrescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
     val mockResponse =
-        ErpResponse.forPayload(mockPrescriptionBundle, ErxPrescriptionBundle.class)
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, mockPrescriptionBundle)
             .withStatusCode(200)
             .usedJwt(jwt)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(erpClientAbility.request(any(TaskGetByIdCommand.class))).thenReturn(mockResponse);
 
     // make sure the teardown does not run into an NPE
     val tearDownResponse =
-        ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, createOperationOutcome())
             .withStatusCode(404)
             .usedJwt(jwt)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(tearDownResponse);
   }

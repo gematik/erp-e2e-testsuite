@@ -149,7 +149,7 @@ actors:
       egkIccsn: 80276883110000163965
 
     - name: Aenna Gondern # Kassenidentität ohne validen privaten Schlüssel
-      egkIccsn: 80276881040001935352
+      egkIccsn: 80276883110000168560
 
     - name: Tina Kleinschmidt # Für Egk in der Apotheke / AuditEvents
       egkIccsn: 80276883110000168560
@@ -272,193 +272,144 @@ environments:
       maxWait: 360000
 
 konnektors:
-  - name: KonSim@localhost
-    type: remote
-    profile: KONSIM
-    address: 127.0.0.1:9106
-    protocol: http
+  - name: "Soft-Konn"
     context:
-      mandantId: Mandant1
-      clientSystemId: CS1
-      workplaceId: WP1
-      userId: user1
-    tls:
-      keyStore: konsim_mandant1_keystore.p12
-      keyStorePassword: "00"
-      trustStore: konsim_truststore.jks
-      trustStorePassword: "gematik"
+      mandantId: "Mandant1"
+      clientSystemId: "CS1"
+      workplaceId: "AP1"
+      userId: "user1"
+    service:
+      type: "Soft-Kon"
+      vsdmConfiguration:
+        hMacKey: "DUMMY VALUE"
+        operator: S
+        version: 1
 
-  - name: Soft-Konn
-    type: local
-    vsdmService:
-      hMacKey: DUMMY VALUE
-      operator: S
-      version: 1
-
-  - name: Secunet@gwtop279
-    type: remote
-    profile: SECUNET
-    address: 10.11.221.141:80
-    protocol: http
+  # --- Remote-Konnektoren ---
+  - name: "KOCO@kon7"
     context:
-      mandantId: Mandant1
-      clientSystemId: CS1
-      workplaceId: AP1
-      userId: user1
+      mandantId: "Mandant1"
+      clientSystemId: "CS1"
+      workplaceId: "AP1"
+      userId: "user1"
+    service:
+      type: "Remote-Kon"
+      address: "https://kon7.ksp.ltuzd.telematik-test"
+      tls:
+        keyStore: "tls/kon7_CS1.p12"
+        keyStorePassword: "DUMMY VALUE"
+        trustStore: "tls/erpe2e_truststore.p12"
+        trustStorePassword: "DUMMY VALUE"
+      basicAuth:
+        username: "DUMMY VALUE"
+        password: "DUMMY VALUE"
+    cardTerminals:
+      - type: "CATS"
+        ctId: "CT_ID_0003"
+        url: "https://ksp.ltuzd.telematik-test/kon7/cats1"
+      - type: "CATS"
+        ctId: "CT_ID_0004"
+        url: "https://ksp.ltuzd.telematik-test/kon7/cats2"
 
-  - name: RISE@gwtop381
-    type: remote
-    profile: RISE
-    address: 10.11.221.140:80
-    protocol: http
+  - name: "RISE@kon8"
     context:
-      mandantId: Mandant1
-      clientSystemId: CS1
-      workplaceId: AP1
-      userId: user1
-    cats:
+      mandantId: "Mandant1"
+      clientSystemId: "CS1"
+      workplaceId: "AP1"
+      userId: "user1"
+    service:
+      type: "Remote-Kon"
+      address: "https://ksp.ltuzd.telematik-test/kon8"
+      tls:
+        keyStore: "tls/kon8_CS1.p12"
+        keyStorePassword: "DUMMY VALUE"
+        trustStore: "tls/erpe2e_truststore.p12"
+        trustStorePassword: "DUMMY VALUE"
+      basicAuth:
+        username: "DUMMY VALUE"
+        password: "DUMMY VALUE"
+    cardTerminals:
+      - type: "CATS"
+        ctId: "02:42:0A:64:00:03"
+        url: "https://ksp.ltuzd.telematik-test/kon8/cats"
+      - type: "CATS"
+        ctId: "02:42:0A:64:00:04"
+        url: "https://ksp.ltuzd.telematik-test/kon8/cats2"
 
-  - name: KoCo@gwtop381
-    type: remote
-    profile: CGM
-    address: 10.11.221.142:80
-    protocol: http
+  - name: "SECUNET@kon9"
     context:
-      mandantId: Mandant1
-      clientSystemId: CS1
-      workplaceId: AP1
-      userId: user1
+      mandantId: "Mandant1"
+      clientSystemId: "CS1"
+      workplaceId: "AP1"
+      userId: "user1"
+    service:
+      type: "Remote-Kon"
+      address: "https://kon9.ksp.ltuzd.telematik-test"
+      tls:
+        keyStore: "tls/kon9_CS1.p12"
+        keyStorePassword: "DUMMY VALUE"
+        trustStore: "tls/erpe2e_truststore.p12"
+        trustStorePassword: "DUMMY VALUE"
+      basicAuth:
+        username: "DUMMY VALUE"
+        password: "DUMMY VALUE"
+    cardTerminals:
+      - type: "CATS"
+        ctId: "e526d874-e1fb-4b88-b55f-930a5ca7baab"
+        url: "https://ksp.ltuzd.telematik-test/kon9/cats1"
+      - type: "CATS"
+        ctId: "8cf501d2-c97f-436e-8d87-ddd9bb674318"
+        url: "https://ksp.ltuzd.telematik-test/kon9/cats2"
 
-  - name: RISE@gwtop281
-    type: remote
-    profile: RISE
-    address: 10.11.221.143:80
-    protocol: http
+  - name: "RISE@hsk2"
     context:
-      mandantId: Mandant1
-      clientSystemId: CS1
-      workplaceId: AP1
-      userId: user1
-    tls:
-      keyStore: rise_ru_cs1.p12
-      keyStorePassword: "DUMMY VALUE"
-      trustStore: erpe2e_truststore.p12
-      trustStorePassword: "DUMMY VALUE"
+      mandantId: "M1"
+      clientSystemId: "C1"
+      workplaceId: "W1"
+      userId: "user1"
+    service:
+      type: "Remote-Kon"
+      address: "https://kon2.rise-tu.hsk.ltuzd.telematik-test"
+      tls:
+        keyStore: "tls/hsk2_C1_ECC.p12"
+        keyStorePassword: "DUMMY VALUE"
+        trustStore: "tls/erpe2e_truststore.p12"
+        trustStorePassword: "123456"
+      basicAuth:
+        username: "DUMMY VALUE"
+        password: "DUMMY VALUE"
+    cardTerminals:
+      - type: "CATS"
+        ctId: "02:42:0A:64:00:03"
+        url: "https://rise-tu.hsk.ltuzd.telematik-test:443/kon2/cats"
+      - type: "CATS"
+        ctId: "02:42:0A:64:00:04"
+        url: "https://rise-tu.hsk.ltuzd.telematik-test:443/kon2/cats2"
+  - name: "SECUNET@HSK5"
+    context:
+      mandantId: "Mandant1"
+      clientSystemId: "CS1"
+      workplaceId: "AP1"
+      userId: "user1"
+    service:
+      type: "Remote-Kon"
+      address: "https://kon5.secunet-tu.hsk.ltuzd.telematik-test"
+      tls:
+        keyStore: "tls/secunet_hsk5_CS1.p12"
+        keyStorePassword: "DUMMY VALUE"
+        trustStore: "tls/erpe2e_truststore.p12"
+        trustStorePassword: "DUMMY VALUE"
+      basicAuth:
+        username: "DUMMY VALUE"
+        password: "DUMMY VALUE"
+    cardTerminals:
+      - type: "CATS"
+        ctId: "6131b43c-bf0b-4706-82d9-b35b9827ac1d"
+        url: "https://secunet-tu.hsk.ltuzd.telematik-test:443/kon5/cats"
 
-  - name: KOCO@kon7
-    type: remote
-    profile: CGM
-    address: ksp.ltuzd.telematik-test/kon7
-    protocol: https
-    context:
-      mandantId: Mandant1
-      clientSystemId: CS1
-      workplaceId: AP1
-      userId: user1
-    tls:
-      keyStore: kon7_CS1.p12
-      keyStorePassword: "DUMMY VALUE"
-      trustStore: erpe2e_truststore.p12
-      trustStorePassword: "DUMMY VALUE"
-    basicAuth:
-      username: "DUMMY VALUE"
-      password: "DUMMY VALUE"
-    cats:
-      - ctId: CT_ID_0000
-        url: https://ksp.ltuzd.telematik-test/kon7/cats
-      - ctId: CT_ID_0001
-        url: https://ksp.ltuzd.telematik-test/kon7/cats2
-
-  - name: RISE@kon8
-    type: remote
-    profile: RISE
-    address: ksp.ltuzd.telematik-test/kon8
-    protocol: https
-    context:
-      mandantId: Mandant1
-      clientSystemId: CS1
-      workplaceId: AP1
-      userId: user1
-    tls:
-      keyStore: kon8_CS1.p12
-      keyStorePassword: "DUMMY VALUE"
-      trustStore: erpe2e_truststore.p12
-      trustStorePassword: "DUMMY VALUE"
-    basicAuth:
-      username: "DUMMY VALUE"
-      password: "DUMMY VALUE"
-    cats:
-      - ctId: 02:42:0A:64:00:03
-        url: https://ksp.ltuzd.telematik-test/kon8/cats
-      - ctId: 02:42:0A:64:00:04
-        url: https://ksp.ltuzd.telematik-test/kon8/cats2
-
-  - name: SECUNET@kon9
-    type: remote
-    profile: SECUNET
-    address: kon9.ksp.ltuzd.telematik-test
-    protocol: https
-    context:
-      mandantId: Mandant1
-      clientSystemId: CS1
-      workplaceId: AP1
-      userId: user1
-    tls:
-      keyStore: kon9_CS1.p12
-      keyStorePassword: "DUMMY VALUE"
-      trustStore: erpe2e_truststore.p12
-      trustStorePassword: "DUMMY VALUE"
-    basicAuth:
-      username: "DUMMY VALUE"
-      password: "DUMMY VALUE"
-    cats:
-      - ctId: 8cf501d2-c97f-436e-8d87-ddd9bb674318
-        url: https://ksp.ltuzd.telematik-test/kon9/cats1
-      - ctId: e526d874-e1fb-4b88-b55f-930a5ca7baab
-        url: https://ksp.ltuzd.telematik-test/kon9/cats2
-
-  - name: KocoRu@kon19
-    type: remote
-    profile: CGM
-    address: ksp.ltuzd.telematik-test/kon19
-    protocol: https
-    context:
-      mandantId: m1
-      clientSystemId: cs1
-      workplaceId: ap1
-      userId: user1
-    tls:
-      keyStore: kon19_CS1.p12
-      keyStorePassword: "DUMMY VALUE"
-      trustStore: erpe2e_truststore.p12
-      trustStorePassword: "DUMMY VALUE"
-    basicAuth:
-      username: "DUMMY VALUE"
-      password: "DUMMY VALUE"
-    cats:
-      - ctId: CT_ID_0001
-        url: https://ksp.ltuzd.telematik-test/kon19/cats
-
-  - name: RISE@hsk2
-    type: remote
-    profile: RISE
-    address: kon2.rise-tu.hsk.ltuzd.telematik-test
-    protocol: https
-    context:
-      mandantId: M1
-      clientSystemId: C1
-      workplaceId: W1
-      userId: user1
-    tls:
-      keyStore: hsk2_C1_ECC.p12
-      keyStorePassword: "DUMMY VALUE"
-      trustStore: erpe2e_truststore.p12
-      trustStorePassword: "123456"
-    basicAuth:
-      username: "DUMMY VALUE"
-      password: "DUMMY VALUE"
-    cats:
-      - ctId: 02:42:0A:64:00:03
-        url: https://rise-tu.hsk.ltuzd.telematik-test:443/kon2/cats
-      - ctId: 02:42:0A:64:00:04
-        url: https://rise-tu.hsk.ltuzd.telematik-test:443/kon2/cats2
+poppTokenGenerator:
+  keyStorePath: "popp/popp-token-Server2-nist-komp61.p12"
+  keyStorePassword: "00"
+  keyAlias: "alias"
+  kid: "J3gf1Zvz281LpmRG0se2qzaJJA9aYRZ6DhAAHlZM6ok"
+  iss: "https://popp.dev.poppservice.de"

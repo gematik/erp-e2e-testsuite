@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -284,6 +284,13 @@ class ErpFdTestsuiteFactoryTest {
   void shouldCreateVsdmService() {
     val config = ErpFdTestsuiteFactory.create();
     val vsdmService = assertDoesNotThrow(config::getSoftKonnVsdmService);
+    assertNotNull(vsdmService);
+  }
+
+  @Test
+  void shouldCreatePoPPServiceMock() {
+    val config = ErpFdTestsuiteFactory.create();
+    val vsdmService = assertDoesNotThrow(config::getPoppTokenGenerator);
     assertNotNull(vsdmService);
   }
 

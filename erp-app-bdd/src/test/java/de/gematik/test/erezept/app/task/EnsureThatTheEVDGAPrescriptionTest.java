@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ package de.gematik.test.erezept.app.task;
 
 import static de.gematik.test.erezept.app.mocker.EvdgaTestDummyFactory.createTestActor;
 import static de.gematik.test.erezept.app.mocker.EvdgaTestDummyFactory.setupTestBundle;
+import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -72,6 +73,7 @@ class EnsureThatTheEVDGAPrescriptionTest {
   @Test
   void shouldReceiveEVDGACode() {
     val app = theAppUser.abilityTo(UseIOSApp.class);
+    givenThat(theAppUser).can(app);
 
     KbvEvdgaBundle evdgaBundle = mock(KbvEvdgaBundle.class);
     when(prescriptionBundle.getEvdgaBundle()).thenReturn(Optional.of(evdgaBundle));
@@ -113,6 +115,8 @@ class EnsureThatTheEVDGAPrescriptionTest {
 
   @Test
   void shouldThrowPreconditionErrorOnMissingPrescription() {
+    val app = mock(UseIOSApp.class);
+    givenThat(theAppUser).can(app);
 
     doReturn(Optional.empty()).when(theAppUser).asksFor(any(MovingToPrescription.class));
 
@@ -124,6 +128,8 @@ class EnsureThatTheEVDGAPrescriptionTest {
 
   @Test
   void shouldThrowPreconditionErrorOnMissingBundle() {
+    val app = mock(UseIOSApp.class);
+    givenThat(theAppUser).can(app);
 
     doReturn(Optional.empty()).when(prescriptionBundle).getEvdgaBundle();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,7 @@ class ChargeItemPutCommandTest extends ErpFhirBuildingTest {
     assertTrue(cmd.getRequestLocator().contains(format("ac={0}", accessCode.getValue())));
     assertTrue(
         cmd.getRequestLocator().contains(format("ChargeItem/{0}", prescriptionId.getValue())));
-    assertTrue(cmd.getRequestBody().isPresent());
-    assertEquals(chargeItem, cmd.getRequestBody().orElseThrow());
+    assertEquals(chargeItem, cmd.getRequestBody());
   }
 
   @Test
@@ -57,7 +56,6 @@ class ChargeItemPutCommandTest extends ErpFhirBuildingTest {
     assertTrue(cmd.getRequestLocator().contains(format("ac={0}", accessCode.getValue())));
     assertTrue(
         cmd.getRequestLocator().contains(format("ChargeItem/{0}", prescriptionId.getValue())));
-    assertTrue(cmd.getRequestBody().isPresent());
-    assertEquals(chargeItem, cmd.getRequestBody().orElseThrow());
+    assertEquals(chargeItem, cmd.getRequestBody());
   }
 }

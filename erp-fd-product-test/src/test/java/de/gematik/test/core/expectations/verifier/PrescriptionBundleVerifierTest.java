@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
@@ -340,6 +341,30 @@ class PrescriptionBundleVerifierTest {
     when(mockTask.getLastModified()).thenReturn(previousLastModified);
 
     val step = PrescriptionBundleVerifier.lastModifiedIsAfter(previousLastModified);
+    assertThrows(AssertionError.class, () -> step.apply(prescriptionBundle));
+  }
+
+  @Test
+  void shouldPassWithCorrectOwner() {
+    val ownerId = TelematikID.from("OwnerId");
+    val erxTask = new ErxTask();
+    erxTask.setOwner(ownerId.asReference());
+    val prescriptionBundle = mock(ErxPrescriptionBundle.class);
+    when(prescriptionBundle.getTask()).thenReturn(erxTask);
+
+    val step = ownerIdInPrescriptionEquals(ownerId, ErpAfos.A_28410);
+    assertDoesNotThrow(() -> step.apply(prescriptionBundle));
+  }
+
+  @Test
+  void shouldThrowWithIncorrectOwner() {
+    val ownerId = TelematikID.from("OwnerId");
+    val erxTask = new ErxTask();
+    erxTask.setOwner(ownerId.asReference());
+    val prescriptionBundle = mock(ErxPrescriptionBundle.class);
+    when(prescriptionBundle.getTask()).thenReturn(erxTask);
+
+    val step = ownerIdInPrescriptionEquals(TelematikID.from("IncorrectOwnerId"), ErpAfos.A_28410);
     assertThrows(AssertionError.class, () -> step.apply(prescriptionBundle));
   }
 }

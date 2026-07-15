@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ public class HisSentCommunications implements Question<Boolean> {
               id -> {
                 val cmd = new CommunicationGetByIdCommand(id);
                 val response = erpClient.request(cmd);
-                val optionalBody = response.getResourceOptional(cmd.expectedResponseBody());
+                val optionalBody = response.getResourceOptional(cmd.expectedResponseType());
                 optionalBody.ifPresent(fetchedCommunications::add);
               });
     }

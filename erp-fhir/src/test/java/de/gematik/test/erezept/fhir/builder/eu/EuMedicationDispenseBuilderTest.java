@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,13 +74,9 @@ class EuMedicationDispenseBuilderTest extends ErpFhirParsingTest {
   }
 
   @Test
-  void buildMedicationDispenseWithMultipleDosageInstructions() {
+  void shouldBuildMedicationDispenseWithMultipleDosageInstructionsAsTextInstructionsIsForbidden() {
     val pzn = "06313728";
-    val medication =
-        EuMedicationPZNFaker.faker()
-            .withPzn(PZN.from(pzn), fakerDrugName())
-            //            .withVersion(kbvItaVersion)
-            .fake();
+    val medication = EuMedicationPZNFaker.faker().withPzn(PZN.from(pzn), fakerDrugName()).fake();
 
     val kvnr = KVNR.from("X234567890");
     val telematikId = "606358757";
@@ -110,7 +106,7 @@ class EuMedicationDispenseBuilderTest extends ErpFhirParsingTest {
     assertEquals(
         "in 7 Tagen Rücksprache mit dem Hausarzt halten",
         medicationDispense.getNoteFirstRep().getText());
-    assertTrue(parser.isValid(medicationDispense));
+    assertFalse(ValidatorUtil.encodeAndValidate(parser, medicationDispense).isSuccessful());
   }
 
   @Test

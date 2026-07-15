@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,7 @@
 package de.gematik.test.erezept.integration.communication;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeContainsInDetailText;
-import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
+import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.*;
 import static de.gematik.test.fuzzing.erx.ErxCommunicationPayloadManipulatorFactory.*;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
@@ -46,7 +45,6 @@ import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import java.security.SecureRandom;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -128,8 +126,10 @@ public class SendInvalidMessagesIT extends ErpTest {
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val replyMessage =
-        new CommunicationReplyMessage(
-            supplyOptionsType, getRandomString(MAX_STRING_LENGTH_500 + 1));
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .infoText(getRandomString(MAX_STRING_LENGTH_500 + 1))
+            .build();
     val response2 =
         pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
     pharma.attemptsTo(
@@ -137,9 +137,6 @@ public class SendInvalidMessagesIT extends ErpTest {
             .withOperationOutcome(ErpAfos.A_23879)
             .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23879))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_02")
@@ -153,22 +150,24 @@ public class SendInvalidMessagesIT extends ErpTest {
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithToLongString(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
+
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val disReqMessage =
-        new CommunicationDisReqMessage(
-            supplyOptionsType, getRandomString(MAX_STRING_LENGTH_500 + 1));
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .hint(getRandomString(MAX_STRING_LENGTH_500 + 1))
+            .build();
+
     val response2 =
         patient.performs(
             SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(disReqMessage));
+
     patient.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23878)
             .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23878))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_03")
@@ -186,24 +185,22 @@ public class SendInvalidMessagesIT extends ErpTest {
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val replyMessage =
-        new CommunicationReplyMessage(
-            new Random().nextInt(2, 999999),
-            supplyOptionsType.getLabel(),
-            getRandomString(MAX_STRING_LENGTH_500),
-            null,
-            null,
-            null);
+        CommunicationReplyMessage.forV1()
+            .version(2) // invalid version > 1
+            .supplyOptionsType(supplyOptionsType)
+            .infoText(getRandomString(MAX_STRING_LENGTH_500))
+            .build();
     val response2 =
         pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
+
     pharma.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23879)
             .hasResponseWith(returnCode(400, ErpAfos.A_23879))
-            .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23879))
+            .and(
+                operationOutcomeContainsInDiagnostics(
+                    "Invalid payload version: 2", ErpAfos.A_23879))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_04")
@@ -219,25 +216,28 @@ public class SendInvalidMessagesIT extends ErpTest {
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
 
     val prescTask = doc.prescribeFor(patient, assignmentKind);
+
     val cDRM2 =
-        new CommunicationDisReqMessage(
-            new Random().nextInt(2, 1999999),
-            supplyOptionsType.getLabel(),
-            "patientName",
-            null,
-            getRandomString(MAX_STRING_LENGTH_500),
-            null);
+        CommunicationDisReqMessage.forV1()
+            .version(2) // invalid version > 1
+            .supplyOptionsType(supplyOptionsType)
+            .name("patientName")
+            .addressLines()
+            .hint(null)
+            .phone(null)
+            .build();
+
     val response2 =
         patient.performs(SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(cDRM2));
+
     patient.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23878)
             .hasResponseWith(returnCode(400, ErpAfos.A_23878))
-            .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23878))
+            .and(
+                operationOutcomeContainsInDiagnostics(
+                    "Invalid payload version: 2", ErpAfos.A_23878))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_05_A")
@@ -255,20 +255,20 @@ public class SendInvalidMessagesIT extends ErpTest {
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val replyMessage =
-        new CommunicationReplyMessage(
-            1, "zuwerfen", getRandomString(MAX_STRING_LENGTH_500), null, null, null);
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType("zuwerfen") // invalid supply option")
+            .infoText(getRandomString(MAX_STRING_LENGTH_500))
+            .build();
 
     val response2 =
         pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
+
     pharma.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23879)
             .hasResponseWith(returnCode(400, ErpAfos.A_23879))
             .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23879))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_05_B")
@@ -286,20 +286,20 @@ public class SendInvalidMessagesIT extends ErpTest {
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val replyMessage =
-        new CommunicationReplyMessage(
-            1, "", getRandomString(MAX_STRING_LENGTH_500), null, null, null);
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType("zuwerfen")
+            .infoText(getRandomString(MAX_STRING_LENGTH_500))
+            .build();
 
-    val response2 =
+    val response =
         pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
+
     pharma.attemptsTo(
-        Verify.that(response2)
+        Verify.that(response)
             .withOperationOutcome(ErpAfos.A_23879)
             .hasResponseWith(returnCode(400, ErpAfos.A_23879))
             .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23879))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_06_A")
@@ -317,19 +317,23 @@ public class SendInvalidMessagesIT extends ErpTest {
     val prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val cDRM2 =
-        new CommunicationDisReqMessage(
-            1, "zuwerfen", "patientName", null, getRandomString(MAX_STRING_LENGTH_500), null);
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType("zuwerfen")
+            .name("patientName")
+            .addressLines()
+            .hint(null)
+            .phone(null)
+            .build();
+
     val response2 =
         patient.performs(SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(cDRM2));
+
     patient.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23878)
             .hasResponseWith(returnCode(400, ErpAfos.A_23878))
             .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23878))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_06_B")
@@ -345,20 +349,25 @@ public class SendInvalidMessagesIT extends ErpTest {
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
 
     val prescTask = doc.prescribeFor(patient, assignmentKind);
+
     val cDRM2 =
-        new CommunicationDisReqMessage(
-            1, "", "patientName", null, getRandomString(MAX_STRING_LENGTH_500), null);
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(" ")
+            .name("PatientName")
+            .addressLines(List.of("address-line"))
+            .phone("1234567890")
+            .hint(getRandomString(MAX_STRING_LENGTH_500))
+            .build();
+
     val response2 =
         patient.performs(SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(cDRM2));
+
     patient.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23878)
             .hasResponseWith(returnCode(400, ErpAfos.A_23878))
             .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23878))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_07")
@@ -374,26 +383,23 @@ public class SendInvalidMessagesIT extends ErpTest {
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
 
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
+
     val replyMessage =
-        new CommunicationReplyMessage(
-            1,
-            supplyOptionsType.getLabel(),
-            getRandomString(MAX_STRING_LENGTH_500),
-            null,
-            null,
-            getRandomString(MAX_STRING_LENGTH_128 + 1)); // max allowed 128
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .infoText(getRandomString(MAX_STRING_LENGTH_500))
+            .pickUpCodeDMC(getRandomString(MAX_STRING_LENGTH_128 + 1)) // invalid DMC (>128)
+            .build();
 
     val response2 =
         pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
+
     pharma.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23879)
             .hasResponseWith(returnCode(400, ErpAfos.A_23879))
             .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23879))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_08")
@@ -409,25 +415,25 @@ public class SendInvalidMessagesIT extends ErpTest {
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
 
     val prescTask = doc.prescribeFor(patient, assignmentKind);
+
     val cDRM2 =
-        new CommunicationDisReqMessage(
-            1,
-            supplyOptionsType.getLabel(),
-            getRandomString(MAX_STRING_LENGTH_100 + 1),
-            null,
-            getRandomString(MAX_STRING_LENGTH_500),
-            null);
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .name(getRandomString(MAX_STRING_LENGTH_100 + 1)) // invalid name
+            .addressLines(List.of("address-line"))
+            .phone("1234567890")
+            .hint("hint")
+            .build();
+
     val response2 =
         patient.performs(SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(cDRM2));
+
     patient.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23878)
             .hasResponseWith(returnCode(400, ErpAfos.A_23878))
             .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23878))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_09")
@@ -444,14 +450,13 @@ public class SendInvalidMessagesIT extends ErpTest {
 
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
     val manipulator = getCommunicationPayloadManipulators();
+
     val replyMessage =
-        new CommunicationReplyMessage(
-            1,
-            supplyOptionsType.getLabel(),
-            getRandomString(MAX_STRING_LENGTH_500),
-            null,
-            null,
-            null);
+        CommunicationReplyMessage.forV1()
+            .version(2) // invalid version
+            .supplyOptionsType(supplyOptionsType)
+            .infoText(getRandomString(MAX_STRING_LENGTH_500))
+            .build();
 
     val response2 =
         pharma.performs(
@@ -459,15 +464,14 @@ public class SendInvalidMessagesIT extends ErpTest {
                 .forTask(prescTask)
                 .addManipulator(manipulator)
                 .asReply(replyMessage, pharma));
+
     pharma.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23879)
             .hasResponseWith(returnCode(400, ErpAfos.A_23879))
-            .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23879))
+            .and(
+                operationOutcomeContainsInDiagnostics("version must be 'integer'", ErpAfos.A_23879))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_10")
@@ -481,32 +485,33 @@ public class SendInvalidMessagesIT extends ErpTest {
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithIncorrectVersionAsString(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
+
     val prescTask = doc.prescribeFor(patient, assignmentKind);
     val manipulator = getCommunicationPayloadManipulators();
 
     val cDRM2 =
-        new CommunicationDisReqMessage(
-            1,
-            supplyOptionsType.getLabel(),
-            "patientName",
-            null,
-            getRandomString(MAX_STRING_LENGTH_500),
-            null);
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .name("patientName")
+            .addressLines(List.of("address-line"))
+            .phone(getRandomString(10))
+            .hint("hint")
+            .build();
+
     val response2 =
         patient.performs(
             SendMessages.to(pharma)
                 .forTask(prescTask)
                 .addManipulator(manipulator)
                 .asDispenseRequest(cDRM2));
+
     patient.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23878)
             .hasResponseWith(returnCode(400, ErpAfos.A_23878))
-            .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23878))
+            .and(
+                operationOutcomeContainsInDiagnostics("version must be 'integer'", ErpAfos.A_23878))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_11")
@@ -520,27 +525,25 @@ public class SendInvalidMessagesIT extends ErpTest {
   @MethodSource("communicationTestComposerForSupplyOption")
   void shouldValidatePharmaciesCommunicationWithToIncorrectPickUpCodHR(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
+
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
+
     val replyMessage =
-        new CommunicationReplyMessage(
-            1,
-            supplyOptionsType.getLabel(),
-            getRandomString(MAX_STRING_LENGTH_500),
-            null,
-            "123456789", // only length of 8 is allowed for pickUpCodeHR
-            null);
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .infoText(getRandomString(MAX_STRING_LENGTH_500))
+            .pickUpCodeHR("123456789") // invalid: > 8 chars
+            .build();
 
     val response2 =
         pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
+
     pharma.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23879)
             .hasResponseWith(returnCode(400, ErpAfos.A_23879))
             .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23879))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_12")
@@ -554,27 +557,25 @@ public class SendInvalidMessagesIT extends ErpTest {
   @MethodSource("communicationTestComposerForSupplyOption")
   void shouldValidatePharmaciesCommunicationWithIncorrectUrlLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
+
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
+
     val replyMessage =
-        new CommunicationReplyMessage(
-            1,
-            supplyOptionsType.getLabel(),
-            getRandomString(MAX_STRING_LENGTH_500),
-            getRandomString(MAX_STRING_LENGTH_500 + 1),
-            null, // only length of 8 is allowed for pickUpCodeHR
-            null);
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .infoText(getRandomString(MAX_STRING_LENGTH_500))
+            .url(getRandomString(MAX_STRING_LENGTH_500 + 1)) // invalid URL (>500)
+            .build();
 
     val response2 =
         pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
+
     pharma.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23879)
             .hasResponseWith(returnCode(400, ErpAfos.A_23879))
             .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23879))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_13")
@@ -588,26 +589,27 @@ public class SendInvalidMessagesIT extends ErpTest {
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithIncorrectPhoneLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
+
     val prescTask = doc.prescribeFor(patient, assignmentKind);
+
     val cDRM2 =
-        new CommunicationDisReqMessage(
-            1,
-            supplyOptionsType.getLabel(),
-            null,
-            null,
-            getRandomString(MAX_STRING_LENGTH_500),
-            getRandomString(32 + 1)); // max allowd Stringlength == 32
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .name("patientName")
+            .addressLines(List.of("some-address"))
+            .phone(getRandomString(32 + 1)) // invalid phone (> 32)
+            .hint("hint")
+            .build();
+
     val response2 =
         patient.performs(SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(cDRM2));
+
     patient.attemptsTo(
         Verify.that(response2)
             .withOperationOutcome(ErpAfos.A_23878)
             .hasResponseWith(returnCode(400, ErpAfos.A_23878))
             .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23878))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_14")
@@ -621,14 +623,19 @@ public class SendInvalidMessagesIT extends ErpTest {
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithHeadderParams(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
+
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val disReqMessage =
-        new CommunicationDisReqMessage(
-            supplyOptionsType, getRandomString(MAX_STRING_LENGTH_500 + 1));
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .hint(getRandomString(MAX_STRING_LENGTH_500 + 1))
+            .build();
+
     val response =
         alternativPatient.performs(
             SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(disReqMessage));
+
     alternativPatient.attemptsTo(
         Verify.that(response)
             .withOperationOutcome()
@@ -637,9 +644,6 @@ public class SendInvalidMessagesIT extends ErpTest {
                 operationOutcomeHasDetailsText(
                     "Header must contain an access code", ErpAfos.A_19520))
             .isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   private static Stream<Arguments> getDspRequestManipulationComposer() {
@@ -669,17 +673,22 @@ public class SendInvalidMessagesIT extends ErpTest {
   @MethodSource("getDspRequestManipulationComposer")
   void shouldPostInvalidCommunicationsAsPatient(
       InsuranceTypeDe insuranceType, NamedEnvelope<FuzzingMutator<ErxCommunication>> manipulator) {
+
     patient.changePatientInsuranceType(insuranceType);
 
     val task = doc.prescribeFor(patient);
+
     val response =
         patient.performs(
             SendMessages.to(pharma)
                 .forTask(task)
                 .addManipulator(manipulator)
                 .asDispenseRequest(
-                    new CommunicationDisReqMessage(
-                        SupplyOptionsType.SHIPMENT, "nope, we´ll get SMOK!")));
+                    CommunicationDisReqMessage.forV1()
+                        .supplyOptionsType(SupplyOptionsType.SHIPMENT)
+                        .hint("nope, we´ll get SMOK!")
+                        .build()));
+
     patient.attemptsTo(
         Verify.that(response).withOperationOutcome().hasResponseWith(returnCode(400)).isCorrect());
   }
@@ -704,8 +713,10 @@ public class SendInvalidMessagesIT extends ErpTest {
                 .forTask(task)
                 .addManipulator(manipulator)
                 .asReply(
-                    new CommunicationReplyMessage(
-                        SupplyOptionsType.SHIPMENT, "We can deliver a mask, too"),
+                    CommunicationReplyMessage.forV1()
+                        .supplyOptionsType(SupplyOptionsType.SHIPMENT)
+                        .infoText("We can deliver a mask, too")
+                        .build(),
                     pharma));
 
     pharma.attemptsTo(

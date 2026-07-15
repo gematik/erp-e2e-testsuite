@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,10 @@
 
 package de.gematik.test.erezept.actors;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.core.exceptions.MissingCacheException;
@@ -33,6 +31,7 @@ import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
@@ -41,7 +40,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class ActorStageTest {
+class ActorStageTest extends ErpFhirParsingTest {
 
   private static ActorStage stage;
 

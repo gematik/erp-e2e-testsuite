@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,12 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommandWithoutSecret;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationPZNBuilderORIGINAL_BUILDER;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
@@ -62,7 +60,6 @@ public class ResponseOfDispenseMedicationWithoutAcceptance implements Question<B
   public Boolean answeredBy(Actor actor) {
     val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
     val dmcPrescription = order.chooseFrom(prescriptionManager.getAssignedList());
-    ErpResponse<ErxMedicationDispenseBundle> resp;
     val client = SafeAbility.getAbility(actor, UseTheErpClient.class);
 
     val bundle =
@@ -90,7 +87,7 @@ public class ResponseOfDispenseMedicationWithoutAcceptance implements Question<B
         GemOperationInputParameterBuilder.forDispensingPharmaceuticals()
             .with(medicationDisp, gemMedication)
             .build();
-    resp =
+    val resp =
         client.request(
             new DispensePrescriptionAsBundleCommandWithoutSecret(
                 dmcPrescription.getTaskId(), closeParams));

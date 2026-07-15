@@ -5,7 +5,7 @@ Um die {name-all-testsuites} auszuführen und einzusetzen müssen zunächst eini
 === Basisanforderungen [[prerequisites_basics]]
 Bei der Entwicklung der {name-all-testsuites} setzen wir auf {link-serenity-bdd} in Kombination mit Java und Maven:
 
-- link:https://openjdk.org/projects/jdk/17/[Java Development Kit 17]
+- link:https://openjdk.org/projects/jdk/21/[Java Development Kit 21]
 - link:https://maven.apache.org/download.cgi[Maven] (idealerweise 3.8.5 und neuer)
 
 === Integrierte Entwicklungsumgebung [[prerequisites_ide]]

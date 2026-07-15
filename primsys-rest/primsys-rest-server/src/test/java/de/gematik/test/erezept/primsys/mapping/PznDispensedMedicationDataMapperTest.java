@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -30,15 +30,6 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junitpioneer.jupiter.SetSystemProperty;
 
 class PznDispensedMedicationDataMapperTest extends ErpFhirParsingTest {
-
-  @SetSystemProperty(key = "erp.fhir.profile", value = "1.3.0")
-  @RepeatedTest(value = 5)
-  void shouldGenerateRandomly() {
-    val mapper = PznDispensedMedicationDataMapper.random();
-    val medicationDispense = mapper.convert();
-    val vr = ValidatorUtil.encodeAndValidate(parser, medicationDispense);
-    assertTrue(vr.isSuccessful());
-  }
 
   @SetSystemProperty(key = "erp.fhir.profile", value = "1.4.0")
   @RepeatedTest(value = 5)

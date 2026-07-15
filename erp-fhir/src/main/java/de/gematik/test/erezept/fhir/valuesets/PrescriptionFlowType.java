@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ public enum PrescriptionFlowType implements FromValueSet {
   FLOW_TYPE_200("200", "Flowtype für Apothekenpflichtige Arzneimittel (PKV)"),
   FLOW_TYPE_209("209", "Flowtype zur Workflow-Steuerung durch Leistungserbringer (PKV)");
 
-  public static final ErpWorkflowCodeSystem CODE_SYSTEM = ErpWorkflowCodeSystem.FLOW_TYPE_12;
+  public static final ErpWorkflowCodeSystem CODE_SYSTEM = ErpWorkflowCodeSystem.FLOW_TYPE;
 
   private final String code;
   private final String display;
@@ -85,8 +85,8 @@ public enum PrescriptionFlowType implements FromValueSet {
   }
 
   public Extension asExtension() {
-    val system = ErpWorkflowStructDef.PRESCRIPTION_TYPE_12.getCanonicalUrl();
-    val coding = this.asCoding(ErpWorkflowCodeSystem.FLOW_TYPE_12, true);
+    val system = ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl();
+    val coding = this.asCoding(ErpWorkflowCodeSystem.FLOW_TYPE, true);
     return new Extension(system, coding);
   }
 

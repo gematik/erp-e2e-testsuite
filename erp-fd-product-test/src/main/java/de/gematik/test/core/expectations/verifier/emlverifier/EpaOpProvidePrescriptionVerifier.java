@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import com.google.common.base.Strings;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.expectations.requirements.EmlAfos;
+import de.gematik.test.core.expectations.requirements.EmlBfd;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationVersion;
@@ -45,6 +46,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
+import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Medication;
 
@@ -170,22 +172,21 @@ public class EpaOpProvidePrescriptionVerifier {
 
     expectedValues.put(
         INGREDIENT_CODEABLE_CONCEPT_SYSTEM,
-        Optional.ofNullable(
-            expectedMedication
-                .getIngredientFirstRep()
-                .getItemCodeableConcept()
-                .getCoding()
-                .get(0)
-                .getSystem()));
+        Optional.ofNullable(expectedMedication)
+            .map(Medication::getIngredient)
+            .flatMap(ingredients -> ingredients.stream().findFirst())
+            .map(Medication.MedicationIngredientComponent::getItemCodeableConcept)
+            .map(CodeableConcept::getCoding)
+            .flatMap(codings -> codings.stream().findFirst())
+            .map(Coding::getSystem));
     expectedValues.put(
         INGREDIENT_CODE_CON_CODE,
-        Optional.ofNullable(
-            expectedMedication
-                .getIngredientFirstRep()
-                .getItemCodeableConcept()
-                .getCoding()
-                .get(0)
-                .getCode()));
+        expectedMedication.getIngredient().stream()
+            .map(Medication.MedicationIngredientComponent::getItemCodeableConcept)
+            .flatMap(cc -> cc.getCoding().stream())
+            .map(Coding::getCode)
+            .findFirst());
+
     expectedValues.put(
         INGREDIENT_CODE_CON_TEXT,
         Optional.ofNullable(
@@ -244,23 +245,23 @@ public class EpaOpProvidePrescriptionVerifier {
 
     expectedValues.put(
         INGREDIENT_CODEABLE_CONCEPT_SYSTEM,
-        Optional.ofNullable(
-            expectedMedication
-                .getIngredientFirstRep()
-                .getItemCodeableConcept()
-                .getCoding()
-                .get(0)
-                .getSystem()));
+        Optional.ofNullable(expectedMedication)
+            .map(Medication::getIngredient)
+            .flatMap(ingredients -> ingredients.stream().findFirst())
+            .map(Medication.MedicationIngredientComponent::getItemCodeableConcept)
+            .map(CodeableConcept::getCoding)
+            .flatMap(codings -> codings.stream().findFirst())
+            .map(Coding::getSystem));
+
     expectedValues.put(
         INGREDIENT_CODE_CON_CODE,
-        Optional.ofNullable(
-            String.valueOf(
-                expectedMedication
-                    .getIngredientFirstRep()
-                    .getItemCodeableConcept()
-                    .getCoding()
-                    .get(0)
-                    .getCode())));
+        Optional.ofNullable(expectedMedication)
+            .map(Medication::getIngredient)
+            .flatMap(ingredients -> ingredients.stream().findFirst())
+            .map(Medication.MedicationIngredientComponent::getItemCodeableConcept)
+            .map(CodeableConcept::getCoding)
+            .flatMap(codings -> codings.stream().findFirst())
+            .map(Coding::getCode));
 
     expectedValues.put(
         INGREDIENT_CODE_CON_TEXT,
@@ -809,7 +810,7 @@ public class EpaOpProvidePrescriptionVerifier {
             prescription.getEpaPractitioner().getTelematikId().getValue().equals(hbaId.getValue());
     return new VerificationStep.StepBuilder<EpaOpProvidePrescription>(
             EmlAfos.A_25949.getRequirement(),
-            "Der EpaPractitioner muss die TelematikId: {0} besitzen")
+            format("Der EpaPractitioner muss die HBA_ID TelematikId: {0} besitzen", hbaId))
         .predicate(predicate)
         .accept();
   }
@@ -818,6 +819,21 @@ public class EpaOpProvidePrescriptionVerifier {
     Predicate<List<EpaOpProvidePrescription>> predicate = List::isEmpty;
     return new VerificationStep.StepBuilder<List<EpaOpProvidePrescription>>(
             EmlAfos.A_25951.getRequirement(), "Eml besitzt eine leere Liste")
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<EpaOpProvidePrescription> emlMedRequestDosageHasText(String text) {
+    Predicate<EpaOpProvidePrescription> predicate =
+        provPresc ->
+            provPresc.getEpaMedicationRequest().getDosageInstruction().stream()
+                .anyMatch(t -> t.getText() != null ? t.getText().equals(text) : Boolean.FALSE);
+    return new VerificationStep.StepBuilder<EpaOpProvidePrescription>(
+            EmlBfd.B_FD_1571.getRequirement(),
+            format(
+                "Die EpaProvidePrescriptions enthält im MedicationRequest die DosageInstruction"
+                    + " {0}",
+                text))
         .predicate(predicate)
         .accept();
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.fdv.task;
 
 import de.gematik.bbriccs.fhir.de.value.IKNR;
-import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
+import de.gematik.bbriccs.rest.fd.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxComPrescriptionBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
@@ -68,14 +68,16 @@ public class RedeemPrescription implements Task {
   public static RedeemPrescription assign(Actor pharmacist, DequeStrategy deque) {
     val useSMCBAbility = SafeAbility.getAbility(pharmacist, UseSMCB.class);
 
-    // TODO replace this
     val message =
-        new CommunicationDisReqMessage(
-            SupplyOptionsType.DELIVERY,
-            "Dr. Maximilian von Muster",
-            List.of("wohnhaft bei Emilia Fischer", "Bundesallee 312", "123. OG", "12345 Berlin"),
-            "Bitte im Morsecode klingeln: -.-.",
-            "004916094858168");
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(SupplyOptionsType.DELIVERY)
+            .name("Dr. Maximilian von Muster")
+            .addressLines(
+                List.of(
+                    "wohnhaft bei Emilia Fischer", "Bundesallee 312", "123. OG", "12345 Berlin"))
+            .hint("hint.")
+            .phone("004916094858168")
+            .build();
 
     val communicationBuilder =
         ErxCommunicationBuilder.forDispenseRequest(message)

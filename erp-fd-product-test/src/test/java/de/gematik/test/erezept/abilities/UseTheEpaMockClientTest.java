@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import de.gematik.bbriccs.fhir.exceptions.FhirValidationException;
 import de.gematik.bbriccs.rest.HttpBClient;
 import de.gematik.bbriccs.rest.HttpBRequest;
 import de.gematik.bbriccs.rest.HttpBResponse;
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.client.exceptions.FhirValidationException;
 import de.gematik.test.erezept.eml.EpaMockClient;
 import de.gematik.test.erezept.eml.EpaMockDownloadRequest;
 import de.gematik.test.erezept.eml.ErpEmlLog;

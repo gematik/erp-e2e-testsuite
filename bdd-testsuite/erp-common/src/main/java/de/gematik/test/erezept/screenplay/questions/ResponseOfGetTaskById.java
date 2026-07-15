@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdAsAcceptBundleCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
@@ -61,7 +61,7 @@ public class ResponseOfGetTaskById {
     }
 
     @Override
-    public ErpResponse<ErxAcceptBundle> answeredBy(Actor actor) {
+    public FhirBResponse<ErxAcceptBundle> answeredBy(Actor actor) {
       val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
       val dmc = deque.chooseFrom(prescriptionManager.getAssignedList());
       val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
@@ -80,7 +80,7 @@ public class ResponseOfGetTaskById {
     }
 
     @Override
-    public ErpResponse<ErxPrescriptionBundle> answeredBy(Actor actor) {
+    public FhirBResponse<ErxPrescriptionBundle> answeredBy(Actor actor) {
       val dmcManager = SafeAbility.getAbility(actor, ManageDataMatrixCodes.class);
       val dmc = deque.chooseFrom(dmcManager.getDmcList());
       val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);

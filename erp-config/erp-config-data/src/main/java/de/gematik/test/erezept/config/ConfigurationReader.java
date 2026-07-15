@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,18 @@
 
 package de.gematik.test.erezept.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import de.gematik.test.erezept.config.dto.BaseConfigurationDto;
+import de.gematik.bbriccs.cfg.BaseConfigurationDto;
+import de.gematik.bbriccs.konnektor.cfg.KonnektorModuleConfigurationDto;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.app.ErpAppConfigurationBase;
-import de.gematik.test.erezept.config.dto.konnektor.KonnektorModuleConfigurationDto;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.config.dto.remotefdv.RemoteFdVConfigurationBase;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
-import lombok.SneakyThrows;
 import lombok.val;
+import tools.jackson.databind.jsontype.NamedType;
 
 @SuppressWarnings("java:S119")
 public class ConfigurationReader<DTO extends BaseConfigurationDto> {
@@ -51,11 +48,10 @@ public class ConfigurationReader<DTO extends BaseConfigurationDto> {
     this.subtypes = builder.subtypes;
   }
 
-  @SneakyThrows
   private DTO create(boolean withPcs) {
-    val om = new ObjectMapper(new YAMLFactory());
+    val om = de.gematik.bbriccs.cfg.ConfigurationReader.getConfigurationMapper();
 
-    subtypes.forEach(om::registerSubtypes);
+    subtypes.forEach(it -> om.deserializationConfig().getSubtypeResolver().registerSubtypes(it));
 
     val configTemplate = om.readTree(configPath.toFile());
 

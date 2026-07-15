@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
+import de.gematik.bbriccs.konnektor.SoftKonVerifier;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseDiGABuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
@@ -27,7 +28,6 @@ import de.gematik.test.erezept.fhir.r4.kbv.KbvEvdgaBundle;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.konnektor.soap.mock.LocalVerifier;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -57,9 +57,9 @@ public class CloseDigaPrescriptionWithoutRedeemCode implements Task {
         SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
     val acceptBundle = order.chooseFrom(prescriptionPharmacyManager.getAcceptedPrescriptions());
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
-    val evdgaBundleAsString = LocalVerifier.parse(acceptBundle.getSignedKbvBundle()).getDocument();
+    val evdgaBundleAsString =
+        SoftKonVerifier.parse(acceptBundle.getSignedKbvBundle()).getDocument();
     val evdgaBundle = erpClient.decode(KbvEvdgaBundle.class, evdgaBundleAsString);
-    val pzn = evdgaBundle.getHealthAppRequest().getPzn();
 
     // build dispensation
     val md =

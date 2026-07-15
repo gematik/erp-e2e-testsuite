@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.primsys
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import tools.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
@@ -146,6 +146,18 @@ open class RestTest {
     fun setupPositiveStubs(env: String? = null) {
         setupPositiveInfo(env)
         setupPositiveActors(env)
+    }
+
+    fun setupPositiveAbort(): StubMapping {
+        return stubFor(
+            delete(urlPathMatching("/(doc|pharm)/[^/]+/abort"))
+                .willReturn(
+                    aResponse()
+                        .withStatus(204)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("")
+                )
+        )
     }
 
     companion object {

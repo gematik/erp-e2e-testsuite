@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,14 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 import de.gematik.bbriccs.fhir.conf.exceptions.FhirConfigurationException;
 import java.util.List;
 import lombok.Data;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.ClearSystemProperty;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.exc.ValueInstantiationException;
 
 class ValidatorModeTest {
 

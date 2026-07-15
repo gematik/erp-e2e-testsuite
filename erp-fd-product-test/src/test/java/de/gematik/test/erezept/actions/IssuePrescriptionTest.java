@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,14 +37,14 @@ import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
+import de.gematik.bbriccs.rest.fd.MediaType;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
@@ -73,7 +73,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -395,10 +394,9 @@ class IssuePrescriptionTest extends ErpFhirParsingTest {
     assertTrue((Base64.getEncoder().encodeToString(sigObserver.toByteArray())).length() > 20);
   }
 
-  private ErpResponse<ErxTask> createErpResponse(ErxTask draftTask) {
-    return ErpResponse.forPayload(draftTask, ErxTask.class)
+  private FhirBResponse<ErxTask> createErpResponse(ErxTask draftTask) {
+    return FhirBResponse.forPayload(ErxTask.class, draftTask)
         .withStatusCode(201)
-        .withHeaders(Map.of())
         .andValidationResult(createEmptyValidationResult());
   }
 }

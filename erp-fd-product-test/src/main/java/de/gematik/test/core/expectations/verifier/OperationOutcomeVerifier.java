@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,6 +73,20 @@ public class OperationOutcomeVerifier {
         oo ->
             oo.getIssue().stream()
                 .anyMatch(issue -> issue.hasDiagnostics() && issue.getDiagnostics().contains(text));
+
+    val step =
+        new VerificationStep.StepBuilder<OperationOutcome>(
+            req.getRequirement(), format(EXPECTATION_TEMPLATE, text));
+    return step.predicate(predicate).accept();
+  }
+
+  public static VerificationStep<OperationOutcome> operationOutcomeDoesNotContainsInDiagnostics(
+      String text, RequirementsSet req) {
+    Predicate<OperationOutcome> predicate =
+        oo ->
+            oo.getIssue().stream()
+                .filter(OperationOutcome.OperationOutcomeIssueComponent::hasDiagnostics)
+                .noneMatch(it -> it.getDiagnostics().contains(text));
 
     val step =
         new VerificationStep.StepBuilder<OperationOutcome>(

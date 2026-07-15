@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,7 +90,9 @@ public class PznDispensedMedicationDataMapper
         ErxMedicationDispenseBuilder.forKvnr(forKvnr)
             .performerId(performerTelematikId)
             .prescriptionId(forPrescription)
-            .medication(KbvPznMedicationDataMapper.from(dto).convert())
+            // todo diesen medicationSetter() auf GemMedication umbauen und dann convert()
+            // zurückbauen
+            // .medication(KbvPznMedicationDataMapper.from(dto).convert())
             .status("completed")
             .whenPrepared(dto.getWhenPrepared())
             .whenHandedOver(dto.getWhenHandedOver())

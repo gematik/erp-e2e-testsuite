@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.exceptions.MissingAbilityException;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -35,7 +36,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SafeAbilityTest {
+public class SafeAbilityTest extends ErpFhirBuildingTest {
 
   @Before
   public void setUp() {

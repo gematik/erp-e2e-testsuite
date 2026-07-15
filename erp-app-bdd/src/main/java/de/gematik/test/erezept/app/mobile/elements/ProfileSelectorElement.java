@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,12 +54,7 @@ public class ProfileSelectorElement implements PageElement {
           AppiumBy.iOSNsPredicateString(
               format("type == \"XCUIElementTypeButton\" AND label CONTAINS \"{0}\"", userName));
     } else {
-      return () ->
-          AppiumBy.iOSNsPredicateString(
-              format(
-                  "type == \"XCUIElementTypeButton\" AND name == \"pro_btn_selection_profile_row\""
-                      + " AND label == \"{0}\"",
-                  userName));
+      return () -> AppiumBy.name(userName);
     }
   }
 

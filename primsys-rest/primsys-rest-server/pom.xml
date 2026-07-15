@@ -5,7 +5,7 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>primsys-rest</artifactId>
-        <version>1.4.0</version>
+        <version>1.6.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -14,12 +14,16 @@
     <name>PrimSys REST-Server</name>
 
     <properties>
-        <java.version>${version.java}</java.version>
         <maven.compiler.target>${version.java}</maven.compiler.target>
         <maven.compiler.source>${version.java}</maven.compiler.source>
         <maven.compiler.release>${version.java}</maven.compiler.release>
 
         <main.class>de.gematik.test.erezept.primsys.Main</main.class>
+
+        <sonar.cpd.exclusions>
+            <!-- yes, it's a duplication, just ignore for now -->
+            **/de/gematik/test/erezept/primsys/util/DataMatrixCodeGenerator.java
+        </sonar.cpd.exclusions>
     </properties>
 
     <dependencyManagement>
@@ -31,36 +35,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>1.18.0</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>2.18.0</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>3.16.0</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.google.errorprone</groupId>
-                <artifactId>error_prone_annotations</artifactId>
-                <version>2.36.0</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.github.ben-manes.caffeine</groupId>
-                <artifactId>caffeine</artifactId>
-                <version>3.2.2</version>
-                <scope>compile</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -71,21 +45,19 @@
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
-            <artifactId>erp-bdd-common</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.serenity-bdd</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>smartcard</artifactId>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>konnektor-client-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>softkon-service-brick</artifactId>
         </dependency>
         <dependency>
             <groupId>de.gematik.bbriccs</groupId>
@@ -97,22 +69,19 @@
         </dependency>
 
         <!-- Provides ObjectMapper and SerializationConfig -->
+<!--        <dependency>-->
+<!--            <groupId>tools.jackson.core</groupId>-->
+<!--            <artifactId>jackson-databind</artifactId>-->
+<!--        </dependency>-->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+            <groupId>tools.jackson.jakarta.rs</groupId>
             <artifactId>jackson-jakarta-rs-xml-provider</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
+            <groupId>tools.jackson.jakarta.rs</groupId>
             <artifactId>jackson-jakarta-rs-json-provider</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-grizzly2-http</artifactId>
@@ -128,6 +97,7 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
         </dependency>
 
         <!-- shouldn't be required once de.gematik.test.erezept.primsys.rest.data is refactored -->
@@ -146,10 +116,16 @@
             <artifactId>swagger-jaxrs2-jakarta</artifactId>
         </dependency>
 
+        <!-- required by the Doctor to generate DMC for "low-detail" Prescription -->
         <dependency>
-            <groupId>de.gematik.test.erezept</groupId>
-            <artifactId>konnektor-client</artifactId>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-fhir</artifactId>

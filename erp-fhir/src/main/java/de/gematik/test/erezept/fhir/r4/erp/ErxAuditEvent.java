@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,10 @@ public class ErxAuditEvent extends AuditEvent {
     PHARMACY_GET_TASK_UNSUCCESSFUL(
         "{agentName} konnte aufgrund eines Fehlerfalls nicht die Liste der offenen E-Rezepte mit"
             + " Ihrer eGK abrufen.",
+        AuditEventAction.R),
+    PHARMACY_GET_TASK_WITH_POPP_SUCCESSFUL(
+        "{agentName} hat die Liste der einlösbaren E-Rezepte abgerufen durch Autorisierung mittels"
+            + " Gesundheitskarte in der Apotheke.",
         AuditEventAction.R);
 
     private final String text;

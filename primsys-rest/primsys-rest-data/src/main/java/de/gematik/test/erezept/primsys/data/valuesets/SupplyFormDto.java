@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import lombok.NonNull;
  */
 @Getter
 public enum SupplyFormDto {
+  KEINE_DARREICHUNGSFORM("---", "keine Darreichungsform"),
   AEO("AEO", "Ätherisches Öl"),
   AMP("AMP", "Ampullen"),
   APA("APA", "Ampullenpaare"),
@@ -55,7 +56,7 @@ public enum SupplyFormDto {
   BTA("BTA", "Brausetabletten"),
   CRE("CRE", "Creme"),
   DFL("DFL", "Durchstechflaschen"),
-  // DIG("DIG", "Digitale Gesundheitsanwendungen"), // not supported yet by IBM
+  DIG("DIG", "Digitale Gesundheitsanwendungen"),
   DIL("DIL", "Dilution"),
   DIS("DIS", "Depot-Injektionssuspension"),
   DKA("DKA", "Dragees in Kalenderpackung"),
@@ -103,7 +104,7 @@ public enum SupplyFormDto {
   IFB("IFB", "Infusionsbeutel"),
   IFD("IFD", "Infusionsdispersion"),
   IFE("IFE", "Injektionslösung in einer Fertigspritze"),
-  IFF("IFF", "Infusionsflasche"),
+  IFF("IFF", "Infusionsflaschen"),
   IFK("IFK", "Infusionslösungskonzentrat"),
   IFL("IFL", "Injektionsflaschen"),
   IFS("IFS", "Infusionsset"),
@@ -195,10 +196,7 @@ public enum SupplyFormDto {
       "PIE",
       "Pulver für ein Konzentrat zur Herstellung einer Infusionslösung, Pulver zur Herstellung"
           + " einer Lösung zum Einnehmen"),
-  PIF(
-      "PIF",
-      "Pulver für ein Konzentrat zur Herstellung einer Infusionslösung, Pulver zur Herstellung"
-          + " einer Lösung zum Einnehmen"),
+  PIF("PIF", "Pulver zur Herstellung einer Infusionslösung"),
   PII("PII", "Pulver zur Herstellung einer Injektions- oder Infusionslösung"),
   PIJ("PIJ", "Pulver zur Herstellung einer Injektionslösung"),
   PIK("PIK", "Pulver zur Herstellung eines Infusionslösungskonzentrates"),
@@ -228,7 +226,8 @@ public enum SupplyFormDto {
   REK("REK", "Retard-Kapseln"),
   RET("RET", "Retard-Tabletten"),
   RGR("RGR", "Retard-Granulat"),
-  RKA("RKA", "Rektal-Kapseln"),
+  RKA("RKA", "Rektalkapseln"),
+  RKT("RKT", "Retardkautablette"),
   RMS("RMS", "Retardmikrokapseln und Suspensionsmittel"),
   RSC("RSC", "Rektalschaum"),
   RSU("RSU", "Rektalsuspension"),
@@ -257,6 +256,7 @@ public enum SupplyFormDto {
   STR("STR", "Streifen"),
   SUB("SUB", "Substanz"),
   SUE("SUE", "Suspension zum Einnehmen"),
+  SUF("SUF", "Sublingualfilm"),
   SUI("SUI", "Suspension zur Implantation"),
   SUL("SUL", "Sublingualspray, Lösung"),
   SUP("SUP", "Suppositorien"),
@@ -272,11 +272,11 @@ public enum SupplyFormDto {
   TES("TES", "Test"),
   TIN("TIN", "Tinktur"),
   TKA("TKA", "Tabletten in Kalenderpackung"),
-  TLE("TLE", "Tabletten zur Herstellung einer Lösung zum Einnehmen"),
-  TMR("TMR", "Tabletten magensaftresisten"),
+  TLE("TLE", "Tablette zur Herstellung einer Lösung zum Einnehmen"),
+  TMR("TMR", "Tabletten magensaftresistent"),
   TON("TON", "Tonikum"),
   TPN("TPN", "Tampon"),
-  TPO("TPO", "Tamponade"),
+  TPO("TPO", "Tamponaden"),
   TRA("TRA", "Trinkampullen"),
   TRI("TRI", "Trituration"),
   TRO("TRO", "Tropfen"),

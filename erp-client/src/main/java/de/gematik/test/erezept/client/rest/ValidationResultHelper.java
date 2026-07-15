@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ package de.gematik.test.erezept.client.rest;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.validation.*;
+import de.gematik.bbriccs.fhir.exceptions.FhirValidationException;
 import de.gematik.test.erezept.client.exceptions.*;
 import java.util.stream.*;
 import lombok.*;

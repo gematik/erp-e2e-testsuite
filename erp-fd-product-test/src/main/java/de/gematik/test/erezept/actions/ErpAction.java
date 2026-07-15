@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.abilities.UseHapiFuzzer;
-import de.gematik.test.erezept.client.usecases.ICommand;
+import de.gematik.test.erezept.client.usecases.ErpBaseCommand;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.Optional;
@@ -50,7 +50,7 @@ public abstract class ErpAction<R extends Resource> implements Question<ErpInter
           .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
           .writerWithDefaultPrettyPrinter();
 
-  protected final ErpInteraction<R> performCommandAs(ICommand<R> cmd, Actor actor) {
+  protected final ErpInteraction<R> performCommandAs(ErpBaseCommand<R> cmd, Actor actor) {
     applyFuzzer(cmd, actor);
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val response = erpClient.request(cmd);
@@ -82,8 +82,8 @@ public abstract class ErpAction<R extends Resource> implements Question<ErpInter
    * @param cmd to be fuzzed before executing against the FD
    * @param actor who is performing the request
    */
-  private void applyFuzzer(ICommand<R> cmd, Actor actor) {
-    cmd.getRequestBody().ifPresent(body -> applyFuzzer(body, actor));
+  private void applyFuzzer(ErpBaseCommand<R> cmd, Actor actor) {
+    Optional.ofNullable(cmd.getRequestBody()).ifPresent(body -> applyFuzzer(body, actor));
   }
 
   private void applyFuzzer(Resource resource, Actor actor) {

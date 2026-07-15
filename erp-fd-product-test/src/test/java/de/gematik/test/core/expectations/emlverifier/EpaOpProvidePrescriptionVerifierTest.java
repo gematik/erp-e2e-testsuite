@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,6 +68,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithPzn;
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithIngredient;
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithCompounding;
+  private static EpaOpProvidePrescription epaOpProvidePrescriptionWithCompoundingWithoutPzn;
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithFreeText;
   private static EpaOpProvidePrescription epaOpProvidePrescriptionWithRenderedDosage;
 
@@ -99,6 +100,11 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
             EpaOpProvidePrescription.class,
             ResourceLoader.readFileFromResource(
                 "fhir/forunittests/providePrescrWithMedCompoundingFromFD.json"));
+    epaOpProvidePrescriptionWithCompoundingWithoutPzn =
+        epaFhir.decode(
+            EpaOpProvidePrescription.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/forunittests/provPrescWithMedCompoundingWithoutPzn.xml"));
     epaOpProvidePrescriptionWithIngredient =
         epaFhir.decode(
             EpaOpProvidePrescription.class,
@@ -559,7 +565,7 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
   }
 
   @Test
-  void shoulThrowWhiledValidateEpaMedicationCategoryCorrect() {
+  void shouldThrowWhiledValidateEpaMedicationCategoryCorrect() {
     val step = emlHasMedicationCategory(MedicationCategory.C_01, EmlAfos.A_25946);
     assertThrows(AssertionError.class, () -> step.apply(epaOpProvidePrescriptionWithPzn));
   }
@@ -593,6 +599,19 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
             .fake();
     val step = emlMedicationMapsTo(compoundingMed);
     assertDoesNotThrow(() -> step.apply(epaOpProvidePrescriptionWithCompounding));
+  }
+
+  @Test
+  void shouldValidateEpaMedicationWithMedicationCompoundingCorrectWithoutIngredientCoding() {
+    val compoundingMed =
+        KbvErpMedicationCompoundingFaker.builder(kbvItaErpVersion)
+            .withCategory(MedicationCategory.C_00) // Mapped to 'Medication.extension:drugCategory'
+            .withAmount(5, 1, "Stk")
+            .withDosageForm("Gurgellösung")
+            .withIngredItemText("Posterisan® akut Ätherisches Öl 700 mg")
+            .fake();
+    val step = emlMedicationMapsTo(compoundingMed);
+    assertDoesNotThrow(() -> step.apply(epaOpProvidePrescriptionWithCompoundingWithoutPzn));
   }
 
   @Test
@@ -807,5 +826,17 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
     val step = provPrescriptionHasCorrectDosageComponent(medReq);
     assertThrows(
         AssertionError.class, () -> step.apply(epaOpProvidePrescriptionWithRenderedDosage));
+  }
+
+  @Test
+  void shouldValidateEpaMedicationRequestDosageInstruction() {
+    val step = emlMedRequestDosageHasText("1-0-0-0");
+    assertDoesNotThrow(() -> step.apply(epaOpProvidePrescriptionWithPzn));
+  }
+
+  @Test
+  void shouldThrowWhiledValidateEpaMedicationRequestDosageInstruction() {
+    val step = emlMedRequestDosageHasText("Wrong Text");
+    assertThrows(AssertionError.class, () -> step.apply(epaOpProvidePrescriptionWithPzn));
   }
 }

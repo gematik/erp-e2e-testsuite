@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,33 +20,21 @@
 
 package de.gematik.test.erezept.client.usecases.eu;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.rest.HttpRequestMethod;
-import de.gematik.test.erezept.client.usecases.BaseCommand;
-import java.util.Optional;
-import org.hl7.fhir.r4.model.Resource;
+import de.gematik.test.erezept.client.usecases.ErpBaseCommand;
 
 /*
  @see <a href="https://github.com/gematik/api-erp/blob/master/docs/erp_eprescription.adoc#erstellen-eines-zugriffscodes-f%C3%BCr-das-einl%C3%B6sen-im-eu-ausland">Api@GitHub</a>
 */
-public class EuGrantAccessDeleteCommand extends BaseCommand<Resource> {
+public class EuGrantAccessDeleteCommand extends ErpBaseCommand<EmptyResource> {
 
   public EuGrantAccessDeleteCommand() {
-    super(Resource.class, HttpRequestMethod.DELETE, "access-permission");
+    super(EmptyResource.class, HttpRequestMethod.DELETE, "access-permission");
   }
 
   @Override
   public String getRequestLocator() {
     return "/$revoke-eu-access-permission";
-  }
-
-  /**
-   * Get the FHIR-Resource for the Request-Body (of the inner-HTTP)
-   *
-   * @return an Optional.of(FHIR-Resource) for the Request-Body or an empty Optional if Request-Body
-   *     is empty
-   */
-  @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.empty();
   }
 }

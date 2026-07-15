@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ package de.gematik.test.core.expectations;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.core.expectations.requirements.Requirement;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,18 +36,18 @@ import org.hl7.fhir.r4.model.Resource;
 @Slf4j
 public class ErpResponseExpectation<T extends Resource> {
 
-  private final ErpResponse<? extends Resource> actual;
+  private final FhirBResponse<? extends Resource> actual;
 
   private final Class<T> expectedPayloadType;
 
   /** verifying the outer ErpResponse */
-  private final List<VerificationStep<ErpResponse<? extends Resource>>> responseSteps;
+  private final List<VerificationStep<FhirBResponse<? extends Resource>>> responseSteps;
 
   /** verifying the contained FHIR Resource from the payload */
   private final List<VerificationStep<T>> payloadSteps;
 
   public ErpResponseExpectation(
-      ErpResponse<? extends Resource> actual, Class<T> expectedPayloadType) {
+      FhirBResponse<? extends Resource> actual, Class<T> expectedPayloadType) {
     this.actual = actual;
     this.responseSteps = new LinkedList<>();
     this.payloadSteps = new LinkedList<>();
@@ -55,23 +55,23 @@ public class ErpResponseExpectation<T extends Resource> {
   }
 
   public static <T extends Resource> ErpResponseExpectation<T> expectFor(
-      ErpResponse<? extends Resource> actual, Class<T> expectedPayloadType) {
+      FhirBResponse<? extends Resource> actual, Class<T> expectedPayloadType) {
     return new ErpResponseExpectation<>(actual, expectedPayloadType);
   }
 
   public ErpResponseExpectation<T> responseWith(
-      VerificationStep<ErpResponse<? extends Resource>> step) {
+      VerificationStep<FhirBResponse<? extends Resource>> step) {
     this.responseSteps.add(step);
     return this;
   }
 
   public ErpResponseExpectation<T> hasResponseWith(
-      VerificationStep<ErpResponse<? extends Resource>> step) {
+      VerificationStep<FhirBResponse<? extends Resource>> step) {
     return responseWith(step);
   }
 
   public ErpResponseExpectation<T> andResponse(
-      VerificationStep<ErpResponse<? extends Resource>> step) {
+      VerificationStep<FhirBResponse<? extends Resource>> step) {
     return responseWith(step);
   }
 
@@ -117,8 +117,7 @@ public class ErpResponseExpectation<T extends Resource> {
 
     // now assert the steps for the payload separately
     for (val step : this.payloadSteps) {
-      log.info(
-          format("+- [{0}] {1}: {2}", stepIdx++, step.getRequirement(), step.getExpectation()));
+      log.info("+- [{}] {}: {}", stepIdx++, step.getRequirement(), step.getExpectation());
       step.apply(payload);
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,9 @@ import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.actions.eu.EnsureEuConsent;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.eu.EuConsentDeleteCommand;
 import de.gematik.test.erezept.client.usecases.eu.EuConsentGetCommand;
 import de.gematik.test.erezept.client.usecases.eu.EuConsentPostCommand;
@@ -39,7 +39,6 @@ import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import java.util.List;
-import java.util.Map;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
@@ -70,16 +69,14 @@ class EnsureEuConsentTest extends ErpFhirBuildingTest {
     patient.can(ProvidePatientBaseData.forGkvPatient(kvnr, patient.getName()));
 
     val getResponse =
-        ErpResponse.forPayload(createOperationOutcome(), EuConsentBundle.class)
+        FhirBResponse.forPayload(EuConsentBundle.class, createOperationOutcome())
             .withStatusCode(404)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(EuConsentGetCommand.class))).thenReturn(getResponse);
 
     val postResponse =
-        ErpResponse.forPayload(EuConsentBuilder.forKvnr(kvnr).build(), EuConsent.class)
+        FhirBResponse.forPayload(EuConsent.class, EuConsentBuilder.forKvnr(kvnr).build())
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(EuConsentPostCommand.class))).thenReturn(postResponse);
 
@@ -107,9 +104,8 @@ class EnsureEuConsentTest extends ErpFhirBuildingTest {
     bundle.setEntry(List.of(entry));
 
     val getResponse =
-        ErpResponse.forPayload(bundle, EuConsentBundle.class)
+        FhirBResponse.forPayload(EuConsentBundle.class, bundle)
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(useErpClient.request(any(EuConsentGetCommand.class))).thenReturn(getResponse);
@@ -132,17 +128,15 @@ class EnsureEuConsentTest extends ErpFhirBuildingTest {
     emptyConsentBundle.setEntry(List.of());
 
     val getResponse =
-        ErpResponse.forPayload(emptyConsentBundle, EuConsentBundle.class)
+        FhirBResponse.forPayload(EuConsentBundle.class, emptyConsentBundle)
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(EuConsentGetCommand.class))).thenReturn(getResponse);
 
     val consent = EuConsentBuilder.forKvnr(patient.getKvnr()).build();
     val postResponse =
-        ErpResponse.forPayload(consent, EuConsent.class)
+        FhirBResponse.forPayload(EuConsent.class, consent)
             .withStatusCode(201)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(EuConsentPostCommand.class))).thenReturn(postResponse);
 
@@ -164,16 +158,14 @@ class EnsureEuConsentTest extends ErpFhirBuildingTest {
     emptyConsentBundle.setEntry(List.of());
 
     val getResponse =
-        ErpResponse.forPayload(emptyConsentBundle, EuConsentBundle.class)
+        FhirBResponse.forPayload(EuConsentBundle.class, emptyConsentBundle)
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(EuConsentGetCommand.class))).thenReturn(getResponse);
 
     val deleteResponse =
-        ErpResponse.forPayload(emptyConsentBundle, EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, emptyConsentBundle)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(EuConsentDeleteCommand.class))).thenReturn(deleteResponse);
 
@@ -201,16 +193,14 @@ class EnsureEuConsentTest extends ErpFhirBuildingTest {
     consentBundle.setEntry(List.of(entry));
 
     val getResponse =
-        ErpResponse.forPayload(consentBundle, EuConsentBundle.class)
+        FhirBResponse.forPayload(EuConsentBundle.class, consentBundle)
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(EuConsentGetCommand.class))).thenReturn(getResponse);
 
     val deleteResponse =
-        ErpResponse.forPayload(mock(Resource.class), EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, mock(Resource.class))
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(EuConsentDeleteCommand.class))).thenReturn(deleteResponse);
 

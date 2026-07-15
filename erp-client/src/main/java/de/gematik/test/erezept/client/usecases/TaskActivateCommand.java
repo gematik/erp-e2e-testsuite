@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,10 @@ import de.gematik.test.erezept.fhir.builder.erp.PrescriptionBuilder;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
-import java.util.Optional;
 import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Resource;
 
-public class TaskActivateCommand extends BaseCommand<ErxTask> {
+public class TaskActivateCommand extends ErpBaseCommand<ErxTask> {
 
   private final AccessCode accessCode;
   private final Parameters parameters;
@@ -57,13 +56,8 @@ public class TaskActivateCommand extends BaseCommand<ErxTask> {
     return this.getResourcePath() + "/$activate";
   }
 
-  /**
-   * Get the FHIR-Resource for the Request-Body (of the inner-HTTP)
-   *
-   * @return FHIR-Resource for the Request-Body
-   */
   @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.of(parameters);
+  public Resource getRequestBody() {
+    return parameters;
   }
 }

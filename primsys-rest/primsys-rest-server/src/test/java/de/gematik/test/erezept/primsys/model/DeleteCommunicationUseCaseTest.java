@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.CommunicationDeleteCommand;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
-import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -43,9 +42,8 @@ class DeleteCommunicationUseCaseTest extends TestWithActorContext {
     val mockClient = pharm.getClient();
 
     val erpResponse =
-        ErpResponse.forPayload(null, EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, null)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(CommunicationDeleteCommand.class))).thenReturn(erpResponse);

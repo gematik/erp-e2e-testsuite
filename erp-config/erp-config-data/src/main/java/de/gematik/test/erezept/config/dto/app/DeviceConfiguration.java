@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@
 
 package de.gematik.test.erezept.config.dto.app;
 
-import de.gematik.test.erezept.config.dto.INamedConfigurationElement;
+import de.gematik.bbriccs.cfg.NamedConfigurationElement;
 import lombok.Data;
 
 @Data
-public class DeviceConfiguration implements INamedConfigurationElement {
+public class DeviceConfiguration implements NamedConfigurationElement {
 
   private String name;
   private String platform;

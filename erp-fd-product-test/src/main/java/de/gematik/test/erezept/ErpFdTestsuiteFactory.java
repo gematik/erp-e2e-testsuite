@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,18 @@ package de.gematik.test.erezept;
 import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 
-import com.apicatalog.jsonld.StringUtils;
 import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.konnektor.Konnektor;
+import de.gematik.bbriccs.konnektor.cfg.KonnektorConfiguration;
+import de.gematik.bbriccs.konnektor.cfg.SoftKonServiceConfiguration;
+import de.gematik.bbriccs.popp.PoppTokenGenerator;
 import de.gematik.bbriccs.rest.UnirestHttpClient;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.bbriccs.vsdm.VsdmService;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.abilities.*;
+import de.gematik.test.erezept.abilities.UsePoppTokenGenerator;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.ErpActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
@@ -40,8 +45,6 @@ import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.actor.*;
 import de.gematik.test.erezept.config.dto.erpclient.BackendRouteConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.erezept.config.dto.konnektor.KonnektorConfiguration;
-import de.gematik.test.erezept.config.dto.konnektor.LocalKonnektorConfiguration;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import de.gematik.test.erezept.eml.EpaMockClient;
@@ -49,9 +52,7 @@ import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.parser.ValidatorType;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.trezept.TRegisterMockClient;
-import de.gematik.test.konnektor.Konnektor;
-import de.gematik.test.konnektor.cfg.KonnektorFactory;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
+import java.util.Optional;
 import kong.unirest.core.Unirest;
 import kong.unirest.jackson.JacksonObjectMapper;
 import lombok.AccessLevel;
@@ -60,6 +61,7 @@ import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
+import org.apache.commons.lang3.StringUtils;
 
 /** Configured Factory for the erp-fd-product-Testsuite */
 @Slf4j
@@ -72,8 +74,20 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
   private static final int GEM_PROXY_PORT = 3128;
 
   public VsdmService getSoftKonnVsdmService() {
-    val softKonnConfig = (LocalKonnektorConfiguration) this.getKonnektorConfig("Soft-Konn");
-    return VsdmService.createFrom(softKonnConfig.getVsdmServiceConfiguration());
+    val cfg = this.getKonnektorConfig("Soft-Konn");
+
+    if (!(cfg.getService() instanceof SoftKonServiceConfiguration serviceCfg)) {
+      throw new IllegalArgumentException(
+          "The configuration is not a SoftKon service configuration");
+    }
+    return Optional.ofNullable(serviceCfg.getVsdmConfiguration())
+        .map(VsdmService::createFrom)
+        .orElseGet(VsdmService::instantiateWithTestKey);
+  }
+
+  public PoppTokenGenerator getPoppTokenGenerator() {
+    val cfg = dto.getPoppTokenGenerator();
+    return PoppTokenGenerator.from(cfg);
   }
 
   public <A extends Actor> void equipAsDoctor(A actor) {
@@ -90,6 +104,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     givenThat(actor)
         .describedAs(cfg.getDescription())
         .whoCan(UseSMCB.itHasAccessTo(smcb))
+        .can(UsePoppTokenGenerator.with(getPoppTokenGenerator(), smcb))
         .can(UseHBA.itHasAccessTo(hba))
         .can(useTheKonnektor)
         .can(useTheErpClientFrom(cfg).authenticatingWith(useTheKonnektor))
@@ -149,12 +164,14 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
     val useTheKonnektor =
         UseTheKonnektor.with(smcb).and(algorithm).on(instantiateKonnektorClient(cfg));
+
     givenThat(actor)
         .describedAs(cfg.getDescription())
         .whoCan(UseSMCB.itHasAccessTo(smcb))
         .can(useTheKonnektor)
         .can(ManagePharmacyPrescriptions.itWorksWith())
         .can(ManageCommunications.heExchanges())
+        .can(UsePoppTokenGenerator.with(getPoppTokenGenerator(), smcb))
         .can(
             ProvidePharmacyBaseData.forNationalPharmacy()
                 .practitionerIdentifier("telematik-id HBA")
@@ -339,7 +356,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
   }
 
   public Konnektor instantiateKonnektorClient(String name) {
-    return KonnektorFactory.createKonnektor(this.getKonnektorConfig(name));
+    return Konnektor.create(this.getKonnektorConfig(name));
   }
 
   private KonnektorConfiguration getKonnektorConfig(String name) {

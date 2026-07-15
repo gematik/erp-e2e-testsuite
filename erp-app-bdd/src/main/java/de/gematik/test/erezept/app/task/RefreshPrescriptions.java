@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ public class RefreshPrescriptions implements Task {
   public <T extends Actor> void performAs(T actor) {
     val app = SafeAbility.getAbility(actor, UseTheApp.class);
     app.tap(Mainscreen.REFRESH_BUTTON);
+    app.waitUntilElementIsNotVisible(Mainscreen.LOADING_SPINNER);
   }
 
   public static RefreshPrescriptions byTap() {

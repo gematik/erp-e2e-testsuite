@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public abstract class ErpFhirBuildingTest {
       ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
 
   /**
-   * Required to initialise the virtual default profile for the test which require default versions
+   * Required to initialize the virtual default profile for the test which require default versions
    */
   protected static ProfilesConfigurator configuration =
       ProfilesConfigurator.getConfiguration(ERP_FHIR_PROFILES_CONFIG, ERP_FHIR_PROFILES_TOGGLE);

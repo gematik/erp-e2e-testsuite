@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 package de.gematik.test.fuzzing.fhirfuzz;
 
 import de.gematik.bbriccs.fhir.EncodingType;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.bbriccs.fhir.codec.FhirCodec;
 import lombok.val;
 import org.hl7.fhir.r4.model.Resource;
 
@@ -33,7 +33,7 @@ import org.hl7.fhir.r4.model.Resource;
  */
 public interface FhirResourceFuzz<T extends Resource> extends BaseFuzzer<T> {
 
-  default T fuzzTilInvalid(T value, FhirParser parser) {
+  default T fuzzTilInvalid(T value, FhirCodec parser) {
     val inputPOE = getContext().getFuzzConfig().getPercentOfEach();
     val inputPOA = getContext().getFuzzConfig().getPercentOfAll();
     val inputPOM = getContext().getFuzzConfig().getUsedPercentOfMutators();

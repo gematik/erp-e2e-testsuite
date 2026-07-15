@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,16 +26,23 @@ import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier;
+import de.gematik.test.core.expectations.verifier.TaskVerifier;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
-import de.gematik.test.erezept.actors.*;
+import de.gematik.test.erezept.actors.DoctorActor;
+import de.gematik.test.erezept.actors.GemaTestActor;
+import de.gematik.test.erezept.actors.PatientActor;
+import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
+import de.gematik.test.erezept.fhir.valuesets.PerformerType;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -55,6 +62,17 @@ class ActivateTRezeptIT extends ErpTest {
 
   @Actor(name = "Sina Hüllmann")
   private PatientActor sina;
+
+  @Actor(name = "Am Flughafen")
+  private PharmacyActor flughafen;
+
+  private GemaTestActor tRegisterChecker;
+
+  @BeforeEach
+  void setup() {
+    tRegisterChecker = new GemaTestActor("TRegisterChecker");
+    this.config.equipWithTPrescriptionMockClient(tRegisterChecker);
+  }
 
   @Test
   @TestcaseId("ERP_ACTIVATE_TREZEPT_01")
@@ -113,6 +131,28 @@ class ActivateTRezeptIT extends ErpTest {
         Verify.that(task)
             .withOperationOutcome()
             .hasResponseWith(returnCode(400, ErpAfos.A_27812))
+            .isCorrect());
+  }
+
+  @Test
+  @TestcaseId("ERP_ACTIVATE_TREZEPT_04")
+  @DisplayName("Aktivieren eines T-Rezepts und Prüfen der Prozessparameter im Task")
+  void activateTRezeptAndVerifyProcessParameters() {
+
+    val kbvBundleNew =
+        KbvErpBundleFaker.builder().withMedication(KbvErpMedicationPZNFaker.asTPrescription());
+
+    val interaction =
+        doctor.performs(
+            IssuePrescription.forPatient(sina).asTPrescription(kbvBundleNew.toBuilder()));
+
+    doctor.attemptsTo(
+        Verify.that(interaction)
+            .withExpectedType()
+            .hasResponseWith(returnCode(200))
+            .and(TaskVerifier.hasCorrectPerformerType(PerformerType.PUBLIC_PHARMACY))
+            .and(TaskVerifier.hasFlowType(PrescriptionFlowType.FLOW_TYPE_166))
+            .and(TaskVerifier.hasCorrectTPrescriptionProcessDates())
             .isCorrect());
   }
 }

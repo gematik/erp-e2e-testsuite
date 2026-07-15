@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,13 +91,12 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability {
     Thread.sleep(1000);
   }
 
-  @SneakyThrows
-  public void longPauseApp() {
-    Thread.sleep(60000);
-  }
-
   protected int getPollingInterval() {
     return appiumConfiguration.getPollingInterval();
+  }
+
+  protected int getMaxRefreshTimeout() {
+    return appiumConfiguration.getMaxRefreshTimeout();
   }
 
   public void removeTooltips() {
@@ -313,6 +312,18 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability {
     waitUntil(
         ExpectedConditions.visibilityOfElementLocated(this.getLocator(pageElement)),
         maxWaitTimeout);
+  }
+
+  public final void waitUntilElementIsNotVisible(PageElement pageElement) {
+    waitUntilElementIsNotVisible(pageElement, getMaxRefreshTimeout());
+  }
+
+  public final void waitUntilElementIsNotVisible(
+      PageElement pageElement, int maxWaitTimeoutForInvisibility) {
+    waitUntil(
+        ExpectedConditions.invisibilityOfElementLocated(this.getLocator(pageElement)),
+        maxWaitTimeoutForInvisibility);
+    log.info("Element {} is not visible", pageElement.getFullName());
   }
 
   public final void waitUntilElementIsPresent(PageElement pageElement) {

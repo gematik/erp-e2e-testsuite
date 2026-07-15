@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,17 +25,19 @@ import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 import lombok.Getter;
 
 /**
  * kal: Well, couldn't find a proper english translation for that <br>
  * <br>
  * <b>Note:</b> manually generated from <a
- * href="https://applications.kbv.de/S_KBV_DARREICHUNGSFORM_V1.08.xhtml">S_KBV_DARREICHUNGSFORM_V1.08</a>
- * and is not complete yet. Extend on demand!
+ * href="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM">KBV_CS_SFHIR_KBV_DARREICHUNGSFORM</a>
+ * version 1.16.
  */
 @Getter
 public enum Darreichungsform implements FromValueSet {
+  KEINE_DARREICHUNGSFORM("---", "keine Darreichungsform"),
   AEO("AEO", "Ätherisches Öl"),
   AMP("AMP", "Ampullen"),
   APA("APA", "Ampullenpaare"),
@@ -58,7 +60,7 @@ public enum Darreichungsform implements FromValueSet {
   BTA("BTA", "Brausetabletten"),
   CRE("CRE", "Creme"),
   DFL("DFL", "Durchstechflaschen"),
-  // DIG("DIG", "Digitale Gesundheitsanwendungen"),//not supported yet by IBM
+  DIG("DIG", "Digitale Gesundheitsanwendungen"),
   DIL("DIL", "Dilution"),
   DIS("DIS", "Depot-Injektionssuspension"),
   DKA("DKA", "Dragees in Kalenderpackung"),
@@ -106,7 +108,7 @@ public enum Darreichungsform implements FromValueSet {
   IFB("IFB", "Infusionsbeutel"),
   IFD("IFD", "Infusionsdispersion"),
   IFE("IFE", "Injektionslösung in einer Fertigspritze"),
-  IFF("IFF", "Infusionsflasche"),
+  IFF("IFF", "Infusionsflaschen"),
   IFK("IFK", "Infusionslösungskonzentrat"),
   IFL("IFL", "Injektionsflaschen"),
   IFS("IFS", "Infusionsset"),
@@ -197,10 +199,7 @@ public enum Darreichungsform implements FromValueSet {
       "PIE",
       "Pulver für ein Konzentrat zur Herstellung einer Infusionslösung, Pulver zur Herstellung"
           + " einer Lösung zum Einnehmen"),
-  PIF(
-      "PIF",
-      "Pulver für ein Konzentrat zur Herstellung einer Infusionslösung, Pulver zur Herstellung"
-          + " einer Lösung zum Einnehmen"),
+  PIF("PIF", "Pulver zur Herstellung einer Infusionslösung"),
   PII("PII", "Pulver zur Herstellung einer Injektions- oder Infusionslösung"),
   PIJ("PIJ", "Pulver zur Herstellung einer Injektionslösung"),
   PIK("PIK", "Pulver zur Herstellung eines Infusionslösungskonzentrates"),
@@ -230,7 +229,8 @@ public enum Darreichungsform implements FromValueSet {
   REK("REK", "Retard-Kapseln"),
   RET("RET", "Retard-Tabletten"),
   RGR("RGR", "Retard-Granulat"),
-  RKA("RKA", "Rektal-Kapseln"),
+  RKA("RKA", "Rektalkapseln"),
+  RKT("RKT", "Retardkautablette"),
   RMS("RMS", "Retardmikrokapseln und Suspensionsmittel"),
   RSC("RSC", "Rektalschaum"),
   RSU("RSU", "Rektalsuspension"),
@@ -259,6 +259,7 @@ public enum Darreichungsform implements FromValueSet {
   STR("STR", "Streifen"),
   SUB("SUB", "Substanz"),
   SUE("SUE", "Suspension zum Einnehmen"),
+  SUF("SUF", "Sublingualfilm"),
   SUI("SUI", "Suspension zur Implantation"),
   SUL("SUL", "Sublingualspray, Lösung"),
   SUP("SUP", "Suppositorien"),
@@ -274,11 +275,11 @@ public enum Darreichungsform implements FromValueSet {
   TES("TES", "Test"),
   TIN("TIN", "Tinktur"),
   TKA("TKA", "Tabletten in Kalenderpackung"),
-  TLE("TLE", "Tabletten zur Herstellung einer Lösung zum Einnehmen"),
-  TMR("TMR", "Tabletten magensaftresisten"),
+  TLE("TLE", "Tablette zur Herstellung einer Lösung zum Einnehmen"),
+  TMR("TMR", "Tabletten magensaftresistent"),
   TON("TON", "Tonikum"),
   TPN("TPN", "Tampon"),
-  TPO("TPO", "Tamponade"),
+  TPO("TPO", "Tamponaden"),
   TRA("TRA", "Trinkampullen"),
   TRI("TRI", "Trituration"),
   TRO("TRO", "Tropfen"),
@@ -329,7 +330,7 @@ public enum Darreichungsform implements FromValueSet {
   ZPA("ZPA", "Zahnpasta");
 
   public static final KbvCodeSystem CODE_SYSTEM = KbvCodeSystem.DARREICHUNGSFORM;
-  public static final String VERSION = "1.07";
+  public static final String VERSION = "1.16";
   public static final String DESCRIPTION = "Darreichungsform Arzneimittel/Rezeptur";
   public static final String PUBLISHER = "Kassenärztliche Bundesvereinigung";
 
@@ -358,5 +359,25 @@ public enum Darreichungsform implements FromValueSet {
         .filter(df -> df.code.equals(code))
         .findFirst()
         .orElseThrow(() -> new InvalidValueSetException(Darreichungsform.class, code));
+  }
+
+  /**
+   * This static Method is useful to get all special SupplyForms.
+   *
+   * @return List<Darreichungsform>
+   */
+  public static List<Darreichungsform> getUpdatedInJulyPlusKPG() {
+    return List.of(
+        Darreichungsform.KEINE_DARREICHUNGSFORM,
+        Darreichungsform.DIG,
+        Darreichungsform.IFF,
+        Darreichungsform.PIF,
+        Darreichungsform.RKA,
+        Darreichungsform.RKT,
+        Darreichungsform.SUF,
+        Darreichungsform.TLE,
+        Darreichungsform.TMR,
+        Darreichungsform.TPO,
+        Darreichungsform.KPG);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.ChargeItemPostCommand;
 import de.gematik.test.erezept.client.usecases.ChargeItemPutCommand;
@@ -45,7 +45,6 @@ import de.gematik.test.erezept.primsys.rest.data.InvoiceData;
 import de.gematik.test.erezept.primsys.rest.data.PriceComponentData;
 import jakarta.ws.rs.WebApplicationException;
 import java.util.List;
-import java.util.Map;
 import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
 import org.junit.jupiter.api.Test;
@@ -73,11 +72,10 @@ class ChargeItemUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val mockResponse =
-        ErpResponse.forPayload(
-                ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake(),
-                ErxChargeItem.class)
+        FhirBResponse.forPayload(
+                ErxChargeItem.class,
+                ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake())
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(ChargeItemPostCommand.class))).thenReturn(mockResponse);
 
@@ -117,25 +115,22 @@ class ChargeItemUseCaseTest extends TestWithActorContext {
     val chargeItemBundle = new ErxChargeItemBundle();
     chargeItemBundle.addEntry(new Bundle.BundleEntryComponent().setResource(originalChargeItem));
     val mockGetResponse =
-        ErpResponse.forPayload(chargeItemBundle, ErxChargeItemBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxChargeItemBundle.class, chargeItemBundle)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
 
     val mockPostResponse =
-        ErpResponse.forPayload(
-                ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake(),
-                ErxChargeItem.class)
+        FhirBResponse.forPayload(
+                ErxChargeItem.class,
+                ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake())
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     val mockPutResponse =
-        ErpResponse.forPayload(
-                ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake(),
-                ErxChargeItem.class)
+        FhirBResponse.forPayload(
+                ErxChargeItem.class,
+                ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake())
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(ChargeItemGetByIdCommand.class))).thenReturn(mockGetResponse);

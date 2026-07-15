@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,7 +108,9 @@ class DosageDgMPTest {
   @Test
   void shouldFailWhileUseEquals2() {
     val d1 =
-        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG).text("1 Tablette morgens").build();
+        DosageDgMPBuilder.dosageBuilder(2.5, BmpDosiereinheit.MG)
+            .text("1 Tablette morgens")
+            .build();
     val d2 =
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG).text("1 Tablette morgens").build();
 

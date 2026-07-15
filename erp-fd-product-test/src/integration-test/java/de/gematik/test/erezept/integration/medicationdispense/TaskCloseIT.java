@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,7 @@ import static de.gematik.test.core.expectations.verifier.AcceptBundleVerifier.is
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.bundleHasLastMedicationDispenseDateAfterClose;
 import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.prescriptionInStatus;
-import static de.gematik.test.core.expectations.verifier.ReceiptBundleVerifier.compAuthorRefIsUuid;
-import static de.gematik.test.core.expectations.verifier.ReceiptBundleVerifier.compSectionRefIsUuid;
-import static de.gematik.test.core.expectations.verifier.ReceiptBundleVerifier.entryFullUrlIsUuid;
-import static de.gematik.test.core.expectations.verifier.ReceiptBundleVerifier.signatureRefIsUuid;
+import static de.gematik.test.core.expectations.verifier.ReceiptBundleVerifier.*;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflowType;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyStatus;
 
@@ -289,7 +286,7 @@ class TaskCloseIT extends ErpTest {
   @Test
   @DisplayName(
       "Prüfe, dass ein patient beim Abruf seiner MedicationDispense bei einem Close die"
-          + " lastMedicationDispense Informationen der Dispensierung vorliegen")
+          + " lastMedicationDispense Informationen der Dispensierung vorliegen hat")
   void shouldDownloadMedicDispenseWithAllInformation() {
     val task =
         doctor

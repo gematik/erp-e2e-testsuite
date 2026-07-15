@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
+import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getUpdatedInJulyPlusKPG;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
@@ -31,7 +32,6 @@ import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import lombok.val;
@@ -44,10 +44,8 @@ public class KbvErpMedicationPZNFaker {
 
   private KbvErpMedicationPZNFaker(KbvItaErpVersion version) {
     this.version = version;
-    val supplyForm =
-        fakerValueSet(
-            Darreichungsform.class,
-            List.of(Darreichungsform.PUE, Darreichungsform.KPG, Darreichungsform.LYE));
+    val supplyForm = fakerValueSet(Darreichungsform.class, getUpdatedInJulyPlusKPG());
+
     this.withPznMedication(PZN.random(), fakerDrugName())
         .withType(BaseMedicationType.MEDICAL_PRODUCT)
         .withCategory(MedicationCategory.C_00)

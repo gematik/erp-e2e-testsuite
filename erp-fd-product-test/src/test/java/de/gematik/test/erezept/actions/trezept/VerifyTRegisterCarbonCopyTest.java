@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,18 @@
 
 package de.gematik.test.erezept.actions.trezept;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.rest.headers.HttpHeader;
+import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.trezept.TRegisterLog;
+import de.gematik.test.erezept.trezept.TRegisterMockDownloadRequest;
 import java.util.List;
 import net.serenitybdd.screenplay.Actor;
 import org.junit.jupiter.api.Test;
@@ -29,20 +39,66 @@ import org.junit.jupiter.api.Test;
 class VerifyTRegisterCarbonCopyTest {
 
   @Test
-  void shouldThrowAssertionErrorWhenLogsAreNull() {
+  void shouldFailWhenLogsAreNull() {
     Actor actor = Actor.named("doctor");
-
-    VerifyTRegisterCarbonCopy task = VerifyTRegisterCarbonCopy.from(null, null, null);
-
-    assertThrows(AssertionError.class, () -> task.performAs(actor));
+    VerifyTRegisterCarbonCopy task = VerifyTRegisterCarbonCopy.from(null, null, null, null);
+    AssertionError ex = assertThrows(AssertionError.class, () -> task.performAs(actor));
+    assertEquals("No carbon copy found in T-Register", ex.getMessage());
   }
 
   @Test
-  void shouldThrowAssertionErrorWhenLogsAreEmpty() {
+  void shouldFailWhenLogsAreEmpty() {
+    Actor actor = Actor.named("doctor");
+    VerifyTRegisterCarbonCopy task = VerifyTRegisterCarbonCopy.from(List.of(), null, null, null);
+    AssertionError ex = assertThrows(AssertionError.class, () -> task.performAs(actor));
+    assertEquals("No carbon copy found in T-Register", ex.getMessage());
+  }
+
+  @Test
+  void shouldEnterOptionalBlockWhenMedDispenseBundlePresent() {
     Actor actor = Actor.named("doctor");
 
-    VerifyTRegisterCarbonCopy task = VerifyTRegisterCarbonCopy.from(List.of(), null, null);
+    TRegisterLog log = mock(TRegisterLog.class, RETURNS_DEEP_STUBS);
 
-    assertThrows(AssertionError.class, () -> task.performAs(actor));
+    when(log.request().bodyAsString()).thenReturn("{}");
+
+    ErxMedicationDispenseBundle bundle = mock(ErxMedicationDispenseBundle.class);
+    when(bundle.getDispensePairBy(any())).thenReturn(List.of());
+
+    VerifyTRegisterCarbonCopy task =
+        VerifyTRegisterCarbonCopy.from(List.of(log), null, bundle, false);
+
+    assertThrows(Exception.class, () -> task.performAs(actor));
+  }
+
+  @Test
+  void shouldPassLogsCheckWhenLogsAreNotNullAndNotEmpty() {
+    Actor actor = Actor.named("doctor");
+
+    TRegisterLog log = mock(TRegisterLog.class, RETURNS_DEEP_STUBS);
+
+    when(log.request().bodyAsString()).thenReturn("{}");
+
+    VerifyTRegisterCarbonCopy task =
+        VerifyTRegisterCarbonCopy.from(List.of(log), null, null, false);
+
+    assertDoesNotThrow(() -> task.performAs(actor));
+  }
+
+  @Test
+  void shouldVerifyAccessTokenInTRegisterWhenAuthCheckIsEnabled() {
+    Actor actor = Actor.named("doctor");
+
+    TRegisterMockDownloadRequest request =
+        new TRegisterMockDownloadRequest("166.000.000.000.001.39");
+
+    request.headers().add(new HttpHeader("Authorization", "Bearer token"));
+
+    TRegisterLog log =
+        new TRegisterLog(System.currentTimeMillis(), "id-1", "166.000.000.000.001.39", request);
+
+    VerifyTRegisterCarbonCopy task = VerifyTRegisterCarbonCopy.from(List.of(log), null, null, true);
+
+    assertDoesNotThrow(() -> task.performAs(actor));
   }
 }

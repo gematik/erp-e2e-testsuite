@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,17 @@ package de.gematik.test.erezept.app.task.ios;
 
 import static de.gematik.test.erezept.app.mocker.EvdgaTestDummyFactory.createTestActor;
 import static de.gematik.test.erezept.app.mocker.EvdgaTestDummyFactory.setupTestBundle;
+import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.elements.EVDGADetails;
+import de.gematik.test.erezept.app.questions.MovingToEVDGAPrescription;
 import de.gematik.test.erezept.app.questions.MovingToPrescription;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
+import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import java.util.Optional;
@@ -67,6 +70,10 @@ class ReceiveAnEVDGACodeOnIOSTest {
     // Skip the VisibleStatus validation
     doNothing().when(theAppUser).attemptsTo(any(PerformableExpectation.class));
 
+    // Skip the question to move to the EVDGA prescription
+    val mockedEVDGABundle = mock(ErxPrescriptionBundle.class);
+    doReturn(mockedEVDGABundle).when(theAppUser).asksFor(MovingToEVDGAPrescription.with(any()));
+
     val receiveAnEvdgaCode = ReceiveAnEVDGACodeOnIOS.fromStack(DequeStrategy.LIFO);
     assertDoesNotThrow(() -> theAppUser.attemptsTo(receiveAnEvdgaCode));
 
@@ -76,6 +83,9 @@ class ReceiveAnEVDGACodeOnIOSTest {
 
   @Test
   void shouldThrowPreconditionErrorOnMissingBundle() {
+    val app = mock(UseIOSApp.class);
+    givenThat(theAppUser).can(app);
+
     doReturn(Optional.empty()).when(theAppUser).asksFor(any(MovingToPrescription.class));
 
     val receiveAnEvdgaCode = ReceiveAnEVDGACodeOnIOS.fromStack("erste");

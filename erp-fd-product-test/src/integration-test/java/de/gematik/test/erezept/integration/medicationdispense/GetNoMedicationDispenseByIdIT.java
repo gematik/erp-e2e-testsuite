@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,16 +36,14 @@ import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.client.usecases.BaseCommand;
+import de.gematik.test.erezept.client.usecases.ErpBaseCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.annotations.Step;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
-import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -110,7 +108,7 @@ public class GetNoMedicationDispenseByIdIT extends ErpTest {
   }
 
   private static class GetMedicationDispenseByIdShouldFailCommand
-      extends BaseCommand<ErxMedicationDispense> {
+      extends ErpBaseCommand<ErxMedicationDispense> {
 
     private GetMedicationDispenseByIdShouldFailCommand(PrescriptionId prescriptionId) {
       super(
@@ -118,11 +116,6 @@ public class GetNoMedicationDispenseByIdIT extends ErpTest {
           HttpRequestMethod.GET,
           "/MedicationDispense",
           prescriptionId.getValue());
-    }
-
-    @Override
-    public Optional<Resource> getRequestBody() {
-      return Optional.empty();
     }
   }
 

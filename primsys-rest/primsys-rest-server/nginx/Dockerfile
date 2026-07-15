@@ -1,4 +1,4 @@
-FROM nginx:1.26.0-alpine-slim
+FROM nginx:1.31.1-alpine-slim
 
 ARG COMMIT_HASH
 ARG VERSION

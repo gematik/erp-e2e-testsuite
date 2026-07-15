@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 package de.gematik.test.eml;
 
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.provDispensationHasCorrectDosageComponent;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.provDispensationHasCorrectDosageDgMPComponent;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -130,7 +130,7 @@ class CheckEpaOpProvideDispensationsRenderedDosageInstructionTest extends ErpFhi
                 medDisp,
                 prescriptionId,
                 List.of(
-                    provDispensationHasCorrectDosageComponent(
+                    provDispensationHasCorrectDosageDgMPComponent(
                         createMedicationDispenseBundle()
                             .getDispensePairBy(prescriptionId)
                             .get(0)

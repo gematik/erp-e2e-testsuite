@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@
 
 package de.gematik.test.erezept.config.dto.app;
 
-import de.gematik.test.erezept.config.dto.INamedConfigurationElement;
+import de.gematik.bbriccs.cfg.NamedConfigurationElement;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 @Data
 @Slf4j
-public class AppConfiguration implements INamedConfigurationElement {
+public class AppConfiguration implements NamedConfigurationElement {
 
   private String platform;
   private String appFile;
@@ -35,7 +35,7 @@ public class AppConfiguration implements INamedConfigurationElement {
 
   @Override
   public String getName() {
-    // Note: temporary workaround to satisfy the INamedConfigurationElement
+    // Note: temporary workaround to satisfy the NamedConfigurationElement
     // in the future we might require multiple AppConfigurations for a single platform
     return platform;
   }

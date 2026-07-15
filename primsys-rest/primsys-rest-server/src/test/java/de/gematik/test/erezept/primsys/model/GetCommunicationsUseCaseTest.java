@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.CommunicationGetCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunicationBundle;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.rest.params.CommunicationFilterParams;
 import java.util.List;
-import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -48,9 +47,8 @@ class GetCommunicationsUseCaseTest extends TestWithActorContext {
 
     val body = new ErxCommunicationBundle();
     val erpResponse =
-        ErpResponse.forPayload(body, ErxCommunicationBundle.class)
+        FhirBResponse.forPayload(ErxCommunicationBundle.class, body)
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(CommunicationGetCommand.class))).thenReturn(erpResponse);

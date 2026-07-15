@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,11 @@ package de.gematik.test.erezept.client.usecases;
 
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
@@ -72,6 +74,6 @@ class ChargeItemPostCommandTest extends ErpFhirBuildingTest {
   @Test
   void getRequestBody() {
     val chargeItemPostCommand = getChargeItemPostCommand();
-    assertTrue(chargeItemPostCommand.getRequestBody().isPresent());
+    assertInstanceOf(ErxChargeItem.class, chargeItemPostCommand.getRequestBody());
   }
 }

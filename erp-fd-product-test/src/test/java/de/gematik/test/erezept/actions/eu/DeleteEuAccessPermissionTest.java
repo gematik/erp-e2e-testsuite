@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ package de.gematik.test.erezept.actions.eu;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.actions.ErpAction;
 import de.gematik.test.erezept.actions.MockActorsUtils;
@@ -30,7 +31,6 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.usecases.eu.EuGrantAccessDeleteCommand;
 import lombok.val;
-import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -51,7 +51,7 @@ class DeleteEuAccessPermissionTest {
 
   @Test
   void shouldDeleteEuAccessPermissionSuccessfully() {
-    val mockResponse = mockUtil.createErpResponse(null, Resource.class, 204);
+    val mockResponse = mockUtil.createErpResponse(null, EmptyResource.class, 204);
     when(erpClientMock.request(any(EuGrantAccessDeleteCommand.class))).thenReturn(mockResponse);
 
     assertDoesNotThrow(() -> patient.performs(DeleteEuAccessPermission.forOneSelf()));

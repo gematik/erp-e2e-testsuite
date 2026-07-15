@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,34 +20,26 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
+import de.gematik.bbriccs.fhir.codec.FhirCodec;
+import de.gematik.bbriccs.konnektor.KonnektorResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
+import de.gematik.bbriccs.rest.fd.MediaType;
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.client.usecases.ChargeItemPostCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
-import de.gematik.test.konnektor.KonnektorResponse;
 import java.security.cert.X509Certificate;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.core.Serenity;
@@ -64,15 +56,21 @@ class UseTheErpClientTest extends ErpFhirBuildingTest {
       "eyJhbGciOiJCUDI1NlIxIiwidHlwIjoiYXQrSldUIiwia2lkIjoicHVrX2lkcF9zaWcifQ.eyJzdWIiOiJJWERkLTNyUVpLS0ZYVWR4R0dqNFBERG9WNk0wUThaai1xdzF2cjF1XzU4IiwicHJvZmVzc2lvbk9JRCI6IjEuMi4yNzYuMC43Ni40LjQ5Iiwib3JnYW5pemF0aW9uTmFtZSI6ImdlbWF0aWsgTXVzdGVya2Fzc2UxR0tWTk9ULVZBTElEIiwiaWROdW1tZXIiOiJYMTEwNTAyNDE0IiwiYW1yIjpbIm1mYSIsInNjIiwicGluIl0sImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTUwMTEvYXV0aC9yZWFsbXMvaWRwLy53ZWxsLWtub3duL29wZW5pZC1jb25maWd1cmF0aW9uIiwiZ2l2ZW5fbmFtZSI6IlJvYmluIEdyYWYiLCJjbGllbnRfaWQiOiJlcnAtdGVzdHN1aXRlLWZkIiwiYWNyIjoiZ2VtYXRpay1laGVhbHRoLWxvYS1oaWdoIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDozMDAwLyIsImF6cCI6ImVycC10ZXN0c3VpdGUtZmQiLCJzY29wZSI6Im9wZW5pZCBlLXJlemVwdCIsImF1dGhfdGltZSI6MTY0MzgwNDczMywiZXhwIjoxNjQzODA1MDMzLCJmYW1pbHlfbmFtZSI6IlbDs3Jtd2lua2VsIiwiaWF0IjoxNjQzODA0NjEzLCJqdGkiOiI2Yjg3NmU0MWNmMGViNGJkIn0.MV5cDnL3JBZ4b6xr9SqiYDmZ7qtZFEWBd1vCrHzVniZeDhkyuSYc7xhf577h2S21CzNgrMp0M6JALNW9Qjnw_g";
 
   private ErpClient mockErpClient;
-  private FhirParser mockFhir;
+  private FhirCodec mockFhir;
   private UseTheErpClient ability;
 
   @BeforeEach
   void setup() {
     try (MockedStatic<ErpClientFactory> f = mockStatic(ErpClientFactory.class)) {
       mockErpClient = mock(ErpClient.class);
-      mockFhir = mock(FhirParser.class);
+      mockFhir = mock(FhirCodec.class);
       when(mockErpClient.getFhir()).thenReturn(mockFhir);
+      when(mockErpClient.decode(any(), any()))
+          .thenAnswer(
+              invocation ->
+                  mockFhir.decode(
+                      invocation.getArgument(0, Class.class),
+                      invocation.getArgument(1, String.class)));
       when(mockErpClient.getAcceptMime()).thenReturn(MediaType.ACCEPT_FHIR_JSON);
       when(mockErpClient.getSendMime()).thenReturn(MediaType.FHIR_JSON);
       when(mockErpClient.getClientType()).thenReturn(ClientType.PS);
@@ -87,10 +85,9 @@ class UseTheErpClientTest extends ErpFhirBuildingTest {
         ErxChargeItemFaker.builder().withPrescriptionId(PrescriptionId.random()).fake();
     val cmd = new ChargeItemPostCommand(chargeItem, Secret.from("123"));
     val expectedResponse =
-        ErpResponse.forPayload(chargeItem, ErxChargeItem.class)
+        FhirBResponse.forPayload(ErxChargeItem.class, chargeItem)
             .withStatusCode(201)
             .usedJwt(TEST_TOKEN)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(mockErpClient.request(cmd)).thenReturn(expectedResponse);

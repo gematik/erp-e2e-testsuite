@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>erezept-testsuite</artifactId>
-        <version>1.4.0</version>
+        <version>1.6.0</version>
     </parent>
 
     <artifactId>primsys-rest</artifactId>
@@ -19,9 +19,4 @@
         <module>primsys-rest-client</module>
     </modules>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 </project>

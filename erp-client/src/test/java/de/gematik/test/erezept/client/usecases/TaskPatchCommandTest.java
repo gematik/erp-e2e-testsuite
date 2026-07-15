@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,8 @@ package de.gematik.test.erezept.client.usecases;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.values.TaskId;
-import java.util.Optional;
+import lombok.val;
 import org.hl7.fhir.r4.model.Parameters;
-import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.Test;
 
 class TaskPatchCommandTest {
@@ -36,9 +35,7 @@ class TaskPatchCommandTest {
     Parameters body = new Parameters();
 
     TaskPatchCommand command = new TaskPatchCommand(taskId, body);
-    Optional<Resource> requestBody = command.getRequestBody();
-
-    assertTrue(requestBody.isPresent());
-    assertEquals(body, requestBody.get());
+    val requestBody = command.getRequestBody();
+    assertEquals(body, requestBody);
   }
 }

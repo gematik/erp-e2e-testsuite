@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ package de.gematik.test.erezept.fhirdump;
 
 import static java.text.MessageFormat.format;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import io.cucumber.java.Scenario;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -39,6 +37,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.thucydides.model.domain.TestOutcome;
+import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 public class FhirDumper {
@@ -151,7 +150,7 @@ public class FhirDumper {
 
   @SneakyThrows
   public void writeDumpSummary() {
-    val mapper = new ObjectMapper().registerModule(new Jdk8Module());
+    val mapper = new ObjectMapper();
     val objectWriter = mapper.writerWithDefaultPrettyPrinter();
     val indexFile = basePath.resolve("fhir_dump.json").toFile();
     this.index.setRecorded(new Date());

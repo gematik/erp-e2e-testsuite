@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.screenplay.task;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
-import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
+import de.gematik.bbriccs.rest.fd.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
 import de.gematik.test.erezept.screenplay.questions.GetMedicationDispense;

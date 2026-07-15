@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
-import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
 import de.gematik.test.erezept.app.questions.MovingToPrescription;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
@@ -67,9 +66,8 @@ public class EnsureThatThePharmaceuticalPrescription implements Task {
         format(
             "{0} überprüft die Darstellung von dem {1} ausgestellten E-Rezept",
             actor.getName(), deque));
-    app.tap(Mainscreen.REFRESH_BUTTON);
-    // Note: wait 60s to load the newly created prescription
-    app.longPauseApp();
+
+    actor.attemptsTo(RefreshPrescriptions.byTap());
 
     val prescriptionBundle =
         actor

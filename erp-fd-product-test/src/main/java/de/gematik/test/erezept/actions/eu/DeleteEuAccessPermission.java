@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.actions.eu;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actions.ErpAction;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -29,10 +30,9 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import net.serenitybdd.annotations.Step;
 import net.serenitybdd.screenplay.Actor;
-import org.hl7.fhir.r4.model.Resource;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class DeleteEuAccessPermission extends ErpAction<Resource> {
+public class DeleteEuAccessPermission extends ErpAction<EmptyResource> {
 
   public static DeleteEuAccessPermission forOneSelf() {
     return new DeleteEuAccessPermission();
@@ -40,7 +40,7 @@ public class DeleteEuAccessPermission extends ErpAction<Resource> {
 
   @Step("{0} löscht seine EU-Zugriffsberechtigung")
   @Override
-  public ErpInteraction<Resource> answeredBy(Actor actor) {
+  public ErpInteraction<EmptyResource> answeredBy(Actor actor) {
     val patient = (PatientActor) actor;
     val cmd = new EuGrantAccessDeleteCommand();
     return performCommandAs(cmd, patient);

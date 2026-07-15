@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,14 @@ import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.date.DateCalculator;
+import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowCodeSystem;
 import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.valuesets.PerformerType;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -138,7 +141,7 @@ class TaskVerifierTest {
     val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(validExpiryDate));
     val task = new ErxTask();
 
-    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE_12.getCanonicalUrl(), dateType);
+    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE.getCanonicalUrl(), dateType);
 
     val step = hasCorrectMvoExpiryDate(null);
     step.apply(task);
@@ -151,7 +154,7 @@ class TaskVerifierTest {
     val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(invalidExpiryDate));
     val task = new ErxTask();
 
-    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE_12.getCanonicalUrl(), dateType);
+    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE.getCanonicalUrl(), dateType);
 
     val step = hasCorrectMvoExpiryDate(null);
     assertThrows(AssertionError.class, () -> step.apply(task));
@@ -165,7 +168,7 @@ class TaskVerifierTest {
     val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(expiryDate));
     val task = new ErxTask();
 
-    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE_12.getCanonicalUrl(), dateType);
+    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE.getCanonicalUrl(), dateType);
 
     val step = hasCorrectMvoExpiryDate(mvoEndDate);
     step.apply(task);
@@ -179,7 +182,7 @@ class TaskVerifierTest {
     val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(expiryDate));
     val task = new ErxTask();
 
-    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE_12.getCanonicalUrl(), dateType);
+    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE.getCanonicalUrl(), dateType);
 
     val step = hasCorrectMvoExpiryDate(mvoEndDate);
     assertThrows(AssertionError.class, () -> step.apply(task));
@@ -380,5 +383,72 @@ class TaskVerifierTest {
     val step = TaskVerifier.hasSecret();
 
     assertFalse(step.getPredicate().test(bundle));
+  }
+
+  @Test
+  void shouldPassOnCorrectPerformerType() {
+    val task = new ErxTask();
+
+    val expected = PerformerType.PUBLIC_PHARMACY;
+
+    val coding = expected.asCoding(true);
+    coding.setSystem(ErpWorkflowCodeSystem.ORGANIZATION_TYPE.getCanonicalUrl());
+
+    task.addPerformerType().addCoding(coding);
+
+    val step = TaskVerifier.hasCorrectPerformerType(expected);
+
+    assertDoesNotThrow(() -> step.apply(task));
+  }
+
+  @Test
+  void shouldFailOnWrongPerformerDisplay() {
+    val task = new ErxTask();
+
+    val expected = PerformerType.PUBLIC_PHARMACY;
+    val coding = expected.asCoding(true);
+    coding.setDisplay("WRONG");
+
+    task.addPerformerType().addCoding(coding);
+
+    val step = TaskVerifier.hasCorrectPerformerType(expected);
+
+    assertThrows(AssertionError.class, () -> step.apply(task));
+  }
+
+  @Test
+  void shouldPassWhenFlowTypeIsCorrect() {
+    val task = new ErxTask();
+
+    val expected = PrescriptionFlowType.FLOW_TYPE_166;
+    val coding = expected.asCoding(true);
+
+    task.addExtension(ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl(), coding);
+
+    val step = TaskVerifier.hasFlowType(expected);
+
+    assertTrue(step.getPredicate().test(task));
+  }
+
+  @Test
+  void shouldPassOnCorrectProcessDates() {
+    val dc = new DateCalculator();
+
+    val signatureDate = new Date();
+
+    val expectedDate =
+        DateConverter.getInstance().truncate(dc.getDateAfterCalendarDays(signatureDate, 6));
+
+    val dateType = new DateType(new SimpleDateFormat("yyyy-MM-dd").format(expectedDate));
+
+    val task = new ErxTask();
+
+    task.addExtension(ErpWorkflowStructDef.ACCEPT_DATE.getCanonicalUrl(), dateType);
+
+    task.addExtension(ErpWorkflowStructDef.EXPIRY_DATE.getCanonicalUrl(), dateType);
+
+    val step = TaskVerifier.hasCorrectTPrescriptionProcessDates(signatureDate);
+
+    step.apply(task);
   }
 }

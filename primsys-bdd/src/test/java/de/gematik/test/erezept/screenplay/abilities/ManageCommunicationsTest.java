@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.ErpClient;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.CommunicationDeleteCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
@@ -37,7 +37,6 @@ import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.util.ExchangedCommunication;
-import java.util.Map;
 import java.util.stream.Stream;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -80,9 +79,8 @@ class ManageCommunicationsTest extends ErpFhirBuildingTest {
     actor.can(erpClientAbility);
 
     val mockResponse =
-        ErpResponse.forPayload(resource, EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, resource)
             .withStatusCode(returnCode)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(CommunicationDeleteCommand.class))).thenReturn(mockResponse);
 

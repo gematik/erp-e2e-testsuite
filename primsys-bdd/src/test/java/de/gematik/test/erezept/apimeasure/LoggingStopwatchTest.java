@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 import ca.uhn.fhir.validation.ValidationResult;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.ClientType;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskGetCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTaskBundle;
 import java.time.Duration;
-import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -42,10 +41,9 @@ class LoggingStopwatchTest {
     val cmd = new TaskGetCommand();
     val vr = mock(ValidationResult.class);
     val response =
-        ErpResponse.forPayload(null, ErxTaskBundle.class)
+        FhirBResponse.forPayload(ErxTaskBundle.class, null)
             .withDuration(Duration.ofMillis(200))
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(vr);
     assertDoesNotThrow(() -> sw.measurement(clientType, cmd, response));
     assertDoesNotThrow(sw::close);

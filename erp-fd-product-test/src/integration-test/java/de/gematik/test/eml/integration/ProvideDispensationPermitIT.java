@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ public class ProvideDispensationPermitIT extends ErpTest {
     return WorkflowAndMedicationComposer.workflowAndMedicationComposer().create();
   }
 
-  @TestcaseId("EML_PROVIDE_PRESCRIPTION_WITH_CONSENT_DECISION_APPLY_01")
+  @TestcaseId("EML_PROVIDE_DISPENSATION_WITH_CONSENT_DECISION_APPLY_01")
   @ParameterizedTest(
       name =
           "[{index}] -> für einen Flow Type {2} sollen die zum Epa-Aktensystem gesendete"
@@ -136,7 +136,7 @@ public class ProvideDispensationPermitIT extends ErpTest {
             medDispBundle, pharmacy.getTelematikId(), task.getPrescriptionId()));
   }
 
-  @TestcaseId("EML_PROVIDE_PRESCRIPTION_WITH_CONSENT_DECISION_APPLY_02")
+  @TestcaseId("EML_PROVIDE_DISPENSATION_WITH_CONSENT_DECISION_APPLY_02")
   @Test()
   @DisplayName(
       "Es wird geprüft, dass die Werte der Dosierung innerhalb der übermittelten"

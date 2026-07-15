@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.client.vau;
 
+import de.gematik.bbriccs.rest.HttpBClient;
 import de.gematik.bbriccs.rest.HttpBRequest;
 import de.gematik.bbriccs.rest.HttpBResponse;
 import de.gematik.bbriccs.rest.RawHttpCodec;
@@ -49,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 @Slf4j
-public class VauClient {
+public class VauClient implements HttpBClient {
 
   private final RawHttpCodec httpCodec = RawHttpCodec.defaultCodec();
   private final VauProtocol vauProtocol;
@@ -81,7 +82,8 @@ public class VauClient {
   }
 
   @SneakyThrows
-  public VauClient initialize() {
+  @Override
+  public HttpBClient init() {
     // init SSL Context
     val vauTrustManager = new VauTrustManager();
     val sslCtx = SSLContext.getInstance("TLS");
@@ -97,14 +99,22 @@ public class VauClient {
     return this;
   }
 
-  public HttpBResponse send(HttpBRequest innerHttpRequest, String accessToken, String erpResource) {
+  @Override
+  public HttpBResponse send(HttpBRequest innerHttpRequest) {
     Objects.requireNonNull(
         this.unirest, "VauClient is not initialized: missing call to initialize()?");
 
+    val bearerToken =
+        innerHttpRequest
+            .getBearerToken()
+            .orElseThrow(
+                () ->
+                    new VauException(
+                        "Authorization header is missing which is required for VAU requests"));
     val encodedRequest = httpCodec.encode(innerHttpRequest);
     val reqBody =
         vauProtocol.encryptRawVauRequest(
-            accessToken, encodedRequest.getBytes(StandardCharsets.UTF_8));
+            bearerToken, encodedRequest.getBytes(StandardCharsets.UTF_8));
     log.info(
         "Sending VAU-Request as {} to: {} with Request ID {}",
         clientType.toString(),
@@ -117,11 +127,10 @@ public class VauClient {
     // additional/conditional outer VAU-Request Headers
     StandardHttpHeaderKey.CONTENT_TYPE.apply("application/octet-stream", req::header);
     StandardHttpHeaderKey.USER_AGENT.apply(this.userAgent, req::header);
-    // erpResource is optional? check if that is still true
-    Optional.ofNullable(erpResource)
-        .map(rh -> rh.replaceFirst("/", ""))
-        .ifPresent(rh -> VauHeader.X_ERP_RESOURCE.apply(rh, req::header));
-    VauHeader.X_ERP_USER.apply(clientType.getHeaderValue(), req::header);
+
+    // extract ERP FHIR resource from inner request and provide as header in outer HTTP request
+    extractErpResourceAsHeader(innerHttpRequest).apply(req::header);
+
     // API-Key is optional because only required/used by FdVs
     Optional.ofNullable(xApiKey)
         .ifPresent(ak -> AuthHttpHeaderKey.X_API_KEY.apply(ak, req::header));
@@ -187,5 +196,22 @@ public class VauClient {
 
   private String getVauRequestUrl() {
     return fdBaseUrl + "/VAU/" + vauUserPseudonym;
+  }
+
+  /**
+   * The FD requires the ERP-Resource from inner HTTP-Request
+   *
+   * @param innerHttpRequest which will be VAU encrypted
+   * @return additional header for the outer request
+   */
+  private HttpHeader extractErpResourceAsHeader(HttpBRequest innerHttpRequest) {
+    // remove leading slash for the header value
+    val urlPath =
+        innerHttpRequest.urlPath().startsWith("/")
+            ? innerHttpRequest.urlPath().replaceFirst("/", "")
+            : innerHttpRequest.urlPath();
+    val erpResource = urlPath.split("[/?]")[0]; // remove query parameters and UUIDs if present
+
+    return VauHeader.X_ERP_RESOURCE.createHeader(erpResource);
   }
 }

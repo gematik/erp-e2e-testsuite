@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -65,6 +66,7 @@ public class DoctorsController {
   public Response issuePrescription(
       @PathParam("doctorId") String doctorId,
       @DefaultValue("false") @QueryParam("direct") boolean isDirectAssignment,
+      @QueryParam("kvnr") String kvnr,
       String kbvBundle) {
     val doctor = actors.getDoctorOrThrowNotFound(doctorId);
     log.info(
@@ -72,6 +74,7 @@ public class DoctorsController {
         doctor.getName(),
         isDirectAssignment);
     return PrescribePharmaceuticals.as(doctor)
+        .forCustomKvnr(kvnr)
         .assignDirectly(isDirectAssignment)
         .withKbvBundle(kbvBundle);
   }
@@ -81,10 +84,10 @@ public class DoctorsController {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes({MediaType.APPLICATION_XML, "application/fhir+xml"})
   public Response issueDiGAPrescription(
-      @PathParam("doctorId") String doctorId, String evdgaBundle) {
+      @PathParam("doctorId") String doctorId, @QueryParam("kvnr") String kvnr, String evdgaBundle) {
     val doctor = actors.getDoctorOrThrowNotFound(doctorId);
     log.info("Doctor {} will issue a DiGA prescription", doctor.getName());
-    return PrescribeDiGA.as(doctor).withEvdga(evdgaBundle);
+    return PrescribeDiGA.as(doctor).forCustomKvnr(kvnr).build().withEvdga(evdgaBundle);
   }
 
   @DELETE
@@ -95,7 +98,7 @@ public class DoctorsController {
       @PathParam("doctorId") String doctorId,
       @QueryParam("taskId") String taskId,
       @QueryParam("ac") String accessCode,
-      @QueryParam("secret") String secret) {
+      @Nullable @QueryParam("secret") String secret) {
     val doctor = actors.getDoctorOrThrowNotFound(doctorId);
     log.info("Doctor {} will abort Task {}", doctor.getName(), taskId);
     return new AbortUseCase(doctor).abortPrescription(taskId, accessCode, secret);

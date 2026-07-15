@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ package de.gematik.test.erezept.screenplay.task;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.exceptions.FeatureNotImplementedException;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.ManageDoctorsPrescriptions;
@@ -80,7 +80,7 @@ public class AbortPrescription implements Task {
     ability.moveToDeleted(deleted);
   }
 
-  private void checkReturnCode(ErpResponse<EmptyResource> response) {
+  private void checkReturnCode(FhirBResponse<EmptyResource> response) {
     // see A_19514-03
     then(Ensure.that(response.getStatusCode()).isEqualTo(204));
   }

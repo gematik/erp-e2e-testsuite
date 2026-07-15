@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,6 @@ class ProfileSelectorElementTest {
     val locator = pse.getIosLocator().get();
     assertTrue(pse.getElementName().contains("main screen"));
     assertTrue(locator.toString().contains("alice"));
-    assertTrue(locator.toString().contains("pro_btn_selection_profile_row"));
   }
 
   @Test

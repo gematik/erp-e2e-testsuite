@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ package de.gematik.test.erezept.client.usecases;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseFaker;
@@ -65,11 +64,10 @@ class DispensePrescriptionAsBundleCommandWithoutSecretTest extends ErpFhirBuildi
     medDisp.setId(testString);
     val command =
         new DispensePrescriptionAsBundleCommandWithoutSecret(TaskId.from("testId"), medDisp);
-    assertTrue(command.getRequestBody().isPresent());
     assertEquals(
         testString,
         (((Bundle.BundleEntryComponent)
-                    ((ArrayList<?>) ((Bundle) command.getRequestBody().get()).getEntry()).get(0))
+                    ((ArrayList<?>) ((Bundle) command.getRequestBody()).getEntry()).get(0))
                 .getResource())
             .getId());
   }
@@ -95,8 +93,7 @@ class DispensePrescriptionAsBundleCommandWithoutSecretTest extends ErpFhirBuildi
         new DispensePrescriptionAsBundleCommandWithoutSecret(
             TaskId.from(taskId), dispenseParameters);
 
-    val optBody = cmd.getRequestBody();
-    assertTrue(optBody.isPresent());
-    assertInstanceOf(GemDispenseOperationParameters.class, optBody.get());
+    val body = cmd.getRequestBody();
+    assertInstanceOf(GemDispenseOperationParameters.class, body);
   }
 }

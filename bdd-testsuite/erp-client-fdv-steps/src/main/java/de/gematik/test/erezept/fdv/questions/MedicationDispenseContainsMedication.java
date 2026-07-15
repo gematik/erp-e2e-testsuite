@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 package de.gematik.test.erezept.fdv.questions;
 
-import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.questions.GetMedicationDispense;
@@ -73,13 +72,9 @@ public class MedicationDispenseContainsMedication implements Question<Boolean> {
     checkResults.add(
         medDspFromFD.getPerformerIdFirstRep().equals(medDspFromStack.getPerformerIdFirstRep()));
 
-    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3) <= 0) {
-      val erxMedRes = response.unpackDispensePairBy(prescriptionId);
-      checkResults.add(dispenseBundle.getMedicationDispenses().size() == erxMedRes.size());
-    } else {
-      val gemMedRes = response.getDispensePairBy(prescriptionId);
-      checkResults.add(dispenseBundle.getMedicationDispenses().size() == gemMedRes.size());
-    }
+    val gemMedRes = response.getDispensePairBy(prescriptionId);
+    checkResults.add(dispenseBundle.getMedicationDispenses().size() == gemMedRes.size());
+
     return !checkResults.contains(false);
   }
 

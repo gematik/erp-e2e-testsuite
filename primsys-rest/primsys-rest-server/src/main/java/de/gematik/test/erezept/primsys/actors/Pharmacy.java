@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,16 @@
 
 package de.gematik.test.erezept.primsys.actors;
 
+import de.gematik.bbriccs.konnektor.Konnektor;
+import de.gematik.bbriccs.konnektor.requests.GetCardHandleRequest;
+import de.gematik.bbriccs.konnektor.requests.ReadVsdRequest;
+import de.gematik.bbriccs.konnektor.requests.SignXMLDocumentRequest;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.builder.dav.PharmacyOrganizationFaker;
 import de.gematik.test.erezept.fhir.r4.dav.PharmacyOrganization;
-import de.gematik.test.konnektor.Konnektor;
-import de.gematik.test.konnektor.commands.GetCardHandleCommand;
-import de.gematik.test.konnektor.commands.ReadVsdCommand;
-import de.gematik.test.konnektor.commands.SignXMLDocumentCommand;
 import java.util.Base64;
 import lombok.val;
 
@@ -44,7 +44,7 @@ public class Pharmacy extends BaseActor {
   }
 
   public byte[] signDocument(String document) {
-    val signCmd = new SignXMLDocumentCommand(smcbHandle, document, algorithm);
+    val signCmd = new SignXMLDocumentRequest(smcbHandle, document, algorithm);
     return konnektor.execute(signCmd).getPayload();
   }
 
@@ -53,8 +53,8 @@ public class Pharmacy extends BaseActor {
   }
 
   public String requestEvidenceForEgk(Egk egk) {
-    val egkCardHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(egk)).getPayload();
-    val readVsdCommand = new ReadVsdCommand(egkCardHandle, smcbHandle, true, true);
+    val egkCardHandle = konnektor.execute(GetCardHandleRequest.forSmartcard(egk)).getPayload();
+    val readVsdCommand = new ReadVsdRequest(egkCardHandle, smcbHandle, true, true);
     val pruefnachweis = konnektor.execute(readVsdCommand).getPayload().getPruefungsnachweis();
     return Base64.getEncoder().encodeToString(pruefnachweis);
   }

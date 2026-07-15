@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static de.gematik.test.erezept.client.rest.param.IQueryParameter.queryListFromUrl;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.core.expectations.requirements.ErpAfos;
@@ -46,7 +45,7 @@ public class GenericBundleVerifier {
         .accept();
   }
 
-  public static <T extends Bundle> VerificationStep<T> minimumCountOfEntriesOf(int count) {
+  public static <T extends Bundle> VerificationStep<T> minimumCountOfEntries(int count) {
     Predicate<T> predicate = bundle -> bundle.getEntry().size() >= count;
     return new VerificationStep.StepBuilder<T>(
             ErpAfos.A_24441,
@@ -63,6 +62,15 @@ public class GenericBundleVerifier {
         .accept();
   }
 
+  public static <T extends Bundle> VerificationStep<T> containsMinimumTotalCountOf(int totalCount) {
+    Predicate<T> predicate = bundle -> bundle.getTotal() >= totalCount;
+    return new VerificationStep.StepBuilder<T>(
+            ErpAfos.A_24443,
+            format("Die enthaltene Angabe in Total muss mindestens {0} sein", totalCount))
+        .predicate(predicate)
+        .accept();
+  }
+
   public static <T extends Bundle> VerificationStep<T> expectedParamsIn(
       String relation, String queryKey, String queryValue) {
     Predicate<T> predicate =
@@ -72,7 +80,7 @@ public class GenericBundleVerifier {
                   .filter(link -> link.getRelation().equalsIgnoreCase(relation))
                   .map(Bundle.BundleLinkComponent::getUrl)
                   .findFirst()
-                  .map(u -> queryListFromUrl(u))
+                  .map(IQueryParameter::queryListFromUrl)
                   .orElse(List.of());
           return queryList.stream()
               .filter(qp -> qp.parameter().equals(queryKey))

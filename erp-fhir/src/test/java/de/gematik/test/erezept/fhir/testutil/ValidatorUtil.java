@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,9 @@ import ca.uhn.fhir.validation.ResultSeverityEnum;
 import ca.uhn.fhir.validation.SingleValidationMessage;
 import ca.uhn.fhir.validation.ValidationResult;
 import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.codec.FhirCodec;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.bbriccs.utils.StopwatchUtil;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
 import java.io.File;
 import java.util.List;
 import java.util.function.Consumer;
@@ -46,7 +46,7 @@ public class ValidatorUtil {
   }
 
   public static void validateFiles(
-      FhirParser parser,
+      FhirCodec parser,
       List<File> files,
       Consumer<Boolean> validationAssertion,
       boolean printResult) {
@@ -54,7 +54,7 @@ public class ValidatorUtil {
   }
 
   public static void validateFile(
-      FhirParser parser, File file, Consumer<Boolean> validationAssertion, boolean printResult) {
+      FhirCodec parser, File file, Consumer<Boolean> validationAssertion, boolean printResult) {
 
     log.info("Validate {}", file.getName());
     val content = ResourceLoader.readString(file);
@@ -67,27 +67,27 @@ public class ValidatorUtil {
     validationAssertion.accept(vr.isSuccessful());
   }
 
-  public static ValidationResult encodeAndValidate(FhirParser parser, Resource resource) {
+  public static ValidationResult encodeAndValidate(FhirCodec parser, Resource resource) {
     return encodeAndValidate(parser, resource, false);
   }
 
   public static ValidationResult encodeAndValidate(
-      FhirParser parser, Resource resource, EncodingType encodingType) {
+      FhirCodec parser, Resource resource, EncodingType encodingType) {
     return encodeAndValidate(parser, resource, encodingType, false);
   }
 
   public static ValidationResult encodeAndValidate(
-      FhirParser parser, Resource resource, boolean printEncoded) {
+      FhirCodec parser, Resource resource, boolean printEncoded) {
     return encodeAndValidate(parser, resource, EncodingType.XML, printEncoded);
   }
 
   public static ValidationResult encodeAndValidate(
-      FhirParser parser, Resource resource, EncodingType encodingType, boolean printEncoded) {
+      FhirCodec parser, Resource resource, EncodingType encodingType, boolean printEncoded) {
     return encodeAndValidate(parser, resource, encodingType, printEncoded, false);
   }
 
   public static ValidationResult encodeAndValidate(
-      FhirParser parser,
+      FhirCodec parser,
       Resource resource,
       EncodingType encodingType,
       boolean printEncoded,

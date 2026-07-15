@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,8 @@ import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
-import java.util.Optional;
-import org.hl7.fhir.r4.model.Resource;
 
-public class TaskRejectCommand extends BaseCommand<EmptyResource> {
+public class TaskRejectCommand extends ErpBaseCommand<EmptyResource> {
 
   private final Secret secret;
 
@@ -41,10 +39,5 @@ public class TaskRejectCommand extends BaseCommand<EmptyResource> {
   @Override
   public String getRequestLocator() {
     return this.getResourcePath() + "/$reject?secret=" + this.secret.getValue();
-  }
-
-  @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.empty();
   }
 }

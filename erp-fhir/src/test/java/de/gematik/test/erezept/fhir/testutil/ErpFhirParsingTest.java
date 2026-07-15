@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.fhir.testutil;
 
+import de.gematik.bbriccs.fhir.codec.FhirCodec;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.bbriccs.utils.StopwatchUtil;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
@@ -32,15 +33,14 @@ import org.hl7.fhir.r4.model.Resource;
 @SuppressWarnings({"java:S2187"})
 public abstract class ErpFhirParsingTest extends ErpFhirBuildingTest {
 
-  protected static FhirParser parser;
+  protected static FhirCodec parser;
 
   static {
-    // TODO: measure time of parser initialization
+    // measure the time of FhirCodec initialization
     val measurement = StopwatchUtil.measure(() -> new FhirParser());
 
-    log.info("Initialized FhirParser in {}", measurement.duration());
+    log.info("Initialized FhirCodec in {}", measurement.duration());
     parser = measurement.response();
-    //    parser = new FhirParser();
   }
 
   protected <T extends Resource> T getDecodedFromPath(

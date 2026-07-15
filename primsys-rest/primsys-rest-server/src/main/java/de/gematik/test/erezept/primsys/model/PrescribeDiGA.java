@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,18 +27,17 @@ import de.gematik.test.erezept.primsys.data.PrescriptionDto;
 import de.gematik.test.erezept.primsys.data.PrescriptionDto.PrescriptionDtoBuilder;
 import de.gematik.test.erezept.primsys.mapping.HealthAppRequestDataMapper;
 import jakarta.ws.rs.core.Response;
+import javax.annotation.Nullable;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 @Slf4j
 public class PrescribeDiGA extends PrescribeUseCase<KbvEvdgaBundle> {
 
-  private PrescribeDiGA(Doctor doctor) {
-    super(doctor);
-  }
-
-  public static PrescribeDiGA as(Doctor doctor) {
-    return new PrescribeDiGA(doctor);
+  private PrescribeDiGA(Doctor doctor, @Nullable String kvnr) {
+    super(doctor, kvnr);
   }
 
   public Response withEvdga(String kbvBundleXmlBody) {
@@ -56,5 +55,24 @@ public class PrescribeDiGA extends PrescribeUseCase<KbvEvdgaBundle> {
   protected PrescriptionDto finalise(KbvEvdgaBundle bundle, PrescriptionDtoBuilder builder) {
     val healthAppRequestMapper = HealthAppRequestDataMapper.from(bundle.getHealthAppRequest());
     return builder.healthAppRequest(healthAppRequestMapper.build().getDto()).build();
+  }
+
+  public static Builder as(Doctor doctor) {
+    return new Builder(doctor);
+  }
+
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+  public static class Builder {
+    private final Doctor doctor;
+    @Nullable private String kvnr;
+
+    public Builder forCustomKvnr(String kvnr) {
+      this.kvnr = kvnr;
+      return this;
+    }
+
+    public PrescribeDiGA build() {
+      return new PrescribeDiGA(doctor, kvnr);
+    }
   }
 }

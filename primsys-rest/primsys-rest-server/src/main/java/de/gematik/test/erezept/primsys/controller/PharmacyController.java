@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,12 @@
 
 package de.gematik.test.erezept.primsys.controller;
 
+import com.google.common.base.Strings;
 import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto;
 import de.gematik.test.erezept.primsys.model.*;
 import de.gematik.test.erezept.primsys.rest.data.InvoiceData;
 import de.gematik.test.erezept.primsys.rest.params.CommunicationFilterParams;
+import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -219,15 +221,32 @@ public class PharmacyController {
           examEvidence,
           kvnr,
           hcv);
-      return new GetPrescriptionsWithPNUseCase(pharmacy)
+      return new GetPrescriptionsAsPharmacyUseCase(pharmacy)
           .getPrescriptionsByEvidence(examEvidence, kvnr, hcv);
     } else {
       log.info(
           "Pharmacy {} will read all prescriptions with ExamEvidence '{}'",
           pharmacy.getName(),
           examEvidence);
-      return new GetPrescriptionsWithPNUseCase(pharmacy).getPrescriptionsByEvidence(examEvidence);
+      return new GetPrescriptionsAsPharmacyUseCase(pharmacy)
+          .getPrescriptionsByEvidence(examEvidence);
     }
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Path("{pharmacyId}/withPoppToken")
+  public Response getPrescriptionsByPoppToken(
+      @PathParam("pharmacyId") String pharmacyId,
+      @QueryParam("poppToken") @Nullable String poppToken) {
+    if (Strings.isNullOrEmpty(poppToken)) {
+      return ErrorResponseBuilder.createInternalError(400, "missing poppToken");
+    }
+
+    val pharmacy = actors.getPharmacyOrThrowNotFound(pharmacyId);
+    log.info("Pharmacy {} will read all prescriptions by PoPP-Token", pharmacy.getName());
+    return new GetPrescriptionsAsPharmacyUseCase(pharmacy).getPrescriptionsByPoppToken(poppToken);
   }
 
   @GET
@@ -238,7 +257,7 @@ public class PharmacyController {
       @PathParam("pharmacyId") String pharmacyId, @QueryParam("kvnr") String kvnr) {
     val pharmacy = actors.getPharmacyOrThrowNotFound(pharmacyId);
     log.info("Pharmacy {} will read all prescriptions for KVNR: {}", pharmacy.getName(), kvnr);
-    return new GetPrescriptionsWithPNUseCase(pharmacy).getPrescriptionByKvnr(kvnr);
+    return new GetPrescriptionsAsPharmacyUseCase(pharmacy).getPrescriptionByKvnr(kvnr);
   }
 
   @POST

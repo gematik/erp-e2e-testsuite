@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@ package de.gematik.test.erezept.client.usecases;
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import java.util.Optional;
-import org.hl7.fhir.r4.model.Resource;
 
-public class ChargeItemDeleteCommand extends BaseCommand<EmptyResource> {
+public class ChargeItemDeleteCommand extends ErpBaseCommand<EmptyResource> {
 
   public ChargeItemDeleteCommand(PrescriptionId prescriptionId) {
     super(EmptyResource.class, HttpRequestMethod.DELETE, "ChargeItem", prescriptionId.getValue());
@@ -41,16 +39,5 @@ public class ChargeItemDeleteCommand extends BaseCommand<EmptyResource> {
   @Override
   public String getRequestLocator() {
     return this.getResourcePath();
-  }
-
-  /**
-   * Get the FHIR-Resource for the Request-Body (of the inner-HTTP)
-   *
-   * @return an Optional.of(FHIR-Resource) for the Request-Body or an empty Optional if Request-Body
-   *     is empty
-   */
-  @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.empty();
   }
 }

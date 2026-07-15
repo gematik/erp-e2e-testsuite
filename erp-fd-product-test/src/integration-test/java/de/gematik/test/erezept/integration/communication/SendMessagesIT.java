@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@ import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.security.SecureRandom;
-import java.util.List;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -116,12 +115,13 @@ public class SendMessagesIT extends ErpTest {
             SendMessages.to(patient)
                 .forTask(prescTask)
                 .asReply(
-                    new CommunicationReplyMessage(supplyOptionsType, getRandomString(500)),
+                    CommunicationReplyMessage.forV1()
+                        .supplyOptionsType(supplyOptionsType)
+                        .infoText(getRandomString(500))
+                        .build(),
                     pharma));
+
     pharma.attemptsTo(Verify.that(response).withExpectedType().isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_02")
@@ -135,20 +135,30 @@ public class SendMessagesIT extends ErpTest {
   @MethodSource("communicationTestComposer")
   void shouldValidatePatientCommunicationWithCorrectStringLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
+
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
-    val cDRM = new CommunicationDisReqMessage(supplyOptionsType, getRandomString(500));
+
+    val cDRM =
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .hint(getRandomString(500))
+            .build();
+
     val response =
         patient.performs(SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(cDRM));
+
     patient.attemptsTo(Verify.that(response).withExpectedType().isCorrect());
+
     val cDRM2 =
-        new CommunicationDisReqMessage(
-            supplyOptionsType, getRandomString(RANDOM.nextInt(0, MAX_STRING_LENGTH_500)));
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .hint(getRandomString(RANDOM.nextInt(0, MAX_STRING_LENGTH_500)))
+            .build();
+
     val response2 =
         patient.performs(SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(cDRM2));
+
     patient.attemptsTo(Verify.that(response2).withExpectedType().isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_03")
@@ -166,15 +176,18 @@ public class SendMessagesIT extends ErpTest {
     val prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val cDRM =
-        new CommunicationDisReqMessage(
-            1, supplyOptionsType.getLabel(), patient.getName(), null, getRandomString(500), null);
+        CommunicationDisReqMessage.forV1()
+            .version(1)
+            .supplyOptionsType(supplyOptionsType)
+            .name(patient.getName())
+            .hint(getRandomString(500))
+            .build();
+
     val response =
         patient.performs(SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(cDRM));
+
     patient.attemptsTo(
         Verify.that(response).withExpectedType().hasResponseWith(returnCode(201)).isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_04")
@@ -192,14 +205,15 @@ public class SendMessagesIT extends ErpTest {
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val replyMessage =
-        new CommunicationReplyMessage(
-            1, supplyOptionsType.getLabel(), getRandomString(500), null, null, null);
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .infoText(getRandomString(500))
+            .build();
+
     val response =
         pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
+
     pharma.attemptsTo(Verify.that(response).withExpectedType().isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_05")
@@ -217,14 +231,16 @@ public class SendMessagesIT extends ErpTest {
     val prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val cDRM =
-        new CommunicationDisReqMessage(
-            1, supplyOptionsType.getLabel(), "patientName", null, getRandomString(500), null);
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .name("patientName")
+            .hint(getRandomString(500))
+            .build();
+
     val response =
         patient.performs(SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(cDRM));
+
     patient.attemptsTo(Verify.that(response).withExpectedType().isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_06")
@@ -242,16 +258,16 @@ public class SendMessagesIT extends ErpTest {
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val replyMessage =
-        new CommunicationReplyMessage(
-            1,
-            supplyOptionsType.getLabel(),
-            getRandomString(500),
-            null,
-            null,
-            "5346a991-c5c6-49c8-b87b-4cdd255bbde4");
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .infoText(getRandomString(500))
+            .pickUpCodeDMC("5346a991-c5c6-49c8-b87b-4cdd255bbde4")
+            .build();
+
     val response =
         pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
-    if (supplyOptionsType.equals(SupplyOptionsType.ON_PREMISE)) {
+
+    if (SupplyOptionsType.ON_PREMISE.equals(supplyOptionsType)) {
       pharma.attemptsTo(Verify.that(response).withExpectedType().isCorrect());
     } else {
       pharma.attemptsTo(
@@ -260,9 +276,6 @@ public class SendMessagesIT extends ErpTest {
               .hasResponseWith(returnCode(400, ErpAfos.A_23879))
               .isCorrect());
     }
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_07")
@@ -280,22 +293,19 @@ public class SendMessagesIT extends ErpTest {
     val prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val cDRM =
-        new CommunicationDisReqMessage(
-            1,
-            supplyOptionsType.getLabel(),
-            "Prof Dr. Dr. Johann-Wolfgang von und zu Burkstätten Grteifswalde",
-            null,
-            getRandomString(500),
-            null);
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .name("Prof Dr. Dr. Johann-Wolfgang von und zu Burkstätten Grteifswalde")
+            .hint(getRandomString(500))
+            .build();
+
     val response =
         patient.performs(SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(cDRM));
+
     patient.attemptsTo(Verify.that(response).withExpectedType().isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
-  @TestcaseId("ERP_COMMUNICATION_SEND_8")
+  @TestcaseId("ERP_COMMUNICATION_SEND_08")
   @ParameterizedTest(
       name =
           "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit"
@@ -306,13 +316,20 @@ public class SendMessagesIT extends ErpTest {
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWithCorrectPickUpCodHR(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
+
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
+
     val replyMessage =
-        new CommunicationReplyMessage(
-            1, supplyOptionsType.getLabel(), getRandomString(500), null, "12345678", null);
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .infoText(getRandomString(500))
+            .pickUpCodeHR("12345678")
+            .build();
+
     val response =
         pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
-    if (supplyOptionsType.equals(SupplyOptionsType.ON_PREMISE)) {
+
+    if (SupplyOptionsType.ON_PREMISE.equals(supplyOptionsType)) {
       pharma.attemptsTo(Verify.that(response).withExpectedType().isCorrect());
     } else {
       pharma.attemptsTo(
@@ -321,12 +338,9 @@ public class SendMessagesIT extends ErpTest {
               .hasResponseWith(returnCode(400, ErpAfos.A_23879))
               .isCorrect());
     }
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
-  @TestcaseId("ERP_COMMUNICATION_SEND_9")
+  @TestcaseId("ERP_COMMUNICATION_SEND_09")
   @ParameterizedTest(
       name =
           "[{index}] -> Die Stadtapotheke schickt eine Communication mit validem Json-Content mit"
@@ -337,22 +351,20 @@ public class SendMessagesIT extends ErpTest {
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWitCorrectUrlLength(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
+
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
+
     val replyMessage =
-        new CommunicationReplyMessage(
-            1,
-            supplyOptionsType.getLabel(),
-            GemFaker.getFaker().internet().url(),
-            null,
-            null,
-            null);
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .infoText("")
+            .url(String.format("https://%s", GemFaker.getFaker().internet().domainName()))
+            .build();
+
     val response =
         pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
 
     pharma.attemptsTo(Verify.that(response).withExpectedType().isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_10")
@@ -370,14 +382,17 @@ public class SendMessagesIT extends ErpTest {
     val prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val cDRM =
-        new CommunicationDisReqMessage(
-            1, supplyOptionsType.getLabel(), null, null, getRandomString(500), "123456789");
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .name("patientName")
+            .phone("123456789")
+            .hint(getRandomString(500))
+            .build();
+
     val response =
         patient.performs(SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(cDRM));
+
     patient.attemptsTo(Verify.that(response).withExpectedType().isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
   @TestcaseId("ERP_COMMUNICATION_SEND_11")
@@ -391,25 +406,22 @@ public class SendMessagesIT extends ErpTest {
   @MethodSource("communicationTestComposer")
   void shouldValidatePharmaciesCommunicationWitEscapeQuotes(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
+
     final ErxTask prescTask = doc.prescribeFor(patient, assignmentKind);
+
     val replyMessage =
-        new CommunicationReplyMessage(
-            1,
-            supplyOptionsType.getLabel(),
-            "\" Test \" Text \"mit jeder \" Menge escaped \"  Anführungszeichen \" ",
-            null,
-            null,
-            null);
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .infoText("\" Test \" Text \"mit jeder \" Menge escaped \"  Anführungszeichen \" ")
+            .build();
+
     val response =
         pharma.performs(SendMessages.to(patient).forTask(prescTask).asReply(replyMessage, pharma));
 
     pharma.attemptsTo(Verify.that(response).withExpectedType().isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 
-  @TestcaseId("ERP_COMMUNICATION_SEND_10")
+  @TestcaseId("ERP_COMMUNICATION_SEND_11")
   @ParameterizedTest(
       name =
           "[{index}] -> Der Versicherte schickt eine Communication DispRequest mit validem"
@@ -424,18 +436,16 @@ public class SendMessagesIT extends ErpTest {
     val prescTask = doc.prescribeFor(patient, assignmentKind);
 
     val cDRM =
-        new CommunicationDisReqMessage(
-            1,
-            supplyOptionsType.getLabel(),
-            " \"" + patient.getName() + " \"",
-            List.of(" \"" + GemFaker.fakerStreetName() + " \""),
-            "\" Test \" Text \"mit jeder \" Menge escaped \"  Anführungszeichen \" ",
-            " \" 123456789");
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(supplyOptionsType)
+            .name("\" " + patient.getName() + " \"")
+            .phone("\" 123456789")
+            .hint("\" Test \" Text \"mit escaped quotes \"")
+            .build();
+
     val response =
         patient.performs(SendMessages.to(pharma).forTask(prescTask).asDispenseRequest(cDRM));
+
     patient.attemptsTo(Verify.that(response).withExpectedType().isCorrect());
-    // cleanup
-    pharma.performs(
-        ClosePrescription.acceptedWith(pharma.performs(AcceptPrescription.forTheTask(prescTask))));
   }
 }

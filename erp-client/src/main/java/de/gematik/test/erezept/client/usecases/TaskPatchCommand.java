@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,10 @@ package de.gematik.test.erezept.client.usecases;
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.TaskId;
-import java.util.Optional;
 import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Resource;
 
-public class TaskPatchCommand extends BaseCommand<ErxTask> {
+public class TaskPatchCommand extends ErpBaseCommand<ErxTask> {
 
   private final Parameters body;
 
@@ -37,7 +36,7 @@ public class TaskPatchCommand extends BaseCommand<ErxTask> {
   }
 
   @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.of(body);
+  public Resource getRequestBody() {
+    return body;
   }
 }

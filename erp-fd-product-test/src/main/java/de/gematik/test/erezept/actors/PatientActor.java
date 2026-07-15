@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import com.ibm.icu.impl.Pair;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
@@ -85,6 +86,11 @@ public class PatientActor extends ErpActor {
     if (InsuranceTypeDe.PKV.equals(coverageType)) {
       this.changePatientInsuranceType(coverageType);
     }
+  }
+
+  public void setVersion(KbvItaForVersion kbvItaForVersion) {
+    val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
+    bd.setVersion(kbvItaForVersion);
   }
 
   public InsuranceTypeDe getPatientInsuranceType() {

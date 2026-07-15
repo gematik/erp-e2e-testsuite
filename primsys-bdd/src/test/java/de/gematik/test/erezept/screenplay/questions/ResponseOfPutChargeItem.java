@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 package de.gematik.test.erezept.screenplay.questions;
 
 import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.smartcards.SmartcardType;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemPutCommand;
 import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenFaker;
 import de.gematik.test.erezept.fhir.profiles.definitions.AbdaErpPkvStructDef;
@@ -53,7 +53,7 @@ public class ResponseOfPutChargeItem extends FhirResponseQuestion<ErxChargeItem>
   }
 
   @Override
-  public ErpResponse<ErxChargeItem> answeredBy(Actor actor) {
+  public FhirBResponse<ErxChargeItem> answeredBy(Actor actor) {
     strategy.init(actor);
 
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);

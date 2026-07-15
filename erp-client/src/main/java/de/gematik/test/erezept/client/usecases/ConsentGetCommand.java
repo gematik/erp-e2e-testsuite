@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,24 +23,11 @@ package de.gematik.test.erezept.client.usecases;
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.fhir.r4.erp.ErxConsentBundle;
-import java.util.Optional;
-import org.hl7.fhir.r4.model.Resource;
 
-public class ConsentGetCommand extends BaseCommand<ErxConsentBundle> {
+public class ConsentGetCommand extends ErpBaseCommand<ErxConsentBundle> {
 
   public ConsentGetCommand() {
     super(ErxConsentBundle.class, HttpRequestMethod.GET, "Consent");
     this.queryParameters.add(new QueryParameter("category", "CHARGCONS"));
-  }
-
-  /**
-   * Get the FHIR-Resource for the Request-Body (of the inner-HTTP)
-   *
-   * @return an Optional.of(FHIR-Resource) for the Request-Body or an empty Optional if Request-Body
-   *     is empty
-   */
-  @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.empty();
   }
 }

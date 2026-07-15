@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ package de.gematik.test.erezept.app.cfg;
 import static de.gematik.test.erezept.app.mobile.PlatformType.ANDROID;
 import static java.text.MessageFormat.format;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.test.erezept.app.abilities.UseAndroidApp;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
@@ -49,6 +48,7 @@ import lombok.val;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.http.ClientConfig;
+import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @UtilityClass

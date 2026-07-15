@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,11 @@
 package de.gematik.test.erezept.client.usecases;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import lombok.val;
+import org.hl7.fhir.r4.model.Subscription;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,20 +41,20 @@ class SubscriptionPostCommandTest {
 
   @Test
   void getRequestLocatorStartsWithSlash() {
-    var request = subscriptionPostCommand.getRequestLocator();
+    val request = subscriptionPostCommand.getRequestLocator();
     assertTrue(request.startsWith("/"));
   }
 
   @Test
   void getRequestLocatorFirstEntryIsSubscription() {
-    var request = subscriptionPostCommand.getRequestLocator();
-    var requestArray = request.split("/");
+    val request = subscriptionPostCommand.getRequestLocator();
+    val requestArray = request.split("/");
     assertEquals("Subscription", requestArray[1]);
   }
 
   @Test
   void getRequestBodyIsPresent() {
-    var request = subscriptionPostCommand.getRequestBody();
-    assertTrue(request.isPresent());
+    val request = subscriptionPostCommand.getRequestBody();
+    assertInstanceOf(Subscription.class, request);
   }
 }

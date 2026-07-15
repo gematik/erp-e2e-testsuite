@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ class DispenseMedicationTimelyMannerIT extends ErpTest {
   @DisplayName(
       "Prüfe, dass der Fachdienst manipulierte MedicationDispense-Daten während der Dispensierung"
           + " ablehnt")
-  @MethodSource("disppensationSystemManipulators")
+  @MethodSource("dispensationSystemManipulators")
   void shouldManipulateSystemsWhileDispensing(
       NamedEnvelope<FuzzingMutator<ErxMedicationDispense>> manipulator) {
 
@@ -241,7 +241,7 @@ class DispenseMedicationTimelyMannerIT extends ErpTest {
 
     val dispensation =
         pharmacy.performs(
-            DispensePrescriptionOld.withCredentials(
+            DispensePrescriptionNew.withCredentials(
                     acceptation.getTaskId(), acceptation.getSecret())
                 .withParameters(params));
 
@@ -274,7 +274,7 @@ class DispenseMedicationTimelyMannerIT extends ErpTest {
     return List.of(Pair.of(medDisp1, medication1));
   }
 
-  static Stream<Arguments> disppensationSystemManipulators() {
+  static Stream<Arguments> dispensationSystemManipulators() {
     return ArgumentComposer.composeWith(
             ErxMedicationDispenseManipulatorFactory.getSystemManipulator())
         .create();
@@ -287,22 +287,8 @@ class DispenseMedicationTimelyMannerIT extends ErpTest {
     dispenses.forEach(p -> paramsBuilder.with(p.getLeft(), p.getRight()));
     val params = paramsBuilder.build();
 
-    // derive version from CapabilityStatement
-    val interaction = patient.asksFor(new ResponseOfGetCapabilityStatement());
-    ErxCapabilityStatement cs = interaction.getResponse().getExpectedResource();
-
-    PrescriptionServiceVersion currentVersion =
-        PrescriptionServiceVersion.from(cs.getSoftwareVersion());
-
-    if (currentVersion.isAtLeast(PrescriptionServiceVersion.V_1_21_0)) {
-      return DispensePrescriptionNew.withCredentials(
-              acceptation.getTaskId(), acceptation.getSecret())
-          .withParameters(params);
-    } else {
-      return DispensePrescriptionOld.withCredentials(
-              acceptation.getTaskId(), acceptation.getSecret())
-          .withParameters(params);
-    }
+    return DispensePrescriptionNew.withCredentials(acceptation.getTaskId(), acceptation.getSecret())
+        .withParameters(params);
   }
 
   private void shouldDownloadMedicDispenseWithAllInformationAfterDispenseForNewProfiles(

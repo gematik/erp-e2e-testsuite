@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,14 @@ package de.gematik.test.erezept.client.cfg;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.codec.FhirCodec;
+import de.gematik.bbriccs.rest.fd.FhirBResponseCreator;
 import de.gematik.bbriccs.rest.headers.AuthHttpHeaderKey;
 import de.gematik.bbriccs.rest.headers.StandardHttpHeaderKey;
 import de.gematik.idp.client.IdpClient;
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.UnirestRetryWrapper;
-import de.gematik.test.erezept.client.rest.ErpResponseFactory;
 import de.gematik.test.erezept.client.vau.VauClient;
 import de.gematik.test.erezept.client.vau.VauException;
 import de.gematik.test.erezept.config.dto.actor.BaseActorConfiguration;
@@ -109,7 +110,7 @@ public class ErpClientFactory {
         .idpClient(idp)
         .vauClient(vau)
         .fhir(fhir)
-        .responseFactory(new ErpResponseFactory(fhir))
+        .responseFactory(new FhirBResponseCreator(fhir, fhir::decode))
         .baseFdUrl(cfg.getFdBaseUrl())
         .acceptCharset(cfg.getAcceptCharset())
         .acceptMime(cfg.getAcceptMimeType())
@@ -118,7 +119,7 @@ public class ErpClientFactory {
         .build();
   }
 
-  private static FhirParser getFhirParser(ErpClientConfiguration cfg) {
+  private static FhirCodec getFhirParser(ErpClientConfiguration cfg) {
     val validatorType =
         ValidatorType.fromString(cfg.getFhirValidator())
             .orElseThrow(

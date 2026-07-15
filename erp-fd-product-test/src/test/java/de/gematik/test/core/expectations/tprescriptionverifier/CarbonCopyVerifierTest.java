@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,17 @@ package de.gematik.test.core.expectations.tprescriptionverifier;
 
 import static de.gematik.test.core.expectations.verifier.tprescriptionverifier.CarbonCopyVerifier.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.bbriccs.rest.headers.HttpHeader;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
+import de.gematik.test.core.expectations.verifier.tprescriptionverifier.CarbonCopyVerifier;
+import de.gematik.test.erezept.actions.trezept.VerifyTRegisterCarbonCopy;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
@@ -38,6 +42,8 @@ import de.gematik.test.erezept.fhir.r4.erp.tprescription.ErpTPrescriptionCarbonC
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
+import de.gematik.test.erezept.trezept.TRegisterLog;
+import de.gematik.test.erezept.trezept.TRegisterMockDownloadRequest;
 import java.util.Date;
 import java.util.List;
 import lombok.val;
@@ -158,5 +164,66 @@ class CarbonCopyVerifierTest extends ErpFhirParsingTest {
   void shouldThrowWhileVerifyDarreichungsformInDispensation() {
     val step = checkDarreichungsformInDispensation(incorrectMedicationDispenseBundle);
     assertThrows(AssertionError.class, () -> step.apply(erpTPrescriptionCarbonCopy));
+  }
+
+  @Test
+  void shouldVerifyPresenceOfAccessToken() {
+    val request = new TRegisterMockDownloadRequest("166.000.000.000.973.21");
+    request.headers().add(new HttpHeader("Authorization", "Bearer AccessToken"));
+
+    val log =
+        new TRegisterLog(
+            System.currentTimeMillis(),
+            "91d74726-8184-45e5-9c9c-aec1b8fa1ec4",
+            "166.000.000.000.973.21",
+            request);
+
+    val logs = List.of(log);
+    val step = CarbonCopyVerifier.checkPresenceAccessToken();
+
+    assertDoesNotThrow(() -> step.apply(logs));
+  }
+
+  @Test
+  void shouldFailWhenAccessTokenIsMissing() {
+    val request = new TRegisterMockDownloadRequest("166.000.000.000.973.21");
+
+    val log = new TRegisterLog(System.currentTimeMillis(), "id", "166.000.000.000.973.21", request);
+
+    val logs = List.of(log);
+
+    val result = CarbonCopyVerifier.checkPresenceAccessToken().getPredicate().test(logs);
+
+    assertFalse(result);
+  }
+
+  @Test
+  void shouldCheckAccessToken() {
+    var request = new TRegisterMockDownloadRequest("166.000.000.000.973.21");
+    request.headers().add(new HttpHeader("Authorization", "Bearer AccessToken"));
+
+    var log = new TRegisterLog(System.currentTimeMillis(), "id", "166.000.000.000.973.21", request);
+
+    var logs = List.of(log);
+
+    var verifier =
+        VerifyTRegisterCarbonCopy.from(
+            logs, PrescriptionId.from("166.000.000.000.973.21"), null, null);
+
+    assertDoesNotThrow(verifier::checkAccessToken);
+  }
+
+  @Test
+  void shouldFailWhenAccessTokenIsInvalid() {
+    var request = new TRegisterMockDownloadRequest("166.000.000.000.973.21");
+    request.headers().add(new HttpHeader("Authorization", "AccessToken"));
+
+    var log = new TRegisterLog(System.currentTimeMillis(), "id", "166.000.000.000.973.21", request);
+
+    var logs = List.of(log);
+
+    var result = CarbonCopyVerifier.checkPresenceAccessToken().getPredicate().test(logs);
+
+    assertFalse(result);
   }
 }

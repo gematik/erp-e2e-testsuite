@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 class PostDispenseRequestIT extends ErpTest {
 
   private static final CommunicationDisReqMessage USELESS_DSP_REQUEST =
-      new CommunicationDisReqMessage(SupplyOptionsType.ON_PREMISE, "useless Questions");
+      CommunicationDisReqMessage.forV1()
+          .supplyOptionsType(SupplyOptionsType.ON_PREMISE)
+          .hint("useless Questions")
+          .build();
 
   @Actor(name = "Leonie Hütter")
   private PatientActor patient;
@@ -229,7 +232,6 @@ class PostDispenseRequestIT extends ErpTest {
   void shouldRejectDispRequestWithAssignmentToHealthInsurance(InsuranceTypeDe insuranceTypeDe) {
     patient.changePatientInsuranceType(insuranceTypeDe);
 
-    // activate
     val task =
         doc.performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
             .getExpectedResponse();
@@ -239,9 +241,10 @@ class PostDispenseRequestIT extends ErpTest {
             SendMessages.to(healthInsurance)
                 .forTask(task)
                 .asDispenseRequest(
-                    new CommunicationDisReqMessage(
-                        SupplyOptionsType.ON_PREMISE, GemFaker.getFaker().buffy().quotes())));
-
+                    CommunicationDisReqMessage.forV1()
+                        .supplyOptionsType(SupplyOptionsType.ON_PREMISE)
+                        .hint(GemFaker.getFaker().buffy().quotes())
+                        .build()));
     patient.attemptsTo(
         Verify.that(communication)
             .withOperationOutcome(ErpAfos.A_27767)

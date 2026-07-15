@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ public enum ErpAfos implements RequirementsSet {
 
   A_19284("A_19284-04", "Versichertenprotokoll zu Operationen"),
   A_19284_11("A_19284_11", "E-Rezept-Fachdienst - Versichertenprotokoll zu Operationen"),
+  A_19395("A_19395", "E-Rezept-Fachdienst - Rollenprüfung Versicherter liest AuditEvent"),
   A_19405("A_19405-01", "E-Rezept-Fachdienst - Rollenprüfung Versicherter liest MedicationDispens"),
   A_19445("A_19445-08", "FHIR FlowType für Prozessparameter"),
   A_19447_05("A_19447_05", "E-Rezept-Fachdienst - Nachricht einstellen - Schemaprüfung"),
@@ -67,7 +68,20 @@ public enum ErpAfos implements RequirementsSet {
   A_20513("A_20513", "E-Rezept-Fachdienst - nicht mehr benötigte Einlösekommunikation"),
   A_21782("A_21782-01", "E-Rezept-Fachdienst - Schnittstellenadressierung Internet"),
   A_22110("A_22110", "Task akzeptieren - Flowtype 200/209 - Einwilligung ermitteln"),
+  A_22113("A_22113", "E-Rezept-Fachdienst – Abrechnungsinformation löschen Rollenprüfung"),
+  A_22118(
+      "A_22118",
+      "E-Rezept-Fachdienst – Abrechnungsinformationen abrufen - Rollenprüfung Versicherter"),
+  A_22119(
+      "A_22119",
+      "E-Rezept-Fachdienst – Abrechnungsinformationen abrufen – Versicherter – Filter KVNR"),
+  A_22124(
+      "A_22124",
+      "E-Rezept-Fachdienst – Abrechnungsinformation abrufen - Rollenprüfung Versicherter oder"
+          + " Apotheker"),
+  A_22129("A_22129", "E-Rezept-Fachdienst – Abrechnungsinformation bereitstellen - Rollenprüfung"),
   A_22136_01("A_22136_01", "Abrechnungsinformation bereitstellen – FHIR-Validierung ChargeItem"),
+  A_22144("A_22144", "E-Rezept-Fachdienst – Abrechnungsinformation ändern – Rollenprüfung"),
   A_22154("A_22154", " Consent löschen - alles Löschen verbieten ohne QuerryParam ?category"),
   A_22155("A_22155", "E-Rezept-Fachdienst - Consent löschen - Rollenprüfung Versicherter"),
   A_22158("A_22158", "E-Rezept-Fachdienst - Consent löschen - Löschen der Consent"),
@@ -84,6 +98,7 @@ public enum ErpAfos implements RequirementsSet {
           + " Einwilligungstyp"),
   A_22222("A_22222", "E-Rezept-Fachdienst - Task aktivieren - Ausschluss weitere Kostenträger"),
   A_22289("A_22289", "E-Rezept-Fachdienst - Consent schreiben - Prüfung KVNR"),
+  A_22432("A_22432-02", "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - Prüfung PoPP-Token"),
   A_22487("A_22487", "Prüfregel Ausstellungsdatum"),
   A_22627("A_22627-01", "Mehrfachverordnung - zulässige Flowtype"),
   A_22628("A_22628", "Mehrfachverordnung - Numerator-Denominator kleiner 5"),
@@ -98,11 +113,17 @@ public enum ErpAfos implements RequirementsSet {
       "E-Rezept-Fachdienst - Task akzeptieren Mehrfachverordnung - Beginn Einlösefrist prüfen"),
   A_22704("A_22704", "Mehrfachverordnung - Numerator größer 0"),
   A_22874("A_22874-01", "E-Rezept-Fachdienst - Consent löschen - Prüfung category"),
+  A_22875("A_22875", "E-Rezept-Fachdienst – Abrechnungsinformation ändern (PATCH) – Rollenprüfung"),
   A_22927("A_22927-02", " FHIR-Ressource validieren - Ausschluss unspezifizierter Extensions"),
-  A_23443("A_23443", "Task aktivieren – Flowtype 160/169 - Prüfung Coverage Type"),
   A_22347("A_22347-01", "Task aktivieren – Flowtype 200/209 - Prüfung Coverage Type"),
   A_22350("A_22350", "E-Rezept-Fachdienst - Consent schreiben – Persistieren"),
   A_22351("A_22351", "E-Rezept-Fachdienst - Consent schreiben - FHIR-Validierung"),
+  A_22362_01("A_22362_01", "E-Rezept-Fachdienst – Subscription registrieren – Rollenprüfung"),
+  A_22369("A_22369", "E-Rezept-Fachdienst - Subscription Service - Prüfung Bearer-Token"),
+  A_23399(
+      "A_23399-01",
+      "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - PoPP - Zeitraum Akzeptanz PoPP-Token"),
+  A_23443("A_23443", "Task aktivieren – Flowtype 160/169 - Prüfung Coverage Type"),
   A_23455("A_23455", "E-Rezept-Fachdienst - Prüfung Prüfziffer - keine Prüfziffer"),
   A_23450(
       "A_23450-01",
@@ -161,9 +182,8 @@ public enum ErpAfos implements RequirementsSet {
       "A_24177",
       "E-Rezept-Fachdienst - Task abrufen - Apotheke - Verordnung abrufen - Prüfung AccessCode"),
   A_24178(
-      "A_24178",
-      "E-Rezept-Fachdienst - Task abrufen - Apotheke - Verordnung abrufen - Prüfung Status"
-          + " in-progress"),
+      "A_24178-01",
+      "E-Rezept-Fachdienst - Task abrufen - Apotheke - Verordnung abrufen - Prüfung Status"),
   A_24179(
       "A_24179",
       "E-Rezept-Fachdienst - Task abrufen - Apotheke - Verordnung abrufen - erneuter Abruf"
@@ -296,10 +316,18 @@ public enum ErpAfos implements RequirementsSet {
   A_27813(
       "A_27813",
       "E-Rezept-Fachdienst - Task aktivieren - Flowtype 166 - Prüfung Arzneimittelverordnung"),
+  A_27821("A_27821 ", "E-Rezept-Fachdienst - BfArM - Beziehen des AccessTokens"),
   A_27827(
       "A_27827",
       "E-Rezept-Fachdienst - BfArM - Anwendungsfall Übertragen des digitalen Durchschlags"),
-  ;
+  A_27846("A_27846", "FHIR FLOWTYPE für Prozessparameter - Flowtype 166"),
+  A_28410(
+      "A_28410",
+      "E-Rezept-Fachdienst - Dispensierinformationen bereitstellen - Telematik-ID der abgebenden"
+          + " LEI speichern"),
+  A_28411(
+      "A_28411",
+      "E-Rezept-Fachdienst - Task schließen - Telematik-ID der abgebenden LEI speichern");
   private final Requirement requirement;
 
   ErpAfos(String id, String description) {

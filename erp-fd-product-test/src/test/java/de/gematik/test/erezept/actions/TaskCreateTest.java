@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
@@ -38,7 +38,6 @@ import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -54,9 +53,8 @@ class TaskCreateTest extends ErpFhirBuildingTest {
     patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient.getName()));
 
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, createOperationOutcome())
             .withStatusCode(404)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(TaskCreateCommand.class))).thenReturn(mockResponse);
 
@@ -77,9 +75,8 @@ class TaskCreateTest extends ErpFhirBuildingTest {
     patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient.getName()));
 
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, createOperationOutcome())
             .withStatusCode(404)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(TaskCreateCommand.class))).thenReturn(mockResponse);
 
@@ -101,9 +98,8 @@ class TaskCreateTest extends ErpFhirBuildingTest {
     patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient.getName()));
 
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), ErxTask.class)
+        FhirBResponse.forPayload(ErxTask.class, createOperationOutcome())
             .withStatusCode(404)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(TaskCreateCommand.class))).thenReturn(mockResponse);
 

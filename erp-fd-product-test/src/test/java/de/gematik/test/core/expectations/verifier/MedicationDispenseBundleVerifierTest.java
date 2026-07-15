@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,7 @@
 package de.gematik.test.core.expectations.verifier;
 
 import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
@@ -33,11 +31,15 @@ import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.builder.eu.EuMedicationDispenseFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerRoleBuilder;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
+import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.val;
+import org.hl7.fhir.r4.model.Identifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -327,9 +329,37 @@ class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
   }
 
   @Test
-  void shoulThrowWhiledDetectContainedErxMedicationAndGemDispense() {
+  void shouldThrowWhiledDetectContainedErxMedicationAndGemDispense() {
     val step =
         containsErxMedicationAndGemMedDispense(PrescriptionId.from("000.000.000.000.000.01"));
     assertThrows(AssertionError.class, () -> step.apply(simpleMedDispBundle));
+  }
+
+  @Test
+  void shouldFindAllTaskIds() {
+    List<ErxReceipt> dispensations = new ArrayList<>();
+    dispensations.add(
+        (ErxReceipt)
+            new ErxReceipt().setIdentifier(new Identifier().setValue("160.000.000.000.000.02")));
+    dispensations.add(
+        (ErxReceipt)
+            new ErxReceipt().setIdentifier(new Identifier().setValue("160.000.000.000.000.01")));
+
+    val step = containsIdsOf(dispensations, ErpAfos.A_24442);
+    assertDoesNotThrow(() -> step.apply(validMedDisp));
+  }
+
+  @Test
+  void shouldThrowWhileDetectingPrescriptionIds() {
+    List<ErxReceipt> dispensations = new ArrayList<>();
+    dispensations.add(
+        (ErxReceipt)
+            new ErxReceipt().setIdentifier(new Identifier().setValue("160.000.000.000.000.02")));
+    dispensations.add(
+        (ErxReceipt)
+            new ErxReceipt().setIdentifier(new Identifier().setValue("160.000.000.000.3.03")));
+
+    val step = containsIdsOf(dispensations, ErpAfos.A_24442);
+    assertThrows(AssertionError.class, () -> step.apply(simpleEuMedDispBundle));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,6 @@ package de.gematik.test.erezept.config;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
 import de.gematik.test.erezept.config.dto.app.ErpAppConfigurationBase;
 import de.gematik.test.erezept.config.exceptions.PcsExpressionException;
@@ -40,6 +38,7 @@ import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.ClearSystemProperty;
+import tools.jackson.dataformat.yaml.YAMLMapper;
 
 class PartialConfigSubstituterTest {
 
@@ -53,7 +52,7 @@ class PartialConfigSubstituterTest {
                 .getResource("configurations/pharmacy_am_flughafen.yaml")
                 .getPath());
 
-    val om = new ObjectMapper(new YAMLFactory());
+    val om = YAMLMapper.builder().build();
     val configTemplate = om.readTree(confPath.toFile());
 
     System.setProperty("erp.primsys.name", "TEST");
@@ -77,7 +76,7 @@ class PartialConfigSubstituterTest {
                 .getResource("configurations/app_config.yaml")
                 .getPath());
 
-    val om = new ObjectMapper(new YAMLFactory());
+    val om = YAMLMapper.builder().build();
     val configTemplate = om.readTree(confPath.toFile());
 
     System.setProperty("erp.app.apps.#0.appFile", "cloud:uniqueName=202317071200_1.11.0-1");
@@ -118,7 +117,7 @@ class PartialConfigSubstituterTest {
     // set the system property
     System.setProperty("erp.primsys.name", "TEST_123");
 
-    val om = new ObjectMapper(new YAMLFactory());
+    val om = YAMLMapper.builder().build();
     val configTemplate = om.readTree(templatePath.toFile());
 
     val substituted =
@@ -143,7 +142,7 @@ class PartialConfigSubstituterTest {
                 .getResource("configurations/actors_list.yaml")
                 .getPath());
 
-    val om = new ObjectMapper(new YAMLFactory());
+    val om = YAMLMapper.builder().build();
     val configTemplate = om.readTree(templatePath.toFile());
 
     System.setProperty("erp.primsys.actors.doctors.#3.name", "TEST");
@@ -163,7 +162,7 @@ class PartialConfigSubstituterTest {
                 .getResource("configurations/actors_list.yaml")
                 .getPath());
 
-    val om = new ObjectMapper(new YAMLFactory());
+    val om = YAMLMapper.builder().build();
     val configTemplate = om.readTree(templatePath.toFile());
 
     System.setProperty("erp.primsys.actors.doctors.*.konnektor", "TEST");
@@ -185,7 +184,7 @@ class PartialConfigSubstituterTest {
                 .getResource("configurations/actors_list.yaml")
                 .getPath());
 
-    val om = new ObjectMapper(new YAMLFactory());
+    val om = YAMLMapper.builder().build();
     val configTemplate = om.readTree(templatePath.toFile());
 
     System.setProperty("erp.primsys.actors.doctors.*.konnektor", "NULL");

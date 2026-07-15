@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,8 @@ import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
-import java.util.Optional;
-import org.hl7.fhir.r4.model.Resource;
 
-public class TaskAcceptCommand extends BaseCommand<ErxAcceptBundle> {
+public class TaskAcceptCommand extends ErpBaseCommand<ErxAcceptBundle> {
 
   public TaskAcceptCommand(TaskId taskId, AccessCode accessCode) {
     super(ErxAcceptBundle.class, HttpRequestMethod.POST, "Task", taskId.getValue());
@@ -44,16 +42,5 @@ public class TaskAcceptCommand extends BaseCommand<ErxAcceptBundle> {
   @Override
   public String getRequestLocator() {
     return this.getResourcePath() + "/$accept";
-  }
-
-  /**
-   * Get the FHIR-Resource for the Request-Body (of the inner-HTTP)
-   *
-   * @return an Optional.of(FHIR-Resource) for the Request-Body or an empty Optional if Request-Body
-   *     is empty
-   */
-  @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.empty();
   }
 }

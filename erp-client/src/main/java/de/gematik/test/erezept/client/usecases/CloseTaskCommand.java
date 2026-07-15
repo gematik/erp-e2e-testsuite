@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.client.usecases;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBundleBuilder;
@@ -32,7 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
-public class CloseTaskCommand extends BaseCommand<ErxReceipt> {
+public class CloseTaskCommand extends ErpBaseCommand<ErxReceipt> {
 
   private List<ErxMedicationDispense> medicationDispenses;
   private GemCloseOperationParameters closeParameters;
@@ -96,21 +97,20 @@ public class CloseTaskCommand extends BaseCommand<ErxReceipt> {
    *     is empty
    */
   @Override
-  public Optional<Resource> getRequestBody() {
+  public Resource getRequestBody() {
     Optional<Resource> ret;
 
     // for newer profiles the closeParameters are used and preferred here
     if (closeParameters != null) {
-      return Optional.of(closeParameters);
+      return closeParameters;
     }
 
     if (medicationDispenses.size() == 1) {
-      ret = Optional.of(medicationDispenses.get(0));
+      return medicationDispenses.getFirst();
     } else if (medicationDispenses.size() > 1) {
-      ret = Optional.of(ErxMedicationDispenseBundleBuilder.of(medicationDispenses).build());
+      return ErxMedicationDispenseBundleBuilder.of(medicationDispenses).build();
     } else {
-      ret = Optional.empty();
+      return new EmptyResource();
     }
-    return ret;
   }
 }

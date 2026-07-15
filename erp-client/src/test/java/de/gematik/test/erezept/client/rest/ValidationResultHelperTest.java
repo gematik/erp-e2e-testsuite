@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmp
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createFailingValidationResult;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.exceptions.FhirValidationException;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.erezept.client.exceptions.*;
 import de.gematik.test.erezept.fhir.r4.kbv.*;

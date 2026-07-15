@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,9 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
-import java.util.Optional;
 import javax.annotation.Nullable;
-import org.hl7.fhir.r4.model.Resource;
 
-public class TaskGetByIdCommand extends BaseCommand<ErxPrescriptionBundle> {
+public class TaskGetByIdCommand extends ErpBaseCommand<ErxPrescriptionBundle> {
 
   public TaskGetByIdCommand(TaskId taskId) {
     this(taskId, null, null);
@@ -55,15 +53,5 @@ public class TaskGetByIdCommand extends BaseCommand<ErxPrescriptionBundle> {
     if (secret != null) {
       queryParameters.add(new QueryParameter("secret", secret.getValue()));
     }
-  }
-
-  /**
-   * Get the FHIR-Resource for the Request-Body (of the inner-HTTP)
-   *
-   * @return FHIR-Resource for the Request-Body
-   */
-  @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.empty();
   }
 }

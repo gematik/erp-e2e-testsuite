@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,15 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.DispensePrescriptionCommandNew;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
+import de.gematik.test.erezept.client.usecases.DispensePrescriptionCommand;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
@@ -38,7 +38,6 @@ import de.gematik.test.erezept.primsys.mapping.KbvPznMedicationDataMapper;
 import de.gematik.test.erezept.primsys.mapping.PznDispensedMedicationDataMapper;
 import jakarta.ws.rs.WebApplicationException;
 import java.util.List;
-import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -52,12 +51,11 @@ class DispenseUseCaseTest extends TestWithActorContext {
 
     val responseBody = new EmptyResource();
     val mockResponse =
-        ErpResponse.forPayload(responseBody, EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, responseBody)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
-    when(mockClient.request(any(DispensePrescriptionCommandNew.class))).thenReturn(mockResponse);
+    when(mockClient.request(any(DispensePrescriptionCommand.class))).thenReturn(mockResponse);
 
     val taskId = PrescriptionId.random().getValue();
     val accessCode = AccessCode.random().getValue();
@@ -98,11 +96,10 @@ class DispenseUseCaseTest extends TestWithActorContext {
     val responseBody = new EmptyResource();
 
     val mockResponse =
-        ErpResponse.forPayload(responseBody, EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, responseBody)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
-    when(mockClient.request(any(DispensePrescriptionCommandNew.class))).thenReturn(mockResponse);
+    when(mockClient.request(any(DispensePrescriptionCommand.class))).thenReturn(mockResponse);
 
     val taskId = PrescriptionId.random().getValue();
     val accessCode = AccessCode.random().getValue();

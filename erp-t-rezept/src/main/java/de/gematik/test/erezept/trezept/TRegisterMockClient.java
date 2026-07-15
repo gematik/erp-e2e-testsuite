@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,24 +21,26 @@
 package de.gematik.test.erezept.trezept;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.gematik.bbriccs.rest.HttpBClient;
-import de.gematik.bbriccs.rest.HttpBRequest;
+import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.bbriccs.rest.RawHttpCodec;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @Slf4j
 public class TRegisterMockClient {
 
   private final HttpBClient restClient;
   private final ObjectMapper om =
-      new ObjectMapper().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+      JsonMapper.builder().enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY).build();
   private final RawHttpCodec codec = RawHttpCodec.defaultCodec();
   private final long interval;
   private final long maxWait;
@@ -66,43 +68,33 @@ public class TRegisterMockClient {
     val response = restClient.send(request);
     val body = response.isEmptyBody() ? "[]" : response.bodyAsString();
     if (response.statusCode() > 400) {
-      throw new AssertionError(
+      throw new PollingTimeoutException(
           "Request to T-Register-Mock failed with status code "
               + response.statusCode()
-              + ". This might be caused by a missing or incorrect proxy parameter"
-              + " (https.gematikProxy).");
+              + ". URL: "
+              + request.urlPath());
     }
-    List<TRegisterDto> dtoList = om.readValue(body, new TypeReference<>() {});
-    if (!dtoList.isEmpty()) {
-      val first =
-          dtoList.stream()
-              .filter(entry -> entry.request() != null && entry.request().length() > 500)
-              .findFirst()
-              .orElse(null);
-      List<TRegisterLog> responseList = new ArrayList<>();
-      if (first != null) {
-        if (codec.decodeRequest(first.request()).isEmptyBody()) {
-          responseList.add(
-              new TRegisterLog(
-                  first.tsp(),
-                  first.xRequestId(),
-                  first.key(),
-                  HttpBRequest.post().withPayload("{" + first.request().split("\\{", 2)[1])));
 
-        } else {
-          responseList.add(
-              new TRegisterLog(
-                  first.tsp(),
-                  first.xRequestId(),
-                  first.key(),
-                  codec.decodeRequest(first.request())));
-        }
-      }
+    val dtoList =
+        om.readValue(body, new TypeReference<List<TRegisterDto>>() {}).stream()
+            .filter(Objects::nonNull)
+            // filter logs with null-Requests
+            .filter(it -> Objects.nonNull(it.request()))
+            // filter logs which do not log requests but e.g. 't-rezept' because proper requests
+            // start with the HTTP method
+            .filter(
+                it ->
+                    Stream.of(HttpRequestMethod.values())
+                        .anyMatch(method -> it.request().startsWith(method.name())))
+            .toList();
 
-      return responseList;
-    } else {
-      return List.of();
-    }
+    // now safely decode the request under test
+    return dtoList.stream()
+        .map(
+            it ->
+                new TRegisterLog(
+                    it.tsp(), it.xRequestId(), it.key(), codec.decodeRequest(it.request())))
+        .toList();
   }
 
   @SneakyThrows

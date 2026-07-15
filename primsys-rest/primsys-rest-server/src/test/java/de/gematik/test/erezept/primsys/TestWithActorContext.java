@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,15 @@
 package de.gematik.test.erezept.primsys;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.konnektor.Konnektor;
+import de.gematik.bbriccs.konnektor.KonnektorImpl;
+import de.gematik.bbriccs.konnektor.SofKonServicePort;
+import de.gematik.bbriccs.konnektor.cfg.KonnektorContextConfiguration;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.bbriccs.vsdm.VsdmService;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.ConfigurationReader;
@@ -43,13 +45,12 @@ import de.gematik.test.erezept.primsys.actors.Doctor;
 import de.gematik.test.erezept.primsys.actors.HealthInsurance;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.model.ActorContext;
-import de.gematik.test.konnektor.Konnektor;
-import de.gematik.test.konnektor.cfg.KonnektorFactory;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.val;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.stubbing.Answer;
 
@@ -58,13 +59,17 @@ public abstract class TestWithActorContext extends ErpFhirParsingTest {
   protected static final PrimsysConfigurationDto configDto;
   protected static final EnvironmentConfiguration env;
   protected static final SmartcardArchive sca;
-  protected static final Konnektor softKonn;
+  protected static final Konnektor konnektor;
 
   static {
     configDto = ConfigurationReader.forPrimSysConfiguration().create();
     env = createActiveEnvironment();
     sca = SmartcardArchive.fromResources();
-    softKonn = KonnektorFactory.createSoftKon();
+
+    val serviceProvider = new SofKonServicePort(sca, VsdmService.instantiateWithTestKey());
+    konnektor =
+        new KonnektorImpl(
+            KonnektorContextConfiguration.getDefaultContextType(), serviceProvider, List.of());
 
     val mockFactory = mock(PrimSysRestFactory.class);
 
@@ -105,15 +110,15 @@ public abstract class TestWithActorContext extends ErpFhirParsingTest {
   }
 
   private static Doctor createMockDoctor(DoctorConfiguration cfg) {
-    return new Doctor(cfg, env, softKonn, sca);
+    return new Doctor(cfg, env, konnektor, sca);
   }
 
   private static Pharmacy createMockedPharmacy(PharmacyConfiguration cfg) {
-    return new Pharmacy(cfg, env, softKonn, sca);
+    return new Pharmacy(cfg, env, konnektor, sca);
   }
 
   private static HealthInsurance createMockedHealthInsurance(HealthInsuranceConfiguration cfg) {
-    return new HealthInsurance(cfg, env, softKonn, sca);
+    return new HealthInsurance(cfg, env, konnektor, sca);
   }
 
   private static EnvironmentConfiguration createActiveEnvironment() {
@@ -153,6 +158,13 @@ public abstract class TestWithActorContext extends ErpFhirParsingTest {
               when(erpClient.getFhir()).thenReturn(parser);
               when(erpClient.getIdpTokenValidUntil())
                   .thenReturn(Instant.now().plus(30, ChronoUnit.MINUTES));
+              when(erpClient.decode(any(), any()))
+                  .thenAnswer(
+                      (Answer<IBaseResource>)
+                          invocationOnMock -> {
+                            val args = invocationOnMock.getArguments();
+                            return parser.decode((Class<Resource>) args[0], (String) args[1]);
+                          });
               when(erpClient.encode(any(), any()))
                   .thenAnswer(
                       (Answer<String>)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.app.mobile.elements.MedicationDispenseDetails;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
+import de.gematik.test.erezept.app.task.RefreshPrescriptions;
 import de.gematik.test.erezept.client.usecases.MedicationDispenseSearchByIdCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
@@ -62,7 +63,7 @@ public class HasReceivedDispensedMedication implements Question<Boolean> {
     val prescriptionId = dispensationInformation.prescriptionId();
 
     // first refresh the screen
-    app.tap(Mainscreen.REFRESH_BUTTON);
+    actor.attemptsTo(RefreshPrescriptions.byTap());
 
     // and after that make only sure we have reached the archive button
     app.swipeIntoView(SwipeDirection.UP, Mainscreen.PRESCRIPTION_ARCHIVE);

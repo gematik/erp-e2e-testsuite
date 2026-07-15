@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,19 +23,18 @@ package de.gematik.test.erezept.screenplay.abilities;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import de.gematik.bbriccs.rest.fd.FhirBRequest;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.smartcards.Smartcard;
 import de.gematik.test.erezept.apimeasure.ApiCallStopwatch;
 import de.gematik.test.erezept.apimeasure.LoggingStopwatch;
 import de.gematik.test.erezept.client.ErpClient;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.ICommand;
 import de.gematik.test.erezept.fhirdump.FhirDumper;
 import de.gematik.test.erezept.jwt.JWTDecoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import javax.annotation.Nullable;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.experimental.Delegate;
 import lombok.val;
 import net.serenitybdd.core.Serenity;
@@ -81,7 +80,8 @@ public class UseTheErpClient implements Ability {
         challenge -> withKonnektor.externalAuthenticate(challenge).getPayload());
   }
 
-  public <R extends Resource> ErpResponse<R> request(ICommand<R> command) {
+  public <T extends Resource, R extends Resource> FhirBResponse<R> request(
+      FhirBRequest<T, R> command) {
     reportRequest(command);
     val response = this.client.request(command);
     reportJwt(command, response);
@@ -90,9 +90,9 @@ public class UseTheErpClient implements Ability {
     return response;
   }
 
-  private void reportRequest(ICommand<?> cmd) {
+  private void reportRequest(FhirBRequest<?, ?> cmd) {
     val title = format("{0} {1}", cmd.getMethod(), cmd.getRequestLocator());
-    val requestBody = cmd.getRequestBody().orElse(null);
+    val requestBody = cmd.getRequestBody();
     val content = reportFhirResource(title, requestBody);
 
     if (requestBody != null) {
@@ -103,13 +103,13 @@ public class UseTheErpClient implements Ability {
     }
   }
 
-  private void reportJwt(ICommand<?> cmd, ErpResponse<?> response) {
+  private void reportJwt(FhirBRequest<?, ?> cmd, FhirBResponse<?> response) {
     val title = format("JWT for {0} {1}", cmd.getMethod(), cmd.getRequestLocator());
     val content = jwtDecoder.decodeToJson(response.getUsedJwt());
     Serenity.recordReportData().withTitle(title).andContents(content);
   }
 
-  private void reportResponse(ErpResponse<?> response) {
+  private void reportResponse(FhirBResponse<?> response) {
     val resource = response.getAsBaseResource();
     var title = format("Response {0}", response.getStatusCode());
     if (resource != null) {
@@ -142,10 +142,6 @@ public class UseTheErpClient implements Ability {
     return content;
   }
 
-  public <T extends Resource> T decode(Class<T> expectedClass, @NonNull final String content) {
-    return this.client.getFhir().decode(expectedClass, content);
-  }
-
   @Override
   public String toString() {
     return format(
@@ -158,6 +154,6 @@ public class UseTheErpClient implements Ability {
    * different implementation
    */
   private interface DelegateExclude {
-    <R extends Resource> ErpResponse<R> request(ICommand<R> command);
+    <T extends Resource, R extends Resource> FhirBResponse<R> request(FhirBRequest<T, R> command);
   }
 }

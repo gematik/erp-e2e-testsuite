@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@
 
 package de.gematik.test.erezept.config.dto.actor;
 
-import de.gematik.test.erezept.config.dto.INamedConfigurationElement;
+import de.gematik.bbriccs.cfg.NamedConfigurationElement;
 import lombok.Data;
 
 @Data
-public abstract class BaseActorConfiguration implements INamedConfigurationElement {
+public abstract class BaseActorConfiguration implements NamedConfigurationElement {
 
   /** Just an identifier to distinguish from other clients within config.yaml */
   private String name;

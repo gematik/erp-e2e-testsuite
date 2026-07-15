@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,17 +158,20 @@ public class TaskBundleVerifier {
   }
 
   public static VerificationStep<ErxTaskBundle> containsOnlyTasksWith(
-      PrescriptionFlowType prescriptionFlowType, ErpAfos req) {
+      ErpAfos req, PrescriptionFlowType... prescriptionFlowTypes) {
+    val allowedTypes = java.util.Set.of(prescriptionFlowTypes);
     Predicate<ErxTaskBundle> verify =
         bundle ->
-            bundle.getTasks().stream()
-                .allMatch(it -> it.getFlowType().equals(prescriptionFlowType));
+            bundle.getTasks().stream().allMatch(it -> allowedTypes.contains(it.getFlowType()));
+    val typesCodes =
+        java.util.Arrays.stream(prescriptionFlowTypes)
+            .map(PrescriptionFlowType::getCode)
+            .collect(java.util.stream.Collectors.joining(", "));
     val step =
         new VerificationStep.StepBuilder<ErxTaskBundle>(
             req.getRequirement(),
             format(
-                "Im Bundle dürfen nur Task mit Workflowtype {0} enthalten sein",
-                prescriptionFlowType.getCode()));
+                "Im Bundle dürfen nur Tasks mit Workflowtype(s) [{0}] enthalten sein", typesCodes));
     return step.predicate(verify).accept();
   }
 }

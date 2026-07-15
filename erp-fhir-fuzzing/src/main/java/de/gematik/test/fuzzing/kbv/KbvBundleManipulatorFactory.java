@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@
 
 package de.gematik.test.fuzzing.kbv;
 
-import static de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem.*;
+import static de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem.IKNR_SID;
+import static de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem.KVID_GKV_SID;
 import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef.*;
 import static de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef.*;
 import static java.text.MessageFormat.format;
@@ -825,11 +826,11 @@ public class KbvBundleManipulatorFactory {
    * These manipulators try to replicate the issue reported in ERPFIND-1068 However, from KBV_FOR
    * 1.2.0 there is no formal restriction on spaces in the BSNR
    *
+   * @return a list of manipualators for the BSNR of the Organization
    * @see <a href="https://service.gematik.de/browse/ERPFIND-1068">ERPFIND-1068</a>
    * @see <a
    *     href="https://simplifier.net/packages/de.basisprofil.r4/1.5.2/files/2720742/~json">KBV_PR_FOR_Organization
    *     1.2.0</a>
-   * @return a list of manipualators for the BSNR of the Organization
    */
   public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>
       getOrganizationBsnrManipulators() {
@@ -1124,6 +1125,18 @@ public class KbvBundleManipulatorFactory {
                     .getIdentifier()
                     .setSystem(KbvItaForStructDef.SER_EXTENSION.getCanonicalUrl())));
 
+    return manipulators;
+  }
+
+  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>> getDosageFlagManipulators() {
+    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>();
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Delete DosageFlag in MedicationRequest|1.5",
+            b ->
+                b.getMedicationRequest().getDosageInstruction().stream()
+                    .map(dosage -> dosage.setExtension(List.of()))));
     return manipulators;
   }
 
