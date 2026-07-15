@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ package de.gematik.test.erezept.lei.steps;
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
 import static org.hamcrest.Matchers.is;
 
-import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
+import de.gematik.bbriccs.rest.fd.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.screenplay.questions.*;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
@@ -268,7 +268,7 @@ public class PharmacyDispenseSteps {
     and(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationNew.fromStackForPatient(order, thePatient).build())
+                    ResponseOfDispenseMedication.fromStackForPatient(order, thePatient).build())
                 .isEqualTo(204));
   }
 
@@ -282,7 +282,7 @@ public class PharmacyDispenseSteps {
     and(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationNew.fromStackForPatient(order, thePatient)
+                    ResponseOfDispenseMedication.fromStackForPatient(order, thePatient)
                         .withMedicationDispense(medications)
                         .build())
                 .isEqualTo(204));
@@ -298,7 +298,7 @@ public class PharmacyDispenseSteps {
     and(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationNew.fromStackForPatient(order, thePatient)
+                    ResponseOfDispenseMedication.fromStackForPatient(order, thePatient)
                         .multiple(2)
                         .build())
                 .isEqualTo(204));
@@ -315,7 +315,7 @@ public class PharmacyDispenseSteps {
     then(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfDispenseMedicationNew.fromStackForPatient(order, thePatient).build())
+                    ResponseOfDispenseMedication.fromStackForPatient(order, thePatient).build())
                 .isEqualTo(403));
     and(then(thePharmacy))
         .attemptsTo(

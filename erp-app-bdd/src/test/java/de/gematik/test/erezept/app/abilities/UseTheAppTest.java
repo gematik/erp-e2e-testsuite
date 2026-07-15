@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -342,6 +342,41 @@ class UseTheAppTest {
   }
 
   @Test
+  void shouldWaitUntilElementIsNotVisible() {
+    val driver = mock(IOSDriver.class);
+    val driverAbility = spy(new UseIOSApp(driver, appiumConfig));
+    val pageElement = Mainscreen.LOADING_SPINNER;
+    val locator = pageElement.forPlatform(driverAbility.getPlatformType());
+
+    val webElement = mock(WebElement.class);
+
+    when(webElement.isDisplayed()).thenReturn(true).thenReturn(true).thenReturn(false);
+
+    when(driver.findElement(locator)).thenReturn(webElement);
+
+    driverAbility.waitUntilElementIsNotVisible(pageElement);
+    verify(driver, times(3)).findElement(locator);
+  }
+
+  @Test
+  void shouldThrowWhenElementIsStillVisible() {
+    val driver = mock(IOSDriver.class);
+    val driverAbility = spy(new UseIOSApp(driver, appiumConfig));
+    val pageElement = Mainscreen.LOADING_SPINNER;
+    val locator = pageElement.forPlatform(driverAbility.getPlatformType());
+
+    val webElement = mock(WebElement.class);
+
+    when(webElement.isDisplayed()).thenReturn(true);
+
+    when(driver.findElement(locator)).thenReturn(webElement);
+
+    assertThrows(
+        TimeoutException.class,
+        () -> driverAbility.waitUntilElementIsNotVisible(pageElement, 1000));
+  }
+
+  @Test
   void shouldWaitUntilElementIsPresent() {
     val driver = mock(IOSDriver.class);
     val driverAbility = spy(new UseIOSApp(driver, appiumConfig));
@@ -406,7 +441,7 @@ class UseTheAppTest {
     val locator = pageElement.forPlatform(driverAbility.getPlatformType());
 
     when(driver.getPageSource()).thenReturn("dummy page source");
-    when(driver.findElement(locator)).thenThrow(NoSuchElementException.class);
+    when(driver.findElement(locator)).thenThrow(new NoSuchElementException("Dummy Error"));
 
     val fluentDriver =
         new AppiumFluentWait<>(driver)
@@ -554,8 +589,18 @@ class UseTheAppTest {
   @Test
   void shouldPauseApp() {
     val driver = mock(IOSDriver.class);
-    val driverAbility = new UseIOSApp(driver, new AppiumConfiguration());
+    val driverAbility = new UseIOSApp(driver, appiumConfig);
 
     assertTimeout(Duration.ofMillis(1100), driverAbility::pauseApp);
+  }
+
+  @Test
+  void shouldReturnCorrectMaxRefreshTimeout() {
+    var maxRefreshTimeout = 60000;
+
+    val driver = mock(IOSDriver.class);
+    appiumConfig.setMaxRefreshTimeout(maxRefreshTimeout);
+    val driverAbility = new UseIOSApp(driver, appiumConfig);
+    assertEquals(maxRefreshTimeout, driverAbility.getMaxRefreshTimeout());
   }
 }

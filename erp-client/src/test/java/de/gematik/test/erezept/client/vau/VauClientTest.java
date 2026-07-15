@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
+import java.util.Optional;
 import javax.net.ssl.SSLContext;
 import kong.unirest.core.Headers;
 import kong.unirest.core.HttpResponse;
@@ -120,9 +121,11 @@ class VauClientTest {
         "X-Request-Id",
         "testRequestId-123456");
 
-    vau.initialize();
+    vau.init();
     val innerRequest = mock(HttpBRequest.class);
-    val response = vau.send(innerRequest, "testToken", "/Task");
+    when(innerRequest.urlPath()).thenReturn("Task");
+    when(innerRequest.getBearerToken()).thenReturn(Optional.of("testToken"));
+    val response = vau.send(innerRequest);
 
     assertEquals(200, response.statusCode());
     assertEquals("Nobody calls me chicken", response.bodyAsString());
@@ -146,9 +149,11 @@ class VauClientTest {
         "octet-stream",
         "X-Request-Id",
         "testRequestId-123456");
-    vau.initialize();
+    vau.init();
     val innerRequest = mock(HttpBRequest.class);
-    assertThrows(VauException.class, () -> vau.send(innerRequest, "testToken", "/Task"));
+    when(innerRequest.urlPath()).thenReturn("/Task");
+    when(innerRequest.getBearerToken()).thenReturn(Optional.of("testToken"));
+    assertThrows(VauException.class, () -> vau.send(innerRequest));
   }
 
   @SneakyThrows
@@ -160,9 +165,12 @@ class VauClientTest {
       prepareEndpointVauCertificate(vauCertificate.getEncoded());
       prepareResponseVau("Nobody calls me chicken".getBytes(StandardCharsets.UTF_8));
 
-      vau.initialize();
+      vau.init();
       val innerRequest = mock(HttpBRequest.class);
-      vau.send(innerRequest, "", null);
+      when(innerRequest.urlPath()).thenReturn("/Task");
+      when(innerRequest.getBearerToken()).thenReturn(Optional.of("testToken"));
+
+      vau.send(innerRequest);
     } catch (VauException e) {
       fail();
     }
@@ -177,9 +185,12 @@ class VauClientTest {
       prepareEndpointVauCertificate(vauCertificate.getEncoded());
       prepareResponseVau("Nobody calls me chicken".getBytes(StandardCharsets.UTF_8));
 
-      vau.initialize();
+      vau.init();
       val innerRequest = mock(HttpBRequest.class);
-      vau.send(innerRequest, "", null);
+      when(innerRequest.urlPath()).thenReturn("/Task");
+      when(innerRequest.getBearerToken()).thenReturn(Optional.of("testToken"));
+
+      vau.send(innerRequest);
     } catch (VauException e) {
       fail();
     }
@@ -202,7 +213,21 @@ class VauClientTest {
       mockSslContext
           .when(() -> SSLContext.getInstance(anyString()))
           .thenThrow(new NoSuchAlgorithmException());
-      assertThrows(NoSuchAlgorithmException.class, vauClient::initialize);
+      assertThrows(NoSuchAlgorithmException.class, vauClient::init);
     }
+  }
+
+  @Test
+  void shouldThrowOnMissingBearerToken() {
+    val vau =
+        this.createMockClient(
+            "https://erp", ClientType.FDV, vauCertificate, "testApiKey", "testAgent");
+
+    vau.init();
+    val innerRequest = mock(HttpBRequest.class);
+    when(innerRequest.urlPath()).thenReturn("/Task");
+    when(innerRequest.getBearerToken()).thenReturn(Optional.empty());
+
+    assertThrows(VauException.class, () -> vau.send(innerRequest));
   }
 }

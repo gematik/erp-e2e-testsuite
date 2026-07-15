@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@ package de.gematik.test.core.expectations.emlverifier;
 import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.codec.FhirCodec;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
+import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.ResourceLoader;
@@ -62,10 +64,12 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
   private static EpaOpProvideDispensation validEpaOpProvideDispensation;
   private static EpaOpProvideDispensation epaOpProvideDispensationFromMock;
 
+  private static FhirCodec fhir;
+
   @BeforeAll
   static void setup() {
     CoverageReporter.getInstance().startTestcase("not needed");
-    val fhir = EpaFhirFactory.create();
+    fhir = EpaFhirFactory.create();
     validEpaOpProvideDispensation =
         fhir.decode(
             EpaOpProvideDispensation.class,
@@ -272,11 +276,39 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
             .performerId("urn:uuid:151f1697-7512-4e21-9466-1b75207475d8")
             .prescriptionId("160.153.303.257.459")
             .status(MedicationDispense.MedicationDispenseStatus.COMPLETED)
-            .medication(getMedication())
             .build();
 
     val step = emlMedicationDispenseMapsTo(medicDsp);
     assertDoesNotThrow(() -> step.apply(validEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shouldVerifyMedicationCodingsInEmlDispensationCorrectWithSwitchedMedicationCodings() {
+    val coding1 =
+        new Coding(DeBasisProfilCodeSystem.ATC.getCanonicalUrl(), "M01AE099111", "Ibuprof");
+
+    val multiCodingDispensation =
+        fhir.decode(
+            EpaOpProvideDispensation.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/valid/parameters/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json"));
+    multiCodingDispensation.getEpaMedication().getCode().getCoding().add(coding1);
+    val medication = new GemErpMedication();
+    medication.getCode().getCoding().add(coding1);
+    medication
+        .getCode()
+        .getCoding()
+        .add(new Coding(DeBasisProfilCodeSystem.ATC.getCanonicalUrl(), "M01AE01", "Ibuprofen"));
+    medication
+        .getCode()
+        .getCoding()
+        .add(
+            DeBasisProfilCodeSystem.PZN
+                .asCoding("10019621")
+                .setDisplay("IBU-ratiopharm 400mg akut Schmerztabletten"));
+
+    val step = emlMedicationCodingsMapsTo(medication);
+    assertDoesNotThrow(() -> step.apply(multiCodingDispensation));
   }
 
   @Test
@@ -362,6 +394,36 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
 
     val step = emlMedicationDispenseMapsTo(medicDsp);
     assertThrows(AssertionError.class, () -> step.apply(validEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shouldVerifyMedicationDispenseInEmlDispensationWithMergedDosageInstructions() {
+    val multiDosageInstructionDispensation =
+        fhir.decode(
+            EpaOpProvideDispensation.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/valid/parameters/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json"));
+    multiDosageInstructionDispensation
+        .getEpaMedicationDispense()
+        .getDosageInstruction()
+        .getFirst()
+        .setText("doasge.text; dosage.patientinstruction");
+
+    val medicDsp =
+        ErxMedicationDispenseBuilder.forKvnr(KVNR.from("X110411319"))
+            .version(ErpWorkflowVersion.V1_5)
+            .dosageInstruction("doasge.text")
+            .patientInstruction("dosage.patientinstruction")
+            .whenHandedOver(testDate_22_01_2025)
+            .wasSubstituted(false)
+            .status(MedicationDispense.MedicationDispenseStatus.COMPLETED)
+            .medication(getMedication())
+            .performerId("urn:uuid:151f1697-7512-4e21-9466-1b75207475d8")
+            .prescriptionId("160.153.303.257.459")
+            .build();
+
+    val step = emlMedicationDispenseMapsTo(medicDsp);
+    assertDoesNotThrow(() -> step.apply(multiDosageInstructionDispensation));
   }
 
   @Test
@@ -464,7 +526,7 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
             .build();
 
     val medDisp = ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6).withDgmp(dgmp).fake();
-    val step = provDispensationHasCorrectDosageComponent(medDisp);
+    val step = provDispensationHasCorrectDosageDgMPComponent(medDisp);
     assertDoesNotThrow(() -> step.apply(epaOpProvideDispensationFromMock));
   }
 
@@ -482,7 +544,7 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
             .build();
 
     val medDisp = ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6).withDgmp(dgmp).fake();
-    val step = provDispensationHasCorrectDosageComponent(medDisp);
+    val step = provDispensationHasCorrectDosageDgMPComponent(medDisp);
     assertThrows(AssertionError.class, () -> step.apply(epaOpProvideDispensationFromMock));
   }
 
@@ -500,7 +562,7 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
             .build();
 
     val medDisp = ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6).withDgmp(dgmp).fake();
-    val step = provDispensationHasCorrectDosageComponent(medDisp);
+    val step = provDispensationHasCorrectDosageDgMPComponent(medDisp);
     assertThrows(AssertionError.class, () -> step.apply(epaOpProvideDispensationFromMock));
   }
 
@@ -518,7 +580,47 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
             .build();
 
     val medDisp = ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6).withDgmp(dgmp).fake();
-    val step = provDispensationHasCorrectDosageComponent(medDisp);
+    val step = provDispensationHasCorrectDosageDgMPComponent(medDisp);
     assertThrows(AssertionError.class, () -> step.apply(epaOpProvideDispensationFromMock));
+  }
+
+  @Test
+  void shouldVerifyDosageInstructionCorrect() {
+    val step = provDispensationContainsDosageInstruction("1-0-0-0");
+    assertDoesNotThrow(() -> step.apply(validEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyDosageInstructionInEmlDispensationWithWrongString() {
+    val step = provDispensationContainsDosageInstruction("1-0-0-0-0-1");
+    assertThrows(AssertionError.class, () -> step.apply(validEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyDosageInstructionInEmlDispensationWithoutTextualDosage() {
+    val step = provDispensationContainsDosageInstruction("1-0-0-0");
+    assertThrows(AssertionError.class, () -> step.apply(epaOpProvideDispensationFromMock));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyMedicationCodingHasNoVersion() {
+    val multiDosageInstructionDispensation =
+        fhir.decode(
+            EpaOpProvideDispensation.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/valid/parameters/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json"));
+    multiDosageInstructionDispensation
+        .getEpaMedication()
+        .getCode()
+        .addCoding((ATC.from("123", "AtcCodeDisplay").asCoding()));
+
+    val step = medicationInProvDispensationContainsAtcCodingWithVersion();
+    assertThrows(AssertionError.class, () -> step.apply(multiDosageInstructionDispensation));
+  }
+
+  @Test
+  void shouldVerifyMedicationCodingHasVersion() {
+    val step = medicationInProvDispensationContainsAtcCodingWithVersion();
+    assertDoesNotThrow(() -> step.apply(epaOpProvideDispensationFromMock));
   }
 }

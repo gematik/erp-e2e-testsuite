@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,17 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
+import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getUpdatedInJulyPlusKPG;
+
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.PZN;
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationPZNBuilderORIGINAL_BUILDER;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNBuilder;
-import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.r4.erp.GemCloseOperationParameters;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
@@ -46,7 +45,6 @@ import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.strategy.PrescriptionToDispenseStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import io.cucumber.datatable.DataTable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +59,7 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
   private final List<Map<String, String>> replacementMedications;
   private final PrescriptionToDispenseStrategy.Builder strategyBuilder;
 
-  private final Boolean alreadyDispensedFlag;
+  private final boolean alreadyDispensedFlag;
   @Getter private PrescriptionToDispenseStrategy executedStrategy;
 
   private ResponseOfClosePrescriptionOperation(
@@ -116,7 +114,7 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
   }
 
   @Override
-  public ErpResponse<ErxReceipt> answeredBy(Actor actor) {
+  public FhirBResponse<ErxReceipt> answeredBy(Actor actor) {
     val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
     val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
@@ -152,47 +150,29 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
       PrescriptionToDispenseStrategy strategy, KbvErpMedication medication, String telematikId) {
     val taskId = strategy.getTaskId();
     val secret = strategy.getSecret();
-    val prescriptionId = strategy.getPrescriptionId();
-    val kvnr = strategy.getKvnr();
 
-    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3) <= 0) {
-      val medicationDispense =
-          ErxMedicationDispenseBuilder.forKvnr(kvnr)
-              .prescriptionId(prescriptionId)
-              .performerId(telematikId)
-              .medication(medication)
-              .batch(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate())
-              .whenPrepared(new Date())
-              .whenHandedOver(new Date())
-              .wasSubstituted(false)
-              .build();
-      return new CloseTaskCommand(taskId, secret, medicationDispense);
+    val lotNr = GemFaker.fakerLotNumber();
+    val expDate = GemFaker.fakerFutureExpirationDate();
+    // val gemMedication = GemErpMedicationPZNBuilder.from(medication).lotNumber(lotNr).build();
+    val gemMedication =
+        GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(medication).lotNumber(lotNr).build();
 
-    } else {
+    val medicationDisp =
+        ErxMedicationDispenseBuilder.forKvnr(strategy.getKvnr())
+            .prescriptionId(strategy.getPrescriptionId())
+            .performerId(telematikId)
+            .batch(lotNr, expDate)
+            .whenPrepared(new Date())
+            .whenHandedOver(new Date())
+            .wasSubstituted(false)
+            .medication(gemMedication)
+            .build();
 
-      val lotNr = GemFaker.fakerLotNumber();
-      val expDate = GemFaker.fakerFutureExpirationDate();
-      // val gemMedication = GemErpMedicationPZNBuilder.from(medication).lotNumber(lotNr).build();
-      val gemMedication =
-          GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(medication).lotNumber(lotNr).build();
-
-      val medicationDisp =
-          ErxMedicationDispenseBuilder.forKvnr(strategy.getKvnr())
-              .prescriptionId(strategy.getPrescriptionId())
-              .performerId(telematikId)
-              .batch(lotNr, expDate)
-              .whenPrepared(new Date())
-              .whenHandedOver(new Date())
-              .wasSubstituted(false)
-              .medication(gemMedication)
-              .build();
-
-      val closeParams =
-          GemOperationInputParameterBuilder.forClosingPharmaceuticals()
-              .with(medicationDisp, gemMedication)
-              .build();
-      return new CloseTaskCommand(taskId, secret, closeParams);
-    }
+    val closeParams =
+        GemOperationInputParameterBuilder.forClosingPharmaceuticals()
+            .with(medicationDisp, gemMedication)
+            .build();
+    return new CloseTaskCommand(taskId, secret, closeParams);
   }
 
   private CloseTaskCommand closeAlreadyDispensed(PrescriptionToDispenseStrategy strategy) {
@@ -206,60 +186,8 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
     val taskId = strategy.getTaskId();
     val secret = strategy.getSecret();
 
-    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3) <= 0) {
-      val medicationDispenses = getAlternativeMedicationDispenses(strategy, performerId);
-      return new CloseTaskCommand(taskId, secret, medicationDispenses);
-    } else {
-      val closeParameters = getAlternativeCloseParameterStructure(strategy, performerId);
-      return new CloseTaskCommand(taskId, secret, closeParameters);
-    }
-  }
-
-  private List<ErxMedicationDispense> getAlternativeMedicationDispenses(
-      PrescriptionToDispenseStrategy strategy, String performerId) {
-    val medicationDispenses = new ArrayList<ErxMedicationDispense>();
-
-    replacementMedications.forEach(
-        medMap -> {
-          val pzn = medMap.getOrDefault("PZN", PZN.random().getValue());
-          val name = medMap.getOrDefault("Name", GemFaker.fakerDrugName());
-          val amount =
-              Long.valueOf(medMap.getOrDefault("Menge", String.valueOf(GemFaker.fakerAmount())));
-          val unit = medMap.getOrDefault("Einheit", "Stk");
-          val categoryCode =
-              medMap.getOrDefault(
-                  "Kategorie", GemFaker.fakerValueSet(MedicationCategory.class).getCode());
-          val isVaccine = Boolean.getBoolean(medMap.getOrDefault("Impfung", "false"));
-          val darreichungsCode =
-              medMap.getOrDefault(
-                  "Darreichungsform", GemFaker.fakerValueSet(Darreichungsform.class).getCode());
-          val sizeCode =
-              medMap.getOrDefault(
-                  "Normgröße", GemFaker.fakerValueSet(StandardSize.class).getCode());
-
-          val medication =
-              KbvErpMedicationPZNBuilder.builder()
-                  .pzn(pzn, name)
-                  .amount(amount, unit)
-                  .category(MedicationCategory.fromCode(categoryCode))
-                  .isVaccine(isVaccine)
-                  .darreichungsform(Darreichungsform.fromCode(darreichungsCode))
-                  .normgroesse(StandardSize.fromCode(sizeCode))
-                  .build();
-
-          val medicationDispense =
-              ErxMedicationDispenseBuilder.forKvnr(strategy.getKvnr())
-                  .prescriptionId(strategy.getPrescriptionId())
-                  .performerId(performerId)
-                  .medication(medication)
-                  .batch(GemFaker.fakerLotNumber(), GemFaker.fakerFutureExpirationDate())
-                  .wasSubstituted(true)
-                  .build();
-
-          medicationDispenses.add(medicationDispense);
-        });
-
-    return medicationDispenses;
+    val closeParameters = getAlternativeCloseParameterStructure(strategy, performerId);
+    return new CloseTaskCommand(taskId, secret, closeParameters);
   }
 
   private GemCloseOperationParameters getAlternativeCloseParameterStructure(
@@ -279,7 +207,9 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
           val isVaccine = Boolean.getBoolean(medMap.getOrDefault("Impfung", "false"));
           val darreichungsCode =
               medMap.getOrDefault(
-                  "Darreichungsform", GemFaker.fakerValueSet(Darreichungsform.class).getCode());
+                  "Darreichungsform",
+                  GemFaker.fakerValueSet(Darreichungsform.class, getUpdatedInJulyPlusKPG())
+                      .getCode());
           val sizeCode =
               medMap.getOrDefault(
                   "Normgröße", GemFaker.fakerValueSet(StandardSize.class).getCode());

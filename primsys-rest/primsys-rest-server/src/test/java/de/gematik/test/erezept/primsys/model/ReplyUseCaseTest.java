@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil;
@@ -39,7 +39,6 @@ import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.data.error.ErrorDto;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import jakarta.ws.rs.WebApplicationException;
-import java.util.Map;
 import lombok.val;
 import org.hl7.fhir.r4.model.AuditEvent;
 import org.junit.jupiter.api.Test;
@@ -73,9 +72,8 @@ class ReplyUseCaseTest extends TestWithActorContext {
         ErxFhirTestResourceUtil.createErxAuditEvent(
             "testString", TelematikID.from("123"), "testName", AuditEvent.AuditEventAction.R);
     val mockResponse =
-        ErpResponse.forPayload(resource, ErxCommunication.class)
+        FhirBResponse.forPayload(ErxCommunication.class, resource)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(CommunicationPostCommand.class))).thenReturn(mockResponse);
     try (val response =
@@ -105,9 +103,8 @@ class ReplyUseCaseTest extends TestWithActorContext {
         ErxFhirTestResourceUtil.createErxAuditEvent(
             "testString", TelematikID.from("123"), "testName", AuditEvent.AuditEventAction.R);
     val mockResponse =
-        ErpResponse.forPayload(resource, ErxCommunication.class)
+        FhirBResponse.forPayload(ErxCommunication.class, resource)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(CommunicationPostCommand.class))).thenReturn(mockResponse);
     try (val response =
@@ -124,9 +121,8 @@ class ReplyUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), ErxCommunication.class)
+        FhirBResponse.forPayload(ErxCommunication.class, createOperationOutcome())
             .withStatusCode(500)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     doThrow(ErrorResponseBuilder.createFachdienstErrorException(mockResponse))
         .when(mockClient)
@@ -153,9 +149,8 @@ class ReplyUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), ErxCommunication.class)
+        FhirBResponse.forPayload(ErxCommunication.class, createOperationOutcome())
             .withStatusCode(500)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     doThrow(ErrorResponseBuilder.createFachdienstErrorException(mockResponse))
         .when(mockClient)
@@ -181,9 +176,8 @@ class ReplyUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), ErxCommunication.class)
+        FhirBResponse.forPayload(ErxCommunication.class, createOperationOutcome())
             .withStatusCode(400)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     doThrow(ErrorResponseBuilder.createFachdienstErrorException(mockResponse))
         .when(mockClient)

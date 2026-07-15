@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@
 
 package de.gematik.test.erezept.primsys.actors;
 
+import de.gematik.bbriccs.konnektor.Konnektor;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.config.dto.actor.HealthInsuranceConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.konnektor.Konnektor;
 
 public class HealthInsurance extends BaseActor {
 

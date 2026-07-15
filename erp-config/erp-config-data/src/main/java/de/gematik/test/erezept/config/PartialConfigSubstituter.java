@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ package de.gematik.test.erezept.config;
 
 import static java.text.MessageFormat.format;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.gematik.test.erezept.config.exceptions.PcsExpressionException;
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,6 +35,8 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 // NOTE: PartialConfigSubstituter can/should be package private
 @Slf4j

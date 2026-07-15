@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,9 +39,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import net.serenitybdd.screenplay.Ability;
+import net.serenitybdd.screenplay.HasTeardown;
 
 /** The Ability to provide Base-Data (Stammdaten) */
-public class ProvideDoctorBaseData implements Ability {
+public class ProvideDoctorBaseData implements Ability, HasTeardown {
+
+  private KbvItaForVersion kbvItaForVersion = KbvItaForVersion.getDefaultVersion();
 
   private final String practitionerId;
   private final String medicationOrganizationId;
@@ -88,7 +91,11 @@ public class ProvideDoctorBaseData implements Ability {
   }
 
   public KbvPractitioner getPractitioner() {
-    return getPractitioner(KbvItaForVersion.getDefaultVersion());
+    return getPractitioner(kbvItaForVersion);
+  }
+
+  public void setVersion(KbvItaForVersion kbvItaForVersion) {
+    this.kbvItaForVersion = kbvItaForVersion;
   }
 
   public KbvPractitioner getPractitioner(KbvItaForVersion forVersion) {
@@ -121,7 +128,7 @@ public class ProvideDoctorBaseData implements Ability {
   }
 
   public KbvMedicalOrganization getMedicalOrganization() {
-    return getMedicalOrganization(KbvItaForVersion.getDefaultVersion());
+    return getMedicalOrganization(kbvItaForVersion);
   }
 
   public KbvMedicalOrganization getMedicalOrganization(KbvItaForVersion forVersion) {
@@ -149,5 +156,10 @@ public class ProvideDoctorBaseData implements Ability {
   public static ProvideDoctorBaseData fromConfiguration(
       DoctorConfiguration doctorConfiguration, String hbaTelematikId) {
     return new ProvideDoctorBaseData(doctorConfiguration, hbaTelematikId);
+  }
+
+  @Override
+  public void tearDown() {
+    this.kbvItaForVersion = KbvItaForVersion.getDefaultVersion();
   }
 }

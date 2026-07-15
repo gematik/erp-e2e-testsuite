@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ public class CheckEpaOpProvideDispensation implements Task {
     verifiers.addAll(
         List.of(
             emlHandedOverIsEqualTo(mdPair.getLeft().getWhenHandedOver()),
-            emlMedicationMapsTo(mdPair.getRight()),
+            emlMedicationCodingsMapsTo(mdPair.getRight()),
             emlMedicationDispenseMapsTo(mdPair.getLeft())));
 
     request.forEach(r -> verifiers.forEach(v -> v.apply(r)));

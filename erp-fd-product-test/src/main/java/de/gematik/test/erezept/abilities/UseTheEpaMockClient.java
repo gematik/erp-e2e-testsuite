@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ package de.gematik.test.erezept.abilities;
 import com.beust.jcommander.Strings;
 import de.gematik.bbriccs.fhir.codec.FhirCodec;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.exceptions.FhirValidationException;
 import de.gematik.bbriccs.rest.HttpBClient;
-import de.gematik.test.erezept.client.exceptions.FhirValidationException;
 import de.gematik.test.erezept.eml.*;
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpCancelPrescription;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,7 @@ import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import lombok.val;
@@ -176,6 +177,11 @@ public class KbvErpBundleFaker {
   }
 
   public KbvErpBundleFaker withDosageDgmp(DosageDgMP dosageDgMP) {
+    medicationRequestFaker.withDgmp(dosageDgMP);
+    return this;
+  }
+
+  public KbvErpBundleFaker withDosageDgmp(List<DosageDgMP> dosageDgMP) {
     medicationRequestFaker.withDgmp(dosageDgMP);
     return this;
   }

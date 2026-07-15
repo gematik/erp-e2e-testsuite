@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,7 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerDrugName;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.getFaker;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
 import de.gematik.bbriccs.fhir.de.value.ASK;
 import de.gematik.bbriccs.fhir.de.value.ATC;
@@ -39,7 +34,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import lombok.val;
-import org.apache.jena.sparql.function.library.version;
 import org.hl7.fhir.r4.model.Quantity;
 
 public class GemErpMedicationIngredientFaker implements GemErpMedicationFaker {

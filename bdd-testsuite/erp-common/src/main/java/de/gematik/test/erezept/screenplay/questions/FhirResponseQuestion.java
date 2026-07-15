@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import net.serenitybdd.screenplay.Question;
 import org.hl7.fhir.r4.model.Resource;
 
 public abstract class FhirResponseQuestion<R extends Resource>
-    implements Question<ErpResponse<R>> {}
+    implements Question<FhirBResponse<R>> {}

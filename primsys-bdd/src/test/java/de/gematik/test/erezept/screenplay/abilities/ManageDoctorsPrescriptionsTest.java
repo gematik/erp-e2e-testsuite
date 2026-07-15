@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.ErpClient;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
-import java.util.Map;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
@@ -66,9 +65,8 @@ class ManageDoctorsPrescriptionsTest {
     actor.can(erpClientAbility);
 
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, createOperationOutcome())
             .withStatusCode(404)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
 

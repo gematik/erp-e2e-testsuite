@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,11 @@
 
 package de.gematik.test.erezept.config.dto.primsys;
 
-import de.gematik.test.erezept.config.dto.BaseConfigurationDto;
+import de.gematik.bbriccs.cfg.BaseConfigurationDto;
+import de.gematik.bbriccs.konnektor.cfg.KonnektorConfiguration;
+import de.gematik.bbriccs.popp.PoppTokenGeneratorConfiguration;
 import de.gematik.test.erezept.config.dto.actor.ActorsListConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.erezept.config.dto.konnektor.KonnektorConfiguration;
 import de.gematik.test.erezept.config.dto.psp.PSPClientConfig;
 import java.util.List;
 import lombok.Data;
@@ -36,4 +37,5 @@ public class PrimsysConfigurationDto implements BaseConfigurationDto {
   private ActorsListConfiguration actors;
   private List<EnvironmentConfiguration> environments;
   private List<KonnektorConfiguration> konnektors;
+  private PoppTokenGeneratorConfiguration poppTokenGenerator;
 }

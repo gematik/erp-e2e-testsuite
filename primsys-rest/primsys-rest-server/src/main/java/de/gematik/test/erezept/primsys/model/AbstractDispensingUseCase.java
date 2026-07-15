@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
-import de.gematik.test.erezept.client.usecases.DispensePrescriptionCommandNew;
+import de.gematik.test.erezept.client.usecases.DispensePrescriptionCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemDispenseCloseOperationPharmaceuticalsBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
@@ -142,7 +142,7 @@ public abstract class AbstractDispensingUseCase {
     }
   }
 
-  protected DispensePrescriptionCommandNew createDispenseCommand(
+  protected DispensePrescriptionCommand createDispenseCommand(
       String prescriptionId,
       Secret secret,
       List<PznDispensedMedicationDto> medications,
@@ -155,6 +155,6 @@ public abstract class AbstractDispensingUseCase {
         this.feedOperationInputParameterBuilder(
             operationBuilder, prescriptionId, kvnr, medications, isSubstituted);
     val tid = TaskId.from(prescriptionId);
-    return new DispensePrescriptionCommandNew(tid, secret, operationParams);
+    return new DispensePrescriptionCommand(tid, secret, operationParams);
   }
 }

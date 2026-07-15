@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,7 @@ package de.gematik.test.erezept.app.task;
 import static de.gematik.test.erezept.app.mocker.ConfigurationMocker.createDefaultTestConfiguration;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.Egk;
@@ -43,6 +38,7 @@ import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -51,7 +47,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class UseInstalledAppTest {
+class UseInstalledAppTest extends ErpFhirParsingTest {
 
   private final SmartcardArchive smartcards = SmartcardArchive.fromResources();
   private Egk deviceOwnerEgk;

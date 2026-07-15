@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,11 @@ public enum Mainscreen implements PageElement {
   CLOSE_CHARGE_ITEM_CONSENT_DRAWER_BUTTON(
       "Close button of the charge item consent drawer",
       null,
-      () -> AppiumBy.accessibilityId("erx_btn_consent_drawer_close"));
+      () -> AppiumBy.accessibilityId("erx_btn_consent_drawer_close")),
+  LOADING_SPINNER(
+      "Loading spinner",
+      null,
+      () -> AppiumBy.accessibilityId("pro_btn_selection_profile_loading_spinner"));
 
   private final String elementName;
   private final Supplier<By> androidLocator;
@@ -85,8 +89,6 @@ public enum Mainscreen implements PageElement {
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class ProfileButton implements PageElement {
-
-    private static final String ACCESSIBILITY_ID = "pro_btn_selection_profile_row";
     private final String profileName;
 
     @Override
@@ -101,9 +103,7 @@ public enum Mainscreen implements PageElement {
 
     @Override
     public Supplier<By> getIosLocator() {
-      return () ->
-          AppiumBy.iOSNsPredicateString(
-              format("name == \"{0}\" AND label == \"{1}\"", ACCESSIBILITY_ID, profileName));
+      return () -> AppiumBy.name(profileName);
     }
   }
 }

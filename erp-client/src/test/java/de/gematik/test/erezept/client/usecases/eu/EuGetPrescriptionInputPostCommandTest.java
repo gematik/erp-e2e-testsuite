@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,8 +68,8 @@ class EuGetPrescriptionInputPostCommandTest {
 
   @Test
   void getRequestBodyShouldBeIsOptionalPresent() {
-    val request = euGetPrescriptionPostCommand.getRequestBody();
-    assertTrue(request.isPresent());
+    val requestBody = euGetPrescriptionPostCommand.getRequestBody();
+    assertInstanceOf(EuGetPrescriptionInput.class, requestBody);
   }
 
   @Test
@@ -84,8 +84,7 @@ class EuGetPrescriptionInputPostCommandTest {
     EuGetPrescriptionPostCommand command = EuGetPrescriptionPostCommand.forEuPrescriptions(input);
 
     assertNotNull(command);
-    assertTrue(command.getRequestBody().isPresent());
-    assertEquals(input, command.getRequestBody().get());
+    assertEquals(input, command.getRequestBody());
     assertEquals("$get-eu-prescriptions", command.getRequestLocator().split("/")[1]);
   }
 
@@ -97,8 +96,7 @@ class EuGetPrescriptionInputPostCommandTest {
         EuGetPrescriptionPostCommand.forEuPrescriptions(input, count);
 
     assertNotNull(command);
-    assertTrue(command.getRequestBody().isPresent());
-    assertEquals(input, command.getRequestBody().get());
+    assertEquals(input, command.getRequestBody());
     assertTrue(command.getRequestLocator().contains("?_count=" + count));
   }
 }

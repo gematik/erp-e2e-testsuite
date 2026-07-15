@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import de.gematik.bbriccs.fhir.codec.OperationOutcomeExtractor;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
-import de.gematik.test.erezept.client.usecases.ICommand;
+import de.gematik.test.erezept.client.usecases.ErpBaseCommand;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
@@ -214,7 +214,7 @@ public class ManagePharmacyPrescriptions implements Ability, HasTeardown, Refers
     }
   }
 
-  private ICommand<?> getTeardownCommandFor(ErxAcceptBundle accepted) {
+  private ErpBaseCommand<?> getTeardownCommandFor(ErxAcceptBundle accepted) {
     val taskId = accepted.getTaskId();
     if (taskId.getFlowType() == PrescriptionFlowType.FLOW_TYPE_162) {
       // approve/decline this DiGA so it won't stay in status "in-progress"

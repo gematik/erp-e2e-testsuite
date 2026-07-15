@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,17 +22,17 @@ package de.gematik.test.erezept.primsys.actors;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.cardterminal.CardInfo;
+import de.gematik.bbriccs.konnektor.Konnektor;
+import de.gematik.bbriccs.konnektor.requests.GetCardHandleRequest;
+import de.gematik.bbriccs.konnektor.requests.SignXMLDocumentRequest;
 import de.gematik.bbriccs.smartcards.Hba;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvBaseBundle;
 import de.gematik.test.erezept.primsys.data.actors.DoctorDto;
 import de.gematik.test.erezept.primsys.data.actors.DoctorNumber;
-import de.gematik.test.konnektor.Konnektor;
-import de.gematik.test.konnektor.commands.GetCardHandleCommand;
-import de.gematik.test.konnektor.commands.SignXMLDocumentCommand;
 import lombok.Getter;
 import lombok.val;
 
@@ -49,11 +49,11 @@ public class Doctor extends BaseActor {
     super(cfg, env, konnektor, sca);
 
     this.hba = sca.getHbaByICCSN(cfg.getHbaIccsn());
-    this.hbaHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(hba)).getPayload();
+    this.hbaHandle = konnektor.execute(GetCardHandleRequest.forSmartcard(hba)).getPayload();
   }
 
   public byte[] signDocument(String document) {
-    val signCmd = new SignXMLDocumentCommand(hbaHandle, document, algorithm);
+    val signCmd = new SignXMLDocumentRequest(hbaHandle, document, algorithm);
     return konnektor.execute(signCmd).getPayload();
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 
 @Slf4j
@@ -52,6 +53,7 @@ public class ErxMedicationDispenseBuilder
 
   private final List<String> notes = new LinkedList<>();
 
+  private String patientInstruction;
   // required because here we need to support KbvMedication and GemErpMedication at the same time
   private Medication baseMedication;
   private Medication.MedicationBatchComponent batch;
@@ -67,12 +69,6 @@ public class ErxMedicationDispenseBuilder
 
   public ErxMedicationDispenseBuilder whenPrepared(Date whenPrepared) {
     this.whenPrepared = whenPrepared;
-    return this;
-  }
-
-  // this is required for older medication dispenses
-  public ErxMedicationDispenseBuilder medication(KbvErpMedication medication) {
-    this.baseMedication = medication;
     return this;
   }
 
@@ -115,6 +111,17 @@ public class ErxMedicationDispenseBuilder
     return this;
   }
 
+  /**
+   * !!! this setter works only in ErpWorflowVersion 1,5 and below !!!
+   *
+   * @param instruction
+   * @return builder()
+   */
+  public ErxMedicationDispenseBuilder patientInstruction(String instruction) {
+    this.patientInstruction = instruction;
+    return this;
+  }
+
   public ErxMedicationDispenseBuilder note(String note) {
     this.notes.add(note);
     return this;
@@ -127,17 +134,12 @@ public class ErxMedicationDispenseBuilder
     val medDisp =
         this.createResource(
             ErxMedicationDispense::new,
-            ErpWorkflowStructDef.MEDICATION_DISPENSE_12,
+            ErpWorkflowStructDef.MEDICATION_DISPENSE,
             erpWorkflowVersion);
     buildBase(medDisp);
 
     // set medication properly by version
-    if (erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_3) <= 0) {
-      medDisp.getContained().add(this.baseMedication);
-      medDisp.setMedication(new Reference("#" + this.baseMedication.getIdElement().getIdPart()));
-    } else {
-      medDisp.setMedication(new Reference(this.baseMedication.getIdPart()));
-    }
+    medDisp.setMedication(new Reference(this.baseMedication.getIdPart()));
 
     Optional.ofNullable(whenPrepared)
         .ifPresent(
@@ -171,6 +173,8 @@ public class ErxMedicationDispenseBuilder
       this.dosageInstructions.stream()
           .map(instruction -> new Dosage().setText(instruction))
           .forEach(medDisp::addDosageInstruction);
+      if (StringUtils.isNotEmpty(patientInstruction))
+        medDisp.getDosageInstructionFirstRep().setPatientInstruction(patientInstruction);
       if (!dosageDgMPS.isEmpty())
         dosageDgMPS.forEach(
             dosageDgMP -> medDisp.addDosageInstruction(new Dosage().setText(dosageDgMP.getText())));
@@ -182,20 +186,11 @@ public class ErxMedicationDispenseBuilder
 
   private void checkRequired() {
     this.checkRequired(baseMedication, "MedicationDispense requires a Medication");
-    if (erpWorkflowVersion.isSmallerThanOrEqualTo(ErpWorkflowVersion.V1_3)) {
-      if (this.baseMedication instanceof GemErpMedication) {
-        throw new BuilderException(
-            format(
-                "in {0} is no {1} allowed",
-                erpWorkflowVersion, GemErpMedication.class.getSimpleName()));
-      }
-    } else {
-      if (this.baseMedication instanceof KbvErpMedication) {
-        throw new BuilderException(
-            format(
-                "in {0} is no {1} allowed",
-                erpWorkflowVersion, KbvErpMedication.class.getSimpleName()));
-      }
+    if (this.baseMedication instanceof KbvErpMedication) {
+      throw new BuilderException(
+          format(
+              "in {0} is no {1} allowed",
+              erpWorkflowVersion, KbvErpMedication.class.getSimpleName()));
     }
   }
 }

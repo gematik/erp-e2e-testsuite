@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@ package de.gematik.test.erezept.client.usecases;
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
-import java.util.Optional;
-import org.hl7.fhir.r4.model.Resource;
 
-public class CommunicationDeleteCommand extends BaseCommand<EmptyResource> {
+public class CommunicationDeleteCommand extends ErpBaseCommand<EmptyResource> {
 
   public CommunicationDeleteCommand(ErxCommunication com) {
     this(com.getUnqualifiedId());
@@ -34,15 +32,5 @@ public class CommunicationDeleteCommand extends BaseCommand<EmptyResource> {
 
   public CommunicationDeleteCommand(String resourceId) {
     super(EmptyResource.class, HttpRequestMethod.DELETE, "Communication", resourceId);
-  }
-
-  @Override
-  public String getRequestLocator() {
-    return this.getResourcePath();
-  }
-
-  @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.empty();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,25 +23,12 @@ package de.gematik.test.erezept.client.usecases.eu;
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
-import de.gematik.test.erezept.client.usecases.BaseCommand;
-import java.util.Optional;
-import org.hl7.fhir.r4.model.Resource;
+import de.gematik.test.erezept.client.usecases.ErpBaseCommand;
 
-public class EuConsentDeleteCommand extends BaseCommand<EmptyResource> {
+public class EuConsentDeleteCommand extends ErpBaseCommand<EmptyResource> {
 
   public EuConsentDeleteCommand() {
     super(EmptyResource.class, HttpRequestMethod.DELETE, "Consent");
     this.queryParameters.add(new QueryParameter("category", "EUDISPCONS"));
-  }
-
-  /**
-   * Get the FHIR-Resource for the Request-Body (of the inner-HTTP)
-   *
-   * @return an Optional.of(FHIR-Resource) for the Request-Body or an empty Optional if Request-Body
-   *     is empty
-   */
-  @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.empty();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,11 @@ import static de.gematik.test.erezept.client.rest.param.IQueryParameter.queryLis
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import java.util.List;
-import java.util.Optional;
 import lombok.val;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Resource;
 
-public class BundlePagingCommand<R extends Bundle> extends BaseCommand<R> {
+public class BundlePagingCommand<R extends Bundle> extends ErpBaseCommand<R> {
 
   private BundlePagingCommand(Class<R> expect, List<IQueryParameter> list, String fhirResource) {
     super(expect, HttpRequestMethod.GET, fhirResource);
@@ -79,10 +77,5 @@ public class BundlePagingCommand<R extends Bundle> extends BaseCommand<R> {
     val pathList = URLEncodedUtils.parsePathSegments(url); // get first param of Path
     val urlPath = pathList.get(pathList.size() - 1);
     return new BundlePagingCommand<>(bundleType, List.of(), urlPath); //
-  }
-
-  @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.empty();
   }
 }

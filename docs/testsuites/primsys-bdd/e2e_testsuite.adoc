@@ -5,6 +5,6 @@ Die {name-primsys-testsuite} fokussiert sich auf die Qualitätssicherung des E-R
 ==== Technologiestack
 Im Wesentlichen setzt die {name-primsys-testsuite} auf den folgenden Technologiestack auf:
 
-- link:https://openjdk.org/projects/jdk/17/[Java 17] mit link:https://maven.apache.org/download.cgi[Maven]
+- link:https://openjdk.org/projects/jdk/21/[Java 21] mit link:https://maven.apache.org/download.cgi[Maven]
 - {link-serenity-bdd} mit {link-serenity-screenplay}
 - {link-gherkin} mit {link-cucumber}

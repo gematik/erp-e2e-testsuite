@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@
 package de.gematik.test.erezept.abilities;
 
 import com.beust.jcommander.Strings;
+import de.gematik.bbriccs.fhir.codec.FhirCodec;
+import de.gematik.bbriccs.fhir.exceptions.FhirValidationException;
 import de.gematik.bbriccs.rest.HttpBClient;
-import de.gematik.test.erezept.client.exceptions.FhirValidationException;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.trezept.TRegisterLog;
 import de.gematik.test.erezept.trezept.TRegisterMockClient;
 import de.gematik.test.erezept.trezept.TRegisterMockDownloadRequest;
@@ -36,20 +36,20 @@ import one.util.streamex.EntryStream;
 @Slf4j
 public class UseTheTRegisterMockClient implements Ability {
 
-  private final FhirParser parser;
+  private final FhirCodec parser;
   private final TRegisterMockClient tRegisterMockClient;
 
-  private UseTheTRegisterMockClient(TRegisterMockClient tRegisterMockClient, FhirParser parser) {
+  private UseTheTRegisterMockClient(TRegisterMockClient tRegisterMockClient, FhirCodec parser) {
     this.tRegisterMockClient = tRegisterMockClient;
     this.parser = parser;
   }
 
   public static UseTheTRegisterMockClient with(
-      TRegisterMockClient tRegisterMockClient, FhirParser parser) {
+      TRegisterMockClient tRegisterMockClient, FhirCodec parser) {
     return new UseTheTRegisterMockClient(tRegisterMockClient, parser);
   }
 
-  public static UseTheTRegisterMockClient with(HttpBClient restClient, FhirParser parser) {
+  public static UseTheTRegisterMockClient with(HttpBClient restClient, FhirCodec parser) {
     return with(TRegisterMockClient.withRestClient(restClient), parser);
   }
 

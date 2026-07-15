@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.konnektor.SoftKonVerifier;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.DispensePrescriptionAsBundleCommandOld;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseDiGAFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
@@ -33,7 +34,6 @@ import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.konnektor.soap.mock.LocalVerifier;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,12 +52,13 @@ public class DispenseDigaPrescription extends FhirResponseQuestion<ErxMedication
   }
 
   @Override
-  public ErpResponse<ErxMedicationDispenseBundle> answeredBy(Actor actor) {
+  public FhirBResponse<ErxMedicationDispenseBundle> answeredBy(Actor actor) {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val prescriptionPharmacyManager =
         SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
     val acceptBundle = order.chooseFrom(prescriptionPharmacyManager.getAcceptedPrescriptions());
-    val evdgaBundleAsString = LocalVerifier.parse(acceptBundle.getSignedKbvBundle()).getDocument();
+    val evdgaBundleAsString =
+        SoftKonVerifier.parse(acceptBundle.getSignedKbvBundle()).getDocument();
     val evdgaBundle = erpClient.decode(KbvEvdgaBundle.class, evdgaBundleAsString);
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
     val pzn = evdgaBundle.getHealthAppRequest().getPzn();

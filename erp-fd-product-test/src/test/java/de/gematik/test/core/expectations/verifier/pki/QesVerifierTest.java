@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.konnektor.SoftKonSigner;
+import de.gematik.bbriccs.konnektor.utils.OcspTokenGenerator;
 import de.gematik.bbriccs.smartcards.Hba;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
-import de.gematik.test.konnektor.soap.mock.LocalSigner;
-import de.gematik.test.konnektor.soap.mock.utils.OcspTokenGenerator;
 import eu.europa.esig.dss.spi.x509.revocation.ocsp.OCSPToken;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -64,7 +64,7 @@ class QesVerifierTest {
     CoverageReporter.getInstance().startTestcase("don't care");
 
     val validSignedQes =
-        LocalSigner.signQES(hba, CryptoSystem.DEFAULT_CRYPTO_SYSTEM)
+        SoftKonSigner.signQES(hba, CryptoSystem.DEFAULT_CRYPTO_SYSTEM)
             .signDocument(List.of(onlineOcspToken), new byte[] {1, 2, 3});
     val acceptBundle = mock(ErxAcceptBundle.class);
     when(acceptBundle.getSignedKbvBundle()).thenReturn(validSignedQes);
@@ -80,7 +80,7 @@ class QesVerifierTest {
   void shouldReplaceOcspResp() {
     CoverageReporter.getInstance().startTestcase("don't care");
     val validSignedQes =
-        LocalSigner.signQES(hba, CryptoSystem.DEFAULT_CRYPTO_SYSTEM)
+        SoftKonSigner.signQES(hba, CryptoSystem.DEFAULT_CRYPTO_SYSTEM)
             .signDocument(true, new byte[] {1, 2, 3});
     val acceptBundle = mock(ErxAcceptBundle.class);
     when(acceptBundle.getSignedKbvBundle()).thenReturn(validSignedQes);

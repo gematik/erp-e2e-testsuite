@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Slf4j
 public class ActorContext {
@@ -128,12 +129,14 @@ public class ActorContext {
     contextData.addDispensedMedications(dispensed);
   }
 
-  public boolean removeAcceptedPrescription(AcceptedPrescriptionDto prescription) {
-    return removeAcceptedPrescription(TaskId.from(prescription.getPrescriptionId()));
+  public boolean removePrescription(AcceptedPrescriptionDto prescription) {
+    return removePrescription(TaskId.from(prescription.getPrescriptionId()));
   }
 
-  public boolean removeAcceptedPrescription(TaskId taskId) {
-    return contextData.removeAcceptedPrescription(taskId.getValue());
+  public boolean removePrescription(TaskId taskId) {
+    val accepted = contextData.removeAcceptedPrescription(taskId.getValue());
+    val ready = contextData.removeReadyPrescription(taskId.getValue());
+    return accepted || ready;
   }
 
   public List<PrescriptionDto> getPrescriptions() {

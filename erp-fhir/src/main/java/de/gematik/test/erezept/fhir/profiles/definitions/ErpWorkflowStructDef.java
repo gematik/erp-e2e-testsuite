@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,14 +45,11 @@ public enum ErpWorkflowStructDef implements WithStructureDefinition<ErpWorkflowV
   SUBSTITUTION_ALLOWED(
       "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SubstitutionAllowedType"),
 
-  PRESCRIPTION_TYPE("https://gematik.de/fhir/StructureDefinition/PrescriptionType"),
-  PRESCRIPTION_TYPE_12(
-      "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_PrescriptionType"),
+  PRESCRIPTION_TYPE("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_PrescriptionType"),
   BINARY("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Binary"),
   TASK("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Task"),
   MEDICATION("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Medication"),
-  MEDICATION_DISPENSE("https://gematik.de/fhir/StructureDefinition/ErxMedicationDispense"),
-  MEDICATION_DISPENSE_12(
+  MEDICATION_DISPENSE(
       "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense"),
   MEDICATION_DISPENSE_DIGA(
       "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA"),
@@ -60,10 +57,8 @@ public enum ErpWorkflowStructDef implements WithStructureDefinition<ErpWorkflowV
       "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_CloseOperationInputBundle"),
   GEM_ERP_PR_BUNDLE("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Bundle"),
   AUDIT_EVENT("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_AuditEvent"),
-  EXPIRY_DATE("https://gematik.de/fhir/StructureDefinition/ExpiryDate"),
-  EXPIRY_DATE_12("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_ExpiryDate"),
-  ACCEPT_DATE("https://gematik.de/fhir/StructureDefinition/AcceptDate"),
-  ACCEPT_DATE_12("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_AcceptDate"),
+  EXPIRY_DATE("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_ExpiryDate"),
+  ACCEPT_DATE("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_AcceptDate"),
   LAST_MEDICATION_DISPENSE(
       "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_LastMedicationDispense"),
   REDEEM_CODE("https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode"),

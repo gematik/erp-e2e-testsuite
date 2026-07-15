@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,23 @@
 
 package de.gematik.test.erezept.client;
 
+import ca.uhn.fhir.validation.ValidationResult;
 import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.codec.FhirCodec;
+import de.gematik.bbriccs.rest.HttpBClient;
 import de.gematik.bbriccs.rest.HttpBRequest;
+import de.gematik.bbriccs.rest.fd.FhirBRequest;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponseCreator;
+import de.gematik.bbriccs.rest.fd.FhirClient;
+import de.gematik.bbriccs.rest.fd.MediaType;
 import de.gematik.bbriccs.rest.headers.HttpHeader;
 import de.gematik.bbriccs.smartcards.Smartcard;
 import de.gematik.idp.client.IdpClient;
 import de.gematik.idp.client.IdpClientRuntimeException;
 import de.gematik.idp.client.IdpTokenResult;
 import de.gematik.idp.crypto.model.PkiIdentity;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.rest.ErpResponseFactory;
-import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.client.rest.ValidationResultHelper;
-import de.gematik.test.erezept.client.usecases.ICommand;
-import de.gematik.test.erezept.client.vau.VauClient;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
@@ -55,7 +57,7 @@ import org.hl7.fhir.r4.model.Resource;
 @Slf4j
 @Getter
 @Builder
-public class ErpClient {
+public class ErpClient implements FhirClient {
 
   private final ClientType clientType;
 
@@ -68,9 +70,9 @@ public class ErpClient {
 
   // client capabilities
   private final IdpClient idpClient;
-  private final FhirParser fhir;
-  private final ErpResponseFactory responseFactory;
-  private final VauClient vauClient;
+  private final FhirCodec fhir;
+  private final FhirBResponseCreator responseFactory;
+  private final HttpBClient vauClient;
 
   // client state
   private IdpTokenResult idpToken;
@@ -83,7 +85,7 @@ public class ErpClient {
    */
   public void initialize() {
     Objects.requireNonNull(authentication);
-    vauClient.initialize();
+    vauClient.init();
     try {
       idpClient.initialize();
     } catch (NullPointerException npe) {
@@ -149,6 +151,16 @@ public class ErpClient {
     return Instant.now().isAfter(refreshInstant);
   }
 
+  @Override
+  public String encode(Resource resource) {
+    return this.encode(resource, false);
+  }
+
+  @Override
+  public String encode(Resource resource, boolean prettyPrint) {
+    return this.encode(resource, this.acceptMime.toFhirEncoding(), prettyPrint);
+  }
+
   public String encode(Resource resource, EncodingType encoding) {
     return this.encode(resource, encoding, false);
   }
@@ -157,16 +169,28 @@ public class ErpClient {
     return fhir.encode(resource, encoding, prettyPrint);
   }
 
-  @SneakyThrows
-  public <R extends Resource> ErpResponse<R> request(ICommand<R> command) {
-    this.refreshIdpToken(); // make sure before each request that the IDP token is not outdated
-    // Request-Body is optional: encode as FHIR if available, otherwise keep empty body
-    val bodyBuilder = new StringBuilder();
-    command
-        .getRequestBody()
-        .ifPresent(b -> bodyBuilder.append(fhir.encode(b, sendMime.toFhirEncoding())));
+  @Override
+  public <R extends Resource> R decode(Class<R> type, String content) {
+    return fhir.decode(type, content);
+  }
 
-    val reqBody = bodyBuilder.toString();
+  @Override
+  public boolean isValid(String content) {
+    return fhir.isValid(content);
+  }
+
+  @Override
+  public ValidationResult validate(String content) {
+    return fhir.validate(content);
+  }
+
+  @SneakyThrows
+  @Override
+  public <T extends Resource, R extends Resource> FhirBResponse<R> request(
+      FhirBRequest<T, R> command) {
+    this.refreshIdpToken(); // make sure before each request that the IDP token is not outdated
+
+    val reqBody = this.encode(command.getRequestBody(), sendMime.toFhirEncoding());
     this.validateRequestFhirContent(reqBody);
 
     val accessToken = idpToken.getAccessToken().getRawString();
@@ -174,19 +198,15 @@ public class ErpClient {
     val innerHttpRequest = createInnerHttpRequest(command, accessToken, reqBody);
 
     val start = Instant.now();
-    val response = vauClient.send(innerHttpRequest, accessToken, command.getFhirResource());
+    val response = vauClient.send(innerHttpRequest);
     val duration = Duration.between(start, Instant.now());
     log.info("Request against {} took {} msec", baseFdUrl, duration.toMillis());
 
-    val responseHeaders =
-        response.headers().stream().collect(Collectors.toMap(HttpHeader::key, HttpHeader::value));
-    return responseFactory.createFrom(
-        response.statusCode(),
-        duration,
-        responseHeaders,
-        accessToken,
-        response.bodyAsString(),
-        command.expectedResponseBody());
+    return responseFactory
+        .takeExpectationFrom(command)
+        .usedAccessToken(accessToken)
+        .received(response)
+        .withDuration(duration);
   }
 
   private void validateRequestFhirContent(String content) {
@@ -197,7 +217,7 @@ public class ErpClient {
   }
 
   private <R extends Resource> HttpBRequest createInnerHttpRequest(
-      ICommand<R> command, String accessToken, String body) {
+      FhirBRequest<?, R> command, String accessToken, String body) {
     val headersMap = command.getHeaderParameters();
     headersMap.put("Accept-Charset", acceptCharset);
     headersMap.put("Authorization", "Bearer " + accessToken);

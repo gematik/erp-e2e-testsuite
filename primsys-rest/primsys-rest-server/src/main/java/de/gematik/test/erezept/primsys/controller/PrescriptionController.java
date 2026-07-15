@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import de.gematik.test.erezept.primsys.data.PrescriptionDto;
 import de.gematik.test.erezept.primsys.model.ActorContext;
 import de.gematik.test.erezept.primsys.rest.params.PrescriptionFilterParams;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
-import de.gematik.test.erezept.screenplay.util.DataMatrixCodeGenerator;
+import de.gematik.test.erezept.primsys.util.DataMatrixCodeGenerator;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;

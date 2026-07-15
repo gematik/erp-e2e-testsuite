@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.DebugSettings;
-import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.app.mobile.elements.Settings;
 import de.gematik.test.erezept.app.task.ios.SetVirtualEgkOnIOS;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
@@ -72,7 +71,7 @@ public class UseInstalledApp implements Task {
       // this hack is required to enforce a login, otherwise we won't find any prescriptions later
       // on
       app.tap(BottomNav.PRESCRIPTION_BUTTON);
-      app.tap(Mainscreen.REFRESH_BUTTON);
+      actor.attemptsTo(RefreshPrescriptions.byTap());
     }
 
     actor.attemptsTo(

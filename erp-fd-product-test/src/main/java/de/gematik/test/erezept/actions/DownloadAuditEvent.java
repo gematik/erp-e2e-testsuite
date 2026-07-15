@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,17 @@
 
 package de.gematik.test.erezept.actions;
 
-import static java.text.MessageFormat.*;
-
-import de.gematik.test.erezept.*;
-import de.gematik.test.erezept.client.rest.param.*;
-import de.gematik.test.erezept.client.usecases.*;
-import de.gematik.test.erezept.fhir.r4.erp.*;
+import de.gematik.test.erezept.ErpInteraction;
+import de.gematik.test.erezept.client.rest.param.IQueryParameter;
+import de.gematik.test.erezept.client.rest.param.QueryParameter;
+import de.gematik.test.erezept.client.usecases.AuditEventGetCommand;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
 import java.util.List;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import net.serenitybdd.screenplay.*;
+import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import net.serenitybdd.annotations.Step;
+import net.serenitybdd.screenplay.Actor;
 
 @Slf4j
 public class DownloadAuditEvent extends ErpAction<ErxAuditEventBundle> {
@@ -41,12 +42,21 @@ public class DownloadAuditEvent extends ErpAction<ErxAuditEventBundle> {
   }
 
   @Override
+  @Step("{0} versucht ein AuditEventBundle am FD abzurufen")
   public ErpInteraction<ErxAuditEventBundle> answeredBy(Actor actor) {
+
     val erpInteraction = this.performCommandAs(cmd, actor);
-    log.info(
-        format(
-            "ErxAuditEventBundle has {0} entries",
-            erpInteraction.getExpectedResponse().getAuditEvents().size()));
+
+    if (erpInteraction.isOfExpectedType()) {
+      val bundle = erpInteraction.getExpectedResponse();
+      log.info("ErxAuditEventBundle has {} entries", bundle.getAuditEvents().size());
+    } else {
+      val resourceType =
+          Objects.requireNonNull(erpInteraction.getResponse().getResourceType()).getSimpleName();
+
+      log.info("AuditEvent request returned non-bundle response of type {}", resourceType);
+    }
+
     return erpInteraction;
   }
 

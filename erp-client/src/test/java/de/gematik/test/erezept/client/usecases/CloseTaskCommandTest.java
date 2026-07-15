@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,9 +65,7 @@ class CloseTaskCommandTest extends ErpFhirParsingTest {
     val expectedEndpoint = format("/Task/{0}/$close?secret={1}", taskId, secret.getValue());
     assertEquals(expectedEndpoint, cmd.getRequestLocator());
 
-    val optBody = cmd.getRequestBody();
-    assertTrue(optBody.isPresent());
-    val body = optBody.orElseThrow();
+    val body = cmd.getRequestBody();
     assertEquals(ResourceType.MedicationDispense, body.getResourceType());
     val rawBody = parser.encode(body, EncodingType.XML);
     assertTrue(parser.isValid(rawBody));
@@ -96,9 +94,7 @@ class CloseTaskCommandTest extends ErpFhirParsingTest {
     val expectedEndpoint = format("/Task/{0}/$close?secret={1}", taskId, secret.getValue());
     assertEquals(expectedEndpoint, cmd.getRequestLocator());
 
-    val optBody = cmd.getRequestBody();
-    assertTrue(optBody.isPresent());
-    val body = optBody.orElseThrow();
+    val body = cmd.getRequestBody();
     assertEquals(ResourceType.Bundle, body.getResourceType());
     val rawBody = parser.encode(body, EncodingType.XML);
 
@@ -123,8 +119,7 @@ class CloseTaskCommandTest extends ErpFhirParsingTest {
     val closeParameters = GemOperationInputParameterBuilder.forClosingPharmaceuticals().build();
     val cmd = new CloseTaskCommand(taskId, secret, closeParameters);
 
-    val optBody = cmd.getRequestBody();
-    assertTrue(optBody.isPresent());
-    assertInstanceOf(GemCloseOperationParameters.class, optBody.get());
+    val body = cmd.getRequestBody();
+    assertInstanceOf(GemCloseOperationParameters.class, body);
   }
 }

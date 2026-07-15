@@ -111,5 +111,15 @@ environments:
       userAgent: DUMMY VALUE
 
 konnektors:
-  - name: Soft-Konn
-    type: local
+  - name: "Soft-Konn"
+    context:
+      mandantId: "Mandant1"
+      clientSystemId: "CS1"
+      workplaceId: "AP1"
+      userId: "user1"
+    service:
+      type: "Soft-Kon"
+      vsdmConfiguration:
+        hMacKey: "DUMMY VALUE"
+        operator: S
+        version: 1

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,7 @@
 
 package de.gematik.test.erezept.fhir.valuesets;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowCodeSystem;
@@ -35,17 +32,14 @@ class AvailabilityStatusTest {
 
   @Test
   void shouldBuildCodingWithCustomSystem() {
-    val coding = AvailabilityStatus.AS_10.asCoding(ErpWorkflowCodeSystem.AVAILABILITY_STATUS_12);
-    assertEquals(
-        ErpWorkflowCodeSystem.AVAILABILITY_STATUS_12.getCanonicalUrl(), coding.getSystem());
+    val coding = AvailabilityStatus.AS_10.asCoding(ErpWorkflowCodeSystem.AVAILABILITY_STATUS);
+    assertEquals(ErpWorkflowCodeSystem.AVAILABILITY_STATUS.getCanonicalUrl(), coding.getSystem());
   }
 
   @Test
   void shouldBuildCodingWithCustomSystemAndDisplay() {
-    val coding =
-        AvailabilityStatus.AS_20.asCoding(ErpWorkflowCodeSystem.AVAILABILITY_STATUS_12, true);
-    assertEquals(
-        ErpWorkflowCodeSystem.AVAILABILITY_STATUS_12.getCanonicalUrl(), coding.getSystem());
+    val coding = AvailabilityStatus.AS_20.asCoding(ErpWorkflowCodeSystem.AVAILABILITY_STATUS, true);
+    assertEquals(ErpWorkflowCodeSystem.AVAILABILITY_STATUS.getCanonicalUrl(), coding.getSystem());
     assertNotNull(coding.getDisplay());
     assertFalse(coding.getDisplay().isEmpty());
   }

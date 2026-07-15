@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.bbriccs.konnektor.Konnektor;
 import de.gematik.bbriccs.smartcards.DummyEgk;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
@@ -36,7 +37,6 @@ import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.konnektor.cfg.KonnektorModuleFactory;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -48,12 +48,10 @@ public class PrimSysBddFactory extends ConfiguredFactory {
 
   @Getter private final PrimsysConfigurationDto dto;
   private final SmartcardArchive sca;
-  private final KonnektorModuleFactory konnektorFactory;
 
   public PrimSysBddFactory(PrimsysConfigurationDto dto, SmartcardArchive sca) {
     this.dto = dto;
     this.sca = sca;
-    this.konnektorFactory = KonnektorModuleFactory.fromKonnektorConfigs(dto.getKonnektors());
   }
 
   public EnvironmentConfiguration getActiveEnvironment() {
@@ -71,7 +69,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
         UseTheKonnektor.with(smcb)
             .and(hba)
             .and(algorithm)
-            .on(konnektorFactory.createKonnektorClient(cfg.getKonnektor()));
+            .on(Konnektor.create((this.getConfig(cfg.getKonnektor(), dto.getKonnektors()))));
     val erpClient = ErpClientFactory.createErpClient(this.getActiveEnvironment(), cfg);
 
     // equip the doctor with abilities
@@ -93,7 +91,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
     val useTheKonnektor =
         UseTheKonnektor.with(smcb)
             .and(algorithm)
-            .on(konnektorFactory.createKonnektorClient(cfg.getKonnektor()));
+            .on(Konnektor.create((this.getConfig(cfg.getKonnektor(), dto.getKonnektors()))));
     val erpClient = ErpClientFactory.createErpClient(this.getActiveEnvironment(), cfg);
 
     givenThat(thePharmacy)
@@ -116,7 +114,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
     val useTheKonnektor =
         UseTheKonnektor.with(smcb)
             .and(algorithm)
-            .on(konnektorFactory.createKonnektorClient(cfg.getKonnektor()));
+            .on(Konnektor.create((this.getConfig(cfg.getKonnektor(), dto.getKonnektors()))));
     val erpClient = ErpClientFactory.createErpClient(this.getActiveEnvironment(), cfg);
 
     givenThat(ktr)
@@ -140,7 +138,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
         .whoCan(
             UseTheKonnektor.with(hba)
                 .and(algorithm)
-                .on(konnektorFactory.createKonnektorClient(cfg.getKonnektor())));
+                .on(Konnektor.create(this.getConfig(cfg.getKonnektor(), dto.getKonnektors()))));
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,17 +22,17 @@ package de.gematik.test.erezept.config.exceptions;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.config.dto.INamedConfigurationElement;
+import de.gematik.bbriccs.cfg.NamedConfigurationElement;
 import java.util.List;
 
 public class ConfigurationMappingException extends RuntimeException {
 
-  public <T extends INamedConfigurationElement> ConfigurationMappingException(
+  public <T extends NamedConfigurationElement> ConfigurationMappingException(
       String elementName, List<T> configs) {
     super(
         format(
             "Element named {0} is not configured within the list of valid Elements {1}",
             elementName,
-            String.join(", ", configs.stream().map(INamedConfigurationElement::getName).toList())));
+            String.join(", ", configs.stream().map(NamedConfigurationElement::getName).toList())));
   }
 }

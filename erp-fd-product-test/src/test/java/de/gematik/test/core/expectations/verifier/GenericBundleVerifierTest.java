@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,8 @@ import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class GenericBundleVerifierTest extends ErpFhirParsingTest {
   private ErxAuditEventBundle secondErxAuditEventBundle;
@@ -68,14 +70,21 @@ class GenericBundleVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldThrowWileDetectingCountOfContainedElements() {
-    val step = minimumCountOfEntriesOf(70);
+    val step = minimumCountOfEntries(70);
     assertThrows(AssertionError.class, () -> step.apply(firstErxAuditEventBundle));
   }
 
-  @Test
-  void shouldDetectMin50EventsCorrect() {
-    val step = minimumCountOfEntriesOf(50);
+  @ParameterizedTest
+  @ValueSource(ints = {49, 40, 50, 10, 48, 0, 1})
+  void shouldDetectMinimumOf49EventsCorrect(int value) {
+    val step = minimumCountOfEntries(value);
     assertDoesNotThrow(() -> step.apply(firstErxAuditEventBundle));
+  }
+
+  @Test
+  void shouldThrowWileDetectingMinimumCountOfContainedElements() {
+    val step = minimumCountOfEntries(51);
+    assertThrows(AssertionError.class, () -> step.apply(firstErxAuditEventBundle));
   }
 
   @Test
@@ -123,6 +132,18 @@ class GenericBundleVerifierTest extends ErpFhirParsingTest {
   @Test
   void shouldThrowWhileDetectTotalCount() {
     val step = containsTotalCountOf(10);
+    assertThrows(AssertionError.class, () -> step.apply(firstErxAuditEventBundle));
+  }
+
+  @Test
+  void shouldDetectMinimumTotalCountCorrect() {
+    val step = containsMinimumTotalCountOf(0);
+    assertDoesNotThrow(() -> step.apply(firstErxAuditEventBundle));
+  }
+
+  @Test
+  void shouldThrowWhileDetectMinimalTotalCount() {
+    val step = containsMinimumTotalCountOf(10);
     assertThrows(AssertionError.class, () -> step.apply(firstErxAuditEventBundle));
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
 import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.Timing;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -98,10 +100,7 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
         GemErpMedicationFaker.forPznMedication(version)
             .withPzn(PZN.from(pzn), fakerDrugName())
             .fake();
-    DosageDgMP dosage =
-        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MIO_E)
-            .text("1 Tablette morgens")
-            .build();
+    DosageDgMP dosage = DosageDgMPBuilder.dosageBuilder().text("1 Tablette morgens").build();
 
     val kvnr = KVNR.from("X234567890");
     val telematikId = "606358757";
@@ -141,7 +140,6 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
         "in 7 Tagen Rücksprache mit dem Hausarzt halten",
         medicationDispense.getNoteFirstRep().getText());
     assertTrue(ValidatorUtil.encodeAndValidate(parser, medicationDispense).isSuccessful());
-    System.out.println();
   }
 
   @ParameterizedTest(name = "[{index}] -> Build MedicationDispense with ErpWorkflowVersion {0}")
@@ -275,21 +273,17 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
   }
 
   @Test
-  void shouldThrowOnDispensingWrongMedicationForProfileVersion() {
-    val medicationDispenseBuilder =
-        ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_3).toBuilder();
-
-    medicationDispenseBuilder.medication(
-        GemErpMedicationFaker.forPznMedication(ErpWorkflowVersion.V1_3).fake());
-
-    assertThrows(BuilderException.class, medicationDispenseBuilder::build);
-  }
-
-  @Test
   void shouldSetDosageDgmpCorrect() {
     DosageDgMP dosage =
         DosageDgMPBuilder.dosageBuilder(5, BmpDosiereinheit.AUGENBADEWANNE)
-            .text("1 Tablette morgens")
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(8, "Woche(n)", "wk")
+                    .frequency(1)
+                    .period(3)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .when("EVE")
+                    .build())
             .build();
 
     val medDisp =
@@ -316,7 +310,14 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
   void shouldSetDosageDgmpCorrectAsList() {
     DosageDgMP dosage =
         DosageDgMPBuilder.dosageBuilder(5, BmpDosiereinheit.AUGENBADEWANNE)
-            .text("1 Tablette morgens")
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(8, "Woche(n)", "wk")
+                    .frequency(1)
+                    .period(3)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .when("EVE")
+                    .build())
             .build();
 
     val medDisp =
@@ -342,6 +343,26 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
                         .findFirst()
                         .orElseThrow())
             .findFirst());
+  }
+
+  @Test
+  void shouldSetPatientInstructionCorrrect() {
+    val teststring = "PatientInstruction";
+    val medDisp =
+        ErxMedicationDispenseBuilder.forKvnr(KVNR.random())
+            .version(ErpWorkflowVersion.V1_5)
+            .medication(
+                GemErpMedicationFaker.forPznMedication()
+                    .withDrugCategory(EpaDrugCategory.C_02)
+                    .fake())
+            .patientInstruction(teststring)
+            .performerId(TelematikID.random())
+            .prescriptionId(PrescriptionId.random())
+            .status("completed") // default COMPLETED
+            .build();
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medDisp).isSuccessful());
+    assertEquals(teststring, medDisp.getDosageInstruction().get(0).getPatientInstruction());
+    assertEquals(teststring, medDisp.getDosageOrPatientInstruction());
   }
 
   private static ValidationResult getRes(Resource medicationDispense) {

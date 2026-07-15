@@ -7,17 +7,13 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.4.0</version>
+        <version>1.6.0</version>
     </parent>
 
     <artifactId>erp-fd-product-test</artifactId>
     <name>E-Rezept Produkt-Testsuite</name>
 
     <properties>
-        <java.version>${version.java}</java.version>
-        <maven.compiler.target>${version.java}</maven.compiler.target>
-        <maven.compiler.source>${version.java}</maven.compiler.source>
-
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <encoding>UTF-8</encoding>
 
@@ -39,10 +35,6 @@
             <artifactId>primsys-bdd</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>net.serenity-bdd</groupId>
                     <artifactId>serenity-cucumber</artifactId>
                 </exclusion>
@@ -53,10 +45,6 @@
             <artifactId>primsys-bdd</artifactId>
             <type>test-jar</type>
             <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
                 <exclusion>
                     <groupId>net.serenity-bdd</groupId>
                     <artifactId>serenity-cucumber</artifactId>
@@ -76,11 +64,11 @@
             <artifactId>fhir-hapi-fuzzing-brick</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <groupId>tools.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
@@ -114,7 +102,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-t-rezept</artifactId>
-            <version>1.4.0</version>
+            <version>1.6.0</version>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
@@ -168,6 +156,18 @@
         <dependency>
             <groupId>de.gematik.bbriccs</groupId>
             <artifactId>ca-supplier-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>konnektor-client-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>softkon-service-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>popp-token-generator-brick</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.stephenc.jcip</groupId>

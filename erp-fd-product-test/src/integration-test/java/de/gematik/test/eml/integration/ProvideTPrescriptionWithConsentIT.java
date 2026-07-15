@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ package de.gematik.test.eml.integration;
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLogFor;
 import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlHasMedicationCategory;
 import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.*;
+import static org.awaitility.Awaitility.await;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
@@ -48,12 +49,15 @@ import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.time.LocalDate;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -121,6 +125,48 @@ public class ProvideTPrescriptionWithConsentIT extends ErpTest {
             doc.getSmcbTelematikId(),
             doc.getHbaTelematikId(),
             emlHasMedicationCategory(MedicationCategory.C_02, EmlAfos.A_25946)));
+  }
+
+  @SneakyThrows
+  @TestcaseId("EML_PROVIDE_T_PRESCRIPTION_WITH_CONSENT_DECISION_APPLY_02")
+  @Test
+  @DisplayName(
+      "Es muss geprüft werden, dass die übermittelte Teratogenic EpaMedication an das Epa"
+          + " Aktensystem den Werten der Teratogenic Prescription entspricht und das ein AuditEvent"
+          + " geschrieben wird")
+  void submitTPrescriptionToEpaMockAndCheckAuditEvent() {
+
+    val epaFhirChecker = new GemaTestActor("epaFhirChecker");
+    this.config.equipWithEpaMockClient(epaFhirChecker);
+
+    patient.changePatientInsuranceType(InsuranceTypeDe.GKV);
+    // todo activate if PUT is activated & equip patient actor with EpaMockClient
+    // this.config.equipWithEpaMockClient(patient);
+    // patient.attemptsTo(EmlProvidePrescriptionApply.forKvnr(patient.getKvnr()));
+
+    val activation =
+        doc.performs(
+            IssuePrescription.forPatient(patient)
+                .asTPrescription(
+                    KbvErpBundleFaker.builder()
+                        .withMedication(getMedication(MEDICATION_PZN))
+                        .toBuilder()));
+
+    // verifies correct activated prescription and get KbvErpBundle for validation step
+    val task = activation.getExpectedResponse();
+
+    val prescr =
+        patient.performs(
+            GetPrescriptionById.withTaskId(task.getTaskId()).withAccessCode(task.getAccessCode()));
+
+    // performs the resource-content validation
+    val kbvBundle = prescr.getExpectedResponse().getKbvBundle().orElseThrow();
+    epaFhirChecker.attemptsTo(
+        CheckEpaOpProvidePrescriptionWithTask.forPrescription(
+            kbvBundle,
+            doc.getSmcbTelematikId(),
+            doc.getHbaTelematikId(),
+            emlHasMedicationCategory(MedicationCategory.C_02, EmlAfos.A_25946)));
 
     // patient checks auditEvent content
     val searchParams =
@@ -128,6 +174,8 @@ public class ProvideTPrescriptionWithConsentIT extends ErpTest {
             .withAuthoredOnAndFilter(LocalDate.now(), SearchPrefix.EQ)
             .sortedBy("date", SortOrder.DESCENDING)
             .createParameter();
+    // Warten auf das Übertragen des FD Exporters zum FD und schreiben des Auditevents
+    await().atMost(2, TimeUnit.SECONDS);
     val auditEvents = patient.performs(DownloadAuditEvent.withQueryParams(searchParams));
 
     patient.attemptsTo(

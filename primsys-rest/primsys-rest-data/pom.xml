@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>primsys-rest</artifactId>
-        <version>1.4.0</version>
+        <version>1.6.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -14,20 +14,11 @@
     <name>PrimSys REST data model</name>
     <description>REST data model between client and server</description>
 
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencies>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
         <dependency>

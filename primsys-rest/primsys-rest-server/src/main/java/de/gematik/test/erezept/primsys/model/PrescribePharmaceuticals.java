@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import de.gematik.test.erezept.primsys.mapping.PrescribeRequestDataMapper;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
 import jakarta.ws.rs.core.Response;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +45,9 @@ public class PrescribePharmaceuticals extends PrescribeUseCase<KbvErpBundle> {
 
   private final boolean isDirectAssignment;
 
-  private PrescribePharmaceuticals(Doctor doctor, boolean isDirectAssignment) {
-    super(doctor);
+  private PrescribePharmaceuticals(
+      Doctor doctor, boolean isDirectAssignment, @Nullable String kvnr) {
+    super(doctor, kvnr);
     this.isDirectAssignment = isDirectAssignment;
   }
 
@@ -97,6 +99,12 @@ public class PrescribePharmaceuticals extends PrescribeUseCase<KbvErpBundle> {
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder {
     private final Doctor doctor;
+    @Nullable private String kvnr;
+
+    public Builder forCustomKvnr(String kvnr) {
+      this.kvnr = kvnr;
+      return this;
+    }
 
     public PrescribePharmaceuticals asDirectAssignment() {
       return assignDirectly(true);
@@ -107,7 +115,7 @@ public class PrescribePharmaceuticals extends PrescribeUseCase<KbvErpBundle> {
     }
 
     public PrescribePharmaceuticals assignDirectly(boolean isDirectAssignment) {
-      return new PrescribePharmaceuticals(doctor, isDirectAssignment);
+      return new PrescribePharmaceuticals(doctor, isDirectAssignment, kvnr);
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,8 @@ import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItemSet;
 import java.util.List;
-import java.util.Optional;
-import org.hl7.fhir.r4.model.Resource;
 
-public class ChargeItemGetCommand extends BaseCommand<ErxChargeItemSet> {
+public class ChargeItemGetCommand extends ErpBaseCommand<ErxChargeItemSet> {
 
   public ChargeItemGetCommand() {
     super(ErxChargeItemSet.class, HttpRequestMethod.GET, "ChargeItem");
@@ -36,10 +34,5 @@ public class ChargeItemGetCommand extends BaseCommand<ErxChargeItemSet> {
   public ChargeItemGetCommand(List<IQueryParameter> searchParameters) {
     super(ErxChargeItemSet.class, HttpRequestMethod.GET, "ChargeItem");
     queryParameters.addAll(searchParameters);
-  }
-
-  @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.empty();
   }
 }

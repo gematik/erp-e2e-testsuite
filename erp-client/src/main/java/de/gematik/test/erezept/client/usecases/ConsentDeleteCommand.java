@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,8 @@ import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import java.util.List;
-import java.util.Optional;
-import org.hl7.fhir.r4.model.Resource;
 
-public class ConsentDeleteCommand extends BaseCommand<EmptyResource> {
+public class ConsentDeleteCommand extends ErpBaseCommand<EmptyResource> {
 
   public ConsentDeleteCommand() {
     this(List.of(new QueryParameter("category", "CHARGCONS")));
@@ -36,16 +34,5 @@ public class ConsentDeleteCommand extends BaseCommand<EmptyResource> {
   public ConsentDeleteCommand(List<QueryParameter> queryList) {
     super(EmptyResource.class, HttpRequestMethod.DELETE, "Consent");
     this.queryParameters.addAll(queryList);
-  }
-
-  /**
-   * Get the FHIR-Resource for the Request-Body (of the inner-HTTP)
-   *
-   * @return an Optional.of(FHIR-Resource) for the Request-Body or an empty Optional if Request-Body
-   *     is empty
-   */
-  @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.empty();
   }
 }

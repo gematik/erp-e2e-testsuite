@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ package de.gematik.test.erezept.cli.cfg;
 
 import static java.text.MessageFormat.format;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.config.PartialConfigSubstituter;
 import de.gematik.test.erezept.config.TestsuiteconfigurationScope;
@@ -36,6 +34,9 @@ import java.util.List;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import tools.jackson.core.exc.JacksonIOException;
+import tools.jackson.databind.exc.MismatchedInputException;
+import tools.jackson.dataformat.yaml.YAMLMapper;
 
 @Slf4j
 public class ErpEnvironmentsConfiguration {
@@ -78,7 +79,7 @@ public class ErpEnvironmentsConfiguration {
       readFrom = "packaged resource";
     }
 
-    val mapper = new ObjectMapper(new YAMLFactory());
+    val mapper = YAMLMapper.builder().build();
 
     try {
       val template = mapper.readTree(configFileContent);
@@ -87,8 +88,8 @@ public class ErpEnvironmentsConfiguration {
               .applyUpdates(configFile, template)
               .toString();
       this.environments = mapper.readValue(finalConfig, ErpEnvironmentsList.class);
-      log.info(format("Read Environment Configurations from {0}", readFrom));
-    } catch (IOException e) {
+      log.info("Read Environment Configurations from {}", readFrom);
+    } catch (JacksonIOException | MismatchedInputException e) {
       throw new ConfigurationException(
           format("Environment Configurations read from ''{0}'' are invalid", readFrom));
     }

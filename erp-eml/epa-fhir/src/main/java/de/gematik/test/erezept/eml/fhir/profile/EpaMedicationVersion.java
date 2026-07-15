@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,9 @@ import lombok.RequiredArgsConstructor;
 public enum EpaMedicationVersion implements ProfileVersion {
   V1_0_3("1.0.3"),
   V1_0_6("1.0.6"),
-  V1_3_0("1.3.0");
+  V1_3_0("1.3.0"), // for Epa-Module
+  V1_3_2("1.3.2"), // for FHireFussing Module
+  ;
 
   private final String version;
   private final String name = "de.gematik.epa.medication";

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.fhir.profiles.systems.KbvNamingSystem;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
@@ -111,5 +112,27 @@ class ProvideDoctorBaseDataTest extends ErpFhirBuildingTest {
                                         KbvNamingSystem.ASV_FACHGRUPPENNUMMER.getCanonicalUrl())))
             .findFirst()
             .isPresent());
+  }
+
+  @Test
+  void shouldSetVersionCorrectly() {
+    val cfgDto = new DoctorConfiguration();
+    cfgDto.setName("Bernd Claudius");
+    cfgDto.setQualificationType("Arzt");
+    val doc = ProvideDoctorBaseData.fromConfiguration(cfgDto, "UselessTestId");
+    doc.setVersion(KbvItaForVersion.V1_3_0);
+    val pract = doc.getPractitioner();
+    assertTrue(pract.getMeta().getProfile().getFirst().getValue().endsWith("|1.3"));
+  }
+
+  @Test
+  void shouldSetVersionCorrectly2() {
+    val cfgDto = new DoctorConfiguration();
+    cfgDto.setName("Bernd Claudius");
+    cfgDto.setQualificationType("Arzt");
+    val doc = ProvideDoctorBaseData.fromConfiguration(cfgDto, "UselessTestId");
+    doc.setVersion(KbvItaForVersion.V1_3_0);
+    val pract = doc.getPractitioner();
+    assertFalse(pract.getMeta().getProfile().getFirst().getValue().endsWith("|1.2"));
   }
 }

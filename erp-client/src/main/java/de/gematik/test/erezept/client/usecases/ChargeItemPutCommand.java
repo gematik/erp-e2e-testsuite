@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,9 @@ import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
-public class ChargeItemPutCommand extends BaseCommand<ErxChargeItem> {
+public class ChargeItemPutCommand extends ErpBaseCommand<ErxChargeItem> {
 
   private final ErxChargeItem body;
 
@@ -44,7 +43,7 @@ public class ChargeItemPutCommand extends BaseCommand<ErxChargeItem> {
   }
 
   @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.of(body);
+  public Resource getRequestBody() {
+    return body;
   }
 }

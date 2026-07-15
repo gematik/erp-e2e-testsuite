@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,12 +103,14 @@ class DispenseTRezeptIT extends ErpTest {
     val logs = tRegisterChecker.asksFor(RetrieveCarbonCopy.forTask(task));
 
     tRegisterChecker.attemptsTo(
-        VerifyTRegisterCarbonCopy.from(logs, task.getPrescriptionId(), medDisp));
+        VerifyTRegisterCarbonCopy.from(logs, task.getPrescriptionId(), medDisp, null));
   }
 
   @Test
   @TestcaseId("ERP_DISPENSE_TREZEPT_02")
-  @DisplayName("Abgabe eines E-T-Rezepts ohne MedicationReference in Dispense Resource")
+  @DisplayName(
+      "Abgabe eines E-T-Rezepts ohne MedicationReference in Dispense Resource soll nicht angenommen"
+          + " werden")
   void shouldRejectCloseWithoutMedicationReferenceInDispense() {
     val kbvErpBundleFaker =
         KbvErpBundleFaker.builder().withMedication(KbvErpMedicationPZNFaker.asTPrescription());
@@ -150,7 +152,7 @@ class DispenseTRezeptIT extends ErpTest {
   @Test
   @TestcaseId("ERP_DISPENSE_TREZEPT_03")
   @DisplayName(
-      "Abgabe  eines E-T-Rezepts ohne MedicationDispense Ressource im Close Objekt"
+      "Abgabe eines E-T-Rezepts ohne MedicationDispense Ressource im Close Objekt"
           + " (GemCloseOperationParameters)")
   void shouldRejectCloseWithoutMedicationDispense() {
     val kbvErpBundleFaker =
@@ -187,5 +189,36 @@ class DispenseTRezeptIT extends ErpTest {
                 operationOutcomeContainsInDiagnostics(
                     "Resource not found in parameter part", ErpAfos.A_26002_02))
             .isCorrect());
+  }
+
+  @Test
+  @TestcaseId("ERP_DISPENSE_TREZEPT_04")
+  @DisplayName(
+      "Abgabe eines E-T-Rezepts und Überprüfung, ob der AccessToken aus dem T-Register in der an"
+          + " die BfArm gesendeten Request enthalten ist")
+  void shouldSendAccessTokenFromTRegisterAfterSuccessfulClose() {
+
+    val kbvErpBundleFaker =
+        KbvErpBundleFaker.builder().withMedication(KbvErpMedicationPZNFaker.asTPrescription());
+
+    val task =
+        doctor
+            .performs(
+                IssuePrescription.forPatient(sina).asTPrescription(kbvErpBundleFaker.toBuilder()))
+            .getExpectedResponse();
+
+    val accept = flughafen.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
+
+    flughafen.performs(ClosePrescription.acceptedWith(accept)).getExpectedResponse();
+
+    val logs = tRegisterChecker.asksFor(RetrieveCarbonCopy.forTask(task));
+
+    tRegisterChecker.attemptsTo(
+        VerifyTRegisterCarbonCopy.from(
+            logs,
+            task.getPrescriptionId(),
+            null,
+            true) //  .checkPresenceAccessToken() innerhalb VerifyTRegisterCarbonCopy
+        );
   }
 }

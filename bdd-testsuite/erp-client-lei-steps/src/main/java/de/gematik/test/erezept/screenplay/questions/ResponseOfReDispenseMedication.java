@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,12 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
-import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
-import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
@@ -62,7 +59,7 @@ public class ResponseOfReDispenseMedication extends FhirResponseQuestion<ErxRece
   }
 
   @Override
-  public ErpResponse<ErxReceipt> answeredBy(Actor actor) {
+  public FhirBResponse<ErxReceipt> answeredBy(Actor actor) {
     val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
     val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
@@ -79,32 +76,18 @@ public class ResponseOfReDispenseMedication extends FhirResponseQuestion<ErxRece
     val prescriptionId = receipt.getPrescriptionId();
     val kvnr = receipt.getReceiverKvnr();
 
-    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_3) <= 0) {
-      val medication =
-          KbvErpMedicationPZNFaker.builder().withCategory(MedicationCategory.C_00).fake();
+    val gemMedication = GemErpMedicationFaker.forPznMedication().fake();
+    val medicationDispense =
+        ErxMedicationDispenseBuilder.forKvnr(kvnr)
+            .prescriptionId(prescriptionId)
+            .performerId(telematikId)
+            .medication(gemMedication)
+            .build();
+    val closeParams =
+        GemOperationInputParameterBuilder.forClosingPharmaceuticals()
+            .with(medicationDispense, gemMedication)
+            .build();
 
-      val medicationDispense =
-          ErxMedicationDispenseBuilder.forKvnr(kvnr)
-              .prescriptionId(prescriptionId)
-              .performerId(telematikId)
-              .medication(medication)
-              .build();
-      return new CloseTaskCommand(taskId, secret, medicationDispense);
-
-    } else {
-      val gemMedication = GemErpMedicationFaker.forPznMedication().fake();
-      val medicationDispense =
-          ErxMedicationDispenseBuilder.forKvnr(kvnr)
-              .prescriptionId(prescriptionId)
-              .performerId(telematikId)
-              .medication(gemMedication)
-              .build();
-      val closeParams =
-          GemOperationInputParameterBuilder.forClosingPharmaceuticals()
-              .with(medicationDispense, gemMedication)
-              .build();
-
-      return new CloseTaskCommand(taskId, secret, closeParams);
-    }
+    return new CloseTaskCommand(taskId, secret, closeParams);
   }
 }

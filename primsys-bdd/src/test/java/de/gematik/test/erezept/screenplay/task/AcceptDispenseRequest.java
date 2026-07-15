@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +71,7 @@ public class AcceptDispenseRequest implements Task {
         ResponseOfAcceptOperation.forDispenseRequest(receivedDispenseRequest);
     val acceptedResponse = actor.asksFor(responseOfAcceptOperation);
     val acceptedTask = acceptedResponse.getExpectedResource();
+
     konnektor.verifyDocument(acceptedTask.getSignedKbvBundle());
     prescriptionManager.appendAcceptedPrescription(acceptedTask);
 
@@ -78,14 +79,19 @@ public class AcceptDispenseRequest implements Task {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val eGK = SafeAbility.getAbility(sender, ProvideEGK.class);
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
+
+    val replyMessage =
+        CommunicationReplyMessage.forV1().supplyOptionsType(SupplyOptionsType.SHIPMENT).build();
+
     val response =
-        ErxCommunicationBuilder.asReply(new CommunicationReplyMessage())
+        ErxCommunicationBuilder.asReply(replyMessage)
             .basedOn(acceptedTask.getTaskId())
             .receiver(eGK.getKvnr().getValue())
             .sender(smcb.getTelematikID())
             .availabilityStatus(AvailabilityStatus.AS_30)
             .supplyOptions(SupplyOptionsType.SHIPMENT)
             .build();
+
     val comResponse = new CommunicationPostCommand(response);
     erpClient.request(comResponse);
   }

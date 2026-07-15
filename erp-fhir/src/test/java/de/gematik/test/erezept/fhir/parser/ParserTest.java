@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,9 @@ package de.gematik.test.erezept.fhir.parser;
 import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.*;
 
-import ca.uhn.fhir.context.ConfigurationException;
-import ca.uhn.fhir.parser.DataFormatException;
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import de.gematik.bbriccs.fhir.codec.exceptions.FhirCodecException;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
@@ -141,14 +140,6 @@ class ParserTest extends ErpFhirParsingTest {
     return Stream.of("", " ", "\t", "\n", "\r", "\r\n").map(Arguments::of);
   }
 
-  @ParameterizedTest
-  @MethodSource("shouldDecodeEmptyResource")
-  @NullSource
-  void shouldThrowOnEmptyWhenExpectedSpecificResource(String content) {
-    // this exception must be later on handled by the client
-    assertThrows(DataFormatException.class, () -> parser.decode(ErxTask.class, content));
-  }
-
   @Test
   void shouldDetectOperationOutcomeWhenExpectedEmptyResource() {
     val oo = new OperationOutcome();
@@ -158,9 +149,24 @@ class ParserTest extends ErpFhirParsingTest {
         .setDiagnostics("This is an empty resource");
     val content = parser.encode(oo, EncodingType.XML);
 
-    // Note: should be DataFormatException or FhirCodecException; this will be fixed in bricks 0.8.0
+    assertThrows(FhirCodecException.class, () -> parser.decode(EmptyResource.class, content));
+  }
+
+  @ParameterizedTest
+  @MethodSource("shouldDecodeEmptyResource")
+  @NullSource
+  void shouldThrowOnEmptyWhenExpectedSpecificResource(String content) {
     // this exception must be later on handled by the client
-    assertThrows(ConfigurationException.class, () -> parser.decode(EmptyResource.class, content));
+    assertThrows(FhirCodecException.class, () -> parser.decode(ErxTask.class, content));
+  }
+
+  @ParameterizedTest
+  @MethodSource("shouldDecodeEmptyResource")
+  @NullSource
+  void shouldDecodeEmptyResourceCorrectly(String content) {
+    // this exception must be later on handled by the client
+    val r = assertDoesNotThrow(() -> parser.decode(EmptyResource.class, content));
+    assertInstanceOf(EmptyResource.class, r);
   }
 
   @ParameterizedTest
@@ -168,5 +174,10 @@ class ParserTest extends ErpFhirParsingTest {
   void shouldEncodeEmptyResource(EncodingType encodingType) {
     val content = assertDoesNotThrow(() -> parser.encode(new EmptyResource(), encodingType));
     assertTrue(content.isEmpty());
+  }
+
+  @Test
+  void shouldHaveValidFhirContext() {
+    assertNotNull(parser.getContext());
   }
 }

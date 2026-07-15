@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,18 +21,17 @@
 package de.gematik.test.erezept.client.usecases.eu;
 
 import de.gematik.bbriccs.rest.HttpRequestMethod;
-import de.gematik.test.erezept.client.usecases.BaseCommand;
+import de.gematik.test.erezept.client.usecases.ErpBaseCommand;
 import de.gematik.test.erezept.fhir.builder.eu.EuAccessPermissionRequestBuilder;
 import de.gematik.test.erezept.fhir.r4.eu.EuAccessPermission;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
 import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
-import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
 /*
  @see <a href="https://github.com/gematik/api-erp/blob/master/docs/erp_eprescription.adoc#erstellen-eines-zugriffscodes-f%C3%BCr-das-einl%C3%B6sen-im-eu-ausland">Api@GitHub</a>
 */
-public class EuGrantAccessPostCommand extends BaseCommand<EuAccessPermission> {
+public class EuGrantAccessPostCommand extends ErpBaseCommand<EuAccessPermission> {
 
   private final EuAccessPermission requestBody;
 
@@ -56,11 +55,10 @@ public class EuGrantAccessPostCommand extends BaseCommand<EuAccessPermission> {
   /**
    * Get the FHIR-Resource for the Request-Body (of the inner-HTTP)
    *
-   * @return an Optional.of(FHIR-Resource) for the Request-Body or an empty Optional if Request-Body
-   *     is empty
+   * @return the FHIR-Resource for the Request-Body
    */
   @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.of(requestBody);
+  public Resource getRequestBody() {
+    return requestBody;
   }
 }

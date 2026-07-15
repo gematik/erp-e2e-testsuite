@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ package de.gematik.test.erezept.primsys.model;
 
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.coding.SemanticValue;
+import de.gematik.bbriccs.fhir.coding.WithSystem;
+import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
@@ -34,7 +36,9 @@ import de.gematik.test.erezept.primsys.actors.Doctor;
 import de.gematik.test.erezept.primsys.data.PrescriptionDto;
 import de.gematik.test.erezept.primsys.mapping.CoverageDataMapper;
 import de.gematik.test.erezept.primsys.mapping.PatientDataMapper;
+import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -42,9 +46,11 @@ import lombok.val;
 public abstract class PrescribeUseCase<B extends KbvBaseBundle> {
 
   protected final Doctor doctor;
+  @Nullable private final String kvnr;
 
-  protected PrescribeUseCase(Doctor doctor) {
+  protected PrescribeUseCase(Doctor doctor, @Nullable String kvnr) {
     this.doctor = doctor;
+    this.kvnr = kvnr;
   }
 
   protected PrescriptionDto prescribeFor(B bundle, PrescriptionFlowType flowType) {
@@ -96,6 +102,19 @@ public abstract class PrescribeUseCase<B extends KbvBaseBundle> {
 
     to.setPrescriptionId(prescriptionId);
     to.setId(UUID.randomUUID().toString());
+
+    // replace the KVNR in the example if one was given
+    Optional.ofNullable(this.kvnr)
+        .ifPresent(
+            providedKvnr ->
+                to.getPatient().getIdentifier().stream()
+                    .filter(
+                        it ->
+                            WithSystem.anyOf(
+                                    DeBasisProfilNamingSystem.KVID_PKV_SID,
+                                    DeBasisProfilNamingSystem.KVID_GKV_SID)
+                                .matches(it))
+                    .forEach(it -> it.setValue(providedKvnr)));
 
     // will update all dates contained within the KBV Bundle to current date
     to.setAllDates();

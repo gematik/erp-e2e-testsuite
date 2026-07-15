@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,7 @@
 
 package de.gematik.test.erezept;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -34,22 +32,8 @@ import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
-import de.gematik.test.erezept.screenplay.abilities.DecideUserBehaviour;
-import de.gematik.test.erezept.screenplay.abilities.ManageChargeItems;
-import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
-import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
-import de.gematik.test.erezept.screenplay.abilities.ManageDoctorsPrescriptions;
-import de.gematik.test.erezept.screenplay.abilities.ManagePatientPrescriptions;
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
-import de.gematik.test.erezept.screenplay.abilities.ProvideApoVzdInformation;
-import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
-import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
-import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
-import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
-import de.gematik.test.erezept.screenplay.abilities.UseSubscriptionService;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.screenplay.abilities.*;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -62,7 +46,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 @ExtendWith(SerenityJUnit5Extension.class)
-class PrimSysBddFactoryTest {
+class PrimSysBddFactoryTest extends ErpFhirParsingTest {
 
   private SmartcardArchive sca;
   private PrimSysBddFactory factory;

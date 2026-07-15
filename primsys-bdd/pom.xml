@@ -5,12 +5,12 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.4.0</version>
+        <version>1.6.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>primsys-bdd</artifactId>
-    <name>E-Rezept E2E-Testsuite</name>
+    <name>E-Rezept Cucumber-Testsuite</name>
 
     <properties>
         <bdd.testsuite>CompleteTestSuite</bdd.testsuite>
@@ -140,10 +140,6 @@
             <artifactId>serenity-model</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jdk8</artifactId>
-        </dependency>
-        <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>smartcard</artifactId>
         </dependency>
@@ -158,17 +154,8 @@
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
-            <artifactId>konnektor-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-fhir</artifactId>
             <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.tngtech.archunit</groupId>
-            <artifactId>archunit-junit5</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -248,7 +235,7 @@
             <plugin>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>bdd-javadocs</artifactId>
-                <version>1.4.0</version>
+                <version>1.6.0</version>
             </plugin>
         </plugins>
     </build>
@@ -292,5 +279,4 @@
             </plugin>
         </plugins>
     </reporting>
-
 </project>

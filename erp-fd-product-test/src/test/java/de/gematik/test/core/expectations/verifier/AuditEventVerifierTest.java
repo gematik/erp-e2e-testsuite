@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,16 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLogFor;
-import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleDoesNotContainLogFor;
-import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.hasAuditEventAtPosition;
+import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.*;
 import static de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil.createErxAuditEvent;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.bbriccs.vsdm.VsdmExamEvidence;
+import de.gematik.bbriccs.vsdm.VsdmExamEvidenceResult;
+import de.gematik.bbriccs.vsdm.VsdmService;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
@@ -41,9 +42,6 @@ import de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidenceResult;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
 import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

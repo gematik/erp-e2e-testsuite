@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ package de.gematik.test.erezept.apimeasure;
 import static java.text.MessageFormat.format;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.ClientType;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.ICommand;
+import de.gematik.test.erezept.client.usecases.ErpBaseCommand;
 import java.nio.file.Path;
 import java.util.*;
 import lombok.SneakyThrows;
@@ -44,7 +44,7 @@ public class DumpingStopwatch implements ApiCallStopwatch {
 
   @Override
   public <T extends Resource> void measurement(
-      ClientType type, ICommand<T> command, ErpResponse<T> response) {
+      ClientType type, ErpBaseCommand<T> command, FhirBResponse<T> response) {
     val m = new ApiCallMeasurement();
     m.setFhirResource(command.getFhirResource());
     m.setRestPath(command.getRequestLocator());

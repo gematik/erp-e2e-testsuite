@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,30 +22,17 @@ package de.gematik.test.erezept.screenplay.abilities;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.cardterminal.CardInfo;
+import de.gematik.bbriccs.cardterminal.PinType;
 import de.gematik.bbriccs.crypto.CryptoSystem;
-import de.gematik.bbriccs.smartcards.Egk;
-import de.gematik.bbriccs.smartcards.Hba;
-import de.gematik.bbriccs.smartcards.Smartcard;
-import de.gematik.bbriccs.smartcards.SmartcardType;
-import de.gematik.bbriccs.smartcards.SmcB;
-import de.gematik.test.cardterminal.CardInfo;
-import de.gematik.test.erezept.config.dto.konnektor.KonnektorConfiguration;
+import de.gematik.bbriccs.konnektor.Konnektor;
+import de.gematik.bbriccs.konnektor.KonnektorResponse;
+import de.gematik.bbriccs.konnektor.cfg.KonnektorConfiguration;
+import de.gematik.bbriccs.konnektor.requests.*;
+import de.gematik.bbriccs.smartcards.*;
 import de.gematik.test.erezept.exceptions.MissingSmartcardException;
 import de.gematik.test.erezept.exceptions.VerifyPinFailed;
 import de.gematik.test.erezept.fhirdump.FhirDumper;
-import de.gematik.test.konnektor.Konnektor;
-import de.gematik.test.konnektor.KonnektorResponse;
-import de.gematik.test.konnektor.PinType;
-import de.gematik.test.konnektor.cfg.KonnektorFactory;
-import de.gematik.test.konnektor.commands.DecryptDocumentCommand;
-import de.gematik.test.konnektor.commands.EncryptDocumentCommand;
-import de.gematik.test.konnektor.commands.ExternalAuthenticateCommand;
-import de.gematik.test.konnektor.commands.GetCardHandleCommand;
-import de.gematik.test.konnektor.commands.ReadCardCertificateCommand;
-import de.gematik.test.konnektor.commands.ReadVsdCommand;
-import de.gematik.test.konnektor.commands.SignXMLDocumentCommand;
-import de.gematik.test.konnektor.commands.VerifyDocumentCommand;
-import de.gematik.test.konnektor.commands.VerifyPinCommand;
 import de.gematik.ws.conn.cardservicecommon.v2.PinResultEnum;
 import de.gematik.ws.conn.vsds.vsdservice.v5.ReadVSDResponse;
 import java.nio.charset.StandardCharsets;
@@ -83,13 +70,7 @@ public class UseTheKonnektor implements Ability {
   }
 
   public void insertCards(Smartcard... cards) {
-    if (konnektor.getCardTerminalManager() == null) {
-      return;
-    }
-
-    Arrays.stream(cards)
-        .filter(Objects::nonNull)
-        .forEach(card -> konnektor.getCardTerminalManager().insertCard(card));
+    Arrays.stream(cards).filter(Objects::nonNull).forEach(konnektor::insertCard);
   }
 
   public static KonnektorAbilityBuilder with(SmcB smcb) {
@@ -102,22 +83,22 @@ public class UseTheKonnektor implements Ability {
 
   private void initCardHandles() {
     if (smcb != null) {
-      this.smcbHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(smcb)).getPayload();
+      this.smcbHandle = konnektor.execute(GetCardHandleRequest.forSmartcard(smcb)).getPayload();
     }
     if (hba != null) {
-      this.hbaHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(hba)).getPayload();
+      this.hbaHandle = konnektor.execute(GetCardHandleRequest.forSmartcard(hba)).getPayload();
     }
   }
 
   public KonnektorResponse<byte[]> decrypt(byte[] data) {
     checkCardHandle(SmartcardType.SMC_B, smcbHandle, "Decrypt Document");
-    return this.konnektor.execute(new DecryptDocumentCommand(smcbHandle, data, algorithm));
+    return this.konnektor.execute(new DecryptDocumentRequest(smcbHandle, data, algorithm));
   }
 
   public KonnektorResponse<byte[]> encrypt(String data) {
     checkCardHandle(SmartcardType.SMC_B, smcbHandle, "Encrypt Document");
     return this.konnektor.execute(
-        new EncryptDocumentCommand(smcbHandle, data.getBytes(StandardCharsets.UTF_8), algorithm));
+        new EncryptDocumentRequest(smcbHandle, data.getBytes(StandardCharsets.UTF_8), algorithm));
   }
 
   public KonnektorResponse<byte[]> signDocumentWithHba(String document) {
@@ -134,7 +115,7 @@ public class UseTheKonnektor implements Ability {
       Smartcard smartcard, CardInfo handle, String document) {
     val title = format("Sign Document with {0} (Cardhandle: {1})", smartcard, handle);
     Serenity.recordReportData().withTitle(title).andContents(document);
-    val signCmd = new SignXMLDocumentCommand(handle, document, algorithm);
+    val signCmd = new SignXMLDocumentRequest(handle, document, algorithm);
     val ret = konnektor.execute(signCmd);
 
     val signOperation =
@@ -158,44 +139,46 @@ public class UseTheKonnektor implements Ability {
     Serenity.recordReportData()
         .withTitle(format("Verify Document with length of {0} Bytes", document.length))
         .andContents(Base64.getEncoder().encodeToString(document));
-    val verifyCmd = new VerifyDocumentCommand(document);
+    val verifyCmd = new VerifyDocumentRequest(document);
     return konnektor.execute(verifyCmd);
   }
 
   public KonnektorResponse<byte[]> externalAuthenticate(byte[] challenge) {
     checkCardHandle(SmartcardType.SMC_B, smcbHandle, "External Authenticate");
+    val currentSmcbHandle = java.util.Objects.requireNonNull(smcbHandle);
 
     Serenity.recordReportData()
         .withTitle(
             format(
                 "VerifyPin for Card {0} with card handle {2} and ICCSN {1}",
-                smcbHandle.getType(), smcbHandle.getIccsn(), smcbHandle.getHandle()));
+                currentSmcbHandle.getType(),
+                currentSmcbHandle.getIccsn(),
+                currentSmcbHandle.getHandle()));
     val pinResponseType =
-        konnektor.execute(new VerifyPinCommand(smcbHandle, PinType.PIN_SMC)).getPayload();
+        konnektor.execute(new VerifyPinRequest(currentSmcbHandle, PinType.PIN_SMC)).getPayload();
     if (pinResponseType.getPinResult() != PinResultEnum.OK) {
-      throw new VerifyPinFailed(smcbHandle.getIccsn());
+      throw new VerifyPinFailed(currentSmcbHandle.getIccsn());
     }
-    val externalAuthenticateCmd = new ExternalAuthenticateCommand(smcbHandle, algorithm);
-    externalAuthenticateCmd.setToBeSignedData(challenge);
-    return konnektor.execute(externalAuthenticateCmd);
+    return konnektor.externalAuthenticate(smcb, algorithm, challenge);
   }
 
   public KonnektorResponse<ReadVSDResponse> requestEvidenceForEgk(Egk egk) {
     checkCardHandle(SmartcardType.SMC_B, smcbHandle, "Request EGK Evidence");
+    val currentSmcbHandle = java.util.Objects.requireNonNull(smcbHandle);
     this.insertCards(egk);
     val pinResponseType =
-        konnektor.execute(new VerifyPinCommand(smcbHandle, PinType.PIN_SMC)).getPayload();
+        konnektor.execute(new VerifyPinRequest(currentSmcbHandle, PinType.PIN_SMC)).getPayload();
     if (pinResponseType.getPinResult() != PinResultEnum.OK) {
-      throw new VerifyPinFailed(smcbHandle.getIccsn());
+      throw new VerifyPinFailed(currentSmcbHandle.getIccsn());
     }
-    val egkCardHandle = konnektor.execute(GetCardHandleCommand.forSmartcard(egk)).getPayload();
-    val readVsdCommand = new ReadVsdCommand(egkCardHandle, smcbHandle, true, true);
+    val egkCardHandle = konnektor.execute(GetCardHandleRequest.forSmartcard(egk)).getPayload();
+    val readVsdCommand = new ReadVsdRequest(egkCardHandle, currentSmcbHandle, true, true);
     return konnektor.execute(readVsdCommand);
   }
 
   public KonnektorResponse<X509Certificate> getSmcbAuthCertificate() {
     checkCardHandle(SmartcardType.SMC_B, smcbHandle, "Get SMC-B Auth Certificate");
-    val readCardCertificateCommand = new ReadCardCertificateCommand(smcbHandle, algorithm);
+    val readCardCertificateCommand = new ReadCardCertificateRequest(smcbHandle, algorithm);
     return konnektor.execute(readCardCertificateCommand);
   }
 
@@ -251,7 +234,7 @@ public class UseTheKonnektor implements Ability {
     }
 
     public UseTheKonnektor on(KonnektorConfiguration cfg) {
-      return on(KonnektorFactory.createKonnektor(cfg));
+      return on(Konnektor.create(cfg));
     }
 
     public UseTheKonnektor on(Konnektor konnektor) {

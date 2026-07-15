@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
@@ -44,7 +44,6 @@ import de.gematik.test.erezept.primsys.mapping.KbvPznMedicationDataMapper;
 import de.gematik.test.erezept.primsys.mapping.PznDispensedMedicationDataMapper;
 import jakarta.ws.rs.WebApplicationException;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -83,15 +82,13 @@ class CloseUseCaseTest extends TestWithActorContext {
     when(mockTask.hasLastMedicationDispenseDate()).thenReturn(shouldHaveLastMedicationDispenseDate);
 
     val mockResponse =
-        ErpResponse.forPayload(receiptMock, ErxReceipt.class)
+        FhirBResponse.forPayload(ErxReceipt.class, receiptMock)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     val mockTaskGetResponse =
-        ErpResponse.forPayload(prescriptionBundleMock, ErxPrescriptionBundle.class)
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, prescriptionBundleMock)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(TaskGetByIdCommand.class))).thenReturn(mockTaskGetResponse);
@@ -127,9 +124,8 @@ class CloseUseCaseTest extends TestWithActorContext {
     when(mockTask.hasLastMedicationDispenseDate()).thenReturn(false);
 
     val mockTaskGetResponse =
-        ErpResponse.forPayload(prescriptionBundleMock, ErxPrescriptionBundle.class)
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, prescriptionBundleMock)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(TaskGetByIdCommand.class))).thenReturn(mockTaskGetResponse);
@@ -152,9 +148,8 @@ class CloseUseCaseTest extends TestWithActorContext {
     when(receiptMock.getId()).thenReturn("123456789");
 
     val mockResponse =
-        ErpResponse.forPayload(receiptMock, ErxReceipt.class)
+        FhirBResponse.forPayload(ErxReceipt.class, receiptMock)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(CloseTaskCommand.class))).thenReturn(mockResponse);
 
@@ -188,9 +183,8 @@ class CloseUseCaseTest extends TestWithActorContext {
     val receiptMock = new ErxReceipt();
 
     val mockResponse =
-        ErpResponse.forPayload(receiptMock, ErxReceipt.class)
+        FhirBResponse.forPayload(ErxReceipt.class, receiptMock)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(CloseTaskCommand.class))).thenReturn(mockResponse);
 

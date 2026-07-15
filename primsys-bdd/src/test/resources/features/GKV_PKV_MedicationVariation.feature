@@ -119,3 +119,24 @@ Funktionalität: Apothekenpflichtige Verordnungstypen für Versicherte und Selbs
     Beispiele:
       | Versicherungsart | Name                                       | PZN      | Menge | isVaccine | Verordnungskategorie | Reichdauer in Wochen | WirkstoffmengeNum | WirkstoffEinheitNum | WirkstoffmengeDenom | WirkstoffeinheitDemon | Wirkstoffname | DarrerichungsformCode | WF  |
       | GKV              | Pomalidomid Accord 1 mg 21 x 1 Hartkapseln | 19201712 | 2     | false     | 02                   | 3                    | 0.15              | mg                  | 0.5                 | L                     | Pomalidomid   | KMR                   | 166 |
+
+
+  @WIP
+  @TCID:ERP_EE_REZEPTVARIANTEN_05
+  @AFO-ID:B_FD-1571
+  @TESTFALL:positiv
+  @Hauptdarsteller:Apotheke
+  Szenario: Einstellen eines Apothekenpflichtigen E-Rezeptes mit mit menschenlesbaren Dosierungsanweisungen und Gebrauchsanweisung
+  Die Apotheke akzeptiert das zugewiesene Rezept und ergänzt die Dosierinformationen.
+
+    Und die GKV Versicherte Sina Hüllmann hat Zugriff auf ihre eGK
+
+    Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgende apothekenpflichtige Rezeptur Verordnung verschreibt:
+      | Name         | Menge | Einheit | Dosierung                |
+      | Ohrentropfen | 100   | ml      | morgens 3 Tropfen je Ohr |
+    Und die Versicherte Sina Hüllmann ihr letztes ausgestelltes E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
+    Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
+
+    Dann kann die Apotheke Am Flughafen das letzte E-Rezept für Sina Hüllmann beim Abschluss des Workflows die Dispensierinformationen ändern in:
+      | Name              | Normgröße | Menge | Einheit | Dosierung                | Gebrauchsanweisung                            |
+      | Ohrentropfen akut | N1        | 10    | Stk     | morgens 3 Tropfen je Ohr | aber erst NACH dem herausnehmen der Ohrhörer! |

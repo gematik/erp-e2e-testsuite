@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.rest.fd.MediaType;
 import de.gematik.test.erezept.client.ClientType;
-import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.config.dto.erpclient.ErpClientConfiguration;
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
 import java.util.List;

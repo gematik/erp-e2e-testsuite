@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ public class RejectUseCase {
     val rejectCommand = new TaskRejectCommand(taskId, accessCode, secret);
     val rejectResponse = this.actor.erpRequest(rejectCommand);
 
-    ActorContext.getInstance().removeAcceptedPrescription(taskId);
+    ActorContext.getInstance().removePrescription(taskId);
     return Response.status(rejectResponse.getStatusCode()).build();
   }
 }

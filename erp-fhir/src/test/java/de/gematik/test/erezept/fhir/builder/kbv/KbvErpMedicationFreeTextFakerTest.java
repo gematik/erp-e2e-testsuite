@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
+import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getUpdatedInJulyPlusKPG;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -36,7 +37,8 @@ class KbvErpMedicationFreeTextFakerTest extends ErpFhirParsingTest {
   void buildFakeMedicationFreeTextWithDosageForm() {
     val freetext =
         KbvErpMedicationFreeTextFaker.builder()
-            .withDosageForm(fakerValueSet(Darreichungsform.class).getCode())
+            .withDosageForm(
+                fakerValueSet(Darreichungsform.class, getUpdatedInJulyPlusKPG()).getCode())
             .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, freetext);
     assertTrue(result.isSuccessful());

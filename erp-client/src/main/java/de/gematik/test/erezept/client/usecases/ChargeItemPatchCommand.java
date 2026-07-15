@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,10 @@ import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.fhir.extensions.erp.MarkingFlag;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import java.util.Optional;
 import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Resource;
 
-public class ChargeItemPatchCommand extends BaseCommand<ErxChargeItem> {
+public class ChargeItemPatchCommand extends ErpBaseCommand<ErxChargeItem> {
 
   private final Parameters body;
 
@@ -44,11 +43,10 @@ public class ChargeItemPatchCommand extends BaseCommand<ErxChargeItem> {
   /**
    * Get the FHIR-Resource for the Request-Body (of the inner-HTTP)
    *
-   * @return an Optional.of(FHIR-Resource) for the Request-Body or an empty Optional if Request-Body
-   *     is empty
+   * @return the FHIR-Resource for the Request-Body
    */
   @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.of(body);
+  public Resource getRequestBody() {
+    return body;
   }
 }

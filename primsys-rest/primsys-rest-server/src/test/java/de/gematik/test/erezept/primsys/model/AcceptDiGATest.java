@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,15 +29,11 @@ import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.konnektor.SoftKonSigner;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAcceptCommand;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvEvdgaBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvHealthAppRequestFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
@@ -45,8 +41,6 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
-import de.gematik.test.konnektor.soap.mock.LocalSigner;
-import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -78,7 +72,7 @@ class AcceptDiGATest extends TestWithActorContext {
     val task = mock(ErxTask.class);
     when(acceptBundle.getSignedKbvBundle())
         .thenReturn(
-            LocalSigner.signQES(hba, CryptoSystem.ECC_256)
+            SoftKonSigner.signQES(hba, CryptoSystem.ECC_256)
                 .signDocument(false, parser.encode(evdga, EncodingType.XML)));
 
     when(acceptBundle.getTask()).thenReturn(task);
@@ -86,9 +80,8 @@ class AcceptDiGATest extends TestWithActorContext {
     when(task.getAccessCode()).thenReturn(accessCode);
     when(acceptBundle.getSecret()).thenReturn(Secret.from("random"));
     val acceptResponse =
-        ErpResponse.forPayload(acceptBundle, ErxAcceptBundle.class)
+        FhirBResponse.forPayload(ErxAcceptBundle.class, acceptBundle)
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(TaskAcceptCommand.class))).thenReturn(acceptResponse);
 

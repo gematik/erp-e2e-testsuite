@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionTechnicalInformation;
 import de.gematik.test.erezept.app.mocker.KbvBundleDummyFactory;
 import de.gematik.test.erezept.client.ErpClient;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
@@ -58,7 +58,6 @@ import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
@@ -94,9 +93,8 @@ class EnsureThatThePharmaceuticalPrescriptionTest extends ErpFhirParsingTest {
 
     // make sure the teardown does not run into an NPE
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, createOperationOutcome())
             .withStatusCode(404)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
   }
@@ -134,8 +132,7 @@ class EnsureThatThePharmaceuticalPrescriptionTest extends ErpFhirParsingTest {
     when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
 
     val getTaskResponse =
-        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, prescriptionBundle)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
 
@@ -181,8 +178,7 @@ class EnsureThatThePharmaceuticalPrescriptionTest extends ErpFhirParsingTest {
     when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
 
     val getTaskResponse =
-        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, prescriptionBundle)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
 
@@ -228,8 +224,7 @@ class EnsureThatThePharmaceuticalPrescriptionTest extends ErpFhirParsingTest {
     when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
 
     val getTaskResponse =
-        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, prescriptionBundle)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
 
@@ -278,8 +273,7 @@ class EnsureThatThePharmaceuticalPrescriptionTest extends ErpFhirParsingTest {
     when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
 
     val getTaskResponse =
-        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, prescriptionBundle)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
 
@@ -319,8 +313,7 @@ class EnsureThatThePharmaceuticalPrescriptionTest extends ErpFhirParsingTest {
     dmcList.appendDmc(DmcPrescription.ownerDmc(taskId, accessCode));
 
     val getTaskResponse =
-        ErpResponse.forPayload(createOperationOutcome(), ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, createOperationOutcome())
             .withStatusCode(404)
             .andValidationResult(createEmptyValidationResult());
 

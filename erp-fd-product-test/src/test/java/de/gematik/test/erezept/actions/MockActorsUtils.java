@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,14 @@ import static org.mockito.Mockito.when;
 import ca.uhn.fhir.validation.ValidationResult;
 import de.gematik.bbriccs.crypto.BC;
 import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
+import de.gematik.bbriccs.rest.fd.MediaType;
+import de.gematik.bbriccs.rest.headers.HttpHeader;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.actors.ActorStage;
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.config.dto.actor.BaseActorConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
@@ -65,29 +66,29 @@ public class MockActorsUtils extends ErpFhirParsingTest {
     initDefaultContextMock();
   }
 
-  public <E extends Resource> ErpResponse<E> createErpResponse(
+  public <E extends Resource> FhirBResponse<E> createErpResponse(
       @Nullable Resource resource, Class<E> expectType) {
     return createErpResponse(
         resource, expectType, 200, encodedJwt, Map.of(), createEmptyValidationResult());
   }
 
-  public <E extends Resource> ErpResponse<E> createErpResponse(
+  public <E extends Resource> FhirBResponse<E> createErpResponse(
       @Nullable Resource resource, Class<E> expectType, int statusCode) {
     return createErpResponse(
         resource, expectType, statusCode, encodedJwt, Map.of(), createEmptyValidationResult());
   }
 
-  public <E extends Resource> ErpResponse<E> createErpResponse(
+  public <E extends Resource> FhirBResponse<E> createErpResponse(
       @Nullable Resource resource,
       Class<E> expectType,
       int statusCode,
       String jwtToken,
       Map<String, String> headderMap,
       ValidationResult validationResult) {
-    return ErpResponse.forPayload(resource, expectType)
+    return FhirBResponse.forPayload(expectType, resource)
         .withStatusCode(statusCode)
         .usedJwt(jwtToken)
-        .withHeaders(headderMap)
+        .withHeaders(HttpHeader.from(headderMap))
         .andValidationResult(validationResult);
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
+import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
@@ -40,12 +41,20 @@ class ExchangedCommunicationTest extends ErpFhirBuildingTest {
   void shouldBuildExchangedCommunicationCorrectly() {
     val sender = new Actor("Marty McFly");
     val receiver = new Actor("Doc Brown");
+
+    val replyMessage =
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(SupplyOptionsType.createDefault())
+            .infoText("test-message")
+            .build();
+
     val com =
-        ErxCommunicationBuilder.asReply(new CommunicationReplyMessage())
+        ErxCommunicationBuilder.asReply(replyMessage)
             .basedOn("123")
             .receiver("X123456789")
             .sender("TelematikId")
             .build();
+
     val exc = ExchangedCommunication.from(com).withActorNames(sender, receiver);
 
     assertEquals("Marty McFly", exc.getSenderName());

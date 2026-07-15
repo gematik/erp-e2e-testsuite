@@ -1,25 +1,62 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 1.6.0
+
+* primsys-bbd:
+    - add Testcase to set DosageDgMP information in E2E usecase and adapt CloseInputOperation Mapper to compute the
+      information
+
+* erp-fhir:
+    - update ErpWf 1.6.1 -> 1.6.2
+    - update EU de.gematik.erezept.eu-1.1.1 -> 1.1.2
+    - update Kbv.ita.erp 1.4.1 -> 1.4.2
+    - update kbv.ita.for 1.3.0 -> 1.3.1
+        - (+) dependencies
+    - update FHIR modul to adapt v3 communication payload
+
+* erp-fd-product-test:
+    - implement toggle to switch DMPKKennzeichentabelle https://applications.kbv.de/S_KBV_DMP_V1.07.xhtml active from
+      01.10.26
+    - implement toggle to switch Darreichungsform https://applications.kbv.de/S_KBV_DARREICHUNGSFORM_V1.16.xhtml active
+      form 01.07.26
+    - implement testcases for Communication v3 payload
+    - implement negativ testcases ( role authorisation ) for chargeitem 
+    - implement ability and question for popp-token testcases
+    - - implement negativ testcases ( role authorisation ) for auditevent 
+* erp-client:
+    - extract konnektor functionality and move to Bricks, now imported as dependency
+
+## Release 1.5.0
+
+* upgrade to JAVA 21
+* konnektor-client:
+    - Extracted and migrated to dedicated [bricks (lib-bbriccs)](https://github.com/gematik/lib-bbriccs) library
+    - Reduces dependencies within the erp-e2e testsuite
+
+* erp-fhir:
+    - delete ErpWorkflow version 1.2 & 1.3 cause they died a year ago
+
+* erp-fd-product-test:
+    * implement t-rezept testcase (close operation) to check, after sending a request to bfarm, whether the access token
+      is present
+
 ## Release 1.4.0
 
-* epa-fhir:
+* erp-fhir:
+    - implement TimingRepeatBuilder and Adapt DosageDgmpBuilder to handle TimingRepeat with several Values and
+      boundsDuration
     - move DosageDgmp to Epa-FHIR and Implement equals() to compare Values contained in DosageAndRate an
       TimimngComponent
     - move DosageDgmpBuilder to Epa-FHIR and adapt it to handle DosageAndRate and TimingComponent with several values
       and
       boundsDuration
     - move TimingRepeatBuilder to Epa-FHIR and adapt it to handle TimingRepeat with several Values and boundsDuration
-    
+
 
 * erp-fd-product-test:
     * add Verifier and Tests for DosageDgmp Values in Epa-FHIR-Objects
     * add Testcases for DosageDgmp in Epa-FHIR-Object
-
-## Release 1.3.0
-
-* erp-fhir:
-    - implememt TimingRepeatBuilder and Adapt DosageDgmpBuilder to handle TimingRepeat with several Values and
-      boundsDuration
+    * add Testcase for activate operation to test task process parameters
 
 * primsys-bbd:
 

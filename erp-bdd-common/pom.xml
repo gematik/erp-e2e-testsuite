@@ -5,17 +5,12 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.4.0</version>
+        <version>1.6.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>erp-bdd-common</artifactId>
 
-    <properties>
-        <java.version>${version.java}</java.version>
-        <maven.compiler.target>${version.java}</maven.compiler.target>
-        <maven.compiler.source>${version.java}</maven.compiler.source>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -63,7 +58,7 @@
             <artifactId>serenity-ensure</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
@@ -78,16 +73,40 @@
         </dependency>
         <!-- new dependencies-->
         <dependency>
-            <groupId>de.gematik.test.erezept</groupId>
-            <artifactId>konnektor-client</artifactId>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>crypto-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>konnektor-ws-api-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>konnektor-client-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>softkon-service-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>remotekon-service-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>cats-client-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>resource-loader-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>vsdm-check-digit-brick</artifactId>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jdk8</artifactId>
         </dependency>
     </dependencies>
     <!-- new plugin maven-jar-plugin because we want to use questions (in test) from erp-bdd-comon in erp-client-fdv-steps-->

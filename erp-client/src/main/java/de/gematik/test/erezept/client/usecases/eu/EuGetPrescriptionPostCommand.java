@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ package de.gematik.test.erezept.client.usecases.eu;
 
 import de.gematik.bbriccs.rest.HttpRequestMethod;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
-import de.gematik.test.erezept.client.usecases.BaseCommand;
+import de.gematik.test.erezept.client.usecases.ErpBaseCommand;
 import de.gematik.test.erezept.fhir.r4.eu.EuGetPrescriptionInput;
 import de.gematik.test.erezept.fhir.r4.eu.EuPrescriptionBundle;
 import java.util.List;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Resource;
 
-public class EuGetPrescriptionPostCommand extends BaseCommand<EuPrescriptionBundle> {
+public class EuGetPrescriptionPostCommand extends ErpBaseCommand<EuPrescriptionBundle> {
 
   private final EuGetPrescriptionInput requestBody;
 
@@ -52,8 +52,8 @@ public class EuGetPrescriptionPostCommand extends BaseCommand<EuPrescriptionBund
   }
 
   @Override
-  public Optional<Resource> getRequestBody() {
-    return Optional.of(requestBody);
+  public Resource getRequestBody() {
+    return requestBody;
   }
 
   public static EuGetPrescriptionPostCommand forDemographics(

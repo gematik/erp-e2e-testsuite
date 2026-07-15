@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilStructDef;
 import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import java.util.Arrays;
+import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.hl7.fhir.r4.model.Extension;
@@ -49,10 +50,11 @@ public enum DmpKennzeichen implements FromValueSet {
   COPD("06", "COPD"),
   HI("07", "HI"),
   DEPRESSION("08", "Depression"),
-  RUECKENSCHMERZ("09", "Rückenschmerz"),
+  RUECKENSCHMERZ("09", "Rueckenschmerz"),
   RHEUMA("10", "Rheuma"),
   OSTEOPOROSE("11", "Osteoporose"),
-  ADIPOSITAS("12", "Adipositas"),
+  ADIPOSITAS_ERWACHSENE("12", "Adipositas Erwachsene"), // new 01.10.26
+  ADIPOSITAS_KINDER_UND_JUGENDLICHE("13", "Adipositas Kinder und Jugendliche"), // new 01.10.26
   DIABETES_TYP_2_UND_KHK("30", "Diabetes Typ 2 und KHK"),
   ASTHMA_UND_DIABETES_TYP_2("31", "Asthma und Diabetes Typ 2"),
   COPD_UND_DIABETES_TYP_2("32", "COPD und Diabetes Typ 2"),
@@ -104,5 +106,10 @@ public enum DmpKennzeichen implements FromValueSet {
         .filter(dmp -> dmp.code.equals(code))
         .findFirst()
         .orElseThrow(() -> new InvalidValueSetException(DmpKennzeichen.class, code));
+  }
+
+  public static List<DmpKennzeichen> getUpdatedOktober26() {
+    return List.of(
+        RUECKENSCHMERZ, ADIPOSITAS_ERWACHSENE, ADIPOSITAS_KINDER_UND_JUGENDLICHE, RUECKENSCHMERZ);
   }
 }

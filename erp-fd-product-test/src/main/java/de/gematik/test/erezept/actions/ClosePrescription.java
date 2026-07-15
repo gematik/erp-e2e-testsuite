@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 package de.gematik.test.erezept.actions;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.konnektor.SoftKonVerifier;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
@@ -39,7 +40,6 @@ import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
-import de.gematik.test.konnektor.soap.mock.LocalVerifier;
 import jakarta.annotation.Nullable;
 import java.util.Date;
 import java.util.LinkedList;
@@ -73,7 +73,7 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
     val kvnr = acceptBundle.getTask().getForKvnr().orElseThrow();
     val telematikId = SafeAbility.getAbility(actor, UseSMCB.class).getTelematikID();
 
-    val kbvAsString = LocalVerifier.parse(acceptBundle.getSignedKbvBundle()).getDocument();
+    val kbvAsString = SoftKonVerifier.parse(acceptBundle.getSignedKbvBundle()).getDocument();
     val kbvBundle = erpClient.decode(KbvErpBundle.class, kbvAsString);
 
     val gemOperationBuilder = GemOperationInputParameterBuilder.forClosingPharmaceuticals();

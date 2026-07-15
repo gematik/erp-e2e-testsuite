@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
+import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.fhir.builder.ReferenceFeatureToggle;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
@@ -41,6 +42,8 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.val;
@@ -202,6 +205,50 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
     assertTrue(result.isSuccessful());
     assertEquals(
         "alle 3 Tage: 08:00 Uhr — je 2 mg",
+        bundle.getMedicationRequest().getRenderedDosageInstruction().get());
+  }
+
+  @Test
+  void buildFakeKbvErpBundleWitDosageDgMPList() {
+    List<DosageDgMP> dosageDgMPList = new ArrayList<>();
+    dosageDgMPList.add(
+        DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(1)
+                    .frequency(1)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("22:00:00")
+                    .build())
+            .build());
+    dosageDgMPList.add(
+        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(1)
+                    .frequency(1)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("18:00:00")
+                    .build())
+            .build());
+    dosageDgMPList.add(
+        DosageDgMPBuilder.dosageBuilder(3, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(1)
+                    .frequency(1)
+                    .periodUnit(Timing.UnitsOfTime.D)
+                    .timeOfDay("01:00:00")
+                    .build())
+            .build());
+    val bundle =
+        KbvErpBundleFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withDosageDgmp(dosageDgMPList)
+            .fake();
+    val result = ValidatorUtil.encodeAndValidate(parser, bundle);
+    assertTrue(result.isSuccessful());
+    assertEquals(
+        "täglich: 22:00 Uhr — je 2 Stück; 18:00 Uhr — je 1 Stück; 01:00 Uhr — je 3 Stück",
         bundle.getMedicationRequest().getRenderedDosageInstruction().get());
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,8 +68,8 @@ class TRegisterMockClientTest {
     assertEquals(1, logs.size());
 
     TRegisterLog first = logs.get(0);
-    assertEquals("166.000.000.000.973.21", first.key());
-    assertEquals("91d74726-8184-45e5-9c9c-aec1b8fa1ec4", first.xRequestId());
+    assertEquals("166.000.000.002.760.92", first.key());
+    assertEquals("0275fdfb-3b37-43f8-a4f3-db869ad64976", first.xRequestId());
     assertNotNull(first.request());
 
     verify(restClient).send(request);
@@ -97,7 +97,7 @@ class TRegisterMockClientTest {
 
     val response = HttpBResponse.status(404).withoutPayload();
     when(restClient.send(request)).thenReturn(response);
-    assertThrows(AssertionError.class, () -> tRegisterMockClient.downloadRequest(request));
+    assertThrows(PollingTimeoutException.class, () -> tRegisterMockClient.downloadRequest(request));
   }
 
   @Test
@@ -110,7 +110,7 @@ class TRegisterMockClientTest {
     when(restClient.send(request)).thenReturn(response);
 
     assertThrows(
-        com.fasterxml.jackson.databind.JsonMappingException.class,
+        tools.jackson.core.exc.StreamReadException.class,
         () -> tRegisterMockClient.downloadRequest(request));
   }
 
@@ -162,6 +162,30 @@ class TRegisterMockClientTest {
 
     assertNotNull(request);
     assertTrue(request.get(0).request().bodyAsString().startsWith("{\"meta\""));
+  }
+
+  @Test
+  void shouldMapAutorisationHeadder() {
+
+    val responseBody = HttpBResponse.status(200).withPayload(contentBodyAsString);
+
+    val mockRestClient = mock(HttpBClient.class);
+    when(mockRestClient.send(any(TRegisterMockDownloadRequest.class))).thenReturn(responseBody);
+
+    val key = "000000";
+    val tRegisterMockDownloadRequest = new TRegisterMockDownloadRequest(key);
+    val tRegisterClient = TRegisterMockClient.withRestClient(mockRestClient);
+    val request = tRegisterClient.downloadRequest(tRegisterMockDownloadRequest);
+
+    assertNotNull(request);
+    assertTrue(request.get(0).request().getBearerToken().get().startsWith("eyJ"));
+    assertTrue(
+        request.get(0).request().headers().stream()
+            .filter(h -> h.key().startsWith("Auth"))
+            .toList()
+            .getFirst()
+            .value()
+            .startsWith("Bearer"));
   }
 
   @Test

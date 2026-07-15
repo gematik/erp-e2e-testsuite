@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ public enum PrescriptionServiceVersion {
   V_1_19_0("1.19.0"),
   V_1_20_0("1.20.0"),
   V_1_21_0("1.21.0"),
+  V_1_22_0("1.22.0"),
   UNKNOWN("unknown");
 
   private final String version;

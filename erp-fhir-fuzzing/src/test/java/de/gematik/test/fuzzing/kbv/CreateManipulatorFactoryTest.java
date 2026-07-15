@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 package de.gematik.test.fuzzing.kbv;
 
-import static de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowCodeSystem.FLOW_TYPE_12;
+import static de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowCodeSystem.FLOW_TYPE;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -46,7 +46,7 @@ class CreateManipulatorFactoryTest extends ErpFhirParsingTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
-        "set Old-FlowType-System  as Value in Parameter.valueCoding",
+        "set Document-Type-System  as Value in Parameter.valueCoding",
         "set AVAILABILITY_STATUS-System  as Value in Parameter.valueCoding"
       })
   void shouldManipulateFlowType(String manipulatorDescription) {
@@ -57,7 +57,7 @@ class CreateManipulatorFactoryTest extends ErpFhirParsingTest {
     assertTrue(ValidatorUtil.encodeAndValidate(parser, create).isSuccessful());
     manipulator.getParameter().accept(create);
     assertNotEquals(
-        FLOW_TYPE_12.getCanonicalUrl(),
+        FLOW_TYPE.getCanonicalUrl(),
         create
             .getParameterFirstRep()
             .getValue()

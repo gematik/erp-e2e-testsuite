@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ public class DeleteRedeemablePrescription implements Task {
 
     // first refresh the screen
     app.swipeIntoView(SwipeDirection.DOWN, Mainscreen.REFRESH_BUTTON);
-    app.tap(Mainscreen.REFRESH_BUTTON);
+    actor.attemptsTo(RefreshPrescriptions.byTap());
 
     // java:S2201: return value not required here, because we are expecting the prescription to
     // exist, but don't need the prescriptionbundle to delete via app

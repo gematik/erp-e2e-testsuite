@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -93,5 +94,36 @@ class ErxAuditEventBundleRelationsTest extends ErpFhirParsingTest {
   @Test
   void shouldDetectNoSelfRelation() {
     assertFalse(invaliErxAuditEventBundle.hasSelfRelation());
+  }
+
+  @Test
+  void shouldDetectOffsetCorrectAtNext() {
+    assertEquals(Optional.empty(), erxAuditEventBundle.getOffsetValueOfRelationLink("next"));
+  }
+
+  @Test
+  void shouldDetectOffsetCorrectAtPrevious() {
+    assertEquals(Optional.of(20), erxAuditEventBundle.getOffsetValueOfRelationLink("prev"));
+  }
+
+  @Test
+  void shouldDetectOffsetCorrectAtFirst() {
+    assertEquals(Optional.empty(), erxAuditEventBundle.getOffsetValueOfRelationLink("first"));
+  }
+
+  @Test
+  void shouldDetectOffsetCorrectAtNonsense3() {
+    assertEquals(Optional.empty(), erxAuditEventBundle.getOffsetValueOfRelationLink("nonsense3"));
+  }
+
+  @Test
+  void shouldDetectOffsetCorrectAtNonsense() {
+    assertEquals(
+        Optional.empty(), invaliErxAuditEventBundle.getOffsetValueOfRelationLink("nonsense"));
+  }
+
+  @Test
+  void shouldDetectOffsetCorrectAtLast() {
+    assertEquals(Optional.of(40), erxAuditEventBundle.getOffsetValueOfRelationLink("last"));
   }
 }

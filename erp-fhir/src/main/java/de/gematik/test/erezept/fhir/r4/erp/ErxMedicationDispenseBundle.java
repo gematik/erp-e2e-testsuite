@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,6 @@ public class ErxMedicationDispenseBundle extends Bundle {
         .filter(
             resource ->
                 WithSystem.anyOf(
-                        ErpWorkflowStructDef.MEDICATION_DISPENSE_12,
                         ErpWorkflowStructDef.MEDICATION_DISPENSE,
                         ErpWorkflowStructDef.MEDICATION_DISPENSE_DIGA)
                     .matches(resource))

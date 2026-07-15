@@ -24,11 +24,13 @@ appium:
     provisioningProfilePostfix: ""
     maxWaitTimeout: 12000
     pollingInterval: 100
+    maxRefreshTimeout: 60000
   - name: t-systems
     url: https://mobiledevicecloud.t-systems-mms.eu/wd/hub
     version: 2.11.3
     maxWaitTimeout: 12000 # how many milliseconds to wait at maximum for an element
     pollingInterval: 100   # polling interval in milliseconds: (maxWaitTimeout/pollingInterval) = retries until NoSuchelementException
+    maxRefreshTimeout: 60000
     provisioningProfilePostfix: ".mdc2"
     accessKey: DUMMY VALUE
   - name: t-systems-public
@@ -37,6 +39,7 @@ appium:
     maxWaitTimeout: 12000
     pollingInterval: 100
     provisioningProfilePostfix: ""
+    maxRefreshTimeout: 60000
     accessKey: DUMMY VALUE
 
 devices:
@@ -87,4 +90,16 @@ devices:
     platform: iOS
     udid: 17FC3BA3-72C8-4625-9342-DE67FA73A85E
     platformVersion: 18.0
+    appium: t-systems-public
+
+  - name: iPhone 16e
+    platform: iOS
+    udid: FEB8D0BA-7FD1-4C15-929F-A279262A9CCD
+    platformVersion: 18.6
+    appium: t-systems-public
+
+  - name: iPhone SE
+    platform: iOS
+    udid: 95FD0E71-C6F2-4B1C-8E26-0C9429CE45B8
+    platformVersion: 18.6
     appium: t-systems-public

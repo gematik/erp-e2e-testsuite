@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
+import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getUpdatedInJulyPlusKPG;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
@@ -30,7 +30,6 @@ import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import lombok.val;
@@ -49,12 +48,14 @@ public class GemErpMedicationPZNFaker {
 
     if (fakerBool()) withStandardSize(StandardSize.random());
 
-    if (fakerBool())
-      withDarreichungsform(
-          fakerValueSet(
-              Darreichungsform.class,
-              List.of(Darreichungsform.KPG, Darreichungsform.PUE, Darreichungsform.LYE)));
+    if (fakerBool()) {
+      if (version.isBiggerThan(ErpWorkflowVersion.V1_5)) {
+        withDarreichungsform(fakerValueSet(Darreichungsform.class, Darreichungsform.KPG));
 
+      } else {
+        withDarreichungsform(fakerValueSet(Darreichungsform.class, getUpdatedInJulyPlusKPG()));
+      }
+    }
     if (fakerBool()) withVaccineFlag(fakerBool());
 
     if (fakerBool()) withAmount(getFaker().random().nextLong(20));

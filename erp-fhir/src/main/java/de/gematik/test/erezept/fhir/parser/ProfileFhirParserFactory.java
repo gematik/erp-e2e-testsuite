@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,24 +35,13 @@ import de.gematik.test.erezept.eml.fhir.r4.EpaMedPznIngredient;
 import de.gematik.test.erezept.fhir.profiles.definitions.*;
 import de.gematik.test.erezept.fhir.profiles.version.*;
 import de.gematik.test.erezept.fhir.r4.dav.DavPkvAbgabedatenBundle;
-import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent;
-import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
-import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseDiGA;
-import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
-import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
+import de.gematik.test.erezept.fhir.r4.erp.*;
 import de.gematik.test.erezept.fhir.r4.eu.*;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvEvdgaBundle;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
-import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitionerRole;
-import java.util.*;
+import de.gematik.test.erezept.fhir.r4.kbv.*;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -105,9 +94,6 @@ public class ProfileFhirParserFactory {
               .forAllVersionsFrom(ErpWorkflowVersion.class)
               .mappingTo(GemErpMedication.class),
           ResourceTypeHint.forStructure(ErpWorkflowStructDef.MEDICATION_DISPENSE)
-              .forAllVersionsFrom(ErpWorkflowVersion.class)
-              .mappingTo(ErxMedicationDispense.class),
-          ResourceTypeHint.forStructure(ErpWorkflowStructDef.MEDICATION_DISPENSE_12)
               .forAllVersionsFrom(ErpWorkflowVersion.class)
               .mappingTo(ErxMedicationDispense.class),
           ResourceTypeHint.forStructure(ErpWorkflowStructDef.MEDICATION_DISPENSE_DIGA)

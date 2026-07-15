@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,18 @@ package de.gematik.test.erezept.config;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.konnektor.cfg.KonnektorModuleConfigurationDto;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.app.ErpAppConfigurationBase;
-import de.gematik.test.erezept.config.dto.konnektor.KonnektorModuleConfigurationDto;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.config.dto.psp.PSPClientConfig;
-import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.ClearSystemProperty;
 import org.junitpioneer.jupiter.ClearSystemProperty.ClearSystemProperties;
+import tools.jackson.core.exc.JacksonIOException;
 
 class ConfigurationReaderTest {
 
@@ -200,7 +200,7 @@ class ConfigurationReaderTest {
             .getParent();
 
     assertThrows(
-        FileNotFoundException.class,
+        JacksonIOException.class,
         () -> ConfigurationReader.forPrimSysConfiguration().configFile(templatePath).create());
   }
 

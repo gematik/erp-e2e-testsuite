@@ -6,16 +6,14 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>bdd-testsuite</artifactId>
-        <version>1.4.0</version>
+        <version>1.6.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>erp-common</artifactId>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <sonar.coverage.exclusions>**/*</sonar.coverage.exclusions>
 
         <!--TODO REMOVE THIS DUPLICATE CODE EXCLUSIONS ONCE THE NEW E2E-TESTSUITE IS READY!-->
@@ -58,10 +56,6 @@
         <!--<dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-client</artifactId>
-        </dependency>-->
-        <!--<dependency>
-            <groupId>de.gematik.test.erezept</groupId>
-            <artifactId>konnektor-client</artifactId>
         </dependency>-->
     </dependencies>
 

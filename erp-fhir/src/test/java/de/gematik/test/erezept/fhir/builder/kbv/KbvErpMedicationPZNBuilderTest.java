@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,20 +162,13 @@ class KbvErpMedicationPZNBuilderTest extends ErpFhirParsingTest {
     assertNotNull(medication);
     assertNotNull(medication.getCode());
     assertEquals("Test Medikament", medication.getCode().getText());
-    assertFalse(
-        medication.getForm().getCoding().stream()
-            .anyMatch(
-                coding ->
-                    coding.getCode().equals(Darreichungsform.PUE.getCode())
-                        || coding.getCode().equals(Darreichungsform.LYE.getCode())),
-        "Excluded Darreichungsformen PUE and LYE should not be used before April 2025");
 
     val result = ValidatorUtil.encodeAndValidate(parser, medication);
     assertTrue(result.isSuccessful());
   }
 
   @Test
-  void shouldSetIngredWithDataAbsentInStrength() {
+  void shouldSetIgnoredWithDataAbsentInStrength() {
     val medication =
         KbvErpMedicationPZNBuilder.builder()
             .version(KbvItaErpVersion.V1_4_0)

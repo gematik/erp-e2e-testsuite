@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,8 +102,10 @@ public class DeleteCommunicationIT extends ErpTest {
             SendMessages.to(airportApo)
                 .forTask(task)
                 .asDispenseRequest(
-                    new CommunicationDisReqMessage(
-                        supplyOptionsType, "Bitte Medikament bereitstellen")));
+                    CommunicationDisReqMessage.forV1()
+                        .supplyOptionsType(supplyOptionsType)
+                        .hint("Bitte Medikament bereitstellen")
+                        .build()));
 
     val communicationId = postDispRequest.getExpectedResponse().getIdPart();
 
@@ -122,9 +124,5 @@ public class DeleteCommunicationIT extends ErpTest {
             .hasResponseWith(returnCode(204))
             .hasResponseWith(ErpResponseVerifier.warningHeaderIsUnset())
             .isCorrect());
-
-    // cleanup
-    airportApo.performs(
-        ClosePrescription.acceptedWith(airportApo.performs(AcceptPrescription.forTheTask(task))));
   }
 }

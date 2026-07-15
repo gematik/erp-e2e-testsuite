@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,8 +83,12 @@ class DataMatrixCodeGeneratorTest {
     assertTrue(result.getText().contains(expected));
   }
 
+  /**
+   * Rather than throwing a RuntimeException (as jackson did until 2.22), jackson 3.0+ does not
+   * throw an Exception but instead simply produces no image at all
+   */
   @Test
-  void shouldSneakilyThrowOnWritingError() {
+  void shouldNotSneakilyThrowOnWritingError() {
     try (val ms =
         mockConstruction(
             ObjectMapper.class,
@@ -94,9 +98,9 @@ class DataMatrixCodeGeneratorTest {
       val prescriptionId = PrescriptionId.random().getValue();
       val ac = AccessCode.random();
 
-      assertThrows(
-          RuntimeException.class,
-          () -> DataMatrixCodeGenerator.getBufferedImage(prescriptionId, ac));
+      val bim =
+          assertDoesNotThrow(() -> DataMatrixCodeGenerator.getBufferedImage(prescriptionId, ac));
+      assertNotNull(bim);
     }
   }
 

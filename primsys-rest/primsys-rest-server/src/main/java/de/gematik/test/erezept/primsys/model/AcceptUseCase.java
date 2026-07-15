@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.primsys.model;
 
+import de.gematik.bbriccs.konnektor.SoftKonVerifier;
 import de.gematik.test.erezept.client.usecases.TaskAcceptCommand;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
@@ -29,7 +30,6 @@ import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto;
 import de.gematik.test.erezept.primsys.data.valuesets.PatientInsuranceTypeDto;
 import de.gematik.test.erezept.primsys.mapping.CoverageDataMapper;
 import de.gematik.test.erezept.primsys.mapping.KbvPznMedicationDataMapper;
-import de.gematik.test.konnektor.soap.mock.LocalVerifier;
 import jakarta.ws.rs.core.Response;
 import lombok.val;
 
@@ -53,7 +53,7 @@ public class AcceptUseCase {
     val kbvBundle =
         actor.decode(
             KbvErpBundle.class,
-            LocalVerifier.parse(acceptedTask.getSignedKbvBundle()).getDocument());
+            SoftKonVerifier.parse(acceptedTask.getSignedKbvBundle()).getDocument());
     val patient = kbvBundle.getPatient();
     val patientInsuranceType =
         PatientInsuranceTypeDto.fromCode(patient.getInsuranceType().getCode());

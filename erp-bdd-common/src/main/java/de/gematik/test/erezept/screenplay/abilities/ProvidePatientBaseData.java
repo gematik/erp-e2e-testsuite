@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,8 +46,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
 import net.serenitybdd.screenplay.Ability;
+import net.serenitybdd.screenplay.HasTeardown;
 
-public class ProvidePatientBaseData implements Ability {
+public class ProvidePatientBaseData implements Ability, HasTeardown {
+
+  private KbvItaForVersion kbvItaForVersion = KbvItaForVersion.getDefaultVersion();
 
   @Getter private KVNR kvnr;
   private final String firstName;
@@ -126,7 +129,11 @@ public class ProvidePatientBaseData implements Ability {
   }
 
   public KbvPatient getPatient() {
-    return getPatient(KbvItaForVersion.getDefaultVersion());
+    return getPatient(kbvItaForVersion);
+  }
+
+  public void setVersion(KbvItaForVersion kbvItaForVersion) {
+    this.kbvItaForVersion = kbvItaForVersion;
   }
 
   public KbvPatient getPatient(KbvItaForVersion forVersion) {
@@ -140,7 +147,7 @@ public class ProvidePatientBaseData implements Ability {
   }
 
   public KbvCoverage getInsuranceCoverage(KbvPatient patient) {
-    return getInsuranceCoverage(patient, KbvItaForVersion.getDefaultVersion());
+    return getInsuranceCoverage(patient, kbvItaForVersion);
   }
 
   public KbvCoverage getInsuranceCoverage(KbvPatient patient, KbvItaForVersion forVersion) {
@@ -273,5 +280,10 @@ public class ProvidePatientBaseData implements Ability {
     // try this to assert pbd.getKvnr().getInsuranceType() == insuranceType; // NOSONAR
 
     return pbd;
+  }
+
+  @Override
+  public void tearDown() {
+    this.kbvItaForVersion = KbvItaForVersion.getDefaultVersion();
   }
 }

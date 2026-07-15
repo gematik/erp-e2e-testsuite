@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,13 @@
 
 package de.gematik.test.erezept.screenplay.strategy;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.konnektor.SoftKonSigner;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
@@ -37,7 +36,6 @@ import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import de.gematik.test.konnektor.soap.mock.LocalSigner;
 import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
@@ -65,7 +63,7 @@ class PrescriptionToDispenseStrategyTest {
     when(erxBundle.getKbvBundleId()).thenReturn("678");
     when(erxBundle.getSignedKbvBundle())
         .thenReturn(
-            LocalSigner.signQES(hba, CryptoSystem.ECC_256)
+            SoftKonSigner.signQES(hba, CryptoSystem.ECC_256)
                 .signDocument(false, "<xml>bundle</xml>"));
 
     stack.appendAcceptedPrescription(erxBundle);

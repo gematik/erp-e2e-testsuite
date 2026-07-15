@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
+import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getUpdatedInJulyPlusKPG;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
@@ -42,7 +43,7 @@ public class KbvErpMedicationCompoundingFaker {
 
   private KbvErpMedicationCompoundingFaker(KbvItaErpVersion version) {
     this.version = version;
-    this.withDosageForm(GemFaker.fakerValueSet(Darreichungsform.class))
+    this.withDosageForm(GemFaker.fakerValueSet(Darreichungsform.class, getUpdatedInJulyPlusKPG()))
         .withAmount(5, 1, "Stk")
         .withIngredientStrengthText(
             format("Ad {0} g", GemFaker.randomElement("25", "50", "75", "100", "150", "200")))
@@ -74,14 +75,22 @@ public class KbvErpMedicationCompoundingFaker {
    * packaging will be removed!!!
    *
    * @param productionInstruction
-   * @return
+   * @return KbvErpMedicationCompoundingFaker
    */
   public KbvErpMedicationCompoundingFaker withProductionInstruction(String productionInstruction) {
     return withProductionInstruction(ProductionInstruction.asCompounding(productionInstruction));
   }
 
-  public KbvErpMedicationCompoundingFaker withProductionInstruction(ProductionInstruction pd) {
-    builderConsumers.put("productionInstruction", b -> b.productionInstruction(pd));
+  /**
+   * packaging will be removed!!!
+   *
+   * @param productionInstruction
+   * @return KbvErpMedicationCompoundingFaker
+   */
+  public KbvErpMedicationCompoundingFaker withProductionInstruction(
+      ProductionInstruction productionInstruction) {
+    builderConsumers.put(
+        "productionInstruction", b -> b.productionInstruction(productionInstruction));
     builderConsumers.remove("packaging");
     return this;
   }

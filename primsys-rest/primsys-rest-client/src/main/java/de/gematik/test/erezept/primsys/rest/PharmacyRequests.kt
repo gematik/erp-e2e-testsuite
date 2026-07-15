@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,12 @@
 
 package de.gematik.test.erezept.primsys.rest
 
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
+import tools.jackson.core.type.TypeReference
+import tools.jackson.databind.ObjectMapper
 import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto
 import de.gematik.test.erezept.primsys.data.DispensedMedicationDto
 import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto
+import de.gematik.test.erezept.primsys.data.ShallowPrescriptionDto
 import de.gematik.test.erezept.primsys.data.communication.CommunicationDto
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -66,6 +67,18 @@ class RejectRequest(private val prescriptionId: String, private val accessCode: 
     }
 }
 
+class AbortPharmacyPrescriptionRequest(private val prescriptionId: String, private val accessCode: String, private val secret: String) :
+    PrimSysBasePharmacyRequest<Unit>(object : TypeReference<Unit>() {}) {
+
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Delete
+        rb.url.appendEncodedPathSegments("abort")
+        rb.url.parameters.append("taskId", prescriptionId)
+        rb.url.parameters.append("ac", accessCode)
+        rb.url.parameters.append("secret", secret)
+    }
+}
+
 class ReplyRequest(private val prescriptionId: String, private val kvnr: String, private val body: String): PrimSysBasePharmacyRequest<Unit>(object : TypeReference<Unit>() {}) {
     override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
         rb.method = HttpMethod.Post
@@ -90,6 +103,16 @@ class CommunicationDeleteRequest(private val id: String): PrimSysBasePharmacyReq
         rb.method = HttpMethod.Delete
         rb.url.appendEncodedPathSegments("communication")
         rb.url.appendEncodedPathSegments(id)
+    }
+}
+
+class GetPrescriptionsByPoppTokenRequest(private val poppToken: String) :
+    PrimSysBasePharmacyRequest<List<ShallowPrescriptionDto>>(object : TypeReference<List<ShallowPrescriptionDto>>() {}) {
+
+    override fun finalizeRequest(rb: HttpRequestBuilder, bodyMapper: ObjectMapper) {
+        rb.method = HttpMethod.Get
+        rb.url.appendEncodedPathSegments("withPoppToken")
+        rb.url.parameters.append("poppToken", poppToken)
     }
 }
 
@@ -119,6 +142,16 @@ object PharmacyRequests {
 
     @JvmStatic
     fun reject(prescriptionId: String, accessCode: String, secret: String) = RejectRequest(prescriptionId, accessCode, secret)
+
+    @JvmStatic
+    fun getPrescriptionsByPoppToken(poppToken: String) = GetPrescriptionsByPoppTokenRequest(poppToken)
+
+    @JvmStatic
+    fun abort(prescriptionId: String, accessCode: String, secret: String) =
+        AbortPharmacyPrescriptionRequest(prescriptionId, accessCode, secret)
+
+    @JvmStatic
+    fun abort(prescription: AcceptedPrescriptionDto) = abort(prescription.prescriptionId, prescription.accessCode, prescription.secret)
 }
 
 object PharmacyCommunicationRequests {

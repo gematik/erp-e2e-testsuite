@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,8 +87,10 @@ class SendCommunicationTRezeptIT extends ErpTest {
             SendMessages.to(flughafen)
                 .forTask(task)
                 .asDispenseRequest(
-                    new CommunicationDisReqMessage(
-                        SupplyOptionsType.SHIPMENT, GemFaker.getFaker().buffy().quotes())));
+                    CommunicationDisReqMessage.forV1()
+                        .supplyOptionsType(SupplyOptionsType.SHIPMENT)
+                        .hint(GemFaker.getFaker().buffy().quotes())
+                        .build()));
 
     patient.attemptsTo(
         Verify.that(communication)
@@ -121,8 +123,10 @@ class SendCommunicationTRezeptIT extends ErpTest {
             SendMessages.to(flughafen)
                 .forTask(task)
                 .asDispenseRequest(
-                    new CommunicationDisReqMessage(
-                        supplyOptionsType, GemFaker.getFaker().buffy().quotes())));
+                    CommunicationDisReqMessage.forV1()
+                        .supplyOptionsType(supplyOptionsType)
+                        .hint(GemFaker.getFaker().buffy().quotes())
+                        .build()));
 
     patient.attemptsTo(
         Verify.that(comm).withExpectedType().hasResponseWith(returnCode(201)).isCorrect());
@@ -137,11 +141,12 @@ class SendCommunicationTRezeptIT extends ErpTest {
       mode = INCLUDE,
       names = {"GKV", "PKV"})
   void shouldRejectDispRequestWithAssignmentToHealthInsurance(InsuranceTypeDe insuranceTypeDe) {
+
     patient.changePatientInsuranceType(insuranceTypeDe);
+
     val kbvBundleNew =
         KbvErpBundleFaker.builder().withMedication(KbvErpMedicationPZNFaker.asTPrescription());
 
-    // activate
     val task =
         doctor
             .performs(IssuePrescription.forPatient(sina).asTPrescription(kbvBundleNew.toBuilder()))
@@ -152,8 +157,10 @@ class SendCommunicationTRezeptIT extends ErpTest {
             SendMessages.to(healthInsurance)
                 .forTask(task)
                 .asDispenseRequest(
-                    new CommunicationDisReqMessage(
-                        SupplyOptionsType.ON_PREMISE, GemFaker.getFaker().buffy().quotes())));
+                    CommunicationDisReqMessage.forV1()
+                        .supplyOptionsType(SupplyOptionsType.ON_PREMISE)
+                        .hint(GemFaker.getFaker().buffy().quotes())
+                        .build()));
 
     patient.attemptsTo(
         Verify.that(communication)

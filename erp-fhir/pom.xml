@@ -5,7 +5,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.4.0</version>
+        <version>1.6.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,11 +13,6 @@
     <name>E-Rezept FHIR</name>
     <description>E-Rezept FHIR handling</description>
 
-    <properties>
-        <java.version>${version.java}</java.version>
-        <maven.compiler.target>${version.java}</maven.compiler.target>
-        <maven.compiler.source>${version.java}</maven.compiler.source>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -25,19 +20,19 @@
             <artifactId>feature-toggle-brick</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <groupId>tools.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <groupId>tools.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
         </dependency>
         <dependency>
@@ -65,6 +60,7 @@
         <dependency>
             <groupId>de.gematik.bbriccs</groupId>
             <artifactId>resource-loader-brick</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>de.gematik.bbriccs</groupId>
@@ -104,6 +100,13 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>epa-fhir</artifactId>
+        </dependency>
+
+        <!-- still required until bricks fhir configuration moved to jackson 3 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.22.0</version>
         </dependency>
     </dependencies>
 

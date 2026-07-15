@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.exceptions.AppStateMissmatchException;
@@ -35,7 +36,6 @@ import de.gematik.test.erezept.app.mobile.ListPageElement;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.*;
 import de.gematik.test.erezept.client.ErpClient;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
@@ -50,7 +50,6 @@ import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import lombok.val;
@@ -91,9 +90,8 @@ class AssignPrescriptionToPharmacyOnIosTest extends ErpFhirParsingTest {
 
     // make sure the teardown does not run into an NPE
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, createOperationOutcome())
             .withStatusCode(404)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
   }
@@ -137,8 +135,7 @@ class AssignPrescriptionToPharmacyOnIosTest extends ErpFhirParsingTest {
     actor.can(providePatientBaseData);
 
     val getTaskResponse =
-        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, prescriptionBundle)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
@@ -185,8 +182,7 @@ class AssignPrescriptionToPharmacyOnIosTest extends ErpFhirParsingTest {
 
     val oO = createOperationOutcome();
     val getTaskResponse =
-        ErpResponse.forPayload(oO, ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, oO)
             .withStatusCode(404)
             .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
@@ -230,8 +226,7 @@ class AssignPrescriptionToPharmacyOnIosTest extends ErpFhirParsingTest {
     when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
 
     val getTaskResponse =
-        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, prescriptionBundle)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
@@ -276,8 +271,7 @@ class AssignPrescriptionToPharmacyOnIosTest extends ErpFhirParsingTest {
     when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
 
     val getTaskResponse =
-        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, prescriptionBundle)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);
@@ -327,8 +321,7 @@ class AssignPrescriptionToPharmacyOnIosTest extends ErpFhirParsingTest {
     when(prescriptionBundle.getKbvBundle()).thenReturn(Optional.of(kbvBundle));
 
     val getTaskResponse =
-        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, prescriptionBundle)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(getTaskResponse);

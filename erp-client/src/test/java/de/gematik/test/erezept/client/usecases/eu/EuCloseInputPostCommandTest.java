@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ class EuCloseInputPostCommandTest {
   @Test
   void shouldBuildCommandCorrectly() {
     val command = new EuCloseInputPostCommand(euCloseOperationInput);
-    val body = command.getRequestBody().orElseThrow();
+    val body = command.getRequestBody();
     assertFalse(body.isEmpty());
     assertInstanceOf(EuCloseOperationInput.class, body);
   }

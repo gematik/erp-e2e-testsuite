@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.values.AccessCode;
@@ -37,7 +37,6 @@ import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto;
 import de.gematik.test.erezept.primsys.data.valuesets.PatientInsuranceTypeDto;
 import de.gematik.test.erezept.primsys.mapping.HealthAppRequestDataMapper;
 import jakarta.ws.rs.WebApplicationException;
-import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetSystemProperty;
@@ -55,9 +54,8 @@ class CloseDiGATest extends TestWithActorContext {
     when(receiptMock.getId()).thenReturn("123456789");
 
     val mockResponse =
-        ErpResponse.forPayload(receiptMock, ErxReceipt.class)
+        FhirBResponse.forPayload(ErxReceipt.class, receiptMock)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(CloseTaskCommand.class))).thenReturn(mockResponse);
@@ -89,9 +87,8 @@ class CloseDiGATest extends TestWithActorContext {
     when(receiptMock.getId()).thenReturn("123456789");
 
     val mockResponse =
-        ErpResponse.forPayload(receiptMock, ErxReceipt.class)
+        FhirBResponse.forPayload(ErxReceipt.class, receiptMock)
             .withStatusCode(204)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(mockClient.request(any(CloseTaskCommand.class))).thenReturn(mockResponse);

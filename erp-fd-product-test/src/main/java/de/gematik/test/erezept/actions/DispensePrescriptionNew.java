@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package de.gematik.test.erezept.actions;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.erezept.ErpInteraction;
-import de.gematik.test.erezept.client.usecases.DispensePrescriptionCommandNew;
+import de.gematik.test.erezept.client.usecases.DispensePrescriptionCommand;
 import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.Secret;
@@ -39,7 +39,7 @@ import net.serenitybdd.screenplay.Actor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class DispensePrescriptionNew extends ErpAction<EmptyResource> {
 
-  private final DispensePrescriptionCommandNew dispensePrescriptionAsBundleCommandNew;
+  private final DispensePrescriptionCommand dispensePrescriptionAsBundleCommandNew;
 
   public static Builder withCredentials(TaskId taskId, Secret secret) {
     return new Builder(taskId, secret);
@@ -58,7 +58,7 @@ public class DispensePrescriptionNew extends ErpAction<EmptyResource> {
     private final List<Consumer<KbvErpBundle>> manipulator = new LinkedList<>();
 
     public DispensePrescriptionNew withParameters(GemDispenseOperationParameters params) {
-      val cmd = new DispensePrescriptionCommandNew(taskId, secret, params);
+      val cmd = new DispensePrescriptionCommand(taskId, secret, params);
       return new DispensePrescriptionNew(cmd);
     }
   }

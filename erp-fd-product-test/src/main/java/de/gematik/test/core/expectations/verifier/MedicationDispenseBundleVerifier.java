@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,10 +26,7 @@ import de.gematik.bbriccs.fhir.coding.SemanticValue;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.fhir.date.DateConverter;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBase;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
-import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
+import de.gematik.test.erezept.fhir.r4.erp.*;
 import de.gematik.test.erezept.fhir.r4.eu.EuMedicationDispense;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import java.time.LocalDate;
@@ -97,10 +94,10 @@ public class MedicationDispenseBundleVerifier {
    * Method checks if the given PZNs in the medicationDispense Bundle ist contained in the
    * referenced one
    *
-   * @deprecated (from 01.10.2025, Old Profiles will no longer be used, and can be deleted 100 days
-   *     later
    * @param medicationDispenses
    * @return boolean
+   * @deprecated (from 01.10.2025, Old Profiles will no longer be used, and can be deleted 100 days
+   *     later
    */
   @SuppressWarnings("java:S1133")
   @Deprecated(since = "0.10.1", forRemoval = true)
@@ -297,6 +294,29 @@ public class MedicationDispenseBundleVerifier {
             format(
                 "Der Wert im Feld MedicationDispense.performer muss {0} sein ",
                 telematikID.getValue()))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxMedicationDispenseBundle> containsIdsOf(
+      List<ErxReceipt> dispensations, ErpAfos erpAfos) {
+    Predicate<ErxMedicationDispenseBundle> predicate =
+        bundle -> {
+          val actualIds =
+              bundle.getMedicationDispenses().stream()
+                  .map(entry -> entry.getIdentifierFirstRep().getValue())
+                  .sorted()
+                  .toList();
+          val expectedIds =
+              dispensations.stream()
+                  .map(entry -> entry.getIdentifier().getValue())
+                  .sorted()
+                  .toList();
+          return new HashSet<>(actualIds).containsAll(expectedIds);
+        };
+
+    return new VerificationStep.StepBuilder<ErxMedicationDispenseBundle>(
+            erpAfos.getRequirement(), "Die übergebenen TAskIds sind im Referenzbundle enthalten")
         .predicate(predicate)
         .accept();
   }

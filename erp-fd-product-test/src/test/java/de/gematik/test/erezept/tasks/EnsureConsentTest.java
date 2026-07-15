@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@ import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
+import de.gematik.bbriccs.rest.fd.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ConsentDeleteCommand;
 import de.gematik.test.erezept.client.usecases.ConsentGetCommand;
 import de.gematik.test.erezept.client.usecases.ConsentPostCommand;
@@ -39,7 +39,6 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxConsentBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import java.util.Map;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
@@ -68,9 +67,8 @@ class EnsureConsentTest extends ErpFhirBuildingTest {
     patient.can(ProvidePatientBaseData.forGkvPatient(KVNR.random(), patient.getName()));
 
     val getConsentResponse =
-        ErpResponse.forPayload(createOperationOutcome(), ErxConsentBundle.class)
+        FhirBResponse.forPayload(ErxConsentBundle.class, createOperationOutcome())
             .withStatusCode(400)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(ConsentGetCommand.class))).thenReturn(getConsentResponse);
 
@@ -91,9 +89,8 @@ class EnsureConsentTest extends ErpFhirBuildingTest {
     val consentBundle = mock(ErxConsentBundle.class);
     when(consentBundle.hasConsent()).thenReturn(true); // consent is already set
     val getConsentResponse =
-        ErpResponse.forPayload(consentBundle, ErxConsentBundle.class)
+        FhirBResponse.forPayload(ErxConsentBundle.class, consentBundle)
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(ConsentGetCommand.class))).thenReturn(getConsentResponse);
 
@@ -113,16 +110,14 @@ class EnsureConsentTest extends ErpFhirBuildingTest {
     val consentBundle = mock(ErxConsentBundle.class);
     when(consentBundle.hasConsent()).thenReturn(false); // consent is not set yet
     val getConsentResponse =
-        ErpResponse.forPayload(consentBundle, ErxConsentBundle.class)
+        FhirBResponse.forPayload(ErxConsentBundle.class, consentBundle)
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(ConsentGetCommand.class))).thenReturn(getConsentResponse);
 
     val postConsentResponse =
-        ErpResponse.forPayload(mock(ErxConsent.class), ErxConsent.class)
+        FhirBResponse.forPayload(ErxConsent.class, mock(ErxConsent.class))
             .withStatusCode(201)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(ConsentPostCommand.class))).thenReturn(postConsentResponse);
 
@@ -142,9 +137,8 @@ class EnsureConsentTest extends ErpFhirBuildingTest {
     val consentBundle = mock(ErxConsentBundle.class);
     when(consentBundle.hasConsent()).thenReturn(false); // consent is already unset
     val getConsentResponse =
-        ErpResponse.forPayload(consentBundle, ErxConsentBundle.class)
+        FhirBResponse.forPayload(ErxConsentBundle.class, consentBundle)
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(ConsentGetCommand.class))).thenReturn(getConsentResponse);
 
@@ -164,16 +158,14 @@ class EnsureConsentTest extends ErpFhirBuildingTest {
     val consentBundle = mock(ErxConsentBundle.class);
     when(consentBundle.hasConsent()).thenReturn(true); // consent is already set
     val getConsentResponse =
-        ErpResponse.forPayload(consentBundle, ErxConsentBundle.class)
+        FhirBResponse.forPayload(ErxConsentBundle.class, consentBundle)
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(ConsentGetCommand.class))).thenReturn(getConsentResponse);
 
     val postConsentResponse =
-        ErpResponse.forPayload(mock(Resource.class), EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, mock(Resource.class))
             .withStatusCode(201)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(ConsentDeleteCommand.class))).thenReturn(postConsentResponse);
 

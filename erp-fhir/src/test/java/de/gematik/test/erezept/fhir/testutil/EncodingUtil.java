@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.codec.FhirCodec;
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -56,7 +56,7 @@ public class EncodingUtil {
    * @return the given Resource from <code>filepath</code> with flipped encoding
    */
   public static String validateRoundtripEncoding(
-      FhirParser parser, String filepath, Class<? extends Resource> clazz) {
+      FhirCodec parser, String filepath, Class<? extends Resource> clazz) {
     // read and validate the original content from file
     val originalContent = ResourceLoader.readFileFromResource(filepath);
     val originalValidationResult = parser.validate(originalContent);
@@ -81,7 +81,7 @@ public class EncodingUtil {
   }
 
   public static <T extends IBaseResource> String reEncode(
-      FhirParser parser, T resource, EncodingType encoding) {
+      FhirCodec parser, T resource, EncodingType encoding) {
     val content = parser.encode(resource, encoding);
     val vr = parser.validate(content);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,16 +25,15 @@ import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.Requirement;
 import de.gematik.test.core.extensions.ErpTestExtension;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
-import java.util.Map;
 import lombok.val;
 import net.thucydides.core.steps.StepEventBus;
 import org.hl7.fhir.r4.model.OperationOutcome;
@@ -50,9 +49,8 @@ class ErpResponseExpectationTest extends ErpFhirBuildingTest {
   @DisplayName("Positive Unit Test for an Expectation")
   void shouldPassExpectation() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
+        FhirBResponse.forPayload(KbvErpBundle.class, KbvErpBundleFaker.builder().fake())
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     val expectation =
@@ -69,9 +67,8 @@ class ErpResponseExpectationTest extends ErpFhirBuildingTest {
   @DisplayName("Negative Unit Test for an Expectation")
   void shouldFailExpectation() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
+        FhirBResponse.forPayload(KbvErpBundle.class, KbvErpBundleFaker.builder().fake())
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     val expectation =
@@ -91,9 +88,8 @@ class ErpResponseExpectationTest extends ErpFhirBuildingTest {
   @DisplayName("Expectation contains Requirements in toString")
   void shouldHaveRequirements() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
+        FhirBResponse.forPayload(KbvErpBundle.class, KbvErpBundleFaker.builder().fake())
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     val expectation =
@@ -111,9 +107,8 @@ class ErpResponseExpectationTest extends ErpFhirBuildingTest {
   @DisplayName("Expectation contains no Requirements in toString if no given")
   void shouldNotHaveRequirements() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
+        FhirBResponse.forPayload(KbvErpBundle.class, KbvErpBundleFaker.builder().fake())
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     val expectation = ErpResponseExpectation.expectFor(response, KbvErpBundle.class);
@@ -127,9 +122,8 @@ class ErpResponseExpectationTest extends ErpFhirBuildingTest {
   @DisplayName("Expectation contains no Requirements in toString if only custom requirements given")
   void shouldNotHaveCustomRequirements() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
+        FhirBResponse.forPayload(KbvErpBundle.class, KbvErpBundleFaker.builder().fake())
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     val expectation =
@@ -148,9 +142,8 @@ class ErpResponseExpectationTest extends ErpFhirBuildingTest {
           + " geprüft")
   void shouldThrowOnUnexpectedPayloadWithoutExplicitVerification() {
     val response =
-        ErpResponse.forPayload(KbvErpBundleFaker.builder().fake(), KbvErpBundle.class)
+        FhirBResponse.forPayload(KbvErpBundle.class, KbvErpBundleFaker.builder().fake())
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     val expectation =

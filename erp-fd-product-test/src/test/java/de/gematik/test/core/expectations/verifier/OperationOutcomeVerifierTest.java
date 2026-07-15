@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -123,6 +123,26 @@ class OperationOutcomeVerifierTest {
     val step =
         operationOutcomeContainsInDiagnostics("Die IK-Nummer muss 9-stellig sein", ErpAfos.A_23888);
     step.apply(oOResource);
+  }
+
+  @Test
+  void shouldVerifyDiagnosticDoesNotsContains() {
+    val oOResource = createOperationOutcome();
+    oOResource.getIssueFirstRep().setDiagnostics(DIAGNOSTICS_IKNR);
+    val step =
+        operationOutcomeDoesNotContainsInDiagnostics(
+            "Die IK-Nummer muss 9-stellig sein und auf büttenpapier gereicht", ErpAfos.A_23888);
+    step.apply(oOResource);
+  }
+
+  @Test
+  void shouldThrowWhileVerifyDiagnosticsDoesNotContains() {
+    val oOResource = createOperationOutcome();
+    oOResource.getIssueFirstRep().setDiagnostics(DIAGNOSTICS_IKNR);
+    val step =
+        operationOutcomeDoesNotContainsInDiagnostics(
+            "Die IK-Nummer muss 9-stellig sein", ErpAfos.A_23888);
+    assertThrows(AssertionError.class, () -> step.apply(oOResource));
   }
 
   @Test

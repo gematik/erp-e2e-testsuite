@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import static java.text.MessageFormat.format;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.elements.*;
 import de.gematik.test.erezept.app.task.EnsureTheCorrectProfile;
+import de.gematik.test.erezept.app.task.RefreshPrescriptions;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
@@ -55,7 +56,7 @@ public class MovingToEVDGAPrescription implements Question<ErxPrescriptionBundle
     val dmc = deque.chooseFrom(dmcAbility.chooseStack(DmcStack.ACTIVE));
 
     // Wir befinden uns auf dem Mainscreen und stellen sicher, das die DIGA heruntergeladen ist
-    app.tap(Mainscreen.REFRESH_BUTTON);
+    actor.attemptsTo(RefreshPrescriptions.byTap());
 
     // finde die DIGA
     app.logEvent(

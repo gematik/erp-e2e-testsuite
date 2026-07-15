@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,7 @@ package de.gematik.test.erezept.app.task.android;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.Egk;
@@ -38,6 +36,7 @@ import de.gematik.test.erezept.app.mobile.elements.Debug;
 import de.gematik.test.erezept.app.task.SetUpDevice;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.operator.UIProvider;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import lombok.val;
@@ -51,7 +50,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(SerenityJUnit5Extension.class)
-class SetUpAndroidDeviceTest {
+class SetUpAndroidDeviceTest extends ErpFhirBuildingTest {
   private final SmartcardArchive smartcards = SmartcardArchive.fromResources();
   private Egk egk;
   private EnvironmentConfiguration environment;

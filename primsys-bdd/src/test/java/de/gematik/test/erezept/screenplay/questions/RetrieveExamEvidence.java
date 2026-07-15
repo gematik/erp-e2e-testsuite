@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,10 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.vsdm.VsdmCheckDigitVersion;
+import de.gematik.bbriccs.vsdm.VsdmExamEvidence;
+import de.gematik.bbriccs.vsdm.utils.XmlEncoder;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.konnektor.soap.mock.utils.XmlEncoder;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
 import de.gematik.ws.fa.vsds.UCAllgemeineVersicherungsdatenXML;
 import de.gematik.ws.fa.vsds.UCPersoenlicheVersichertendatenXML;
 import java.nio.charset.StandardCharsets;

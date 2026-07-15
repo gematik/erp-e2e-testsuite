@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.PlatformType;
@@ -34,7 +35,6 @@ import de.gematik.test.erezept.app.mobile.elements.*;
 import de.gematik.test.erezept.app.mocker.WebElementMockFactory;
 import de.gematik.test.erezept.app.questions.ListRedeemedPrescriptions;
 import de.gematik.test.erezept.app.questions.TheLastPrescriptionInTheMainScreen;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
@@ -52,7 +52,6 @@ import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
@@ -120,8 +119,7 @@ class PrescriptionTests {
     when(medicationRequest.isMultiple()).thenReturn(false);
     when(kbvBundle.getMedicationRequest().isMultiple()).thenReturn(false);
     val taskGetResponse =
-        ErpResponse.forPayload(prescriptionBundle, ErxPrescriptionBundle.class)
-            .withHeaders(Map.of())
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, prescriptionBundle)
             .withStatusCode(200)
             .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskGetByIdCommand.class))).thenReturn(taskGetResponse);

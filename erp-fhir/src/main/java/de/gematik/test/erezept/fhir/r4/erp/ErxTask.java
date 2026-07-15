@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ package de.gematik.test.erezept.fhir.r4.erp;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import de.gematik.bbriccs.fhir.coding.WithSystem;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.date.DateConverter;
@@ -82,28 +81,15 @@ public class ErxTask extends Task {
 
   public PrescriptionFlowType getFlowType() {
     return this.getExtension().stream()
-        .filter(
-            extension ->
-                WithSystem.anyOf(
-                        ErpWorkflowStructDef.PRESCRIPTION_TYPE_12,
-                        ErpWorkflowStructDef.PRESCRIPTION_TYPE)
-                    .matches(extension))
+        .filter(ErpWorkflowStructDef.PRESCRIPTION_TYPE::matches)
         .map(Extension::getValue)
         .filter(Coding.class::isInstance)
         .map(Coding.class::cast)
-        .filter(
-            coding ->
-                WithSystem.anyOf(
-                        ErpWorkflowCodeSystem.FLOW_TYPE_12, ErpWorkflowCodeSystem.FLOW_TYPE)
-                    .matches(coding))
+        .filter(ErpWorkflowCodeSystem.FLOW_TYPE::matches)
         .map(coding -> PrescriptionFlowType.fromCode(coding.getCode()))
         .findFirst()
         .orElseThrow(
-            () ->
-                new MissingFieldException(
-                    this.getClass(),
-                    ErpWorkflowCodeSystem.FLOW_TYPE,
-                    ErpWorkflowCodeSystem.FLOW_TYPE_12));
+            () -> new MissingFieldException(this.getClass(), ErpWorkflowCodeSystem.FLOW_TYPE));
   }
 
   public Optional<AccessCode> getOptionalAccessCode() {
@@ -138,42 +124,30 @@ public class ErxTask extends Task {
     return PerformerType.fromCode(this.getPerformerTypeFirstRep().getCodingFirstRep().getCode());
   }
 
+  public String getPerformerDisplayFirstRep() {
+    return this.getPerformerTypeFirstRep().getCodingFirstRep().getDisplay();
+  }
+
   public Optional<KVNR> getForKvnr() {
     return KVNR.extractFrom(this.getFor().getIdentifier());
   }
 
   public Date getExpiryDate() {
     return this.getExtension().stream()
-        .filter(
-            extension ->
-                WithSystem.anyOf(
-                        ErpWorkflowStructDef.EXPIRY_DATE_12, ErpWorkflowStructDef.EXPIRY_DATE)
-                    .matches(extension))
+        .filter(ErpWorkflowStructDef.EXPIRY_DATE::matches)
         .map(ext -> DateConverter.getInstance().dateFromIso8601(ext.getValue().primitiveValue()))
         .findFirst()
         .orElseThrow(
-            () ->
-                new MissingFieldException(
-                    this.getClass(),
-                    ErpWorkflowStructDef.EXPIRY_DATE_12,
-                    ErpWorkflowStructDef.EXPIRY_DATE));
+            () -> new MissingFieldException(this.getClass(), ErpWorkflowStructDef.EXPIRY_DATE));
   }
 
   public Date getAcceptDate() {
     return this.getExtension().stream()
-        .filter(
-            extension ->
-                WithSystem.anyOf(
-                        ErpWorkflowStructDef.ACCEPT_DATE_12, ErpWorkflowStructDef.ACCEPT_DATE)
-                    .matches(extension))
+        .filter(ErpWorkflowStructDef.ACCEPT_DATE::matches)
         .map(ext -> DateConverter.getInstance().dateFromIso8601(ext.getValue().primitiveValue()))
         .findFirst()
         .orElseThrow(
-            () ->
-                new MissingFieldException(
-                    this.getClass(),
-                    ErpWorkflowStructDef.ACCEPT_DATE_12,
-                    ErpWorkflowStructDef.ACCEPT_DATE));
+            () -> new MissingFieldException(this.getClass(), ErpWorkflowStructDef.ACCEPT_DATE));
   }
 
   public Optional<Instant> getLastMedicationDispenseDate() {
@@ -257,5 +231,9 @@ public class ErxTask extends Task {
 
   public static ErxTask fromTask(Resource adaptee) {
     return fromTask((Task) adaptee);
+  }
+
+  public String getFlowTypeDisplay() {
+    return this.getFlowType().getDisplay();
   }
 }

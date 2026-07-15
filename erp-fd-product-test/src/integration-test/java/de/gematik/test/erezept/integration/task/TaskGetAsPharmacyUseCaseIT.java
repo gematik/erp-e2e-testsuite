@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,9 @@ import static java.text.MessageFormat.format;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.vsdm.VsdmCheckDigitVersion;
+import de.gematik.bbriccs.vsdm.VsdmExamEvidence;
+import de.gematik.bbriccs.vsdm.VsdmExamEvidenceResult;
+import de.gematik.bbriccs.vsdm.VsdmService;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -39,16 +42,14 @@ import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.*;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTaskBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.toggle.EgkPharmacyAcceptPN3Toggle;
 import de.gematik.test.erezept.toggle.EgkPharmacyEnforceHcvCheck;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence.VsdmExamEvidenceBuilder;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidenceResult;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -59,7 +60,9 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.hl7.fhir.r4.model.Task;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -102,39 +105,53 @@ class TaskGetAsPharmacyUseCaseIT extends ErpTest {
     return ArgumentComposer.composeWith()
         .arguments(
             "invalide Betreiberkennung in der Prüfziffer",
-            (Function<VsdmExamEvidenceBuilder, VsdmExamEvidenceBuilder>)
+            (Function<
+                    VsdmExamEvidence.VsdmExamEvidenceBuilder,
+                    VsdmExamEvidence.VsdmExamEvidenceBuilder>)
                 builder -> builder.with(VsdmService.CheckDigitConfiguration.INVALID_MANUFACTURER),
             false)
         .arguments(
             "invalide Key-Version für die Prüfziffer",
-            (Function<VsdmExamEvidenceBuilder, VsdmExamEvidenceBuilder>)
+            (Function<
+                    VsdmExamEvidence.VsdmExamEvidenceBuilder,
+                    VsdmExamEvidence.VsdmExamEvidenceBuilder>)
                 builder -> builder.with(VsdmService.CheckDigitConfiguration.INVALID_KEY_VERSION),
             false)
         .arguments(
             "invalider KVNR in der Prüfziffer",
-            (Function<VsdmExamEvidenceBuilder, VsdmExamEvidenceBuilder>)
+            (Function<
+                    VsdmExamEvidence.VsdmExamEvidenceBuilder,
+                    VsdmExamEvidence.VsdmExamEvidenceBuilder>)
                 builder -> builder.with(VsdmService.CheckDigitConfiguration.INVALID_KVNR),
             false)
         .arguments(
             "ungültiger HMac-Key", // invalid hMacKey
-            (Function<VsdmExamEvidenceBuilder, VsdmExamEvidenceBuilder>)
+            (Function<
+                    VsdmExamEvidence.VsdmExamEvidenceBuilder,
+                    VsdmExamEvidence.VsdmExamEvidenceBuilder>)
                 builder -> builder.with(VsdmService.CheckDigitConfiguration.INVALID_KEY),
             false)
         .arguments(
             "abgelaufener Zeitstempel -30 Minuten in der Prüfziffer",
-            (Function<VsdmExamEvidenceBuilder, VsdmExamEvidenceBuilder>)
-                VsdmExamEvidenceBuilder::withExpiredIatTimestamp,
+            (Function<
+                    VsdmExamEvidence.VsdmExamEvidenceBuilder,
+                    VsdmExamEvidence.VsdmExamEvidenceBuilder>)
+                VsdmExamEvidence.VsdmExamEvidenceBuilder::withExpiredIatTimestamp,
             true)
         .arguments(
             "invalider Zeitstempel +40 Minuten in der Prüfziffer",
-            (Function<VsdmExamEvidenceBuilder, VsdmExamEvidenceBuilder>)
-                VsdmExamEvidenceBuilder::withInvalidIatTimestamp,
+            (Function<
+                    VsdmExamEvidence.VsdmExamEvidenceBuilder,
+                    VsdmExamEvidence.VsdmExamEvidenceBuilder>)
+                VsdmExamEvidence.VsdmExamEvidenceBuilder::withInvalidIatTimestamp,
             true)
         .multiply(List.of(VsdmCheckDigitVersion.V1, VsdmCheckDigitVersion.V2))
         .arguments(
             VsdmCheckDigitVersion.V2,
             "mit einer ungültigen (Revoked) Egk",
-            (Function<VsdmExamEvidenceBuilder, VsdmExamEvidenceBuilder>)
+            (Function<
+                    VsdmExamEvidence.VsdmExamEvidenceBuilder,
+                    VsdmExamEvidence.VsdmExamEvidenceBuilder>)
                 builder -> builder.with(VsdmService.CheckDigitConfiguration.REVOKED_EGK),
             true)
         .create();
@@ -175,7 +192,9 @@ class TaskGetAsPharmacyUseCaseIT extends ErpTest {
             .and(TaskBundleVerifier.doesNotContainQES(req))
             .and(TaskBundleVerifier.doesNotContainExpiredTasks(req))
             .and(TaskBundleVerifier.containsOnlyTasksWith(Task.TaskStatus.READY, req))
-            .and(TaskBundleVerifier.containsOnlyTasksWith(PrescriptionFlowType.FLOW_TYPE_160, req))
+            .and(
+                TaskBundleVerifier.containsOnlyTasksWith(
+                    req, PrescriptionFlowType.FLOW_TYPE_160, PrescriptionFlowType.FLOW_TYPE_166))
             .and(TaskBundleVerifier.containsOnlyTasksFor(patient.getKvnr(), req))
             .isCorrect());
     if (withAuditEvent) {
@@ -206,6 +225,18 @@ class TaskGetAsPharmacyUseCaseIT extends ErpTest {
     // Task with InsuranceTypeDe.PKV
     patient.changePatientInsuranceType(InsuranceTypeDe.PKV);
     doctor.performs(IssuePrescription.forPatient(patient).withRandomKbvBundle());
+
+    // Task with InsuranceTypeDe.PKV
+    patient.changePatientInsuranceType(InsuranceTypeDe.PKV);
+    doctor.performs(IssuePrescription.forPatient(patient).withRandomKbvBundle());
+
+    // E-T-Rezepta
+    val kbvErpBundleFaker =
+        KbvErpBundleFaker.builder().withMedication(KbvErpMedicationPZNFaker.asTPrescription());
+    doctor
+        .performs(
+            IssuePrescription.forPatient(patient).asTPrescription(kbvErpBundleFaker.toBuilder()))
+        .getExpectedResponse();
 
     tasksInitialized = true;
   }
@@ -357,7 +388,8 @@ class TaskGetAsPharmacyUseCaseIT extends ErpTest {
   void invalidChecksum(
       VsdmCheckDigitVersion checkDigitVersion,
       String explanation,
-      Function<VsdmExamEvidenceBuilder, VsdmExamEvidenceBuilder> additionalBuilderConfiguration,
+      Function<VsdmExamEvidence.VsdmExamEvidenceBuilder, VsdmExamEvidence.VsdmExamEvidenceBuilder>
+          additionalBuilderConfiguration,
       boolean withVerifyAuditEvent) {
     val evidenceBuilder =
         VsdmExamEvidence.asOnlineMode(vsdmService, patient.getEgk()).with(checkDigitVersion);
@@ -519,7 +551,9 @@ class TaskGetAsPharmacyUseCaseIT extends ErpTest {
         Verify.that(response)
             .withOperationOutcome(ErpAfos.A_24178)
             .responseWith(returnCodeIs(412))
-            .and(operationOutcomeHasDetailsText("Task not in-progress.", ErpAfos.A_24178))
+            .and(
+                operationOutcomeHasDetailsText(
+                    "Task must be in-progress or completed.", ErpAfos.A_24178))
             .isCorrect());
   }
 

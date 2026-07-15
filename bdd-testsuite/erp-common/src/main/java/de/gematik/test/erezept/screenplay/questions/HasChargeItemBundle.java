@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package de.gematik.test.erezept.screenplay.questions;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.exceptions.InvalidActorRoleException;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItemBundle;
 import de.gematik.test.erezept.screenplay.abilities.ManageChargeItems;
@@ -63,7 +63,7 @@ public class HasChargeItemBundle implements Question<Boolean> {
     }
   }
 
-  private Boolean checkAsPatient(Actor actor, ErpResponse<ErxChargeItemBundle> response) {
+  private Boolean checkAsPatient(Actor actor, FhirBResponse<ErxChargeItemBundle> response) {
     val chargeItemBundle = response.getExpectedResource();
     val chargeItem = chargeItemBundle.getChargeItem();
 
@@ -79,7 +79,7 @@ public class HasChargeItemBundle implements Question<Boolean> {
     return chargeItem.getSubjectKvnr().equals(egk.getKvnr());
   }
 
-  private Boolean checkAsPharmacy(Actor actor, ErpResponse<ErxChargeItemBundle> response) {
+  private Boolean checkAsPharmacy(Actor actor, FhirBResponse<ErxChargeItemBundle> response) {
     val chargeItemBundle = response.getExpectedResource();
     val chargeItem = chargeItemBundle.getChargeItem();
 

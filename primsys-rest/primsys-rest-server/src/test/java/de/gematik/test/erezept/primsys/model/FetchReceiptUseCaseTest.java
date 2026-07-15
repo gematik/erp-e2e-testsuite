@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
-import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -44,9 +43,8 @@ class FetchReceiptUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val getResponse =
-        ErpResponse.forPayload(new ErxPrescriptionBundle(), ErxPrescriptionBundle.class)
+        FhirBResponse.forPayload(ErxPrescriptionBundle.class, new ErxPrescriptionBundle())
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(mockClient.request(any(TaskGetByIdCommand.class))).thenReturn(getResponse);
 

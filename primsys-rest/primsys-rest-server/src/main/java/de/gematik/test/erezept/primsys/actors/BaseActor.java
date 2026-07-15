@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,19 @@ package de.gematik.test.erezept.primsys.actors;
 import static java.text.MessageFormat.format;
 
 import ca.uhn.fhir.parser.DataFormatException;
+import de.gematik.bbriccs.cardterminal.CardInfo;
 import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.fhir.codec.exceptions.FhirCodecException;
 import de.gematik.bbriccs.fhir.validation.ProfileExtractor;
+import de.gematik.bbriccs.konnektor.Konnektor;
+import de.gematik.bbriccs.konnektor.requests.GetCardHandleRequest;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.bbriccs.smartcards.SmcB;
-import de.gematik.test.cardterminal.CardInfo;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.usecases.ICommand;
+import de.gematik.test.erezept.client.usecases.ErpBaseCommand;
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
 import de.gematik.test.erezept.config.dto.actor.HealthInsuranceConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
@@ -41,8 +44,6 @@ import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.primsys.data.actors.ActorDto;
 import de.gematik.test.erezept.primsys.data.actors.ActorType;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
-import de.gematik.test.konnektor.Konnektor;
-import de.gematik.test.konnektor.commands.GetCardHandleCommand;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -105,7 +106,7 @@ public abstract class BaseActor {
     this.konnektor = konnektor;
 
     this.smcbHandle =
-        konnektor.execute(GetCardHandleCommand.forSmartcard(this.getSmcb())).getPayload();
+        konnektor.execute(GetCardHandleRequest.forSmartcard(this.getSmcb())).getPayload();
 
     this.client = ErpClientFactory.createErpClient(env, cfg);
     this.client.authenticateWith(smcb);
@@ -119,7 +120,7 @@ public abstract class BaseActor {
     return new BigInteger(1, md.digest(name.getBytes(StandardCharsets.UTF_8))).toString(16);
   }
 
-  public final <R extends Resource> ErpResponse<R> erpRequest(final ICommand<R> command) {
+  public final <R extends Resource> FhirBResponse<R> erpRequest(final ErpBaseCommand<R> command) {
     val response = this.getClient().request(command);
     if (response.isOperationOutcome() || response.getStatusCode() > 299) {
       ErrorResponseBuilder.throwFachdienstError(response);
@@ -128,7 +129,7 @@ public abstract class BaseActor {
   }
 
   // Note: when throw an error anyway in erpRequest, why not unpacking the response directly?
-  public final <R extends Resource> R erpRequest2(final ICommand<R> command) {
+  public final <R extends Resource> R erpRequest2(final ErpBaseCommand<R> command) {
     val response = this.getClient().request(command);
     if (response.isOperationOutcome() || response.getStatusCode() > 299) {
       ErrorResponseBuilder.throwFachdienstError(response);
@@ -138,8 +139,8 @@ public abstract class BaseActor {
 
   public <T extends Resource> T decode(Class<T> expectedClass, final String content) {
     try {
-      return this.getClient().getFhir().decode(expectedClass, content);
-    } catch (DataFormatException dfe) {
+      return this.getClient().decode(expectedClass, content);
+    } catch (DataFormatException | FhirCodecException fce) {
       val profileExtractor = new ProfileExtractor();
       val profile =
           profileExtractor

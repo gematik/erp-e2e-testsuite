@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,11 +29,9 @@ import lombok.experimental.Accessors;
 @Getter
 @RequiredArgsConstructor
 public enum ErpWorkflowVersion implements ProfileVersion {
-  V1_2("1.2.0"),
-  V1_3("1.3.1"),
   V1_4("1.4.3"),
   V1_5("1.5.2"),
-  V1_6("1.6.1"),
+  V1_6("1.6.2"),
   ;
 
   public static final String PROFILE_NAME = "de.gematik.erezept-workflow.r4";

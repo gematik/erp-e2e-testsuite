@@ -1,29 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>de.gematik.test.erezept</groupId>
-    <artifactId>erp-config</artifactId>
-    <version>1.4.0</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>de.gematik.test.erezept</groupId>
+        <artifactId>erp-config</artifactId>
+        <version>1.6.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
-  <artifactId>erp-config-data</artifactId>
-  <name>E-Rezept TestSuite Configurations Data</name>
-  <description>E-Rezept TestSuite Configurations Data</description>
+    <artifactId>erp-config-data</artifactId>
+    <name>E-Rezept TestSuite Configurations Data</name>
+    <description>E-Rezept TestSuite Configurations Data</description>
 
-  <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
 
   <dependencies>
     <dependency>
       <groupId>de.gematik.bbriccs</groupId>
       <artifactId>feature-toggle-brick</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.gematik.bbriccs</groupId>
+      <artifactId>configuration-api-brick</artifactId>
+    </dependency>
+
+    <!-- remove once Bricks moved to Jackson 3 -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.22.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>de.gematik.bbriccs</groupId>
+      <artifactId>popp-token-generator-brick</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>de.gematik.bbriccs</groupId>
+      <artifactId>konnektor-client-brick</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.gematik.bbriccs</groupId>
+      <artifactId>softkon-service-brick</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

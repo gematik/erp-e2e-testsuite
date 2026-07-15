@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ package de.gematik.test.erezept.client.usecases;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
-import java.util.Optional;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -65,7 +65,7 @@ class BundlePagingCommandTest extends ErpFhirParsingTest {
     assertNotNull(command);
     assertNotNull(command.queryParameters);
     assertNotNull(command.getHeaderParameters());
-    assertEquals(Optional.empty(), command.getRequestBody());
+    assertInstanceOf(EmptyResource.class, command.getRequestBody());
   }
 
   @Test

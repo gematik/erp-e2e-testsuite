@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,17 @@ import static de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDe
 import static de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef.EXT_REDEEMABLE_BY_PROPERTIES;
 import static java.text.MessageFormat.format;
 
+import com.google.common.base.Strings;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.Requirement;
 import de.gematik.test.core.expectations.requirements.RequirementsSet;
 import de.gematik.test.erezept.fhir.date.DateCalculator;
 import de.gematik.test.erezept.fhir.date.DateConverter;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowCodeSystem;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.erezept.fhir.valuesets.PerformerType;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.Date;
 import java.util.function.Predicate;
@@ -239,5 +242,79 @@ public class TaskVerifier {
             ErpAfos.A_24177.getRequirement(), ("Task secret muss vorhanden sein"))
         .predicate(predicate)
         .accept();
+  }
+
+  public static VerificationStep<ErxTask> hasCorrectPerformerType(PerformerType expected) {
+
+    Predicate<ErxTask> predicate =
+        task -> {
+          val performerType = task.getPerformerFirstRep();
+          boolean hasCorrectType = expected.equals(performerType);
+
+          val performerDisplay = task.getPerformerDisplayFirstRep();
+          boolean hasCorrectDisplay = expected.getDisplay().equals(performerDisplay);
+
+          boolean hasCorrectOrganizationSystem =
+              task.getPerformerType().stream()
+                  .anyMatch(ErpWorkflowCodeSystem.ORGANIZATION_TYPE::matches);
+
+          return hasCorrectType && hasCorrectDisplay && hasCorrectOrganizationSystem;
+        };
+
+    return new VerificationStep.StepBuilder<ErxTask>(
+            ErpAfos.A_27846.getRequirement(), format("PerformerType muss {0} sein", expected))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxTask> hasFlowType(PrescriptionFlowType expected) {
+
+    Predicate<ErxTask> predicate =
+        task -> {
+          val flowType = task.getFlowType();
+          val display = task.getFlowTypeDisplay();
+
+          boolean hasCorrectType = expected.equals(flowType);
+
+          boolean hasCorrectDisplay =
+              !Strings.isNullOrEmpty(display) && display.equals(expected.getDisplay());
+
+          return hasCorrectType && hasCorrectDisplay;
+        };
+
+    return new VerificationStep.StepBuilder<ErxTask>(
+            ErpAfos.A_27846.getRequirement(), format("Der FlowType muss {0} sein", expected))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<ErxTask> hasCorrectTPrescriptionProcessDates() {
+    return hasCorrectTPrescriptionProcessDates(new Date());
+  }
+
+  public static VerificationStep<ErxTask> hasCorrectTPrescriptionProcessDates(Date signatureDate) {
+    val dc = DateConverter.getInstance();
+    val calculator = new DateCalculator();
+
+    val expectedDate = dc.truncate(calculator.getDateAfterCalendarDays(signatureDate, 6));
+
+    Predicate<ErxTask> predicate =
+        task -> {
+          val acceptDate = task.getAcceptDate();
+          val expiryDate = task.getExpiryDate();
+
+          return calculator.equalDates(expectedDate, acceptDate)
+              && calculator.equalDates(expectedDate, expiryDate);
+        };
+
+    val step =
+        new VerificationStep.StepBuilder<ErxTask>(
+            ErpAfos.A_27846.getRequirement(),
+            format(
+                "AcceptDate und ExpiryDate müssen dem Wert {0} (SignatureDate + 6 Tage)"
+                    + " entsprechen",
+                expectedDate));
+
+    return step.predicate(predicate).accept();
   }
 }

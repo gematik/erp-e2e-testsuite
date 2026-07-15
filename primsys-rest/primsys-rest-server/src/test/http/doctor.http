@@ -28,3 +28,10 @@ apikey: {{apikey}}
     "kvnr": "S040464113"
   }
 }
+
+### DOC-PHARMACEUTICAL-DELETE-01
+# prescribe a completly random pharmaceutical prescription
+DELETE {{host}}/doc/{{doctor}}/abort?taskId=160.000.007.417.811.73&ac=3b128e9730fb02631187ff08dbb320a1956e4458e67e26f7e2a1f74c8c81b138
+Content-Type: application/json
+apikey: {{apikey}}
+

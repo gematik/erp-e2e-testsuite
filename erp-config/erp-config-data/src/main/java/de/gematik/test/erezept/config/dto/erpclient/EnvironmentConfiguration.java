@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,18 @@
 
 package de.gematik.test.erezept.config.dto.erpclient;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-import de.gematik.test.erezept.config.dto.INamedConfigurationElement;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import de.gematik.bbriccs.cfg.NamedConfigurationElement;
 import lombok.Data;
 
 @Data
-public class EnvironmentConfiguration implements INamedConfigurationElement {
+public class EnvironmentConfiguration implements NamedConfigurationElement {
 
   private String name;
   private BackendRouteConfiguration ti;
   private BackendRouteConfiguration internet;
   private EpaMockClientConfiguration epaMockClient;
 
-  @JsonAlias("tRegisterMockClient")
+  @JsonProperty("tRegisterMockClient")
   private TRegisterMockClientConfiguration tRegisterMockClient;
 }

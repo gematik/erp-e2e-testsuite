@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,11 @@ package de.gematik.test.erezept.primsys.model;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.PrimSysRestFactory;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.data.*;
@@ -51,14 +53,32 @@ class ActorContextTest extends TestWithActorContext {
     val ctx = ActorContext.getInstance();
     val prescriptionId = GemFaker.fakerPrescriptionId();
     val prescriptionData = new PrescriptionDto();
+    val kvnr = KVNR.random().getValue();
+
     prescriptionData.setPrescriptionId(prescriptionId);
     prescriptionData.setTaskId(prescriptionId);
-    prescriptionData.setPatient(PatientDto.withKvnr("X110407071").build());
+    prescriptionData.setPatient(PatientDto.withKvnr(kvnr).build());
     val size1 = ctx.getPrescriptions().size();
     ctx.addPrescription(prescriptionData);
     assertTrue(size1 < ctx.getPrescriptions().size());
     assertTrue(ctx.getPrescription(prescriptionId).isPresent());
-    assertFalse(ctx.getPrescriptions(PrescriptionFilterParams.with("X110407071")).isEmpty());
+    assertFalse(ctx.getPrescriptions(PrescriptionFilterParams.with(kvnr)).isEmpty());
+  }
+
+  @Test
+  void shouldAddAndRemoveReadyPrescriptions() {
+    val prescriptionId = PrescriptionId.random().getValue();
+    val ctx = ActorContext.getInstance();
+    val prescriptionDto = new PrescriptionDto();
+    prescriptionDto.setPrescriptionId(prescriptionId);
+    prescriptionDto.setTaskId(prescriptionId);
+
+    ctx.addPrescription(prescriptionDto);
+    assertFalse(ctx.getPrescriptions().isEmpty());
+    assertTrue(ctx.getPrescription(prescriptionId).isPresent());
+
+    assertTrue(ctx.removePrescription(TaskId.from(prescriptionId)));
+    assertFalse(ctx.getPrescription(prescriptionId).isPresent());
   }
 
   @Test
@@ -67,14 +87,14 @@ class ActorContextTest extends TestWithActorContext {
     val ctx = ActorContext.getInstance();
     val acceptData = new AcceptedPrescriptionDto();
     acceptData.setPrescriptionId(prescriptionId);
-    acceptData.setForKvnr("X110407071");
+    val kvnr = KVNR.random().getValue();
+    acceptData.setForKvnr(kvnr);
     ctx.addAcceptedPrescription(acceptData);
     assertFalse(ctx.getAcceptedPrescriptions().isEmpty());
-    assertFalse(
-        ctx.getAcceptedPrescriptions(PrescriptionFilterParams.with("X110407071")).isEmpty());
+    assertFalse(ctx.getAcceptedPrescriptions(PrescriptionFilterParams.with(kvnr)).isEmpty());
     assertTrue(ctx.getAcceptedPrescription(prescriptionId).isPresent());
 
-    assertTrue(ctx.removeAcceptedPrescription(acceptData));
+    assertTrue(ctx.removePrescription(acceptData));
     assertFalse(ctx.getAcceptedPrescription(prescriptionId).isPresent());
   }
 
@@ -116,7 +136,7 @@ class ActorContextTest extends TestWithActorContext {
 
     val ctx = ActorContext.getInstance();
     ctx.addAcceptedPrescription(acceptData);
-    assertTrue(ctx.removeAcceptedPrescription(acceptData));
+    assertTrue(ctx.removePrescription(acceptData));
   }
 
   @Test

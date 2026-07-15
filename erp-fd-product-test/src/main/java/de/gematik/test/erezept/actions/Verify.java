@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ package de.gematik.test.erezept.actions;
 
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
 
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.core.expectations.*;
 import de.gematik.test.core.expectations.requirements.*;
 import de.gematik.test.core.expectations.verifier.*;
@@ -100,16 +101,16 @@ public class Verify<T extends Resource> implements Performable {
       this.expectation = expectation;
     }
 
-    public Builder<R> responseWith(VerificationStep<ErpResponse<? extends Resource>> step) {
+    public Builder<R> responseWith(VerificationStep<FhirBResponse<? extends Resource>> step) {
       this.expectation.responseWith(step);
       return this;
     }
 
-    public Builder<R> hasResponseWith(VerificationStep<ErpResponse<? extends Resource>> step) {
+    public Builder<R> hasResponseWith(VerificationStep<FhirBResponse<? extends Resource>> step) {
       return responseWith(step);
     }
 
-    public Builder<R> andResponse(VerificationStep<ErpResponse<? extends Resource>> step) {
+    public Builder<R> andResponse(VerificationStep<FhirBResponse<? extends Resource>> step) {
       return responseWith(step);
     }
 
@@ -143,17 +144,17 @@ public class Verify<T extends Resource> implements Performable {
       this.expectation = expectation;
     }
 
-    public EmptyBodyBuilder responseWith(VerificationStep<ErpResponse<? extends Resource>> step) {
+    public EmptyBodyBuilder responseWith(VerificationStep<FhirBResponse<? extends Resource>> step) {
       this.expectation.responseWith(step);
       return this;
     }
 
     public EmptyBodyBuilder hasResponseWith(
-        VerificationStep<ErpResponse<? extends Resource>> step) {
+        VerificationStep<FhirBResponse<? extends Resource>> step) {
       return responseWith(step);
     }
 
-    public EmptyBodyBuilder andResponse(VerificationStep<ErpResponse<? extends Resource>> step) {
+    public EmptyBodyBuilder andResponse(VerificationStep<FhirBResponse<? extends Resource>> step) {
       return responseWith(step);
     }
 
@@ -165,7 +166,7 @@ public class Verify<T extends Resource> implements Performable {
     }
   }
 
-  public static <R extends Resource> PreBuilder<R> that(ErpResponse<R> interaction) {
+  public static <R extends Resource> PreBuilder<R> that(FhirBResponse<R> interaction) {
     return new PreBuilder<>(new ErpInteraction<>(interaction));
   }
 }

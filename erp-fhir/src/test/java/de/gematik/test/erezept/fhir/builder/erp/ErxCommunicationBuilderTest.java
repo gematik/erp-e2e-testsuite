@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
     val accessCode = AccessCode.random();
 
     val dispReq =
-        ErxCommunicationBuilder.forDispenseRequest(new CommunicationDisReqMessage())
+        ErxCommunicationBuilder.forDispenseRequest(CommunicationDisReqMessage.forV1().build())
             .version(version)
             .basedOn(taskId, accessCode)
             .receiver("606358757")
@@ -180,7 +180,14 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
               + " Task")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#erpWorkflowVersions")
   void shouldThrowOnMissingTaskForDispReq(ErpWorkflowVersion version) {
-    val message = new CommunicationDisReqMessage();
+    val message =
+        CommunicationDisReqMessage.forV1()
+            .supplyOptionsType(SupplyOptionsType.SHIPMENT)
+            .name("test")
+            .addressLines("street")
+            .phone("12345")
+            .hint("hint")
+            .build();
     val builder =
         ErxCommunicationBuilder.forDispenseRequest(message).version(version).receiver("606358757");
     assertThrows(BuilderException.class, builder::build);
@@ -191,7 +198,7 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
   @ClearSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE)
   void shouldBuildCommunicationReplyFixedValues(ErpWorkflowVersion version) {
     val reply =
-        ErxCommunicationBuilder.asReply(new CommunicationReplyMessage())
+        ErxCommunicationBuilder.asReply(CommunicationReplyMessage.forV1().build())
             .version(version)
             .basedOn(TaskId.from("4711"))
             .receiver("X234567890")
@@ -209,7 +216,7 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
   @ClearSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE)
   void shouldBuildCommunicationReplyWithDefaultSupplyOptions(ErpWorkflowVersion version) {
     val reply =
-        ErxCommunicationBuilder.asReply(new CommunicationReplyMessage())
+        ErxCommunicationBuilder.asReply(CommunicationReplyMessage.forV1().build())
             .version(version)
             .basedOn(TaskId.from("4711"))
             .receiver("X234567890")

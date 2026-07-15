@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.screenplay.questions;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
-import de.gematik.test.erezept.client.rest.ErpResponse;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.TaskRejectCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.values.Secret;
@@ -47,7 +47,7 @@ public class ResponseOfRejectOperation extends FhirResponseQuestion<EmptyResourc
   }
 
   @Override
-  public ErpResponse<EmptyResource> answeredBy(Actor actor) {
+  public FhirBResponse<EmptyResource> answeredBy(Actor actor) {
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val pharmacyStacks = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
     val toReject = deque.chooseFrom(pharmacyStacks.getAcceptedPrescriptions());

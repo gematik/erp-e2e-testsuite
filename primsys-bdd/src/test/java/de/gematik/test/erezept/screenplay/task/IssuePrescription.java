@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ package de.gematik.test.erezept.screenplay.task;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.EncodingType;
-import de.gematik.test.erezept.client.exceptions.UnexpectedResponseResourceError;
+import de.gematik.bbriccs.rest.fd.exceptions.UnexpectedResponseResourceError;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
@@ -136,7 +136,7 @@ public class IssuePrescription implements Task {
             () ->
                 new AssertionError(
                     new UnexpectedResponseResourceError(
-                        activate.expectedResponseBody(), activateResponse.getAsBaseResource())));
+                        activate.expectedResponseType(), activateResponse.getAsBaseResource())));
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ package de.gematik.test.erezept.client.usecases;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Optional;
-import org.hl7.fhir.r4.model.Resource;
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class GetCapabilityStatementCommandTest {
@@ -32,7 +32,7 @@ class GetCapabilityStatementCommandTest {
   void shouldReturnEmptyRequestBody() {
     GetCapabilityStatementCommand command = new GetCapabilityStatementCommand();
 
-    Optional<Resource> body = command.getRequestBody();
-    assertTrue(body.isEmpty());
+    val body = command.getRequestBody();
+    assertInstanceOf(EmptyResource.class, body);
   }
 }

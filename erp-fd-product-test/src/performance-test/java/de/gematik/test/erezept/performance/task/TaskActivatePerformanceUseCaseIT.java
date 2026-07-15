@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ package de.gematik.test.erezept.performance.task;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.bbriccs.konnektor.KonnektorResponse;
 import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
@@ -48,7 +49,6 @@ import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import de.gematik.test.konnektor.KonnektorResponse;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,8 @@ import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
 import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
 import de.gematik.test.erezept.fhir.profiles.definitions.DgMPStructDef;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.LANR;
@@ -98,13 +100,17 @@ class CheckEpaOpProvidePrescriptionsRenderedDosageInstructionValuesTest
                     .build())
             .build();
 
-    val medRequest = KbvErpMedicationRequestFaker.builder().withDgmp(dosageDgMP).fake();
+    val medRequest =
+        KbvErpMedicationRequestFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withDgmp(dosageDgMP)
+            .fake();
     medRequest.addExtension(
         new Extension(
             DgMPStructDef.MR_RENDERED_DOSAGE_INSTRUCTION.getCanonicalUrl(),
             new MarkdownType("1-0-0-0 Stück")));
     erpKbvBundle =
         KbvErpBundleBuilder.builder()
+            .version(KbvItaErpVersion.V1_4_0)
             .prescriptionId(PrescriptionId.random())
             .medicationRequest(medRequest)
             .patient(KbvPatientFaker.builder().fake())

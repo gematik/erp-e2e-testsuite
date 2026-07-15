@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ package de.gematik.test.erezept.screenplay.questions;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.EncodingType;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.smartcards.SmartcardType;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemPostCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.dav.DavPkvAbgabedatenFaker;
@@ -72,7 +72,7 @@ public class ResponseOfPostChargeItem extends FhirResponseQuestion<ErxChargeItem
   }
 
   @Override
-  public ErpResponse<ErxChargeItem> answeredBy(Actor actor) {
+  public FhirBResponse<ErxChargeItem> answeredBy(Actor actor) {
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
     val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
     strategy.init(actor);
@@ -106,7 +106,7 @@ public class ResponseOfPostChargeItem extends FhirResponseQuestion<ErxChargeItem
     return response;
   }
 
-  private void checkNoAccessCodeAndNoReceipt(ErpResponse<ErxChargeItem> response) {
+  private void checkNoAccessCodeAndNoReceipt(FhirBResponse<ErxChargeItem> response) {
     response
         .getResourceOptional()
         .ifPresent(

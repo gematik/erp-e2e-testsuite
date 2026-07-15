@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,10 @@
 
 package de.gematik.test.erezept;
 
+import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_CONFIG;
+import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
+
+import de.gematik.bbriccs.fhir.conf.ProfilesConfigurator;
 import de.gematik.bbriccs.toggle.FeatureConfiguration;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.exceptions.NotAnActorException;
@@ -44,6 +48,8 @@ public abstract class ErpTest {
   protected ErpTest() {
     this.stage = new ActorStage();
     this.config = ActorStage.getConfig();
+    // preventive preparate FhirContext,
+    ProfilesConfigurator.getConfiguration(ERP_FHIR_PROFILES_CONFIG, ERP_FHIR_PROFILES_TOGGLE);
     instrumentAnnotatedActors();
   }
 

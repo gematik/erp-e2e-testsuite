@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,12 @@
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.date.DateConverter;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
@@ -41,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.BooleanType;
+import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Task;
 import org.hl7.fhir.r4.model.Task.TaskStatus;
@@ -323,5 +321,32 @@ class ErxTaskTest extends ErpFhirParsingTest {
   void shouldBeFalseForRedeemableByPropertiesWhenExtensionIsMissing() {
     val task = new ErxTask();
     assertFalse(task.getRedeemableByProperties());
+  }
+
+  @Test
+  void shouldReturnFlowTypeDisplayWhenFlowTypeExists() {
+    val task = new ErxTask();
+
+    val expected = PrescriptionFlowType.FLOW_TYPE_166;
+    val coding = expected.asCoding(true);
+
+    task.addExtension(ErpWorkflowStructDef.PRESCRIPTION_TYPE.getCanonicalUrl(), coding);
+
+    val result = task.getFlowTypeDisplay();
+
+    assertEquals(expected.getDisplay(), result);
+  }
+
+  @Test
+  void shouldReturnPerformerDisplayFirstRep() {
+    val task = new ErxTask();
+
+    val performerType = PerformerType.PUBLIC_PHARMACY;
+
+    task.addPerformerType(new CodeableConcept().addCoding(performerType.asCoding(true)));
+
+    val result = task.getPerformerDisplayFirstRep();
+
+    assertEquals(performerType.getDisplay(), result);
   }
 }

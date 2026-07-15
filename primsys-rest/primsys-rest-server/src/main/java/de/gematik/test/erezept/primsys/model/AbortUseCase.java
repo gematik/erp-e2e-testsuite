@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.actors.BaseActor;
 import jakarta.ws.rs.core.Response;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.val;
 
 public class AbortUseCase {
@@ -36,15 +38,16 @@ public class AbortUseCase {
     this.actor = actor;
   }
 
-  public Response abortPrescription(String taskId, String accessCode, String secret) {
-    return abortUseCase(TaskId.from(taskId), AccessCode.from(accessCode), Secret.from(secret));
+  public Response abortPrescription(String taskId, String accessCode, @Nullable String secret) {
+    val s = Optional.ofNullable(secret).map(Secret::from).orElse(null);
+    return abortUseCase(TaskId.from(taskId), AccessCode.from(accessCode), s);
   }
 
-  private Response abortUseCase(TaskId taskId, AccessCode accessCode, Secret secret) {
+  private Response abortUseCase(TaskId taskId, AccessCode accessCode, @Nullable Secret secret) {
     val abortCommand = new TaskAbortCommand(taskId, accessCode, secret);
     val abortResponse = actor.erpRequest(abortCommand);
 
-    ActorContext.getInstance().removeAcceptedPrescription(taskId);
+    ActorContext.getInstance().removePrescription(taskId);
     return Response.status(abortResponse.getStatusCode()).build();
   }
 }

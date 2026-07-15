@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Bundle xmlns="http://hl7.org/fhir">
+  <id value="3102c63c-1f98-41b7-96e2-4e4b7dc2a8b9"/>
+  <type value="searchset"/>
+  <timestamp value="2026-07-08T08:40:06.015+00:00"/>
+  <total value="6"/>
+  <link>
+    <relation value="last"/>
+    <url
+      value="https://erp-ref.zentral.erp.splitdns.ti-dienste.de/Communication?_sort=-sent&amp;_count=50&amp;__offset=0"/>
+  </link>
+  <link>
+    <relation value="first"/>
+    <url
+      value="https://erp-ref.zentral.erp.splitdns.ti-dienste.de/Communication?_sort=-sent&amp;_count=50&amp;__offset=0"/>
+  </link>
+  <link>
+    <relation value="self"/>
+    <url value="https://erp-ref.zentral.erp.splitdns.ti-dienste.de/Communication?_sort=-sent"/>
+  </link>
+  <entry>
+    <fullUrl
+      value="https://erp-ref.zentral.erp.splitdns.ti-dienste.de/Communication/01ebf82c-aa90-e888-7e9a-52a05434002d"/>
+    <resource>
+      <Communication>
+        <id value="01ebf82c-aa90-e888-7e9a-52a05434002d"/>
+        <meta>
+          <profile
+            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.5"/>
+        </meta>
+        <basedOn>
+          <reference
+            value="Task/209.000.000.195.952.43/$accept?ac=900d7d91d394a1c5013fe764da8b400fca5aa7074c8ea68480814d78ee10587c"/>
+        </basedOn>
+        <status value="unknown"/>
+        <sent value="2026-03-31T09:44:48.805+00:00"/>
+        <received value="2026-03-31T09:54:45.000+00:00"/>
+        <recipient>
+          <identifier>
+            <system value="http://fhir.de/sid/gkv/kvid-10"/>
+            <value value="X110614233"/>
+          </identifier>
+        </recipient>
+        <sender>
+          <identifier>
+            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+            <value value="5-2-KH-APO-Waldesrand-01"/>
+          </identifier>
+        </sender>
+        <payload>
+          <extension
+            url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType">
+            <extension url="shipment">
+              <valueBoolean value="true"/>
+            </extension>
+            <extension url="onPremise">
+              <valueBoolean value="false"/>
+            </extension>
+            <extension url="delivery">
+              <valueBoolean value="false"/>
+            </extension>
+          </extension>
+          <contentString
+            value="{&quot;version&quot;:1,&quot;supplyOptionsType&quot;:&quot;shipment&quot;,&quot;info_text&quot;:&quot;how much is the fish?&quot;}"/>
+        </payload>
+      </Communication>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl
+      value="https://erp-ref.zentral.erp.splitdns.ti-dienste.de/Communication/01ebf82c-aa52-2238-ea49-d5977b73a894"/>
+    <resource>
+      <Communication>
+        <id value="01ebf82c-aa52-2238-ea49-d5977b73a894"/>
+        <meta>
+          <profile
+            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.5"/>
+        </meta>
+        <basedOn>
+          <reference
+            value="Task/209.000.000.195.950.49/$accept?ac=02ea43b9521408a5f90c357df4bf6705f4484e9e6ad03a1480493e9cb012b820"/>
+        </basedOn>
+        <status value="unknown"/>
+        <sent value="2026-03-31T09:44:44.691+00:00"/>
+        <received value="2026-03-31T09:54:45.000+00:00"/>
+        <recipient>
+          <identifier>
+            <system value="http://fhir.de/sid/gkv/kvid-10"/>
+            <value value="X110614233"/>
+          </identifier>
+        </recipient>
+        <sender>
+          <identifier>
+            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+            <value value="5-2-KH-APO-Waldesrand-01"/>
+          </identifier>
+        </sender>
+        <payload>
+          <extension
+            url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType">
+            <extension url="delivery">
+              <valueBoolean value="true"/>
+            </extension>
+            <extension url="onPremise">
+              <valueBoolean value="false"/>
+            </extension>
+            <extension url="shipment">
+              <valueBoolean value="false"/>
+            </extension>
+          </extension>
+          <contentString
+            value="{&quot;version&quot;:1,&quot;supplyOptionsType&quot;:&quot;delivery&quot;,&quot;info_text&quot;:&quot;how much is the fish?&quot;}"/>
+        </payload>
+      </Communication>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl
+      value="https://erp-ref.zentral.erp.splitdns.ti-dienste.de/Communication/01ebf82c-aa15-ffb0-b4ea-5dc540d3ec20"/>
+    <resource>
+      <Communication>
+        <id value="01ebf82c-aa15-ffb0-b4ea-5dc540d3ec20"/>
+        <meta>
+          <profile
+            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.5"/>
+        </meta>
+        <basedOn>
+          <reference
+            value="Task/209.000.000.195.948.55/$accept?ac=776ca7d1b3bc9cab0b4009a1a5c00fdfb885e04ebf796babc28d38c845a7b84d"/>
+        </basedOn>
+        <status value="unknown"/>
+        <sent value="2026-03-31T09:44:40.750+00:00"/>
+        <received value="2026-03-31T09:54:45.000+00:00"/>
+        <recipient>
+          <identifier>
+            <system value="http://fhir.de/sid/gkv/kvid-10"/>
+            <value value="X110614233"/>
+          </identifier>
+        </recipient>
+        <sender>
+          <identifier>
+            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+            <value value="5-2-KH-APO-Waldesrand-01"/>
+          </identifier>
+        </sender>
+        <payload>
+          <extension
+            url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType">
+            <extension url="onPremise">
+              <valueBoolean value="true"/>
+            </extension>
+            <extension url="delivery">
+              <valueBoolean value="false"/>
+            </extension>
+            <extension url="shipment">
+              <valueBoolean value="false"/>
+            </extension>
+          </extension>
+          <contentString
+            value="{&quot;version&quot;:1,&quot;supplyOptionsType&quot;:&quot;onPremise&quot;,&quot;info_text&quot;:&quot;how much is the fish?&quot;}"/>
+        </payload>
+      </Communication>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl
+      value="https://erp-ref.zentral.erp.splitdns.ti-dienste.de/Communication/01ebf82c-a9db-92a8-95db-bfca8a7b1b95"/>
+    <resource>
+      <Communication>
+        <id value="01ebf82c-a9db-92a8-95db-bfca8a7b1b95"/>
+        <meta>
+          <profile
+            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.5"/>
+        </meta>
+        <basedOn>
+          <reference
+            value="Task/169.000.011.822.410.12/$accept?ac=885c3f3ce7ec053baf0837b70bd8eb51952e1e2b9f4e7059814809c1c2d4fc3f"/>
+        </basedOn>
+        <status value="unknown"/>
+        <sent value="2026-03-31T09:44:36.921+00:00"/>
+        <received value="2026-03-31T09:54:45.000+00:00"/>
+        <recipient>
+          <identifier>
+            <system value="http://fhir.de/sid/gkv/kvid-10"/>
+            <value value="X110614233"/>
+          </identifier>
+        </recipient>
+        <sender>
+          <identifier>
+            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+            <value value="5-2-KH-APO-Waldesrand-01"/>
+          </identifier>
+        </sender>
+        <payload>
+          <extension
+            url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType">
+            <extension url="shipment">
+              <valueBoolean value="true"/>
+            </extension>
+            <extension url="onPremise">
+              <valueBoolean value="false"/>
+            </extension>
+            <extension url="delivery">
+              <valueBoolean value="false"/>
+            </extension>
+          </extension>
+          <contentString
+            value="{&quot;version&quot;:1,&quot;supplyOptionsType&quot;:&quot;shipment&quot;,&quot;info_text&quot;:&quot;how much is the fish?&quot;}"/>
+        </payload>
+      </Communication>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl
+      value="https://erp-ref.zentral.erp.splitdns.ti-dienste.de/Communication/01ebf82c-a99a-d088-4375-151b6a899deb"/>
+    <resource>
+      <Communication>
+        <id value="01ebf82c-a99a-d088-4375-151b6a899deb"/>
+        <meta>
+          <profile
+            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.5"/>
+        </meta>
+        <basedOn>
+          <reference
+            value="Task/169.000.011.822.407.21/$accept?ac=bae5f90cb7833ba12eb5b2f415a98b92ce28c5e867c1871db6a414264cc30852"/>
+        </basedOn>
+        <status value="unknown"/>
+        <sent value="2026-03-31T09:44:32.677+00:00"/>
+        <received value="2026-03-31T09:54:45.000+00:00"/>
+        <recipient>
+          <identifier>
+            <system value="http://fhir.de/sid/gkv/kvid-10"/>
+            <value value="X110614233"/>
+          </identifier>
+        </recipient>
+        <sender>
+          <identifier>
+            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+            <value value="5-2-KH-APO-Waldesrand-01"/>
+          </identifier>
+        </sender>
+        <payload>
+          <extension
+            url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType">
+            <extension url="delivery">
+              <valueBoolean value="true"/>
+            </extension>
+            <extension url="onPremise">
+              <valueBoolean value="false"/>
+            </extension>
+            <extension url="shipment">
+              <valueBoolean value="false"/>
+            </extension>
+          </extension>
+          <contentString
+            value="{&quot;version&quot;:1,&quot;supplyOptionsType&quot;:&quot;delivery&quot;,&quot;info_text&quot;:&quot;how much is the fish?&quot;}"/>
+        </payload>
+      </Communication>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+  <entry>
+    <fullUrl
+      value="https://erp-ref.zentral.erp.splitdns.ti-dienste.de/Communication/01ebf82c-a95b-27a8-8da8-75b00fd31c12"/>
+    <resource>
+      <Communication>
+        <id value="01ebf82c-a95b-27a8-8da8-75b00fd31c12"/>
+        <meta>
+          <profile
+            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_Reply|1.5"/>
+        </meta>
+        <basedOn>
+          <reference
+            value="Task/169.000.011.822.402.36/$accept?ac=8d7c9082ef318fc3381afcf336e2cbe48c8a0212c9de2adb34af6f143826d807"/>
+        </basedOn>
+        <status value="unknown"/>
+        <sent value="2026-03-31T09:44:28.505+00:00"/>
+        <received value="2026-03-31T09:54:45.000+00:00"/>
+        <recipient>
+          <identifier>
+            <system value="http://fhir.de/sid/gkv/kvid-10"/>
+            <value value="X110614233"/>
+          </identifier>
+        </recipient>
+        <sender>
+          <identifier>
+            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+            <value value="5-2-KH-APO-Waldesrand-01"/>
+          </identifier>
+        </sender>
+        <payload>
+          <extension
+            url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_SupplyOptionsType">
+            <extension url="onPremise">
+              <valueBoolean value="true"/>
+            </extension>
+            <extension url="delivery">
+              <valueBoolean value="false"/>
+            </extension>
+            <extension url="shipment">
+              <valueBoolean value="false"/>
+            </extension>
+          </extension>
+          <contentString
+            value="{&quot;version&quot;:1,&quot;supplyOptionsType&quot;:&quot;onPremise&quot;,&quot;info_text&quot;:&quot;how much is the fish?&quot;}"/>
+        </payload>
+      </Communication>
+    </resource>
+    <search>
+      <mode value="match"/>
+    </search>
+  </entry>
+</Bundle>

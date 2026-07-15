@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.app.abilities.UseTheApp;
-import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
 import de.gematik.test.erezept.app.questions.MovingToPrescription;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
@@ -58,8 +57,8 @@ public class EnsureThatThePrescriptionValidity implements Task {
     val dmcAbility = SafeAbility.getAbility(actor, ManageDataMatrixCodes.class);
     val dmc = deque.chooseFrom(dmcAbility.chooseStack(DmcStack.ACTIVE));
 
-    // first refresh the screen
-    app.tap(Mainscreen.REFRESH_BUTTON);
+    actor.attemptsTo(RefreshPrescriptions.byTap());
+
     actor
         .asksFor(MovingToPrescription.withTaskId(dmc.getTaskId()))
         .orElseThrow(

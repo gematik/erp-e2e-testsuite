@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,10 @@ package de.gematik.test.erezept.eml.fhir.r4;
 
 import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import java.util.List;
+import lombok.val;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.Resource;
 
 @SuppressWarnings("java:S110")
 public class EpaMedicationRequest extends MedicationRequest {
@@ -34,5 +36,19 @@ public class EpaMedicationRequest extends MedicationRequest {
 
   public List<DosageDgMP> getDosageInstructionDgMPs() {
     return this.getDosageInstruction().stream().map(DosageDgMP::fromDosage).toList();
+  }
+
+  public static EpaMedicationRequest fromEpaMedicationRequest(MedicationRequest adaptee) {
+    if (adaptee instanceof EpaMedicationRequest epaMedReuq) {
+      return epaMedReuq;
+    } else {
+      val epaMedRequ = new EpaMedicationRequest();
+      adaptee.copyValues(epaMedRequ);
+      return epaMedRequ;
+    }
+  }
+
+  public static EpaMedicationRequest fromEpaMedicationRequest(Resource adaptee) {
+    return fromEpaMedicationRequest((MedicationRequest) adaptee);
   }
 }

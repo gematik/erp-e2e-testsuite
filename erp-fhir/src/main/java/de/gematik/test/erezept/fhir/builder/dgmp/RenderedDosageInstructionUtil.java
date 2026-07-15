@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -729,6 +729,7 @@ public class RenderedDosageInstructionUtil {
    * @return Formatted value (e.g., "1" instead of "1,0", "1,5" kept as is)
    */
   private static String formatDecimalValue(BigDecimal value) {
+    if (value.scale() == 0) return value.toPlainString();
     return String.valueOf(value)
         // use comma as decimal separator for german format
         .replace(".", ",");

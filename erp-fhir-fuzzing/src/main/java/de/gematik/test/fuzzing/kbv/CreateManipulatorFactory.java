@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@
 
 package de.gematik.test.fuzzing.kbv;
 
-import static de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowCodeSystem.*;
+import static de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowCodeSystem.AVAILABILITY_STATUS;
+import static de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowCodeSystem.DOCUMENT_TYPE;
 
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
@@ -39,12 +40,12 @@ public class CreateManipulatorFactory {
 
     manipulators.add(
         NamedEnvelope.of(
-            "set Old-FlowType-System  as Value in Parameter.valueCoding",
+            "set Document-Type-System  as Value in Parameter.valueCoding",
             b ->
                 b.getParameterFirstRep()
                     .getValue()
                     .castToCoding(b.getParameterFirstRep().getValue())
-                    .setSystem(FLOW_TYPE.getCanonicalUrl())));
+                    .setSystem(DOCUMENT_TYPE.getCanonicalUrl())));
     manipulators.add(
         NamedEnvelope.of(
             "set AVAILABILITY_STATUS-System  as Value in Parameter.valueCoding",

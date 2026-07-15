@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,17 @@
 
 package de.gematik.test.erezept.actions.eu;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.actions.GetMedicationDispense;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.usecases.MedicationDispenseGetCommand;
@@ -39,7 +39,6 @@ import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import java.time.LocalDate;
-import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -57,9 +56,9 @@ class GetEuMedicationDispensesTest extends ErpFhirBuildingTest {
     sina = new PatientActor("sina");
     sina.can(useErpClient);
     val mockResponse =
-        ErpResponse.forPayload(new ErxMedicationDispenseBundle(), ErxMedicationDispenseBundle.class)
+        FhirBResponse.forPayload(
+                ErxMedicationDispenseBundle.class, new ErxMedicationDispenseBundle())
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(MedicationDispenseGetCommand.class))).thenReturn(mockResponse);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.smartcards.Egk;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
@@ -45,7 +45,6 @@ import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.questions.HasChargeItemBundle;
 import de.gematik.test.erezept.screenplay.questions.HasDispensedDrugs;
 import java.time.Instant;
-import java.util.Map;
 import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
@@ -93,9 +92,8 @@ class DrugDispensationTest extends ErpFhirBuildingTest {
             .fake();
     val chargeItemBundle = mock(ErxChargeItemBundle.class);
     val response =
-        ErpResponse.forPayload(chargeItemBundle, ErxChargeItemBundle.class)
+        FhirBResponse.forPayload(ErxChargeItemBundle.class, chargeItemBundle)
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
 
     when(chargeItemBundle.getChargeItem()).thenReturn(chargeItem);
@@ -111,9 +109,8 @@ class DrugDispensationTest extends ErpFhirBuildingTest {
   @Test
   void thenReceivedDrugsWithoutChargeItem() {
     val response =
-        ErpResponse.forPayload(createOperationOutcome(), ErxChargeItemBundle.class)
+        FhirBResponse.forPayload(ErxChargeItemBundle.class, createOperationOutcome())
             .withStatusCode(404)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useMockClientAbility.request(any(ChargeItemGetByIdCommand.class))).thenReturn(response);
 

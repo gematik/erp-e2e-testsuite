@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,14 @@ package de.gematik.test.erezept.actions;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.bbriccs.vsdm.VsdmExamEvidence;
 import de.gematik.bbriccs.vsdm.types.VsdmPatient;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.usecases.TaskGetByExamEvidenceCommand;
+import de.gematik.test.erezept.client.usecases.TaskGetByPoppTokenCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTaskBundle;
-import de.gematik.test.konnektor.soap.mock.vsdm.VsdmExamEvidence;
 import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
@@ -118,6 +119,11 @@ public class DownloadReadyTask extends ErpAction<ErxTaskBundle> {
     if (hcv != null) {
       cmd = cmd.andHcv(hcv);
     }
+    return new DownloadReadyTask(cmd);
+  }
+
+  public static DownloadReadyTask withPoppToken(String poppToken) {
+    var cmd = new TaskGetByPoppTokenCommand(poppToken);
     return new DownloadReadyTask(cmd);
   }
 

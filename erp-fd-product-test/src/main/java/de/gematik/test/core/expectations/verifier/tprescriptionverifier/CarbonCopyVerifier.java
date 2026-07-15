@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,9 @@ import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.r4.erp.tprescription.ErpTPrescriptionCarbonCopy;
+import de.gematik.test.erezept.trezept.TRegisterLog;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -166,6 +168,25 @@ public class CarbonCopyVerifier {
             ErpAfos.A_27827.getRequirement(),
             "Die Darreichungsform in der CarbonCopy-RxDispensation stimmt mit der Darreichungsform"
                 + " der Medication überein")
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<List<TRegisterLog>> checkPresenceAccessToken() {
+
+    Predicate<List<TRegisterLog>> predicate =
+        logs ->
+            logs.stream()
+                .map(TRegisterLog::request)
+                .filter(Objects::nonNull)
+                .anyMatch(
+                    req -> {
+                      String auth = req.headerValue("Authorization");
+                      return auth != null && auth.startsWith("Bearer ");
+                    });
+
+    return new VerificationStep.StepBuilder<List<TRegisterLog>>(
+            ErpAfos.A_27821.getRequirement(), "Das AccessToken muss vorhanden sein")
         .predicate(predicate)
         .accept();
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@
 
 package de.gematik.test.erezept.config.dto.app;
 
-import de.gematik.test.erezept.config.dto.INamedConfigurationElement;
+import de.gematik.bbriccs.cfg.NamedConfigurationElement;
 import lombok.Data;
 
 @Data
-public class AppiumConfiguration implements INamedConfigurationElement {
+public class AppiumConfiguration implements NamedConfigurationElement {
 
   private String name;
   private String url;
@@ -32,5 +32,7 @@ public class AppiumConfiguration implements INamedConfigurationElement {
   private String version;
   private String provisioningProfilePostfix;
   private int maxWaitTimeout = 5000; // duration until timeout and finally NoSuchElementException
-  private int pollingInterval = 50; // polling interval in milli seconds
+  private int pollingInterval = 50; // polling interval in milliseconds
+  private int maxRefreshTimeout =
+      30000; // duration to wait for the prescription refresh to finish until TimeOutException
 }

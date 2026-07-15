@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,7 @@ public class CommunicationDispenseRequestSender extends BaseRemoteCommand {
     val kvnr = prescription.getTask().getForKvnr().map(KVNR::getValue).orElse("");
 
     ErxCommunicationBuilder<?> builder;
+
     if (flowType.equals(PrescriptionFlowType.FLOW_TYPE_162)) {
       builder =
           ErxCommunicationBuilder.forDiGADispenseRequest()
@@ -90,7 +91,7 @@ public class CommunicationDispenseRequestSender extends BaseRemoteCommand {
               .flowType(flowType);
     } else {
       builder =
-          ErxCommunicationBuilder.forDispenseRequest(new CommunicationDisReqMessage())
+          ErxCommunicationBuilder.forDispenseRequest(CommunicationDisReqMessage.forV1().build())
               .basedOn(taskId, accessCode)
               .sender(kvnr)
               .flowType(flowType);

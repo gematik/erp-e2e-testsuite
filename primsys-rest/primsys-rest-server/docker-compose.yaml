@@ -12,7 +12,9 @@ services:
     hostname: primsys-ru
     environment:
       - TI_ENV=RU
-      - ERP_FHIR_PROFILE=1.5.0
+      - ERP_FHIR_PROFILE=${PROFILES_RU}
+      - VAU_CONNECTION_TIMEOUT=60
+      - NO_PROXY=${NO_PROXY:-127.0.0.1,localhost,.splitdns.ti-dienste.de}
     env_file:
       - .env
 
@@ -22,7 +24,8 @@ services:
     hostname: primsys-tu
     environment:
       - TI_ENV=TU
-      - ERP_FHIR_PROFILE=1.5.0
+      - ERP_FHIR_PROFILE=${PROFILES_TU}
+      - VAU_CONNECTION_TIMEOUT=30
     env_file:
       - .env
 
@@ -31,7 +34,8 @@ services:
     restart: unless-stopped
     environment:
       - TI_ENV=RU-DEV
-      - ERP_FHIR_PROFILE=1.5.0
+      - ERP_FHIR_PROFILE=${PROFILES_RU_DEV}
+      - VAU_CONNECTION_TIMEOUT=30
     env_file:
       - .env
 
@@ -41,8 +45,8 @@ services:
     hostname: erpione-dev
     restart: unless-stopped
     environment:
-      - ERP_FHIR_PROFILE=1.5.0
-      - ACTIVE_SPRING_PROFILES=rudev,noauth
+      - ERP_FHIR_PROFILE=${PROFILES_TU}
+      - ACTIVE_SPRING_PROFILES=tu,noauth
     healthcheck:
       test: "wget -T5 -qO- 127.0.0.1:8080/actuator/health | grep UP || exit 1"
       interval: 2m

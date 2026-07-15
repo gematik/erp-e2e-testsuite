@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -229,6 +229,26 @@ class DoctorRequestTest : RestTest() {
         val cmd = asDirectAssignment?.let {
             DoctorRequests.prescribeKbvBundle(kbvBundlePath!!, it)
         } ?: DoctorRequests.prescribeKbvBundle(kbvBundlePath!!)
+        assertDoesNotThrow {
+            doc.performBlocking(cmd).asExpectedPayload()
+        }
+    }
+
+    @Test
+    fun shouldAbort() {
+        setupPositiveStubs()
+        val clientFactory = PrimSysClientFactory
+            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+
+        removeAllMappings()
+        setupPositiveAbort()
+
+        val doc = clientFactory.getRandomDoctorClient()
+        val prescription = PrescriptionDto().apply {
+            taskId = "160.100.000.000.011.10"
+            accessCode = "123123123"
+        }
+        val cmd = DoctorRequests.abort(prescription)
         assertDoesNotThrow {
             doc.performBlocking(cmd).asExpectedPayload()
         }

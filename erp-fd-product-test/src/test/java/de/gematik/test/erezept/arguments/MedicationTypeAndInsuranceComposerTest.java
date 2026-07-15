@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 class MedicationTypeAndInsuranceComposerTest {
 
   @Test
-  void shouleCountTestcasesCorrect() {
+  void shouldCountTestcasesCorrect() {
     val mTypeAndInsComp = getComposer().create().toList();
     assertFalse(mTypeAndInsComp.isEmpty());
     assertEquals(8, mTypeAndInsComp.size());

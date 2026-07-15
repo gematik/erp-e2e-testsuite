@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ public class ErxMedicationDispenseBundleFaker {
   }
 
   public ErxMedicationDispenseBundleBuilder toBuilder() {
-    val builder = ErxMedicationDispenseBundleBuilder.empty().version(erpWorkflowVersion);
+    val builder = ErxMedicationDispenseBundleBuilder.empty();
     IntStream.range(0, amount)
         .forEach(
             idx ->

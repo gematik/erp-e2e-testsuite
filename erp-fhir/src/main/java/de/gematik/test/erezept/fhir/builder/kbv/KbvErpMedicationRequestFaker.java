@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
@@ -227,14 +228,20 @@ public class KbvErpMedicationRequestFaker {
     return this;
   }
 
+  public KbvErpMedicationRequestFaker withDgmp(List<DosageDgMP> dosageDgMP) {
+    builderConsumers.put("dosageDgmpList", b -> b.dgmp(dosageDgMP));
+    return this;
+  }
+
   public KbvErpMedicationRequest fake() {
     return this.toBuilder().build();
   }
 
   public KbvErpMedicationRequestBuilder toBuilder() {
     val builder = KbvErpMedicationRequestBuilder.forPatient(kbvPatient).version(erpVersion);
-    if (builderConsumers.get("dosageDgmp") == null && builderConsumers.get("dosage") == null)
-      this.withDosageInstruction(fakerDosage());
+    if (builderConsumers.get("dosageDgmp") == null
+        && builderConsumers.get("dosageDgmpList") == null
+        && builderConsumers.get("dosage") == null) this.withDosageInstruction(fakerDosage());
     if (accident != null
             && accident.toString().equals(AccidentCauseType.ACCIDENT_AT_WORK.getDisplay())
         || accident != null

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,13 @@
 
 package de.gematik.test.core.expectations.verifier.emlverifier;
 
-import static de.gematik.test.core.Helper.findBySystem;
 import static de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef.DRUG_CATEGORY_EXT;
 import static java.text.MessageFormat.format;
 
+import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.expectations.requirements.EmlAfos;
+import de.gematik.test.core.expectations.requirements.EmlBfd;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
 import de.gematik.test.erezept.fhir.profiles.definitions.DgMPStructDef;
@@ -43,7 +44,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.commons.lang3.tuple.Pair;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.jetbrains.annotations.NotNull;
@@ -54,7 +54,7 @@ public class EpaOpProvideDispensationVerifier {
 
   public static final String NO_MATCHING_CODING =
       "Die / Das enthaltene/n Coding/s (PZN / ASK / ATC) in der Epa Medication stimmt/-en"
-          + " nicht mit der KbvMedication überein übereinstimmen";
+          + " nicht mit der Dispensation überein";
 
   public static VerificationStep<EpaOpProvideDispensation> emlDispensationIdIsEqualTo(
       PrescriptionId prescriptionId) {
@@ -82,8 +82,7 @@ public class EpaOpProvideDispensationVerifier {
 
   public static VerificationStep<EpaOpProvideDispensation> emlMedicationMapsTo(
       KbvErpMedication expectedMedication) {
-    Predicate<EpaOpProvideDispensation> predicate =
-        getDispensationPredicate(expectedMedication.getCode());
+    Predicate<EpaOpProvideDispensation> predicate = evaluateCodings(expectedMedication.getCode());
 
     return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
             EmlAfos.A_25946.getRequirement(), NO_MATCHING_CODING)
@@ -108,10 +107,9 @@ public class EpaOpProvideDispensationVerifier {
         .accept();
   }
 
-  public static VerificationStep<EpaOpProvideDispensation> emlMedicationMapsTo(
+  public static VerificationStep<EpaOpProvideDispensation> emlMedicationCodingsMapsTo(
       GemErpMedication expectedMedication) {
-    Predicate<EpaOpProvideDispensation> predicate =
-        getDispensationPredicate(expectedMedication.getCode());
+    Predicate<EpaOpProvideDispensation> predicate = evaluateCodings(expectedMedication.getCode());
 
     return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
             EmlAfos.A_25946.getRequirement(), NO_MATCHING_CODING)
@@ -120,7 +118,7 @@ public class EpaOpProvideDispensationVerifier {
   }
 
   @NotNull
-  private static Predicate<EpaOpProvideDispensation> getDispensationPredicate(
+  private static Predicate<EpaOpProvideDispensation> evaluateCodings(
       CodeableConcept expectedMedication) {
     return dispensation -> {
       val epaCodings = dispensation.getEpaMedication().getCode().getCoding();
@@ -128,18 +126,13 @@ public class EpaOpProvideDispensationVerifier {
       if (epaCodings.size() != expectedMedCodings.size()) return false;
 
       return epaCodings.stream()
-          .map(
-              epaCoding -> {
-                val expectedCoding = findBySystem(epaCoding, expectedMedCodings);
-                return Pair.of(epaCoding, expectedCoding);
-              })
-          .allMatch(
-              pair ->
-                  pair.getRight()
-                      .map(
-                          expectedCoding ->
-                              expectedCoding.getCode().equals(pair.getLeft().getCode()))
-                      .orElse(false));
+              .allMatch(
+                  eC ->
+                      expectedMedCodings.stream()
+                          .anyMatch(expC -> expC.getCode().equals(eC.getCode())))
+          && expectedMedCodings.stream()
+              .allMatch(
+                  eC -> epaCodings.stream().anyMatch(expC -> expC.getCode().equals(eC.getCode())));
     };
   }
 
@@ -155,7 +148,14 @@ public class EpaOpProvideDispensationVerifier {
               medicationDispense.getSubjectId().getValue())) return false;
           if (!Objects.equals(
               epaDispensation.getDosageInstructionFirstRep().getText(),
-              medicationDispense.getDosageInstructionTextFirstRep())) return false;
+              medicationDispense.getDosageOrPatientInstruction())) {
+            if (!Objects.equals( // NOSONAR
+                epaDispensation.getDosageInstructionFirstRep().getText(),
+                medicationDispense.getDosageInstructionFirstRep().getText()
+                    + "; "
+                    + medicationDispense.getDosageInstructionFirstRep().getPatientInstruction()))
+              return false;
+          }
           if (!epaDispensation.getWhenHandedOver().equals(medicationDispense.getWhenHandedOver()))
             return false;
 
@@ -218,7 +218,7 @@ public class EpaOpProvideDispensationVerifier {
   }
 
   public static VerificationStep<EpaOpProvideDispensation>
-      provDispensationHasCorrectDosageComponent(ErxMedicationDispense erxMedicationDispense) {
+      provDispensationHasCorrectDosageDgMPComponent(ErxMedicationDispense erxMedicationDispense) {
 
     Predicate<EpaOpProvideDispensation> dgMPContentValidation =
         dispensation ->
@@ -231,6 +231,40 @@ public class EpaOpProvideDispensationVerifier {
             EmlAfos.A_25949.getRequirement(),
             "Die EpaMedicationDispense muss die Dosierinformation der DosageDgMP enthalten")
         .predicate(dgMPContentValidation)
+        .accept();
+  }
+
+  public static VerificationStep<EpaOpProvideDispensation>
+      provDispensationContainsDosageInstruction(String dosageInstruction) {
+    Predicate<EpaOpProvideDispensation> predicate =
+        dispensation ->
+            dispensation.getEpaMedicationDispense().getDosageInstruction().stream()
+                .filter(it -> it.getText() != null)
+                .map(it -> it.getText().equals(dosageInstruction))
+                .findFirst()
+                .orElse(Boolean.FALSE);
+
+    return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
+            EmlBfd.B_FD_1571.getRequirement(),
+            format("Dispensation does not contains dosage instruction. {0}", dosageInstruction))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<EpaOpProvideDispensation>
+      medicationInProvDispensationContainsAtcCodingWithVersion() {
+    Predicate<EpaOpProvideDispensation> predicate =
+        dispensation ->
+            dispensation.getEpaMedication().getCode().getCoding().stream()
+                .filter(DeBasisProfilCodeSystem.ATC::matches)
+                .filter(coding -> !coding.hasVersion())
+                .toList()
+                .isEmpty();
+
+    return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
+            EmlBfd.B_FD_1571.getRequirement(),
+            "Medication in Dispensation contains Coding without Version.")
+        .predicate(predicate)
         .accept();
   }
 }

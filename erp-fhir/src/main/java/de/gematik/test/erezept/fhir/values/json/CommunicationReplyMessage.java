@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,37 +23,230 @@ package de.gematik.test.erezept.fhir.values.json;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
+import java.util.List;
+import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record CommunicationReplyMessage(
     int version,
     String supplyOptionsType,
+    String communicationType,
+    UUID transactionID,
+
+    // v3
+    String text,
+
+    // v1
     String info_text,
     String url,
+    String readyForCollection,
+    String deliveryStatus,
+    InTransportPosition inTransportPosition,
+    InTransportETA inTransportETA,
+    Integer totalAmount,
+    List<PaymentMethod> paymentMethods,
+
+    // V1
     String pickUpCodeHR,
-    String pickUpCodeDMC)
+    String pickUpCodeDMC,
+
+    // V3
+    String pickupCodeHR,
+    String pickupCodeDMC)
     implements CommunicationStructuredMessage {
 
-  public CommunicationReplyMessage(
-      SupplyOptionsType supplyOptionsType,
-      String infoText,
-      String url,
-      String pickUpCodeHR,
-      String pickUpCodeDMC) {
-    this(
-        CommunicationStructuredMessage.DEFAULT_VERSION,
-        supplyOptionsType.getLabel(),
-        infoText,
-        url,
-        pickUpCodeHR,
-        pickUpCodeDMC);
+  public static CommunicationReplyMessageV1Builder forV1() {
+    return new CommunicationReplyMessageV1Builder();
   }
 
-  public CommunicationReplyMessage(SupplyOptionsType supplyOptionsType, String infoText) {
-    this(supplyOptionsType, infoText, null, null, null);
+  public static class CommunicationReplyMessageV1Builder {
+
+    private int version = 1;
+
+    private String supplyOptionsType =
+        GemFaker.randomElement(SupplyOptionsType.values()).getLabel();
+
+    private String infoText = GemFaker.fakerCommunicationReplyMessage();
+    private String url;
+
+    private String pickUpCodeHR;
+    private String pickUpCodeDMC;
+
+    public CommunicationReplyMessageV1Builder version(int version) {
+      this.version = version;
+      return this;
+    }
+
+    public CommunicationReplyMessageV1Builder supplyOptionsType(
+        SupplyOptionsType supplyOptionsType) {
+      this.supplyOptionsType = supplyOptionsType.getLabel();
+      return this;
+    }
+
+    public CommunicationReplyMessageV1Builder supplyOptionsType(String supplyOptionsType) {
+      this.supplyOptionsType = supplyOptionsType;
+      return this;
+    }
+
+    public CommunicationReplyMessageV1Builder infoText(String infoText) {
+      this.infoText = infoText;
+      return this;
+    }
+
+    public CommunicationReplyMessageV1Builder url(String url) {
+      this.url = url;
+      return this;
+    }
+
+    public CommunicationReplyMessageV1Builder pickUpCodeHR(String pickUpCodeHR) {
+      this.pickUpCodeHR = pickUpCodeHR;
+      return this;
+    }
+
+    public CommunicationReplyMessageV1Builder pickUpCodeDMC(String pickUpCodeDMC) {
+      this.pickUpCodeDMC = pickUpCodeDMC;
+      return this;
+    }
+
+    public CommunicationReplyMessage build() {
+      return new CommunicationReplyMessage(
+          version,
+          supplyOptionsType,
+          null,
+          null,
+          null,
+          infoText,
+          url,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          pickUpCodeHR,
+          pickUpCodeDMC,
+          null,
+          null);
+    }
   }
 
-  public CommunicationReplyMessage() {
-    this(GemFaker.randomElement(SupplyOptionsType.values()), GemFaker.getFaker().dune().quote());
+  public static CommunicationReplyMessageV3Builder forV3() {
+    return new CommunicationReplyMessageV3Builder();
   }
+
+  public static class CommunicationReplyMessageV3Builder {
+
+    private int version = 3;
+
+    private String communicationType = "text";
+    private UUID transactionID = UUID.randomUUID();
+
+    private String text = GemFaker.fakerCommunicationReplyMessage();
+
+    private String url;
+    private String readyForCollection;
+    private String deliveryStatus;
+    private InTransportPosition inTransportPosition;
+    private InTransportETA inTransportETA;
+    private Integer totalAmount;
+    private List<PaymentMethod> paymentMethods;
+
+    private String pickupCodeHR;
+    private String pickupCodeDMC;
+
+    public CommunicationReplyMessageV3Builder version(int version) {
+      this.version = version;
+      return this;
+    }
+
+    public CommunicationReplyMessageV3Builder communicationType(String communicationType) {
+      this.communicationType = communicationType;
+      return this;
+    }
+
+    public CommunicationReplyMessageV3Builder transactionID(UUID transactionID) {
+      this.transactionID = transactionID;
+      return this;
+    }
+
+    public CommunicationReplyMessageV3Builder text(String text) {
+      this.text = text;
+      return this;
+    }
+
+    public CommunicationReplyMessageV3Builder url(String url) {
+      this.url = url;
+      return this;
+    }
+
+    public CommunicationReplyMessageV3Builder pickupCodeHR(String pickupCodeHR) {
+      this.pickupCodeHR = pickupCodeHR;
+      return this;
+    }
+
+    public CommunicationReplyMessageV3Builder pickupCodeDMC(String pickupCodeDMC) {
+      this.pickupCodeDMC = pickupCodeDMC;
+      return this;
+    }
+
+    public CommunicationReplyMessageV3Builder readyForCollection(String readyForCollection) {
+      this.readyForCollection = readyForCollection;
+      return this;
+    }
+
+    public CommunicationReplyMessageV3Builder deliveryStatus(String deliveryStatus) {
+      this.deliveryStatus = deliveryStatus;
+      return this;
+    }
+
+    public CommunicationReplyMessageV3Builder totalAmount(Integer totalAmount) {
+      this.totalAmount = totalAmount;
+      return this;
+    }
+
+    public CommunicationReplyMessageV3Builder paymentMethods(List<PaymentMethod> paymentMethods) {
+      this.paymentMethods = paymentMethods;
+      return this;
+    }
+
+    public CommunicationReplyMessageV3Builder inTransportPosition(InTransportPosition pos) {
+      this.inTransportPosition = pos;
+      return this;
+    }
+
+    public CommunicationReplyMessageV3Builder inTransportETA(InTransportETA eta) {
+      this.inTransportETA = eta;
+      return this;
+    }
+
+    public CommunicationReplyMessage build() {
+      return new CommunicationReplyMessage(
+          version,
+          null,
+          communicationType,
+          transactionID,
+          text,
+          null,
+          url,
+          readyForCollection,
+          deliveryStatus,
+          inTransportPosition,
+          inTransportETA,
+          totalAmount,
+          paymentMethods,
+          null,
+          null,
+          pickupCodeHR,
+          pickupCodeDMC);
+    }
+  }
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public record InTransportPosition(Double lat, Double lon) {}
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public record InTransportETA(Long from, Long to) {}
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public record PaymentMethod(String method, String displayName, String url) {}
 }

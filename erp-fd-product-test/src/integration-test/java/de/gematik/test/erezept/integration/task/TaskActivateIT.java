@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,11 @@
 
 package de.gematik.test.erezept.integration.task;
 
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
-import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeContainsInDiagnostics;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHintsDeviatingAuthoredOnDate;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasCorrectAcceptDate;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasCorrectExpiryDate;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.hasWorkflowType;
-import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyStatus;
+import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
+import static de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen.getUpdatedOktober26;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.de.valueset.IdentifierTypeDe;
@@ -57,9 +53,12 @@ import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import de.gematik.test.erezept.toggle.ErpDarreichungsformJuly26Active;
+import de.gematik.test.erezept.toggle.KbvDmpKennzeichenOktober26;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -77,8 +76,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 @Slf4j
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("E-Rezept ausstellen")
-@Tag("UseCase:Activate")
+@Tag("TaskActivate")
 class TaskActivateIT extends ErpTest {
+  private static final Boolean KBV_DMP_OKTOBER_26 =
+      featureConf.getToggle(new KbvDmpKennzeichenOktober26());
+  private static final Boolean DARREICHUNGSFORM_JULY_26_ACTIVE =
+      featureConf.getToggle(new ErpDarreichungsformJuly26Active());
 
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
@@ -129,19 +132,35 @@ class TaskActivateIT extends ErpTest {
   }
 
   static Stream<Arguments> prescriptionTypesProviderDmpKennzeichen() {
-    val dmpList =
-        List.of(
-            DmpKennzeichen.ADIPOSITAS,
-            DmpKennzeichen.ASTHMA_UND_DIABETES_TYP_2_UND_KHK,
-            DmpKennzeichen.BRUSTKREBS_UND_COPD_UND_DIABETES_TYP_1_UND_KHK);
+    val dmpList = new LinkedList<>();
+    if (KBV_DMP_OKTOBER_26) {
+      dmpList.addAll(getUpdatedOktober26());
+    } else {
+      dmpList.add(DmpKennzeichen.ASTHMA_UND_DIABETES_TYP_2_UND_KHK);
+      dmpList.add(DmpKennzeichen.BRUSTKREBS_UND_COPD_UND_DIABETES_TYP_1_UND_KHK);
+    }
     return ArgumentComposer.composeWith(prescriptionTypesProvider()).multiply(2, dmpList).create();
   }
 
   static Stream<Arguments> prescriptionTypesProviderDarreichungsformen() {
-    val dfList =
-        List.of(
-            Darreichungsform.PUE, // From April 2025 Active
-            Darreichungsform.LYE); // From April 2025 Active
+    val dfList = new LinkedList<>();
+    if (DARREICHUNGSFORM_JULY_26_ACTIVE) {
+      dfList.addAll(
+          List.of(
+              Darreichungsform.KEINE_DARREICHUNGSFORM,
+              Darreichungsform.DIG,
+              Darreichungsform.IFF,
+              Darreichungsform.PIF,
+              Darreichungsform.RKA,
+              Darreichungsform.RKT,
+              Darreichungsform.SUF,
+              Darreichungsform.TLE,
+              Darreichungsform.TMR,
+              Darreichungsform.TPO));
+    } else {
+      dfList.add(Darreichungsform.PSE);
+      dfList.add(Darreichungsform.LYE);
+    }
     return ArgumentComposer.composeWith(prescriptionTypesProvider()).multiply(2, dfList).create();
   }
 
@@ -398,10 +417,9 @@ class TaskActivateIT extends ErpTest {
   @ParameterizedTest(
       name =
           "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit dem DmpKennzeichen"
-              + " Version 1.06 aus")
+              + " {2}")
   @DisplayName(
-      "E-Rezept als Verordnender Arzt an eine/n Versicherte/n mit DmpKennzeichen Version 1.06"
-          + " ausstellen")
+      "E-Rezept als Verordnender Arzt an eine/n Versicherte/n mit DmpKennzeichen" + " ausstellen")
   @MethodSource("prescriptionTypesProviderDmpKennzeichen")
   void activatePrescriptionWithNewDmpKennzeichen(
       InsuranceTypeDe insuranceType,
@@ -515,35 +533,5 @@ class TaskActivateIT extends ErpTest {
               .hasResponseWith(returnCode(400, FhirRequirements.FHIR_PROFILES))
               .isCorrect());
     }
-  }
-
-  @TestcaseId("ERP_TASK_ACTIVATE_09")
-  @ParameterizedTest(
-      name = "[{index}] -> Verordnender Arzt Michael Morgenrot stellt ein {0} E-Rezept für {1} aus")
-  @DisplayName(
-      "Verordnender Arzt Michael Morgenrot, tätig in der Vorsorge- und Rehabilitationsklinik,"
-          + " erstellt ein gültiges E-Rezept aus")
-  @MethodSource("prescriptionTypesProvider")
-  void activatePrescriptionForPreventionAndRehabilitation(
-      InsuranceTypeDe insuranceType,
-      PrescriptionAssignmentKind assignmentKind,
-      PrescriptionFlowType expectedFlowType) {
-
-    sina.changePatientInsuranceType(insuranceType);
-
-    val activation =
-        doctor.performs(
-            IssuePrescription.forPatient(sina)
-                .ofAssignmentKind(assignmentKind)
-                .withRandomKbvBundle());
-    doctor.attemptsTo(
-        Verify.that(activation)
-            .withExpectedType(ErpAfos.A_19022)
-            .hasResponseWith(returnCode(200))
-            .and(hasWorkflowType(expectedFlowType))
-            .and(isInReadyStatus())
-            .and(hasCorrectExpiryDate())
-            .and(hasCorrectAcceptDate(expectedFlowType))
-            .isCorrect());
   }
 }

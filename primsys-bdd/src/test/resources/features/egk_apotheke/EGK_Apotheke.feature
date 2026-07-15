@@ -66,7 +66,6 @@ Funktionalität: eGK in der Apotheke
     Und die Apotheke Stadtapotheke hat Zugriff auf ihre SMC-B
     Wenn die Apotheke Am Flughafen die E-Rezepte mit der eGK von Aenna Gondern abruft
     Und die Apotheke Am Flughafen das letzte abgerufene E-Rezept beim Fachdienst akzeptiert
-    Und die Apotheke Stadtapotheke die E-Rezepte mit der eGK von Aenna Gondern abruft
     Dann kann die Apotheke Stadtapotheke das letzte E-Rezept nicht abrufen, weil die Apotheke Am Flughafen dieses bereits akzeptiert hat
 
   @TCID:ERP_EE_WF160_EGK_APOTHEKE_03

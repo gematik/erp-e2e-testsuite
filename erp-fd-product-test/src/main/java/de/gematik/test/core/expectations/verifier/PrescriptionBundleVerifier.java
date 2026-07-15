@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import static java.text.MessageFormat.format;
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.value.PZN;
+import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.core.expectations.requirements.KbvProfileRules;
 import de.gematik.test.core.expectations.requirements.Requirement;
@@ -227,5 +228,22 @@ public class PrescriptionBundleVerifier {
                 previousLastModified))
         .predicate(predicate)
         .accept();
+  }
+
+  public static VerificationStep<ErxPrescriptionBundle> ownerIdInPrescriptionEquals(
+      TelematikID telematikID, ErpAfos erpAfos) {
+    Predicate<ErxPrescriptionBundle> predicate =
+        prescriptionBundle ->
+            prescriptionBundle
+                .getTask()
+                .getOwner()
+                .getIdentifier()
+                .getValue()
+                .equals(telematikID.getValue());
+    val step =
+        new VerificationStep.StepBuilder<ErxPrescriptionBundle>(
+            erpAfos,
+            format("Die TelematikID im übergebenen Task entspricht {0} !", telematikID.getValue()));
+    return step.predicate(predicate).accept();
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.config.dto;
 
+import de.gematik.bbriccs.cfg.NamedConfigurationElement;
 import de.gematik.test.erezept.config.exceptions.ConfigurationMappingException;
 import java.util.List;
 
@@ -30,7 +31,7 @@ import java.util.List;
  */
 public abstract class ConfiguredFactory {
 
-  protected <T extends INamedConfigurationElement> T getConfig(String name, List<T> configs) {
+  protected <T extends NamedConfigurationElement> T getConfig(String name, List<T> configs) {
     return configs.stream()
         .filter(actor -> actor.getName().equalsIgnoreCase(name))
         .findFirst()

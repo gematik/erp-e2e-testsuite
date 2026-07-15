@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -81,10 +80,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.runner.RunWith;
 
 @Slf4j
-@RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Fuzzing-Szenarien für den E-Rezept Workflow (Bricks!)")
 @Tag("Fuzzing")
@@ -116,7 +113,7 @@ public class FuzzingIT extends ErpTest {
     val fhir = actor.abilityTo(UseTheErpClient.class).getFhir();
     val errorHandler = new LenientErrorHandler();
     errorHandler.disableAllErrors();
-    fhir.getCtx().setParserErrorHandler(errorHandler);
+    fhir.getContext().setParserErrorHandler(errorHandler);
   }
 
   @AfterEach
@@ -292,7 +289,7 @@ public class FuzzingIT extends ErpTest {
             });
 
     val replyCom =
-        ErxCommunicationBuilder.asReply(new CommunicationReplyMessage())
+        ErxCommunicationBuilder.asReply(CommunicationReplyMessage.forV1().build())
             .basedOn(task.getTaskId())
             .receiver(patient.getKvnr().getValue())
             .sender(pharmacy.getTelematikId().getValue())

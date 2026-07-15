@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.EVDGAStatus;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.EVDGADetails;
 import de.gematik.test.erezept.client.ErpClient;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
@@ -42,7 +42,6 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import java.util.Map;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
@@ -83,9 +82,8 @@ class TheVisibleStatusTest {
 
     // make sure the teardown does not run into an NPE
     val mockResponse =
-        ErpResponse.forPayload(createOperationOutcome(), EmptyResource.class)
+        FhirBResponse.forPayload(EmptyResource.class, createOperationOutcome())
             .withStatusCode(404)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(erpClient.request(any(TaskAbortCommand.class))).thenReturn(mockResponse);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,11 +33,9 @@ import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBase;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.DateTimeType;
@@ -52,7 +50,6 @@ public abstract class ErxMedicationDispenseBaseBuilder<
         B extends ResourceBuilder<M, B>>
     extends ResourceBuilder<M, B> {
 
-  protected final SimpleDateFormat dateFormat10 = new SimpleDateFormat("yyyy-MM-dd");
   protected V erpWorkflowVersion;
   protected GemErpMedication medication;
   private KVNR kvnr;
@@ -149,9 +146,7 @@ public abstract class ErxMedicationDispenseBaseBuilder<
 
     // this kind of comparison is happened, caused by different .compare() implementations in ENUM
     // and ProfilVersion
-    if (ErpWorkflowVersion.V1_4.compareTo(erpWorkflowVersion) >= 0
-        || Stream.of(ErpWorkflowVersion.V1_3, ErpWorkflowVersion.V1_2)
-            .anyMatch(wfV -> wfV.equals(erpWorkflowVersion))) {
+    if (ErpWorkflowVersion.V1_4.compareTo(erpWorkflowVersion) >= 0) {
       // older Versions
       val subjectIdentifier = DeBasisProfilNamingSystem.KVID_GKV_SID.asIdentifier(kvnr.getValue());
       medDisp.getSubject().setIdentifier(subjectIdentifier);

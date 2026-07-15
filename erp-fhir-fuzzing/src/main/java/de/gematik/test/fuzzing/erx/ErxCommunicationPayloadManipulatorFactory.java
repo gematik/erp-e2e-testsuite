@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 
 package de.gematik.test.fuzzing.erx;
 
-import static de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef.*;
-import static de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowCodeSystem.FLOW_TYPE;
+import static de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem.TELEMATIK_ID_SID;
+import static de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef.PRESCRIPTION_TYPE;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,15 +64,10 @@ public class ErxCommunicationPayloadManipulatorFactory {
     manipulators.add(
         NamedEnvelope.of(
             "Systems Manipulator, that changes Extension URL from PrescType to TelematikId",
-            c -> c.getExtension().get(0).setUrl(PRESCRIPTION_TYPE.getCanonicalUrl())));
+            c -> c.getExtension().get(0).setUrl(TELEMATIK_ID_SID.getCanonicalUrl())));
     manipulators.add(
         NamedEnvelope.of(
-            "Systems Manipulator, that changes Extension URL from PrescType to old PrescriptionType"
-                + " Version",
-            c -> c.getExtension().get(0).setUrl(TelematikID.random().getSystemUrl())));
-    manipulators.add(
-        NamedEnvelope.of(
-            "Systems Manipulator, that changes Extension.valueCoding.system from FlowType to old"
+            "Systems Manipulator, that changes Extension.valueCoding.system from FlowType to"
                 + " PrescriptionType Version",
             c ->
                 c.getExtension().stream()
@@ -100,17 +95,7 @@ public class ErxCommunicationPayloadManipulatorFactory {
                     .get(0)
                     .getValue()
                     .castToCoding(c.getExtension().get(0).getValue())
-                    .setSystem(PRESCRIPTION_TYPE_12.getCanonicalUrl())));
-    manipulators.add(
-        NamedEnvelope.of(
-            "Systems Manipulator, that changes Extension.valueCoding.system from FlowType to Older"
-                + " FLowTypeVersion",
-            c ->
-                c.getExtension()
-                    .get(0)
-                    .getValue()
-                    .castToCoding(c.getExtension().get(0).getValue())
-                    .setSystem(FLOW_TYPE.getCanonicalUrl())));
+                    .setSystem(PRESCRIPTION_TYPE.getCanonicalUrl())));
     manipulators.add(
         NamedEnvelope.of(
             "Systems Manipulator, that changes Recipient-System to PrescriptionType",
@@ -119,7 +104,7 @@ public class ErxCommunicationPayloadManipulatorFactory {
                     .findFirst()
                     .orElseThrow()
                     .getIdentifier()
-                    .setSystem(PRESCRIPTION_TYPE_12.getCanonicalUrl())));
+                    .setSystem(PRESCRIPTION_TYPE.getCanonicalUrl())));
 
     return manipulators;
   }

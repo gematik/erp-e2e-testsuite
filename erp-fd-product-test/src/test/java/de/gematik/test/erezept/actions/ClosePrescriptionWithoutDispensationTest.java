@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,16 +26,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.client.rest.ErpResponse;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import java.util.Map;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -67,9 +66,8 @@ class ClosePrescriptionWithoutDispensationTest extends ErpFhirBuildingTest {
     val action = ClosePrescriptionWithoutDispensation.forTheTask(task, secret);
     val resource = new ErxReceipt();
     val response =
-        ErpResponse.forPayload(resource, ErxReceipt.class)
+        FhirBResponse.forPayload(ErxReceipt.class, resource)
             .withStatusCode(200)
-            .withHeaders(Map.of())
             .andValidationResult(createEmptyValidationResult());
     when(useErpClient.request(any(CloseTaskCommand.class))).thenReturn(response);
     assertDoesNotThrow(() -> pharmacy.performs(action));

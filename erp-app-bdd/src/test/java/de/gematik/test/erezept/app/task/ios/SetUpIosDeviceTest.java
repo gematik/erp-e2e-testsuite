@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 gematik GmbH
+ * Copyright (Change Date see Readme), gematik GmbH
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
+import de.gematik.bbriccs.rest.fd.MediaType;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
@@ -41,8 +43,6 @@ import de.gematik.test.erezept.app.task.SetUpDevice;
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
-import de.gematik.test.erezept.client.rest.ErpResponse;
-import de.gematik.test.erezept.client.rest.MediaType;
 import de.gematik.test.erezept.client.usecases.ConsentGetCommand;
 import de.gematik.test.erezept.client.usecases.eu.EuConsentDeleteCommand;
 import de.gematik.test.erezept.client.usecases.eu.EuConsentGetCommand;
@@ -55,7 +55,6 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxConsentBundle;
 import de.gematik.test.erezept.fhir.r4.eu.EuConsentBundle;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import java.util.Map;
 import java.util.Optional;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
@@ -120,9 +119,8 @@ class SetUpIosDeviceTest {
       // Note: needed to revoke the charge item consent during the onboarding
       val erxConsentBundle = new ErxConsentBundle();
       val erpChargeItemConsentResponse =
-          ErpResponse.forPayload(erxConsentBundle, ErxConsentBundle.class)
+          FhirBResponse.forPayload(ErxConsentBundle.class, erxConsentBundle)
               .withStatusCode(200)
-              .withHeaders(Map.of())
               .usedJwt(jwt)
               .andValidationResult(createEmptyValidationResult());
 
@@ -132,18 +130,16 @@ class SetUpIosDeviceTest {
       // For get command
       val euConsentBundle = new EuConsentBundle();
       val erpEUConsentGetResponse =
-          ErpResponse.forPayload(euConsentBundle, EuConsentBundle.class)
+          FhirBResponse.forPayload(EuConsentBundle.class, euConsentBundle)
               .withStatusCode(200)
-              .withHeaders(Map.of())
               .usedJwt(jwt)
               .andValidationResult(createEmptyValidationResult());
 
       // For delete command
       val emptyResource = new EmptyResource();
       val erpEUConsentDeleteResponse =
-          ErpResponse.forPayload(emptyResource, EmptyResource.class)
+          FhirBResponse.forPayload(EmptyResource.class, emptyResource)
               .withStatusCode(200)
-              .withHeaders(Map.of())
               .usedJwt(jwt)
               .andValidationResult(createEmptyValidationResult());
 
@@ -195,9 +191,8 @@ class SetUpIosDeviceTest {
       // Note: needed to revoke the charge item consent during the onboarding
       val erxConsentBundle = new ErxConsentBundle();
       val erpChargeItemConsentResponse =
-          ErpResponse.forPayload(erxConsentBundle, ErxConsentBundle.class)
+          FhirBResponse.forPayload(ErxConsentBundle.class, erxConsentBundle)
               .withStatusCode(200)
-              .withHeaders(Map.of())
               .usedJwt(jwt)
               .andValidationResult(createEmptyValidationResult());
 
@@ -205,9 +200,8 @@ class SetUpIosDeviceTest {
       // before)
       val euConsentBundleSpy = spy(new EuConsentBundle());
       val erpEUConsentGetResponse =
-          ErpResponse.forPayload(euConsentBundleSpy, EuConsentBundle.class)
+          FhirBResponse.forPayload(EuConsentBundle.class, euConsentBundleSpy)
               .withStatusCode(200)
-              .withHeaders(Map.of())
               .usedJwt(jwt)
               .andValidationResult(createEmptyValidationResult());
 
@@ -261,9 +255,8 @@ class SetUpIosDeviceTest {
       // Note: needed to revoke the charge item consent during the onboarding
       val erxConsentBundle = new ErxConsentBundle();
       val erpChargeItemConsentResponse =
-          ErpResponse.forPayload(erxConsentBundle, ErxConsentBundle.class)
+          FhirBResponse.forPayload(ErxConsentBundle.class, erxConsentBundle)
               .withStatusCode(200)
-              .withHeaders(Map.of())
               .usedJwt(jwt)
               .andValidationResult(createEmptyValidationResult());
 
@@ -271,9 +264,8 @@ class SetUpIosDeviceTest {
       // before)
       val euConsentBundleSpy = spy(new EuConsentBundle());
       val erpEUConsentGetResponse =
-          ErpResponse.forPayload(euConsentBundleSpy, EuConsentBundle.class)
+          FhirBResponse.forPayload(EuConsentBundle.class, euConsentBundleSpy)
               .withStatusCode(200)
-              .withHeaders(Map.of())
               .usedJwt(jwt)
               .andValidationResult(createEmptyValidationResult());
 
