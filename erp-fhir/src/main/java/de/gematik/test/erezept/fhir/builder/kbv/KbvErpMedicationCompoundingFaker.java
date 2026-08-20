@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getUpdatedInJulyPlusKPG;
+import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getSpecialEntries;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
@@ -43,7 +43,7 @@ public class KbvErpMedicationCompoundingFaker {
 
   private KbvErpMedicationCompoundingFaker(KbvItaErpVersion version) {
     this.version = version;
-    this.withDosageForm(GemFaker.fakerValueSet(Darreichungsform.class, getUpdatedInJulyPlusKPG()))
+    this.withDosageForm(GemFaker.fakerValueSet(Darreichungsform.class, getSpecialEntries()))
         .withAmount(5, 1, "Stk")
         .withIngredientStrengthText(
             format("Ad {0} g", GemFaker.randomElement("25", "50", "75", "100", "150", "200")))

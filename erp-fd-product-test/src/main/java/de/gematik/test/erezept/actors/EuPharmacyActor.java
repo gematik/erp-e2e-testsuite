@@ -22,7 +22,7 @@ package de.gematik.test.erezept.actors;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.erezept.abilities.ProvidePharmacyBaseData;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.EqualsAndHashCode;
@@ -37,7 +37,7 @@ public class EuPharmacyActor extends ErpActor {
     super(ActorType.PHARMACY, name);
   }
 
-  public IsoCountryCode getCountryCode() {
+  public IsoCountryCodeNCPeH getCountryCode() {
     val baseData = SafeAbility.getAbility(this, ProvidePharmacyBaseData.class);
     return baseData.getCountryCode();
   }

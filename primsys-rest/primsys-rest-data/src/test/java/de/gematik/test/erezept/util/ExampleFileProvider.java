@@ -52,6 +52,10 @@ public class ExampleFileProvider {
     return readResourceFiles("examples/patients");
   }
 
+  public static Stream<File> getPrescribeRequestExamples() {
+    return readResourceFiles("examples/prescribe");
+  }
+
   public static Stream<File> getMedicationRequestExamples() {
     return readResourceFiles("examples/medicationrequests");
   }

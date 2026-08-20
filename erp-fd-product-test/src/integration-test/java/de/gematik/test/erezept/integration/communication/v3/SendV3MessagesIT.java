@@ -26,12 +26,12 @@ import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actions.communication.SendMessages;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.fhir.extensions.erp.CommunicationType;
+import de.gematik.test.erezept.fhir.extensions.erp.CommunicationPayloadType;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
@@ -54,6 +54,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Communication Send Tests")
 @Tag("Communication")
+@Tag("CommunicationV3")
 public class SendV3MessagesIT extends ErpTest {
 
   @Actor(name = "Leonie Hütter")
@@ -108,7 +109,7 @@ public class SendV3MessagesIT extends ErpTest {
 
     val request =
         CommunicationReplyMessage.forV3()
-            .communicationType(CommunicationType.TEXT.getLabel())
+            .communicationType(CommunicationPayloadType.TEXT.getLabel())
             .transactionID(UUID.randomUUID())
             .text(getRandomString(300))
             .build();
@@ -134,7 +135,7 @@ public class SendV3MessagesIT extends ErpTest {
 
     val request =
         CommunicationReplyMessage.forV3()
-            .communicationType(CommunicationType.LINK.getLabel())
+            .communicationType(CommunicationPayloadType.LINK.getLabel())
             .transactionID(UUID.randomUUID())
             .text("text")
             .url("https://example.com")
@@ -162,9 +163,9 @@ public class SendV3MessagesIT extends ErpTest {
 
     val request =
         CommunicationReplyMessage.forV3()
-            .communicationType(CommunicationType.RESERVATION_STATUS.getLabel())
+            .communicationType(CommunicationPayloadType.RESERVATION_STATUS.getLabel())
             .transactionID(UUID.randomUUID())
-            .readyForCollection("nextDay")
+            .readyForCollecting("nextDay")
             .text(null)
             .build();
 
@@ -244,7 +245,7 @@ public class SendV3MessagesIT extends ErpTest {
 
     val request =
         CommunicationReplyMessage.forV3()
-            .communicationType(CommunicationType.PAYMENT_INFO.getLabel())
+            .communicationType(CommunicationPayloadType.PAYMENT_INFO.getLabel())
             .transactionID(UUID.randomUUID())
             .totalAmount(12550)
             .paymentMethods(
@@ -263,8 +264,8 @@ public class SendV3MessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_V3_SEND_07")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke sendet eine V3 Communication DispReq mit Pflichtfeldern"
-              + " für {0} und SupplyOption {1} an den Versicherten Leonie Hütter!")
+          "[{index}] -> Ein Patient sendet eine V3 Communication DispReq mit Pflichtfeldern"
+              + " für {0} und SupplyOption {1} an die Apotheke!")
   @DisplayName(
       "Es wird geprüft, dass der Fachdienst CommunicationDispReq V3 "
           + "mit minimalen Pflichtfeldern akzeptiert wird")
@@ -276,12 +277,16 @@ public class SendV3MessagesIT extends ErpTest {
 
     val request =
         CommunicationDisReqMessage.forV3()
-            .communicationType(CommunicationType.ORDER.getLabel())
+            .communicationType(CommunicationPayloadType.ORDER.getLabel())
             .supplyOptionsType(supplyOptionsType.getLabel())
             .transactionID(UUID.randomUUID())
             .firstname("John")
             .lastname("Doe")
-            .phone("+49170123456")
+            .phone("0049170123456")
+            .address("FantasyStreet 3")
+            .postcode("12345")
+            .city("city")
+            .country("DE")
             .text("Please prepare medication")
             .build();
 
@@ -308,8 +313,8 @@ public class SendV3MessagesIT extends ErpTest {
 
     val request =
         CommunicationDisReqMessage.forV3()
-            .communicationType(CommunicationType.ORDER.getLabel())
-            .supplyOptionsType(supplyOptionsType.getLabel())
+            .communicationType(CommunicationPayloadType.ORDER)
+            .supplyOptionsType(supplyOptionsType)
             .transactionID(UUID.randomUUID())
             .firstname("Anna")
             .lastname("Schmidt")

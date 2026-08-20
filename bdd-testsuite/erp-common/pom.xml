@@ -6,9 +6,12 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>bdd-testsuite</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+
+    <name>ERP Cucumber-Steps Commons</name>
+    <description>Common Cucumber steps and utilities for ERP tests</description>
 
     <artifactId>erp-common</artifactId>
 

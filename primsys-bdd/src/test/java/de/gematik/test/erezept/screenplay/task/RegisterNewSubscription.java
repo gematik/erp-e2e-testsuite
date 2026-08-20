@@ -50,7 +50,7 @@ public class RegisterNewSubscription implements Task {
     val erpClientAbility = SafeAbility.getAbility(actor, UseTheErpClient.class);
     val subscriptionCmd =
         new SubscriptionPostCommand(
-            "Communication?received=null&recipient=" + useSMCB.getTelematikID());
+            criteria + "?received=null&recipient=" + useSMCB.getTelematikID());
     try {
       val subscriptionResponse = erpClientAbility.request(subscriptionCmd);
       val subscription = subscriptionResponse.getExpectedResource();

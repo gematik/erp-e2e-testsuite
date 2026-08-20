@@ -28,12 +28,12 @@ import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.*;
+import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actions.communication.SendMessages;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.fhir.extensions.erp.CommunicationType;
+import de.gematik.test.erezept.fhir.extensions.erp.CommunicationPayloadType;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
@@ -55,7 +55,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Communication Tests")
 @Tag("Communication")
-public class SendInvalidV3MessagesIT extends ErpTest {
+@Tag("CommunicationV3")
+class SendInvalidV3MessagesIT extends ErpTest {
 
   @Actor(name = "Leonie Hütter")
   private PatientActor patient;
@@ -102,6 +103,7 @@ public class SendInvalidV3MessagesIT extends ErpTest {
 
     val msg =
         CommunicationDisReqMessage.forV3()
+            .supplyOptionsType(supplyOptionsType)
             .firstname("")
             .lastname("Mustermann")
             .address("Street 1")
@@ -177,6 +179,7 @@ public class SendInvalidV3MessagesIT extends ErpTest {
 
     val msg =
         CommunicationDisReqMessage.forV3()
+            .supplyOptionsType(supplyOptionsType)
             .text(getRandomString(801)) // > 800 invalid in v3
             .firstname("Max")
             .lastname("Mustermann")
@@ -214,8 +217,8 @@ public class SendInvalidV3MessagesIT extends ErpTest {
 
     val request =
         CommunicationReplyMessage.forV3()
-            .communicationType(CommunicationType.DELIVERY_STATUS.getLabel())
-            .readyForCollection("tomorrow_maybe") // invalid
+            .communicationType(CommunicationPayloadType.DELIVERY_STATUS.getLabel())
+            .readyForCollecting("tomorrow_maybe") // invalid
             .text("test")
             .build();
 
@@ -245,7 +248,7 @@ public class SendInvalidV3MessagesIT extends ErpTest {
 
     val request =
         CommunicationReplyMessage.forV3()
-            .communicationType(CommunicationType.PAYMENT_INFO.getLabel())
+            .communicationType(CommunicationPayloadType.PAYMENT_INFO.getLabel())
             .totalAmount(-10) //  negative amount
             .text("test")
             .build();
@@ -276,7 +279,7 @@ public class SendInvalidV3MessagesIT extends ErpTest {
 
     val request =
         CommunicationReplyMessage.forV3()
-            .communicationType(CommunicationType.PAYMENT_INFO.getLabel())
+            .communicationType(CommunicationPayloadType.PAYMENT_INFO.getLabel())
             .paymentMethods(
                 List.of(
                     new CommunicationReplyMessage.PaymentMethod(
@@ -310,7 +313,7 @@ public class SendInvalidV3MessagesIT extends ErpTest {
 
     val request =
         CommunicationReplyMessage.forV3()
-            .communicationType(CommunicationType.PAYMENT_INFO.getLabel())
+            .communicationType(CommunicationPayloadType.PAYMENT_INFO.getLabel())
             .totalAmount(0)
             .text("test")
             .build();

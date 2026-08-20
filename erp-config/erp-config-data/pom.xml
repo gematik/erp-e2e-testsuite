@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>erp-config</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -14,60 +14,58 @@
     <name>E-Rezept TestSuite Configurations Data</name>
     <description>E-Rezept TestSuite Configurations Data</description>
 
+    <dependencies>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>feature-toggle-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>configuration-api-brick</artifactId>
+        </dependency>
 
-  <dependencies>
-    <dependency>
-      <groupId>de.gematik.bbriccs</groupId>
-      <artifactId>feature-toggle-brick</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.gematik.bbriccs</groupId>
-      <artifactId>configuration-api-brick</artifactId>
-    </dependency>
+        <!-- remove once Bricks moved to Jackson 3 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.22.1</version>
+        </dependency>
 
-    <!-- remove once Bricks moved to Jackson 3 -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>2.22.1</version>
-    </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>popp-token-generator-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>konnektor-client-brick</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>softkon-service-brick</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-    <dependency>
-      <groupId>de.gematik.bbriccs</groupId>
-      <artifactId>popp-token-generator-brick</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.gematik.bbriccs</groupId>
-      <artifactId>konnektor-client-brick</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>de.gematik.bbriccs</groupId>
-      <artifactId>softkon-service-brick</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.3.0</version>
-        <configuration>
-          <excludes>
-            <exclude>**/logback.xml</exclude>
-            <exclude>**/logback-test.xml</exclude>
-          </excludes>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/logback.xml</exclude>
+                        <exclude>**/logback-test.xml</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -200,6 +200,13 @@ public class KbvErpMedicationRequest extends MedicationRequest implements ErpFhi
         .findFirst();
   }
 
+  public Optional<String> getEmpIdentifier() {
+    return this.getBasedOn().stream()
+        .filter(Reference::hasIdentifier)
+        .map(it -> it.getIdentifier().getValue())
+        .findFirst();
+  }
+
   public boolean allowSubstitution() {
     // accessing directly the primitive boolean value might throw a NPE
     return Optional.ofNullable(this.getSubstitution().getAllowedBooleanType().asStringValue())

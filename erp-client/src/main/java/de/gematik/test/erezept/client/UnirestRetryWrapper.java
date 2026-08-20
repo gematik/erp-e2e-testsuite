@@ -37,7 +37,7 @@ public class UnirestRetryWrapper {
 
   private static final int MAX_CONNECT_ATTEMPTS = 12;
   public static final int CONNECT_TIMEOUT =
-      FeatureToggle.getIntegerToggle("vau.connection.timeout", 10); // in seconds
+      FeatureToggle.getIntegerToggle("vau.connection.timeout", 15); // in seconds
 
   /**
    * due to issues while executing on jenkins we need to retry the request because of sporadic {@see

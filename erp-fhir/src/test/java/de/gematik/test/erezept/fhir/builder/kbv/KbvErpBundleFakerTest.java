@@ -28,6 +28,7 @@ import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.UnitsOfTimeDE;
 import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.fhir.builder.ReferenceFeatureToggle;
@@ -190,9 +191,8 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
         DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
+                    .period(3, Timing.UnitsOfTime.D)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .build())
             .build();
@@ -215,9 +215,8 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
         DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.STUECK)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(1)
+                    .period(1, Timing.UnitsOfTime.D)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .timeOfDay("22:00:00")
                     .build())
             .build());
@@ -225,9 +224,8 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.STUECK)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(1)
+                    .period(1, Timing.UnitsOfTime.D)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .timeOfDay("18:00:00")
                     .build())
             .build());
@@ -235,9 +233,8 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
         DosageDgMPBuilder.dosageBuilder(3, BmpDosiereinheit.STUECK)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(1)
+                    .period(1, Timing.UnitsOfTime.D)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .timeOfDay("01:00:00")
                     .build())
             .build());
@@ -353,5 +350,245 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
             .map(Reference::getReference)
             .allMatch(p);
     assertTrue(compositionEntries);
+  }
+
+  /**
+   * This UnitTest is similar to the IntegrationTest ACTIVATE_DOSAGE_DGMP_PRESCRIPTIONS_08 It
+   * validates the correct handling of complex dosage instructions with multiple timings and
+   * quantities. was found by Mr. Nighthold and communicated in ANFERP-4169 -
+   * https://service.gematik.de/browse/ANFERP-4169 and tracked in B-FD_1699, Abweichende Generierung
+   * / Validierung der Strukturierten Dosierinformationen
+   */
+  @Test
+  void shouldValidateExtrasBigDosageCorrect() {
+    val dosageDGMP1 =
+        DosageDgMPBuilder.dosageBuilder(0.25, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(2)
+                    .dayOfWeek(Timing.DayOfWeek.MON)
+                    .timeOfDay(List.of("06:00:00", "14:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP2 =
+        DosageDgMPBuilder.dosageBuilder(0.5, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.MON)
+                    .timeOfDay(List.of("10:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP3 =
+        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.MON)
+                    .timeOfDay(List.of("18:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP4 =
+        DosageDgMPBuilder.dosageBuilder(0.5, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.TUE)
+                    .timeOfDay(List.of("06:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP5 =
+        DosageDgMPBuilder.dosageBuilder(0.25, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.TUE)
+                    .timeOfDay(List.of("10:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP6 =
+        DosageDgMPBuilder.dosageBuilder(0.75, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.TUE)
+                    .timeOfDay(List.of("14:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP7 =
+        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.TUE)
+                    .timeOfDay(List.of("18:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP8 =
+        DosageDgMPBuilder.dosageBuilder(0.75, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.WED)
+                    .timeOfDay(List.of("10:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP9 =
+        DosageDgMPBuilder.dosageBuilder(0.25, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.WED)
+                    .timeOfDay(List.of("18:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP10 =
+        DosageDgMPBuilder.dosageBuilder(0.25, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.THU)
+                    .timeOfDay(List.of("06:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP11 =
+        DosageDgMPBuilder.dosageBuilder(0.5, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.THU)
+                    .timeOfDay(List.of("14:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP12 =
+        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.FRI)
+                    .timeOfDay(List.of("10:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP13 =
+        DosageDgMPBuilder.dosageBuilder(0.25, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.FRI)
+                    .timeOfDay(List.of("18:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP14 =
+        DosageDgMPBuilder.dosageBuilder(0.75, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.SAT)
+                    .timeOfDay(List.of("06:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP15 =
+        DosageDgMPBuilder.dosageBuilder(0.25, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.SAT)
+                    .timeOfDay(List.of("14:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP16 =
+        DosageDgMPBuilder.dosageBuilder(0.5, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.SUN)
+                    .timeOfDay(List.of("10:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP17 =
+        DosageDgMPBuilder.dosageBuilder(0.75, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.SUN)
+                    .timeOfDay(List.of("18:00:00"))
+                    .build())
+            .build();
+
+    val bundle =
+        KbvErpBundleFaker.builder()
+            .withMedication(KbvErpMedicationPZNFaker.builder().fake())
+            .withDosageDgmp(
+                List.of(
+                    dosageDGMP1,
+                    dosageDGMP2,
+                    dosageDGMP3,
+                    dosageDGMP4,
+                    dosageDGMP5,
+                    dosageDGMP6,
+                    dosageDGMP7,
+                    dosageDGMP8,
+                    dosageDGMP9,
+                    dosageDGMP10,
+                    dosageDGMP11,
+                    dosageDGMP12,
+                    dosageDGMP13,
+                    dosageDGMP14,
+                    dosageDGMP15,
+                    dosageDGMP16,
+                    dosageDGMP17))
+            .fake();
+
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, bundle).isSuccessful());
   }
 }

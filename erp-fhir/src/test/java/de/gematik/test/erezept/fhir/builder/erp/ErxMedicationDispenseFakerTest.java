@@ -28,6 +28,7 @@ import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.ucum.UcumCodeSystem;
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.UnitsOfTimeDE;
 import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
@@ -119,10 +120,9 @@ class ErxMedicationDispenseFakerTest extends ErpFhirParsingTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .boundsDuration(8, "Woche(n)", "wk")
+                    .boundsDuration(8, UnitsOfTimeDE.WOCHE)
                     .frequency(1)
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .when("EVE")
                     .build())
             .build();
@@ -150,9 +150,8 @@ class ErxMedicationDispenseFakerTest extends ErpFhirParsingTest {
         DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
+                    .period(3, Timing.UnitsOfTime.D)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .build())
             .build();
@@ -168,7 +167,7 @@ class ErxMedicationDispenseFakerTest extends ErpFhirParsingTest {
             .isSuccessful());
 
     Assertions.assertEquals(
-        BigDecimal.valueOf(2),
+        BigDecimal.valueOf(2.0),
         medDisp
             .getDosageInstructionFirstRep()
             .getDoseAndRateFirstRep()
@@ -206,11 +205,7 @@ class ErxMedicationDispenseFakerTest extends ErpFhirParsingTest {
     DosageDgMP dosage =
         DosageDgMPBuilder.dosageBuilder(value, unit, code)
             .timing(
-                TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(2)
-                    .periodUnit(Timing.UnitsOfTime.D)
-                    .build())
+                TimingBuilder.forRepeatComp().period(3, Timing.UnitsOfTime.D).frequency(2).build())
             .build();
     val medDisp =
         ErxMedicationDispenseFaker.builder(ErpWorkflowVersion.V1_6)

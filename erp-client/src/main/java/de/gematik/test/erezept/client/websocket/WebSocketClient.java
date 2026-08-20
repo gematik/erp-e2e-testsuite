@@ -22,7 +22,6 @@ package de.gematik.test.erezept.client.websocket;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
@@ -59,16 +58,6 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
   }
 
   @Override
-  public void onOpen(ServerHandshake serverHandshake) {
-    log.info("Connection opened {}", serverHandshake.getHttpStatus());
-    if (serverHandshake.getContent() != null) {
-      log.info(
-          "Message: {}",
-          new String(Objects.requireNonNull(serverHandshake.getContent()), StandardCharsets.UTF_8));
-    }
-  }
-
-  @Override
   public void onMessage(String message) {
     checkBound(message);
     checkPing(message);
@@ -85,14 +74,29 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
 
   private void checkBound(String message) {
     if (message.startsWith("bound: ") && message.endsWith(subscriptionId)) {
+
       this.isBound = true;
-      countDownLatch.countDown();
+
+      if (countDownLatch != null) {
+        countDownLatch.countDown();
+      }
     }
   }
 
   @Override
-  public void onClose(int i, String s, boolean b) {
-    log.info("Connection closed; Http Status Code: {}, Message: {}", i, s);
+  public void onOpen(ServerHandshake serverHandshake) {
+    log.info("Connection opened {}", serverHandshake.getHttpStatus());
+
+    byte[] content = serverHandshake.getContent();
+    if (content != null) {
+      log.info("Message: {}", new String(content, StandardCharsets.UTF_8));
+    }
+  }
+
+  @Override
+  public void onClose(int code, String reason, boolean remote) {
+    log.info("Connection closed; Http Status Code: {}, Message: {}", code, reason);
+
     if (countDownLatch != null && countDownLatch.getCount() > 0) {
       countDownLatch.countDown();
     }

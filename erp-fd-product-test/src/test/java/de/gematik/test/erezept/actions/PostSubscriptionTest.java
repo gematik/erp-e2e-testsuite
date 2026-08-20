@@ -27,6 +27,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import de.gematik.test.erezept.ErpInteraction;
+import de.gematik.test.erezept.actions.subscription.PostSubscription;
 import de.gematik.test.erezept.client.usecases.SubscriptionPostCommand;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import net.serenitybdd.screenplay.Actor;

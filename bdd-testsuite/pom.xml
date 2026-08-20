@@ -6,8 +6,11 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>erezept-testsuite</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
     </parent>
+
+    <name>Parent Cucumber-Steps</name>
+    <description>Parent project for all Cucumber steps in the ERP test suite</description>
 
     <artifactId>bdd-testsuite</artifactId>
     <packaging>pom</packaging>

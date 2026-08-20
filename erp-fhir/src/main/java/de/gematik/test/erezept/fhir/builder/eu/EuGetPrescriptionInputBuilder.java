@@ -32,7 +32,7 @@ import de.gematik.test.erezept.fhir.r4.eu.EuHealthcareFacilityType;
 import de.gematik.test.erezept.fhir.r4.eu.EuOrganizationProfession;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import de.gematik.test.erezept.fhir.valuesets.eu.EuRequestType;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ public class EuGetPrescriptionInputBuilder
   private EuRequestType euRequestType;
   private KVNR kvnr;
   private EuAccessCode euAccessCode;
-  private IsoCountryCode isoCountryCode;
+  private IsoCountryCodeNCPeH isoCountryCodeNCPeH;
   private EuOrganizationProfession euOrganizationProfession =
       EuOrganizationProfession.getDefaultPharmacist();
   private String pointOfCare;
@@ -80,8 +80,8 @@ public class EuGetPrescriptionInputBuilder
     return this;
   }
 
-  public EuGetPrescriptionInputBuilder countryCode(IsoCountryCode countyCode) {
-    this.isoCountryCode = countyCode;
+  public EuGetPrescriptionInputBuilder countryCode(IsoCountryCodeNCPeH countyCode) {
+    this.isoCountryCodeNCPeH = countyCode;
     return this;
   }
 
@@ -126,7 +126,7 @@ public class EuGetPrescriptionInputBuilder
         .setName(EU_KVNR.getCode())
         .setValue(this.kvnr.asIdentifier(DeBasisProfilNamingSystem.KVID_GKV_SID, false));
     param.addPart().setName(ACCESS_CODE.getCode()).setValue(this.euAccessCode.asIdentifier());
-    param.addPart().setName(COUNTRY_CODE.getCode()).setValue(this.isoCountryCode.asCoding());
+    param.addPart().setName(COUNTRY_CODE.getCode()).setValue(this.isoCountryCodeNCPeH.asCoding());
     param
         .addPart()
         .setName(PRACTITIONER_NAME.getCode())
@@ -154,7 +154,7 @@ public class EuGetPrescriptionInputBuilder
   private void checkRequired() {
     this.checkRequired(euRequestType, "getEuPrescriptionInput needs an euRequestType");
     this.checkRequired(kvnr, "getEuPrescriptionInput needs an KVNR");
-    this.checkRequired(isoCountryCode, "getEuPrescriptionInput needs an isoCountyCode");
+    this.checkRequired(isoCountryCodeNCPeH, "getEuPrescriptionInput needs an isoCountyCode");
     this.checkRequired(
         euOrganizationProfession, "getEuPrescriptionInput needs an euPractitionerRole");
     this.checkRequired(pointOfCare, "getEuPrescriptionInput needs an pointOfCare");

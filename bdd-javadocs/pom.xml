@@ -5,11 +5,13 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>bdd-javadocs</artifactId>
+    <name>BDD Javadocs</name>
+    <description>BDD Javadocs for the eRezept test suite</description>
 
+    <artifactId>bdd-javadocs</artifactId>
 
 </project>

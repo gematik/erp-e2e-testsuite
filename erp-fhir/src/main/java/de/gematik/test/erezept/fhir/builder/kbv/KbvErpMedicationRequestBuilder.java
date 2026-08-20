@@ -358,8 +358,8 @@ public class KbvErpMedicationRequestBuilder
         // dgmp setzten
         dosageDgMPS.forEach(medReq::addDosageInstruction);
         // set DosageFlag
-        medReq.addExtension(KbvItaErpStructDef.DOSAGE_FLAG.asBooleanExtension(dosageFlag));
       }
+      medReq.addExtension(KbvItaErpStructDef.DOSAGE_FLAG.asBooleanExtension(dosageFlag));
 
       medReq.setSubstitution(substitution);
 
@@ -378,26 +378,23 @@ public class KbvErpMedicationRequestBuilder
       medReq.setSubstitution(null);
     }
 
-    Optional.ofNullable(basedOnEMP).ifPresent(id -> medReq.addBasedOn().setIdentifier(id));
+    if (kbvItaErpVersion.isBiggerThan(KbvItaErpVersion.V1_3_0)) {
+      Optional.ofNullable(basedOnEMP).ifPresent(id -> medReq.addBasedOn().setIdentifier(id));
+    }
 
     return medReq;
   }
 
-  @SuppressWarnings("java:S6205")
   private void medicationTypeConfig(KbvErpMedicationRequest medReq) {
 
     Optional.ofNullable(this.medicationType)
         .ifPresentOrElse(
             mt -> {
               switch (mt) {
-                case INGREDIENT -> {
-                  setForIngredient(medReq);
-                }
-                case FREETEXT -> {
-                  medReq
-                      .setDosageInstruction(List.of(createFlagedDosage()))
-                      .setSubstitution(substitution);
-                }
+                case INGREDIENT -> setForIngredient(medReq);
+                case FREETEXT -> medReq
+                    .setDosageInstruction(List.of(createFlagedDosage()))
+                    .setSubstitution(substitution);
                 case COMPOUNDING -> {
                   val adaptedDosage = new Dosage();
                   adaptedDosage.setPatientInstruction(dosageInstruction);

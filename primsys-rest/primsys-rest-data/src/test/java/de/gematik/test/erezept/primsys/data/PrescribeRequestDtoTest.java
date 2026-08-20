@@ -20,11 +20,16 @@
 
 package de.gematik.test.erezept.primsys.data;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
+import java.io.File;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import tools.jackson.databind.json.JsonMapper;
 
 class PrescribeRequestDtoTest {
 
@@ -47,6 +52,14 @@ class PrescribeRequestDtoTest {
             .medication(medication)
             .medicationRequest(medicationRequest)
             .build();
+    assertNotNull(dto);
+  }
+
+  @ParameterizedTest(name = "Read example patient from {0}")
+  @MethodSource("de.gematik.test.erezept.util.ExampleFileProvider#getPrescribeRequestExamples")
+  void shouldReadFromJson(File example) {
+    val om = JsonMapper.builder().build();
+    val dto = assertDoesNotThrow(() -> om.readValue(example, PrescribeRequestDto.class));
     assertNotNull(dto);
   }
 }

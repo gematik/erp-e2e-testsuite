@@ -27,17 +27,18 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum UnitsOfTimeDE {
-  SEKUNDE("s", "Sekunde", "Sekunden"),
-  MINUTE("min", "Minute", "Minuten"),
-  STUNDE("h", "Stunde", "Stunden"),
-  TAG("d", "Tag", "Tage"),
-  WOCHE("wk", "Woche", "Wochen"),
-  MONAT("mo", "Monat", "Monate"),
-  JAHR("a", "Jahr", "Jahre");
+  SEKUNDE("s", "Sekunde", "Sekunden", "Sekunde(n)"),
+  MINUTE("min", "Minute", "Minuten", "Minute(n)"),
+  STUNDE("h", "Stunde", "Stunden", "Stunde(n)"),
+  TAG("d", "Tag", "Tage", "Tag(e)"),
+  WOCHE("wk", "Woche", "Wochen", "Woche(n)"),
+  MONAT("mo", "Monat", "Monate", "Monat(e)"),
+  JAHR("a", "Jahr", "Jahre", "Jahr(e)");
 
   private final String code;
   private final String singular;
   private final String plural;
+  private final String kbvUnit;
 
   public static UnitsOfTimeDE fromCode(String code) {
     return Stream.of(UnitsOfTimeDE.values())

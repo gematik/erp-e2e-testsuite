@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Dosage;
 import org.hl7.fhir.r4.model.PrimitiveType;
+import org.hl7.fhir.r4.model.Timing;
 
 /**
  * Implementation Guide: <a href="https://ig.fhir.de/igs/medication/index.html">Medication IG DE</a>
@@ -104,16 +105,40 @@ public class DosageDgMP extends Dosage {
 
   @Override
   public boolean equals(Object dosageDgMP) {
+    if (this == dosageDgMP) return true;
     if (!(dosageDgMP instanceof Dosage dosageDgMP1)) return false;
 
-    val repeatLeft = this.getTiming() != null ? this.getTiming().getRepeat() : null;
-    val repeatRight = dosageDgMP1.getTiming() != null ? dosageDgMP1.getTiming().getRepeat() : null;
+    return hasSameValues(dosageDgMP1);
+  }
 
-    if (repeatLeft == repeatRight) return true;
+  private boolean hasSameValues(Dosage dosageDgMP) {
+    if (this == dosageDgMP) return true;
+    if (dosageDgMP == null) return false;
+
+    val repeatLeft = getRepeat(this);
+    val repeatRight = getRepeat(dosageDgMP);
 
     boolean equals =
-        compareDoseAndRateListIgnoreOrder(dosageDgMP1.getDoseAndRate(), this.getDoseAndRate());
-    equals &= Objects.equals(this.getText(), dosageDgMP1.getText());
+        compareDoseAndRateListIgnoreOrder(dosageDgMP.getDoseAndRate(), this.getDoseAndRate());
+    equals &= Objects.equals(this.getText(), dosageDgMP.getText());
+    equals &= compareRepeatValues(repeatLeft, repeatRight);
+
+    return equals;
+  }
+
+  private static Timing.TimingRepeatComponent getRepeat(Dosage dosage) {
+    if (dosage == null || !dosage.hasTiming() || !dosage.getTiming().hasRepeat()) {
+      return null;
+    }
+    return dosage.getTiming().getRepeat();
+  }
+
+  private static boolean compareRepeatValues(
+      Timing.TimingRepeatComponent repeatLeft, Timing.TimingRepeatComponent repeatRight) {
+    if (repeatLeft == repeatRight) return true;
+    if (repeatLeft == null || repeatRight == null) return false;
+
+    boolean equals = true;
 
     equals &= Objects.equals(repeatLeft.getCount(), repeatRight.getCount());
     equals &= Objects.equals(repeatLeft.getCountMax(), repeatRight.getCountMax());
@@ -144,7 +169,7 @@ public class DosageDgMP extends Dosage {
     return equals;
   }
 
-  private <T, K> boolean compareListIgnoreOrder(
+  private static <T, K> boolean compareListIgnoreOrder(
       List<T> left, List<T> right, Function<T, K> keyExtractor) {
     if (left == right) return true;
     if (left == null || right == null) return false;
@@ -155,7 +180,7 @@ public class DosageDgMP extends Dosage {
     return leftSet.equals(rightSet);
   }
 
-  private <T extends Enum<T>> boolean compareEnumListIgnoreOrder(
+  private static <T extends Enum<T>> boolean compareEnumListIgnoreOrder(
       List<? extends org.hl7.fhir.r4.model.Enumeration<T>> left,
       List<? extends org.hl7.fhir.r4.model.Enumeration<T>> right) {
     if (left == right) return true;

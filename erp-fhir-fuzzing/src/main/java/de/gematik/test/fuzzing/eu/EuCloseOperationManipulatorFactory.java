@@ -22,10 +22,12 @@ package de.gematik.test.fuzzing.eu;
 
 import static de.gematik.test.erezept.fhir.valuesets.eu.EuPartNaming.*;
 
+import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.r4.eu.EuCloseOperationInput;
 import de.gematik.test.erezept.fhir.r4.eu.EuMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.eu.EuOrganization;
 import de.gematik.test.erezept.fhir.r4.eu.EuPractitioner;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import java.util.LinkedList;
@@ -485,7 +487,41 @@ public class EuCloseOperationManipulatorFactory {
     return manipulators;
   }
 
-  private static EuMedicationDispense dispensationOf(EuCloseOperationInput eCOI) {
+  public static List<NamedEnvelope<FuzzingMutator<EuCloseOperationInput>>>
+      getMedicationDispenseConsistencyManipulator() {
+    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<EuCloseOperationInput>>>();
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Set random foreign PrescriptionId in MedicationDispense.identifier",
+            eCOI ->
+                dispensationOf(eCOI)
+                    .getIdentifierFirstRep()
+                    .setValue(PrescriptionId.random().getValue())));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Set invalid PrescriptionId value \"HelloWorld\" in MedicationDispense.identifier",
+            eCOI -> dispensationOf(eCOI).getIdentifierFirstRep().setValue("HelloWorld")));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Set random foreign KVNR in MedicationDispense.subject:identifier",
+            eCOI ->
+                dispensationOf(eCOI)
+                    .getSubject()
+                    .getIdentifier()
+                    .setValue(KVNR.randomStringValue())));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "Set invalid KVNR value \"HelloWorld\" in MedicationDispense.subject:identifier",
+            eCOI -> dispensationOf(eCOI).getSubject().getIdentifier().setValue("HelloWorld")));
+
+    return manipulators;
+  }
+
+  public static EuMedicationDispense dispensationOf(EuCloseOperationInput eCOI) {
     return eCOI.getFirstRxDispension().stream()
         .map(p -> (EuMedicationDispense) p.getPartFirstRep().getResource())
         .findFirst()

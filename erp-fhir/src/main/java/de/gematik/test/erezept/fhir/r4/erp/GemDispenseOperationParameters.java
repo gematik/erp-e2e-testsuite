@@ -21,8 +21,7 @@
 package de.gematik.test.erezept.fhir.r4.erp;
 
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
-import org.hl7.fhir.r4.model.Parameters;
 
 @ResourceDef(name = "Parameters")
 @SuppressWarnings({"java:S110"})
-public class GemDispenseOperationParameters extends Parameters {}
+public class GemDispenseOperationParameters extends GemDispensingOperationParameters {}

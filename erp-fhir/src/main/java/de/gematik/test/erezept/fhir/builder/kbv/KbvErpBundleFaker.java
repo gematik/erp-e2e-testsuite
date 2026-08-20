@@ -39,10 +39,7 @@ import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.fhir.valuesets.StatusKennzeichen;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import lombok.val;
 import org.hl7.fhir.r4.model.MedicationRequest;
@@ -176,8 +173,8 @@ public class KbvErpBundleFaker {
     return this;
   }
 
-  public KbvErpBundleFaker withDosageDgmp(DosageDgMP dosageDgMP) {
-    medicationRequestFaker.withDgmp(dosageDgMP);
+  public KbvErpBundleFaker withDosageDgmp(DosageDgMP... dosageDgMP) {
+    medicationRequestFaker.withDgmp(Arrays.asList(dosageDgMP));
     return this;
   }
 

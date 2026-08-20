@@ -23,7 +23,7 @@ package de.gematik.test.erezept.abilities;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.smartcards.SmcB;
 import de.gematik.test.erezept.config.dto.actor.EuPharmacyConfiguration;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import java.util.Optional;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -32,7 +32,7 @@ import org.hl7.fhir.r4.model.Identifier;
 
 public class ProvidePharmacyBaseData implements Ability {
 
-  @Getter private final IsoCountryCode countryCode;
+  @Getter private final IsoCountryCodeNCPeH countryCode;
   @Getter private final Identifier organizationIdentifier;
   @Getter private final Identifier practitionerIdentifier;
 
@@ -43,11 +43,11 @@ public class ProvidePharmacyBaseData implements Ability {
   }
 
   public static ProvidePharmacyBaseDataBuilder forNationalPharmacy() {
-    return new ProvidePharmacyBaseDataBuilder(IsoCountryCode.DE);
+    return new ProvidePharmacyBaseDataBuilder(IsoCountryCodeNCPeH.DE);
   }
 
   public static ProvidePharmacyBaseData fromConfiguration(EuPharmacyConfiguration cfg) {
-    return new ProvidePharmacyBaseDataBuilder(IsoCountryCode.fromCode(cfg.getCountryCode()))
+    return new ProvidePharmacyBaseDataBuilder(IsoCountryCodeNCPeH.fromCode(cfg.getCountryCode()))
         .practitionerIdentifier(cfg.getPharmacistIdentifier())
         .organizationIdentifier(cfg.getOrganizationIdentifier())
         .build();
@@ -57,7 +57,7 @@ public class ProvidePharmacyBaseData implements Ability {
   @Accessors(fluent = true)
   @Setter
   public static class ProvidePharmacyBaseDataBuilder {
-    private final IsoCountryCode countryCode;
+    private final IsoCountryCodeNCPeH countryCode;
     private Identifier organizationIdentifier;
     private Identifier practitionerIdentifier;
 

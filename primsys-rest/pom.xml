@@ -6,11 +6,12 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>erezept-testsuite</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
     </parent>
 
     <artifactId>primsys-rest</artifactId>
-    <name>PrimSys REST-Service</name>
+    <name>PrimSys-REST Service</name>
+    <description>Parent for PrimSys-REST Modules</description>
     <packaging>pom</packaging>
 
     <modules>

@@ -26,7 +26,7 @@ import de.gematik.test.erezept.actors.EuPharmacyActor;
 import de.gematik.test.erezept.client.usecases.eu.EuGrantAccessPostCommand;
 import de.gematik.test.erezept.fhir.r4.eu.EuAccessPermission;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import net.serenitybdd.annotations.Step;
@@ -60,7 +60,7 @@ public class GrantEuAccessPermission extends ErpAction<EuAccessPermission> {
       return forCountry(euPharmacy.getCountryCode());
     }
 
-    public GrantEuAccessPermission forCountry(IsoCountryCode countryCode) {
+    public GrantEuAccessPermission forCountry(IsoCountryCodeNCPeH countryCode) {
       return new GrantEuAccessPermission(new EuGrantAccessPostCommand(accessCode, countryCode));
     }
 

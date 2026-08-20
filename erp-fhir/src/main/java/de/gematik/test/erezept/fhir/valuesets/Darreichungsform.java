@@ -24,6 +24,7 @@ import de.gematik.bbriccs.fhir.coding.FromValueSet;
 import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 import lombok.Getter;
@@ -114,7 +115,7 @@ public enum Darreichungsform implements FromValueSet {
   IFS("IFS", "Infusionsset"),
   IHA("IHA", "Inhalationsampullen"),
   IHP("IHP", "Inhalationspulver"),
-  IID("IID", "Injektions- und Infusionsdispersion", LocalDate.of(2024, 10, 1)),
+  IID("IID", "Injektions- und Infusionsdispersion", LocalDate.of(2024, Month.OCTOBER, 1)),
   IIE("IIE", "Injektions- oder Infusionslösung oder Lösung zum Einnehmen"),
   IIL("IIL", "Injektions-, Infusionslösung"),
   IIM("IIM", "Injektionslösung zur intramuskulären Anwendung"),
@@ -155,7 +156,7 @@ public enum Darreichungsform implements FromValueSet {
   LAN("LAN", "Lanzetten"),
   LII("LII", "Lösung zur Injektion, Infusion und Inhalation"),
   LIQ("LIQ", "Liquidum"),
-  LIV("LIV", "Lösung zur intravesikalen Anwendung", LocalDate.of(2024, 10, 1)),
+  LIV("LIV", "Lösung zur intravesikalen Anwendung", LocalDate.of(2024, Month.OCTOBER, 1)),
   LOE("LOE", "Lösung"),
   LOT("LOT", "Lotion"),
   LOV("LOV", "Lösung für einen Vernebler"),
@@ -163,7 +164,7 @@ public enum Darreichungsform implements FromValueSet {
   LTA("LTA", "Lacktabletten"),
   LUP("LUP", "Lutschpastillen"),
   LUT("LUT", "Lutschtabletten"),
-  LYE("LYE", "Lyophilisat zum Einnehmen", LocalDate.of(2025, 4, 1)),
+  LYE("LYE", "Lyophilisat zum Einnehmen", LocalDate.of(2025, Month.APRIL, 1)),
   LYO("LYO", "Lyophilisat zur Herstellung einer Infusionslösung"), // ab eRp-FD v1.14.0 verfügbar
   MIL("MIL", "Milch"),
   MIS("MIS", "Mischung"),
@@ -223,7 +224,7 @@ public enum Darreichungsform implements FromValueSet {
   PSE("PSE", "Pulver zur Herstellung einer Suspension zum Einnehmen"),
   PST("PST", "Paste"),
   PUD("PUD", "Puder"),
-  PUE("PUE", "Pulver zum Einnehmen", LocalDate.of(2025, 4, 1)),
+  PUE("PUE", "Pulver zum Einnehmen", LocalDate.of(2025, Month.APRIL, 1)),
   PUL("PUL", "Pulver"),
   RED("RED", "Retard-Dragees"),
   REK("REK", "Retard-Kapseln"),
@@ -340,7 +341,7 @@ public enum Darreichungsform implements FromValueSet {
   private final LocalDate validFrom;
 
   Darreichungsform(String code, String display) {
-    this(code, display, LocalDate.of(1970, 1, 1));
+    this(code, display, LocalDate.of(1970, Month.JANUARY, 1));
   }
 
   Darreichungsform(String code, String display, LocalDate validFrom) {
@@ -362,11 +363,12 @@ public enum Darreichungsform implements FromValueSet {
   }
 
   /**
-   * This static Method is useful to get all special SupplyForms.
+   * This static Method is useful to get all special SupplyForms. these special supply forms, that
+   * comes with very specific rules or restrictions and can´t be used randomly
    *
    * @return List<Darreichungsform>
    */
-  public static List<Darreichungsform> getUpdatedInJulyPlusKPG() {
+  public static List<Darreichungsform> getSpecialEntries() {
     return List.of(
         Darreichungsform.KEINE_DARREICHUNGSFORM,
         Darreichungsform.DIG,

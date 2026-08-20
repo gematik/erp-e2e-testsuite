@@ -6,33 +6,34 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>erp-eml</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
     </parent>
 
-  <artifactId>epa-mock-client</artifactId>
+    <name>ePA Mock-Client</name>
+    <description>Client for interactions with ePA-Mock</description>
+    <artifactId>epa-mock-client</artifactId>
 
-
-  <dependencies>
-    <dependency>
-      <groupId>de.gematik.bbriccs</groupId>
-      <artifactId>rest-client-api-brick</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.gematik.bbriccs</groupId>
-      <artifactId>rest-client-brick</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.gematik.bbriccs</groupId>
-      <artifactId>raw-http-brick</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>tools.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>de.gematik.bbriccs</groupId>
-      <artifactId>resource-loader-brick</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+<dependencies>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>rest-client-api-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>rest-client-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>raw-http-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>resource-loader-brick</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

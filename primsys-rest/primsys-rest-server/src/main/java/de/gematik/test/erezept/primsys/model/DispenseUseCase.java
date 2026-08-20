@@ -20,7 +20,10 @@
 
 package de.gematik.test.erezept.primsys.model;
 
+import de.gematik.test.erezept.client.usecases.DispensePrescriptionCommand;
+import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto;
 import jakarta.ws.rs.core.Response;
@@ -54,5 +57,19 @@ public class DispenseUseCase extends AbstractDispensingUseCase {
     val dispenseResponse = pharmacy.erpRequest(dispenseCommand);
 
     return Response.status(dispenseResponse.getStatusCode()).build();
+  }
+
+  public Response dispensePrescriptionWithParameters(
+      String prescriptionId, String secret, String dispenseOperationInput) {
+
+    val fhirParams =
+        this.decodeParametersFor(
+            prescriptionId, GemDispenseOperationParameters.class, dispenseOperationInput);
+    val cmd =
+        new DispensePrescriptionCommand(
+            TaskId.from(prescriptionId), Secret.from(secret), fhirParams);
+    val closeResponse = pharmacy.erpRequest(cmd);
+
+    return Response.status(closeResponse.getStatusCode()).build();
   }
 }

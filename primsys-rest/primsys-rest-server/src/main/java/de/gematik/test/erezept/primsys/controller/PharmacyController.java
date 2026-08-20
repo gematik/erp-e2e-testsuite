@@ -161,6 +161,25 @@ public class PharmacyController {
     }
   }
 
+  @POST
+  @Path("{pharmacyId}/xml/dispense")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes({MediaType.APPLICATION_XML, "application/fhir+xml"})
+  public Response dispensePrescription(
+      @PathParam("pharmacyId") String pharmacyId,
+      @QueryParam("taskId") String taskId,
+      @QueryParam("secret") String secret,
+      String dispenseOperationInput) {
+    val pharmacy = actors.getPharmacyOrThrowNotFound(pharmacyId);
+    log.info(
+        "Pharmacy {} will dispsense Task {} with dispense data"
+            + " GEM_ERP_PR_PAR_DispenseOperation_Input",
+        pharmacy.getName(),
+        taskId);
+    val usecase = new DispenseUseCase(pharmacy);
+    return usecase.dispensePrescriptionWithParameters(taskId, secret, dispenseOperationInput);
+  }
+
   @GET
   @Path("{pharmacyId}/receipt")
   @Produces("application/fhir+xml")

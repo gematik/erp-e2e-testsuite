@@ -28,7 +28,6 @@ import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.data.PznDispensedMedicationDto;
 import jakarta.ws.rs.core.Response;
-import java.util.Date;
 import java.util.List;
 import lombok.val;
 
@@ -78,22 +77,9 @@ public class CloseUseCase extends AbstractDispensingUseCase {
   public Response closePrescriptionWithParameters(
       String prescriptionId, String secret, String closeOperationInput) {
     val accepted = this.getAcceptedPrescription(prescriptionId);
-    val fhirParams = pharmacy.decode(GemCloseOperationParameters.class, closeOperationInput);
 
-    // adjust the fhir params
-    fhirParams
-        .getMedicationDispenses()
-        .forEach(
-            md -> {
-              md.getIdentifierFirstRep().setValue(prescriptionId); // adjust the prescription ID
-              md.getSubject().getIdentifier().setValue(accepted.getForKvnr()); // adjust the KVNR
-              md.getPerformerFirstRep()
-                  .getActor()
-                  .getIdentifier()
-                  .setValue(pharmacy.getSmcb().getTelematikId());
-              md.setWhenHandedOver(new Date());
-            });
-
+    val fhirParams =
+        this.decodeParametersFor(accepted, GemCloseOperationParameters.class, closeOperationInput);
     val cmd = new CloseTaskCommand(TaskId.from(prescriptionId), Secret.from(secret), fhirParams);
     val closeResponse = pharmacy.erpRequest(cmd);
     val body = closeResponse.getExpectedResource();

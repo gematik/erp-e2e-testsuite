@@ -1,0 +1,271 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gematik.de/erpcom/CommunicationDispReqPayloadV3.schema.json",
+  "title": "Payload of CommunicationDispReq",
+  "type": "object",
+  "oneOf": [
+    {
+      "title": "Delivery & Shipment",
+      "properties": {
+        "version": {
+          "$ref": "#/definitions/version"
+        },
+        "communicationType": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/communicationType"
+            },
+            {
+              "const": "order"
+            }
+          ]
+        },
+        "supplyOptionsType": {
+          "enum": [
+            "delivery",
+            "shipment"
+          ]
+        },
+        "firstname": {
+          "$ref": "#/definitions/firstname"
+        },
+        "lastname": {
+          "$ref": "#/definitions/lastname"
+        },
+        "address": {
+          "$ref": "#/definitions/address"
+        },
+        "postcode": {
+          "$ref": "#/definitions/postcode"
+        },
+        "city": {
+          "$ref": "#/definitions/city"
+        },
+        "country": {
+          "$ref": "#/definitions/country"
+        },
+        "hint": {
+          "$ref": "#/definitions/hint"
+        },
+        "text": {
+          "$ref": "#/definitions/text"
+        },
+        "phone": {
+          "$ref": "#/definitions/phone"
+        },
+        "email": {
+          "$ref": "#/definitions/email"
+        },
+        "transactionID": {
+          "$ref": "#/definitions/transactionID"
+        }
+      },
+      "required": [
+        "version",
+        "communicationType",
+        "supplyOptionsType",
+        "firstname",
+        "lastname",
+        "address",
+        "postcode",
+        "city",
+        "country",
+        "phone",
+        "transactionID"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "title": "Reservation",
+      "properties": {
+        "version": {
+          "$ref": "#/definitions/version"
+        },
+        "communicationType": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/communicationType"
+            },
+            {
+              "const": "order"
+            }
+          ]
+        },
+        "supplyOptionsType": {
+          "enum": [
+            "onPremise"
+          ]
+        },
+        "firstname": {
+          "$ref": "#/definitions/firstname"
+        },
+        "lastname": {
+          "$ref": "#/definitions/lastname"
+        },
+        "address": {
+          "$ref": "#/definitions/address"
+        },
+        "postcode": {
+          "$ref": "#/definitions/postcode"
+        },
+        "city": {
+          "$ref": "#/definitions/city"
+        },
+        "country": {
+          "$ref": "#/definitions/country"
+        },
+        "hint": {
+          "$ref": "#/definitions/hint"
+        },
+        "text": {
+          "$ref": "#/definitions/text"
+        },
+        "phone": {
+          "$ref": "#/definitions/phone"
+        },
+        "email": {
+          "$ref": "#/definitions/email"
+        },
+        "transactionID": {
+          "$ref": "#/definitions/transactionID"
+        }
+      },
+      "required": [
+        "version",
+        "communicationType",
+        "supplyOptionsType",
+        "phone",
+        "transactionID"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "title": "Message",
+      "properties": {
+        "version": {
+          "$ref": "#/definitions/version"
+        },
+        "communicationType": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/communicationType"
+            },
+            {
+              "const": "text"
+            }
+          ]
+        },
+        "firstname": {
+          "$ref": "#/definitions/firstname"
+        },
+        "lastname": {
+          "$ref": "#/definitions/lastname"
+        },
+        "address": {
+          "$ref": "#/definitions/address"
+        },
+        "postcode": {
+          "$ref": "#/definitions/postcode"
+        },
+        "city": {
+          "$ref": "#/definitions/city"
+        },
+        "country": {
+          "$ref": "#/definitions/country"
+        },
+        "text": {
+          "$ref": "#/definitions/text"
+        },
+        "phone": {
+          "$ref": "#/definitions/phone"
+        },
+        "email": {
+          "$ref": "#/definitions/email"
+        },
+        "transactionID": {
+          "$ref": "#/definitions/transactionID"
+        }
+      },
+      "required": [
+        "version",
+        "communicationType",
+        "text",
+        "transactionID"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "definitions": {
+    "version": {
+      "type": "number",
+      "const": 3
+    },
+    "communicationType": {
+      "enum": [
+        "order",
+        "text"
+      ],
+      "description": "Communication type: 'order' to request a product with a chosen supply option (delivery, shipment, onPremise). 'text' to send a free-form message related to the transaction."
+    },
+    "supplyOptionsType": {
+      "enum": [
+        "onPremise",
+        "shipment",
+        "delivery"
+      ]
+    },
+    "firstname": {
+      "type": "string",
+      "maxLength": 45
+    },
+    "lastname": {
+      "type": "string",
+      "maxLength": 45
+    },
+    "address": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 100
+    },
+    "postcode": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 10
+    },
+    "city": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 100
+    },
+    "country": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 2,
+      "description": "2-letter country code as defined in ISO 3166-1."
+    },
+    "transactionID": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "hint": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "text": {
+      "type": "string",
+      "maxLength": 800
+    },
+    "phone": {
+      "type": "string",
+      "pattern": "^(\\+|00)[0-9]+$",
+      "maxLength": 32,
+      "description": "Telefonnummer E-164 Format, jedoch anstelle des „+“ mit „00“ / rein nummerisch."
+    },
+    "email": {
+      "type": "string",
+      "maxLength": 70,
+      "pattern": "^.+@.{1,}\\..{1,}$"
+    }
+  },
+  "version": "2"
+}

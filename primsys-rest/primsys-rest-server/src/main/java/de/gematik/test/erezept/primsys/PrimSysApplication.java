@@ -41,6 +41,7 @@ import jakarta.ws.rs.ApplicationPath;
 import lombok.val;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 import tools.jackson.jakarta.rs.xml.JacksonXMLProvider;
 
@@ -85,6 +86,10 @@ public class PrimSysApplication extends ResourceConfig {
   public PrimSysApplication() {
     packages("de.gematik.test.erezept.primsys.controller");
     val jsonProvider = new JacksonJsonProvider();
+    jsonProvider
+        .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+        .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+        .enable(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT);
     register(jsonProvider);
 
     val xmlProvider = new JacksonXMLProvider();

@@ -31,7 +31,7 @@ import de.gematik.test.erezept.client.usecases.eu.EuGrantAccessPostCommand;
 import de.gematik.test.erezept.fhir.builder.eu.EuPatchTaskInputBuilder;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -68,7 +68,7 @@ public class EuAccessGrantWriter extends BaseRemoteCommand {
         this.getEnvironmentName());
 
     val ac = EuAccessCode.random();
-    val country = IsoCountryCode.fromCode(countryCode);
+    val country = IsoCountryCodeNCPeH.fromCode(countryCode);
     val cmd = new EuGrantAccessPostCommand(ac, country);
     val response = erpClient.request(cmd);
 

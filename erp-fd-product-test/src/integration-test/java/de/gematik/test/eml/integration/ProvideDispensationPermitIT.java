@@ -153,9 +153,8 @@ public class ProvideDispensationPermitIT extends ErpTest {
         DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
+                    .period(3, Timing.UnitsOfTime.D)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .build())
             .build();

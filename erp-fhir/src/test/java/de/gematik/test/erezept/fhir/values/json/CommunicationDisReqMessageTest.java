@@ -20,12 +20,21 @@
 
 package de.gematik.test.erezept.fhir.values.json;
 
+import static de.gematik.test.erezept.fhir.builder.GemFaker.fakePhoneNumberWithStartingDoubleOAsE164;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.extensions.erp.CommunicationPayloadType;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
 import lombok.val;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 class CommunicationDisReqMessageTest {
@@ -55,7 +64,7 @@ class CommunicationDisReqMessageTest {
   void shouldBuildV3CommunicationDisReqMessageCorrectly() {
     val msg =
         CommunicationDisReqMessage.forV3()
-            .communicationType("order")
+            .communicationType(CommunicationPayloadType.ORDER)
             .supplyOptionsType(SupplyOptionsType.DELIVERY)
             .firstname("first")
             .lastname("last")
@@ -103,8 +112,11 @@ class CommunicationDisReqMessageTest {
   }
 
   @Test
-  void shouldCreateDefaultMessage() {
-    val msg = CommunicationDisReqMessage.forV3().build();
+  void shouldSetMessage() {
+    val msg =
+        CommunicationDisReqMessage.forV3()
+            .communicationType(CommunicationPayloadType.ORDER)
+            .build();
 
     assertNotNull(msg);
 
@@ -235,5 +247,65 @@ class CommunicationDisReqMessageTest {
     assertEquals("https://test.de", msg.url());
     assertEquals("HR", msg.pickupCodeHR());
     assertEquals("DMC", msg.pickupCodeDMC());
+  }
+
+  @RepeatedTest(5)
+  void shouldValidateV3PayloadAgainstSchema() {
+    val builder = messageBuilderForOrder("hint", "text");
+    val isValid = shouldValidate(builder.build());
+    assertTrue(isValid);
+  }
+
+  @RepeatedTest(5)
+  void shouldValidateV3PayloadForMessageAgainstSchema() {
+    val communicationDisReqMessagePayload = messageBuilderForText("text").build();
+    val isValid = shouldValidate(communicationDisReqMessagePayload);
+    assertTrue(isValid);
+  }
+
+  public CommunicationDisReqMessage.CommunicationDisReqMessageV3Builder messageBuilderForText(
+      @NonNull String text) {
+    val builder = getPrefilledBuilder();
+    builder.communicationType(CommunicationPayloadType.TEXT.getLabel());
+    builder.text(text);
+
+    return builder;
+  }
+
+  private CommunicationDisReqMessage.CommunicationDisReqMessageV3Builder messageBuilderForOrder(
+      String hint, String text) {
+    val builder = getPrefilledBuilder();
+    builder.supplyOptionsType(GemFaker.fakerValueSet(SupplyOptionsType.class));
+    builder.communicationType(CommunicationPayloadType.ORDER.getLabel());
+    Optional.ofNullable(hint).ifPresent(builder::hint);
+    Optional.ofNullable(text).ifPresent(builder::text);
+
+    return builder;
+  }
+
+  private CommunicationDisReqMessage.CommunicationDisReqMessageV3Builder getPrefilledBuilder() {
+    val builder = new CommunicationDisReqMessage.CommunicationDisReqMessageV3Builder();
+    builder.address("this.street");
+    builder.firstname("Max");
+    builder.lastname("Mustermann");
+    builder.postcode("12345");
+    builder.city("Berlin");
+    builder.country(randomElement(IsoCountryCodeNCPeH.values()).getCode());
+    builder.phone(fakePhoneNumberWithStartingDoubleOAsE164());
+    builder.email(GemFaker.fakerEMail());
+    builder.transactionID(UUID.randomUUID());
+    return builder;
+  }
+
+  private static CommunicationPayloadValidation communicationDispenseRequestValidator;
+
+  @BeforeAll
+  static void setup() {
+    communicationDispenseRequestValidator =
+        new CommunicationPayloadValidation("erpcom/CommunicationDispReqPayloadV3.json");
+  }
+
+  public boolean shouldValidate(Object toValidate) {
+    return communicationDispenseRequestValidator.validate(toValidate).isEmpty();
   }
 }

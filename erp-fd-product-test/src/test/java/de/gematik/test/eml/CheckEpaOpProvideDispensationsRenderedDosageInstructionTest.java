@@ -74,8 +74,7 @@ class CheckEpaOpProvideDispensationsRenderedDosageInstructionTest extends ErpFhi
                     .timing(
                         TimingBuilder.forRepeatComp()
                             .frequency(1)
-                            .period(3)
-                            .periodUnit(Timing.UnitsOfTime.D)
+                            .period(3, Timing.UnitsOfTime.D)
                             .timeOfDay("08:00:00")
                             .build())
                     .build())

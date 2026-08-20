@@ -40,6 +40,8 @@ import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import de.gematik.bbriccs.rest.headers.AuthHttpHeaderKey;
 import de.gematik.bbriccs.rest.headers.StandardHttpHeaderKey;
+import de.gematik.idp.client.IdpClient;
+import de.gematik.test.erezept.client.idpclient.InvalidIdpClient;
 import de.gematik.test.erezept.client.testutils.VauCertificateGenerator;
 import de.gematik.test.erezept.client.vau.VauException;
 import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
@@ -219,5 +221,29 @@ class ErpClientFactoryTest {
         assertThrows(
             ConfigurationException.class, () -> ErpClientFactory.createErpClient(env, actor));
     assertTrue(exception.getMessage().contains("ABC is not a valid option of"));
+  }
+
+  @Test
+  void shouldCreateErpClientWithValidIdpClient() {
+    val env = createEnvironmentConfiguration();
+    val actor = new PatientConfiguration();
+    val mocked = mockConstruction(FhirParser.class);
+    try (mocked) {
+      val erpClient = ErpClientFactory.createErpClient(env, actor);
+
+      assertTrue(erpClient.getIdpClient() instanceof IdpClient);
+    }
+  }
+
+  @Test
+  void shouldCreateErpClientWithInvalidIdpClient() {
+    val env = createEnvironmentConfiguration();
+    val actor = new PatientConfiguration();
+    val mocked = mockConstruction(FhirParser.class);
+    try (mocked) {
+      val erpClient = ErpClientFactory.createErpClientWithInvalidIdpToken(env, actor);
+
+      assertTrue(erpClient.getIdpClient() instanceof InvalidIdpClient);
+    }
   }
 }

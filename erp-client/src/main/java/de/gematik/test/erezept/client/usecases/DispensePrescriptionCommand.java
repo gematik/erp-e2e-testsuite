@@ -26,11 +26,12 @@ import de.gematik.test.erezept.client.rest.param.QueryParameter;
 import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
+import java.util.Objects;
 import org.hl7.fhir.r4.model.Resource;
 
 public class DispensePrescriptionCommand extends ErpBaseCommand<EmptyResource> {
 
-  private GemDispenseOperationParameters dispenseParameters;
+  private final GemDispenseOperationParameters dispenseParameters;
 
   public DispensePrescriptionCommand(
       TaskId taskId, Secret secret, GemDispenseOperationParameters dispenseParameters) {
@@ -46,10 +47,6 @@ public class DispensePrescriptionCommand extends ErpBaseCommand<EmptyResource> {
 
   @Override
   public Resource getRequestBody() {
-    if (dispenseParameters != null) {
-      return dispenseParameters;
-    } else {
-      return new EmptyResource();
-    }
+    return Objects.requireNonNullElseGet(dispenseParameters, EmptyResource::new);
   }
 }

@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getUpdatedInJulyPlusKPG;
+import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getSpecialEntries;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.de.value.PZN;
@@ -179,8 +179,7 @@ public class ResponseOfDispenseMedication extends FhirResponseQuestion<EmptyReso
           val darreichungsCode =
               medMap.getOrDefault(
                   "Darreichungsform",
-                  GemFaker.fakerValueSet(Darreichungsform.class, getUpdatedInJulyPlusKPG())
-                      .getCode());
+                  GemFaker.fakerValueSet(Darreichungsform.class, getSpecialEntries()).getCode());
           val sizeCode = medMap.getOrDefault("Normgröße", StandardSize.random().getCode());
 
           val medication =

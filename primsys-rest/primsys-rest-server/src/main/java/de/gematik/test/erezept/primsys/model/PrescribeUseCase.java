@@ -136,6 +136,8 @@ public abstract class PrescribeUseCase<B extends KbvBaseBundle> {
   }
 
   private PrescriptionDto createPrescriptionDto(ErxTask activatedTask, B bundle) {
+    log.info(
+        "Doctor {} creates prescription dto for activatedTask {}", doctor.getName(), activatedTask);
     val patientMapper = PatientDataMapper.from(bundle.getPatient());
     val coverageMapper = CoverageDataMapper.from(bundle.getCoverage(), bundle.getPatient());
 

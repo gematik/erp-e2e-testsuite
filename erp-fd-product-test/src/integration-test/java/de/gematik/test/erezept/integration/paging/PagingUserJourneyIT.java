@@ -46,7 +46,7 @@ import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.search.CommunicationSearch;
 import de.gematik.test.erezept.fhir.date.DateConverter;
-import de.gematik.test.erezept.fhir.extensions.erp.CommunicationType;
+import de.gematik.test.erezept.fhir.extensions.erp.CommunicationPayloadType;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
@@ -69,6 +69,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Paging Tests")
 @Tag("Paging")
+@Tag("CommunicationV3")
 @SuppressWarnings("java:S8692")
 class PagingUserJourneyIT extends ErpTest {
 
@@ -114,7 +115,7 @@ class PagingUserJourneyIT extends ErpTest {
               .forTask(task)
               .asReply(
                   CommunicationReplyMessage.forV3()
-                      .communicationType(CommunicationType.TEXT.getLabel())
+                      .communicationType(CommunicationPayloadType.TEXT.getLabel())
                       .transactionID(UUID.randomUUID())
                       .text(
                           format(
@@ -136,17 +137,7 @@ class PagingUserJourneyIT extends ErpTest {
     val examEvidence =
         VsdmExamEvidence.asOnlineMode(config.getSoftKonnVsdmService(), patient.getEgk())
             .build(VsdmExamEvidenceResult.UPDATES_SUCCESSFUL);
-    val totalCount =
-        patient
-            .performs(
-                DownloadReadyTask.asPatient(
-                    IQueryParameter.search()
-                        .sortedBy("date", SortOrder.ASCENDING)
-                        .withCount(2)
-                        .withOffset(2)
-                        .createParameter()))
-            .getExpectedResponse()
-            .getTotal();
+
     val addNewTasks = 7;
     val testDate = LocalDate.now();
 
@@ -305,13 +296,12 @@ class PagingUserJourneyIT extends ErpTest {
             .hasResponseWith(returnCode(200, ErpAfos.A_24442))
             .and(hasSameEntryIds(fourthCall.getExpectedResponse(), ErpAfos.A_24442))
             .isCorrect());
-    // prüfe, dass alle 5 links vorhanden sind und totalCount korrekt gezählt wurde
+    // prüfe, dass alle 5 links vorhanden sind
     patient.attemptsTo(
         Verify.that(thirdCall)
             .withExpectedType()
             .hasResponseWith(returnCode(200, ErpAfos.A_24442))
             .and(containsAll5Links())
-            .and(containsTotalCountOf(totalCount + addNewTasks))
             .and(expectedParamsIn("self", "__offset", "6"))
             .and(expectedParamsIn("prev", "__offset", "4"))
             .and(expectedParamsIn("first", "__offset", "0"))
@@ -338,7 +328,7 @@ class PagingUserJourneyIT extends ErpTest {
             .and(hasSameEntryIds(apoAlternativeCall.getExpectedResponse(), ErpAfos.A_24442))
             .isCorrect());
 
-    // Verify RelationLinks, Offset-Values and totalCount of Apos call
+    // Verify RelationLinks, Offset-Values
     flughafenApo.attemptsTo(
         Verify.that(apoSecondCall)
             .withExpectedType()

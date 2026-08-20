@@ -25,7 +25,7 @@ import de.gematik.test.erezept.client.usecases.ErpBaseCommand;
 import de.gematik.test.erezept.fhir.builder.eu.EuAccessPermissionRequestBuilder;
 import de.gematik.test.erezept.fhir.r4.eu.EuAccessPermission;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import org.hl7.fhir.r4.model.Resource;
 
 /*
@@ -35,10 +35,11 @@ public class EuGrantAccessPostCommand extends ErpBaseCommand<EuAccessPermission>
 
   private final EuAccessPermission requestBody;
 
-  public EuGrantAccessPostCommand(EuAccessCode euAccessCode, IsoCountryCode isoCountryCode) {
+  public EuGrantAccessPostCommand(
+      EuAccessCode euAccessCode, IsoCountryCodeNCPeH isoCountryCodeNCPeH) {
     this(
         EuAccessPermissionRequestBuilder.euAccessCode(euAccessCode)
-            .countryCode(isoCountryCode)
+            .countryCode(isoCountryCodeNCPeH)
             .build());
   }
 

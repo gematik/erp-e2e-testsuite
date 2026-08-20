@@ -22,7 +22,7 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerValueSet;
-import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getUpdatedInJulyPlusKPG;
+import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getSpecialEntries;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -37,8 +37,7 @@ class KbvErpMedicationFreeTextFakerTest extends ErpFhirParsingTest {
   void buildFakeMedicationFreeTextWithDosageForm() {
     val freetext =
         KbvErpMedicationFreeTextFaker.builder()
-            .withDosageForm(
-                fakerValueSet(Darreichungsform.class, getUpdatedInJulyPlusKPG()).getCode())
+            .withDosageForm(fakerValueSet(Darreichungsform.class, getSpecialEntries()).getCode())
             .fake();
     val result = ValidatorUtil.encodeAndValidate(parser, freetext);
     assertTrue(result.isSuccessful());

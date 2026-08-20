@@ -28,6 +28,7 @@ import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
@@ -46,7 +47,7 @@ class GemErpMedicationPznFakerTest extends ErpFhirParsingTest {
   @RepeatedTest(5)
   void shouldRandomlyFake() {
     val medication = GemErpMedicationFaker.forPznMedication(version).fake();
-    assertTrue(parser.isValid(medication));
+    assertTrue(ValidatorUtil.encodeAndValidate(parser, medication).isSuccessful());
   }
 
   @Test

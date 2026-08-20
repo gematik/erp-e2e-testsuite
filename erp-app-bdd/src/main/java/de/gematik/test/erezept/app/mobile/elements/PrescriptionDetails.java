@@ -93,7 +93,10 @@ public enum PrescriptionDetails implements PageElement {
               "//XCUIElementTypeNavigationBar[@name=\"Rezeptdetails\"]/XCUIElementTypeButton[1]")),
   SELECT_INSURANCE(
       "Select insurance button",
-      () -> AppiumBy.accessibilityId("diga_dtl_btn_main_select_insurance"));
+      () -> AppiumBy.accessibilityId("diga_dtl_btn_main_select_insurance")),
+  T_PRESCRIPTION_CHIP("Chip indicating the T-Prescription", () -> AppiumBy.name("T-Rezept")),
+  T_PRESCRIPTION_INFO_ITEM(
+      "T-Prescription info item", () -> AppiumBy.accessibilityId("prsc_dtl_btn_teratogenic_info"));
 
   private final String elementName;
   private final Supplier<By> iosLocator;

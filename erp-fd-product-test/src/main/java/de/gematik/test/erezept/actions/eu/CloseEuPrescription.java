@@ -27,10 +27,13 @@ import de.gematik.test.erezept.abilities.ProvidePharmacyBaseData;
 import de.gematik.test.erezept.actions.ErpAction;
 import de.gematik.test.erezept.client.usecases.eu.EuCloseInputPostCommand;
 import de.gematik.test.erezept.fhir.builder.eu.*;
-import de.gematik.test.erezept.fhir.r4.eu.*;
+import de.gematik.test.erezept.fhir.r4.eu.EuCloseOperationInput;
+import de.gematik.test.erezept.fhir.r4.eu.EuGetPrescriptionInput;
+import de.gematik.test.erezept.fhir.r4.eu.EuHealthcareFacilityType;
+import de.gematik.test.erezept.fhir.r4.eu.EuOrganizationProfession;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import de.gematik.test.erezept.fhir.valuesets.eu.EuRequestType;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
@@ -140,12 +143,12 @@ public class CloseEuPrescription extends ErpAction<EmptyResource> {
   private EuGetPrescriptionInput getEuGetPrescriptionInput(
       EuAccessCode accessCode,
       KVNR kvnr,
-      IsoCountryCode isoCountryCode,
+      IsoCountryCodeNCPeH isoCountryCodeNCPeH,
       ProvidePharmacyBaseData pharmacy) {
     return EuGetPrescriptionInputBuilder.forRequestType(EuRequestType.PRESCRIPTION_LIST)
         .kvnr(kvnr)
         .accessCode(accessCode)
-        .countryCode(isoCountryCode)
+        .countryCode(isoCountryCodeNCPeH)
         .practitionerRole(EuOrganizationProfession.getDefaultPharmacist())
         .pointOfCare(
             pharmacy.getOrganizationIdentifier() != null

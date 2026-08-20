@@ -6,11 +6,13 @@
     <parent>
         <artifactId>bdd-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <name>Test Driver Interface for Remote FdV</name>
+    <description>Cucumber-Steps for the ERP Remote FdV</description>
+
     <artifactId>erp-remote-fdv-steps</artifactId>
 
     <properties>
@@ -59,7 +61,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-common</artifactId>
-            <version>1.6.0</version>
+            <version>1.7.1</version>
         </dependency>
         <dependency>
             <groupId>tools.jackson.core</groupId>
@@ -115,7 +117,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <goals>

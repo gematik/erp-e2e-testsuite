@@ -1,0 +1,314 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gematik.de/erpcom/CommunicationReplyPayloadV3.schema.json",
+  "title": "Payload of CommunicationReplyPayload",
+  "type": "object",
+  "oneOf": [
+    {
+      "title": "text",
+      "properties": {
+        "version": {
+          "$ref": "#/definitions/version"
+        },
+        "transactionID": {
+          "$ref": "#/definitions/transactionID"
+        },
+        "communicationType": {
+          "type": "string",
+          "const": "text"
+        },
+        "text": {
+          "$ref": "#/definitions/text"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "title": "link",
+      "properties": {
+        "version": {
+          "$ref": "#/definitions/version"
+        },
+        "transactionID": {
+          "$ref": "#/definitions/transactionID"
+        },
+        "communicationType": {
+          "type": "string",
+          "const": "link"
+        },
+        "text": {
+          "$ref": "#/definitions/text"
+        },
+        "url": {
+          "$ref": "#/definitions/url"
+        }
+      },
+      "required": [
+        "text",
+        "url"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "title": "reservationStatus",
+      "properties": {
+        "version": {
+          "$ref": "#/definitions/version"
+        },
+        "transactionID": {
+          "$ref": "#/definitions/transactionID"
+        },
+        "communicationType": {
+          "type": "string",
+          "const": "reservationStatus"
+        },
+        "readyForCollection": {
+          "$ref": "#/definitions/readyForCollection"
+        }
+      },
+      "required": [
+        "readyForCollection"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "title": "pickupCodeHR",
+      "properties": {
+        "version": {
+          "$ref": "#/definitions/version"
+        },
+        "transactionID": {
+          "$ref": "#/definitions/transactionID"
+        },
+        "communicationType": {
+          "type": "string",
+          "const": "pickupCodeHR"
+        },
+        "text": {
+          "$ref": "#/definitions/text"
+        },
+        "pickupCodeHR": {
+          "$ref": "#/definitions/pickupCodeHR"
+        }
+      },
+      "required": [
+        "pickupCodeHR"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "title": "pickupCodeDMC",
+      "properties": {
+        "version": {
+          "$ref": "#/definitions/version"
+        },
+        "transactionID": {
+          "$ref": "#/definitions/transactionID"
+        },
+        "communicationType": {
+          "type": "string",
+          "const": "pickupCodeDMC"
+        },
+        "text": {
+          "$ref": "#/definitions/text"
+        },
+        "pickupCodeDMC": {
+          "$ref": "#/definitions/pickupCodeDMC"
+        }
+      },
+      "required": [
+        "pickupCodeDMC"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "title": "deliveryStatus",
+      "properties": {
+        "version": {
+          "$ref": "#/definitions/version"
+        },
+        "transactionID": {
+          "$ref": "#/definitions/transactionID"
+        },
+        "communicationType": {
+          "type": "string",
+          "const": "deliveryStatus"
+        },
+        "text": {
+          "$ref": "#/definitions/text"
+        },
+        "deliveryStatus": {
+          "$ref": "#/definitions/deliveryStatus"
+        },
+        "inTransportPosition": {
+          "$ref": "#/definitions/coordinate"
+        },
+        "inTransportETA": {
+          "$ref": "#/definitions/timeframe"
+        }
+      },
+      "required": [
+        "deliveryStatus"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "title": "paymentInfo",
+      "properties": {
+        "version": {
+          "$ref": "#/definitions/version"
+        },
+        "transactionID": {
+          "$ref": "#/definitions/transactionID"
+        },
+        "communicationType": {
+          "type": "string",
+          "const": "paymentInfo"
+        },
+        "text": {
+          "$ref": "#/definitions/text"
+        },
+        "totalAmount": {
+          "$ref": "#/definitions/totalAmount"
+        },
+        "paymentMethods": {
+          "$ref": "#/definitions/paymentMethods"
+        }
+      },
+      "required": [
+        "totalAmount"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "definitions": {
+    "version": {
+      "type": "number",
+      "const": 3
+    },
+    "communicationType": {
+      "enum": [
+        "text",
+        "link",
+        "reservationStatus",
+        "pickupCodeHR",
+        "pickupCodeDMC",
+        "deliveryStatus",
+        "paymentInfo"
+      ]
+    },
+    "text": {
+      "type": "string",
+      "maxLength": 800
+    },
+    "url": {
+      "type": "string",
+      "maxLength": 500,
+      "pattern": "https://.+\\..+"
+    },
+    "transactionID": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "readyForCollection": {
+      "enum": [
+        "immediately",
+        "sameDay",
+        "nextDay",
+        "nextDayAM",
+        "nextDayPM",
+        "unknown",
+        "notAvailable"
+      ]
+    },
+    "deliveryStatus": {
+      "type": "string",
+      "enum": [
+        "preparedWaiting",
+        "inTransport",
+        "delivered",
+        "incident"
+      ]
+    },
+    "coordinate": {
+      "type": "object",
+      "properties": {
+        "lat": {
+          "type": "number"
+        },
+        "long": {
+          "type": "number"
+        }
+      }
+    },
+    "timeframe": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "$ref": "#/definitions/datetime"
+        },
+        "to": {
+          "$ref": "#/definitions/datetime"
+        }
+      }
+    },
+    "totalAmount": {
+      "type": "integer",
+      "$comment": "Value in smallest currency unit (e.g. cents)"
+    },
+    "paymentMethods": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/paymentMethod"
+      }
+    },
+    "paymentMethod": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "enum": [
+            "cash",
+            "bankaccount",
+            "creditcard",
+            "paypal"
+          ]
+        },
+        "url": {
+          "$ref": "#/definitions/url"
+        }
+      },
+      "required": [
+        "method"
+      ]
+    },
+    "pickupCodeHR": {
+      "type": "string",
+      "maxLength": 8,
+      "pattern": "^[a-zA-Z0-9]+$"
+    },
+    "pickupCodeDMC": {
+      "title": "DMC Content",
+      "description": "The app will convert this using utf8 encoding and write to a Data Matrix Code (ISO/IEC 16022:2006). This could be anything like custom JSON: `{\"custom_json\": \"payload\"}`, `BASE64==` encoded data or a simple id `abcdef-12345-sdfsdf`.",
+      "examples": [
+        "{\"custom_json\": \"payload\"}",
+        "BASE64=="
+      ],
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 2000
+    },
+    "datetime": {
+      "type": "number",
+      "$comment": "Unix Timestamp"
+    }
+  },
+  "required": [
+    "version",
+    "communicationType",
+    "transactionID"
+  ],
+  "version": "2"
+}

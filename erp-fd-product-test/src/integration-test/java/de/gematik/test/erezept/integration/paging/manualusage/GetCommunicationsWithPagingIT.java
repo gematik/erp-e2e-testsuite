@@ -42,15 +42,12 @@ import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.CommunicationGetCommand;
 import de.gematik.test.erezept.client.usecases.search.CommunicationSearch;
-import de.gematik.test.erezept.fhir.extensions.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
-import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
-import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
+import de.gematik.test.erezept.fhir.valuesets.DeliveryStatus;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -870,41 +867,31 @@ class GetCommunicationsWithPagingIT extends ErpTest {
 
   private void sendMultipleDispenseRequestsAndCount(ErxTask task, int numberOfMessages) {
     for (int i = 0; i < numberOfMessages; i++) {
-      val request =
-          CommunicationDisReqMessage.forV3()
-              .communicationType(CommunicationType.ORDER.getLabel())
-              .supplyOptionsType(SupplyOptionsType.DELIVERY)
-              .transactionID(UUID.randomUUID())
-              .firstname("John")
-              .lastname("Doe")
-              .phone("+49170123456")
-              .text(
-                  format(
-                      "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Ist"
-                          + " das Medikament No.1 heute noch verfügbar, liebe Apo"
-                          + " woodlandPharma?",
-                      i))
+      val payload =
+          patient
+              .messageFakerForOrder(SupplyOptionsType.SHIPMENT)
+              .hint(format("bring´ it to me, bring it to me: {0} times....", i))
               .build();
-      patient.performs(SendMessages.to(flughafenApo).forTask(task).asDispenseRequest(request));
+      val resp =
+          patient.performs(SendMessages.to(flughafenApo).forTask(task).asDispenseRequest(payload));
+      // todo reduce when FD is fixed
+      if (!resp.getResponse().isOfExpectedType()) {
+        System.out.println(payload);
+        System.out.println(resp);
+      }
     }
   }
 
   private void sendMultipleReplyAndCount(ErxTask task, int numberOfMessages) {
     for (int i = 0; i < numberOfMessages; i++) {
       val replay =
-          CommunicationReplyMessage.forV3()
-              .communicationType(CommunicationType.PAYMENT_INFO.getLabel())
-              .transactionID(UUID.randomUUID())
-              .totalAmount(12550)
-              .paymentMethods(
-                  List.of(
-                      new CommunicationReplyMessage.PaymentMethod(
-                          "creditcard", "Visa", "https://pay.example.com")))
-              .text(
+          flughafenApo
+              .communicationReplayFakerDeliveryStatus(
                   format(
                       "Nachricht Nr. {0} zum testen des ErpFD bezüglich Communication: Hey"
                           + " patient, how are you? does the medicine takes an effect??",
-                      i))
+                      i),
+                  DeliveryStatus.IN_TRANSPORT)
               .build();
 
       flughafenApo.performs(SendMessages.to(patient).forTask(task).asReply(replay, flughafenApo));

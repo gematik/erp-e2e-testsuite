@@ -21,17 +21,19 @@
 package de.gematik.test.erezept.fhir.values.json;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.extensions.erp.CommunicationPayloadType;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import java.util.List;
 import java.util.UUID;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(Include.NON_EMPTY)
 public record CommunicationReplyMessage(
     int version,
     String supplyOptionsType,
     String communicationType,
-    UUID transactionID,
+    String transactionID,
 
     // v3
     String text,
@@ -135,11 +137,10 @@ public record CommunicationReplyMessage(
   }
 
   public static class CommunicationReplyMessageV3Builder {
-
     private int version = 3;
 
     private String communicationType = "text";
-    private UUID transactionID = UUID.randomUUID();
+    private String transactionID = UUID.randomUUID().toString();
 
     private String text = GemFaker.fakerCommunicationReplyMessage();
 
@@ -164,7 +165,17 @@ public record CommunicationReplyMessage(
       return this;
     }
 
+    public CommunicationReplyMessageV3Builder communicationType(
+        CommunicationPayloadType communicationPayloadType) {
+      this.communicationType = communicationPayloadType.getLabel();
+      return this;
+    }
+
     public CommunicationReplyMessageV3Builder transactionID(UUID transactionID) {
+      return this.transactionID(transactionID.toString());
+    }
+
+    public CommunicationReplyMessageV3Builder transactionID(String transactionID) {
       this.transactionID = transactionID;
       return this;
     }
@@ -189,7 +200,7 @@ public record CommunicationReplyMessage(
       return this;
     }
 
-    public CommunicationReplyMessageV3Builder readyForCollection(String readyForCollection) {
+    public CommunicationReplyMessageV3Builder readyForCollecting(String readyForCollection) {
       this.readyForCollection = readyForCollection;
       return this;
     }
@@ -220,6 +231,12 @@ public record CommunicationReplyMessage(
     }
 
     public CommunicationReplyMessage build() {
+
+      if ("reservationStatus".equals(communicationType)) {
+        // not allowed when type is reservationStatus
+        this.text = null;
+      }
+
       return new CommunicationReplyMessage(
           version,
           null,

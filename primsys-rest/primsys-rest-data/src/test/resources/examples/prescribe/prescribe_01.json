@@ -1,0 +1,25 @@
+{
+  "patient": {
+    "kvnr": "X110596703",
+    "insuranceType": "GKV",
+    "firstName": "firstName",
+    "lastName": "lastName",
+    "birthDate": "23.03.1987",
+    "city": "Berlin",
+    "postal": "10117",
+    "street": "Friedrichstraße 142"
+  },
+  "coverage": {
+    "insuranceType": "GKV",
+    "payorType": "Sonstige Kostenträger",
+    "iknr": "109519005",
+    "name": "Test Test",
+    "wop": "Berlin",
+    "insurantState": "Mitglieder",
+    "personGroup": "BVG"
+  },
+  "medication": {
+    "type": "PZN",
+    "category": "Arzneimittel"
+  }
+}

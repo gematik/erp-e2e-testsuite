@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
-import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getUpdatedInJulyPlusKPG;
+import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getSpecialEntries;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
@@ -51,9 +51,8 @@ public class GemErpMedicationPZNFaker {
     if (fakerBool()) {
       if (version.isBiggerThan(ErpWorkflowVersion.V1_5)) {
         withDarreichungsform(fakerValueSet(Darreichungsform.class, Darreichungsform.KPG));
-
       } else {
-        withDarreichungsform(fakerValueSet(Darreichungsform.class, getUpdatedInJulyPlusKPG()));
+        withDarreichungsform(fakerValueSet(Darreichungsform.class, getSpecialEntries()));
       }
     }
     if (fakerBool()) withVaccineFlag(fakerBool());

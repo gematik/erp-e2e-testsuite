@@ -37,6 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -57,11 +58,13 @@ public class KbvErpMedicationRequestFaker {
 
   private KbvErpMedicationRequestFaker(KbvItaErpVersion erpVersion, KbvItaForVersion forVersion) {
     this.erpVersion = erpVersion;
-    if (erpVersion.compareTo(KbvItaErpVersion.V1_1_0) <= 0) {
+
+    if (erpVersion.isSmallerThanOrEqualTo(KbvItaErpVersion.V1_1_0)) {
       this.withBvg(fakerBool());
     } else {
       this.withSer(fakerBool());
     }
+
     this.withEmergencyServiceFee(fakerBool())
         .withMedication(
             KbvErpMedicationPZNFaker.builder(erpVersion)
@@ -69,6 +72,9 @@ public class KbvErpMedicationRequestFaker {
                 .fake())
         .withRequester(KbvPractitionerFaker.builder(forVersion).fake())
         .withInsurance(
+            // TODO: forVersion not necessary here, because we only need an insurance-Reference (not
+            // the whole resource) here
+            // this would eliminate the need for a forVersion in this class entirely
             KbvCoverageFaker.builder(forVersion)
                 .withInsuranceType(kbvPatient.getInsuranceType())
                 .fake())
@@ -168,6 +174,15 @@ public class KbvErpMedicationRequestFaker {
 
   public KbvErpMedicationRequestFaker withDosageInstruction(String text) {
     builderConsumers.put("dosage", b -> b.dosage(text));
+    return this;
+  }
+
+  public KbvErpMedicationRequestFaker withEmpIdentifier(UUID identifier) {
+    return withEmpIdentifier(identifier.toString());
+  }
+
+  public KbvErpMedicationRequestFaker withEmpIdentifier(String identifier) {
+    builderConsumers.put("empIdentifier", b -> b.basedOnEMP(identifier));
     return this;
   }
 

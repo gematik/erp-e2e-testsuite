@@ -30,7 +30,7 @@ import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import de.gematik.test.erezept.fhir.valuesets.eu.EuRequestType;
 import java.util.List;
 import lombok.val;
@@ -42,7 +42,7 @@ class EuGetPrescriptionInputBuilderTest extends ErpFhirParsingTest {
       EuGetPrescriptionInputBuilder.forRequestType(EuRequestType.DEMOGRAPHICS)
           .kvnr(KVNR.randomGkv())
           .accessCode(EuAccessCode.random())
-          .countryCode(IsoCountryCode.AT)
+          .countryCode(IsoCountryCodeNCPeH.AT)
           .practitionerName("Practitioners Name")
           .practitionerRole(EuOrganizationProfession.getDefaultPharmacist())
           .pointOfCare("carePoint")
@@ -62,7 +62,7 @@ class EuGetPrescriptionInputBuilderTest extends ErpFhirParsingTest {
   void shouldBuildWithUncheckedAccessCode() {
     val euGetPrescription =
         euGetPrescriptionBundleBuilder
-            .countryCode(IsoCountryCode.DE)
+            .countryCode(IsoCountryCodeNCPeH.DE)
             .accessCode(EuAccessCode.random())
             .build();
 
@@ -73,8 +73,9 @@ class EuGetPrescriptionInputBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldSetCountryCodeCorrect() {
-    val euGetPrescription = euGetPrescriptionBundleBuilder.countryCode(IsoCountryCode.FR).build();
-    assertEquals(IsoCountryCode.FR, euGetPrescription.getIsoCountyCode());
+    val euGetPrescription =
+        euGetPrescriptionBundleBuilder.countryCode(IsoCountryCodeNCPeH.FR).build();
+    assertEquals(IsoCountryCodeNCPeH.FR, euGetPrescription.getIsoCountyCode());
   }
 
   @Test
@@ -86,8 +87,9 @@ class EuGetPrescriptionInputBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldFailWhileGetCountryCodeCorrect() {
-    val euGetPrescription = euGetPrescriptionBundleBuilder.countryCode(IsoCountryCode.DE).build();
-    assertNotEquals(IsoCountryCode.FR, euGetPrescription.getIsoCountyCode());
+    val euGetPrescription =
+        euGetPrescriptionBundleBuilder.countryCode(IsoCountryCodeNCPeH.DE).build();
+    assertNotEquals(IsoCountryCodeNCPeH.FR, euGetPrescription.getIsoCountyCode());
   }
 
   @Test
@@ -105,7 +107,7 @@ class EuGetPrescriptionInputBuilderTest extends ErpFhirParsingTest {
     val builder =
         euGetPrescriptionBundleBuilder
             .accessCode(EuAccessCode.random())
-            .countryCode(IsoCountryCode.DE);
+            .countryCode(IsoCountryCodeNCPeH.DE);
     val prescription = builder.build();
     assertNotNull(prescription);
     assertEquals(EuRequestType.DEMOGRAPHICS, prescription.getEuRequestType());
@@ -119,7 +121,7 @@ class EuGetPrescriptionInputBuilderTest extends ErpFhirParsingTest {
         EuGetPrescriptionInputBuilder.forRequestType(EuRequestType.PRESCRIPTION_RETRIEVAL)
             .kvnr(KVNR.randomGkv())
             .accessCode(EuAccessCode.random())
-            .countryCode(IsoCountryCode.AT)
+            .countryCode(IsoCountryCodeNCPeH.AT)
             .practitionerName("Practitioners Name")
             .practitionerRole(EuOrganizationProfession.getDefaultPharmacist())
             .pointOfCare("carePoint")
@@ -138,7 +140,7 @@ class EuGetPrescriptionInputBuilderTest extends ErpFhirParsingTest {
         EuGetPrescriptionInputBuilder.forRequestType(EuRequestType.PRESCRIPTION_LIST)
             .kvnr(KVNR.randomGkv())
             .accessCode(EuAccessCode.random())
-            .countryCode(IsoCountryCode.AT)
+            .countryCode(IsoCountryCodeNCPeH.AT)
             .practitionerName("Practitioners Name")
             .practitionerRole(EuOrganizationProfession.getDefaultPharmacist())
             .pointOfCare("carePoint")

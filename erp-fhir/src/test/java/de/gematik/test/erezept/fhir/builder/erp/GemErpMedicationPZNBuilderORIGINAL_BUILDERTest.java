@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR_PROFILES_TOGGLE;
-import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getUpdatedInJulyPlusKPG;
+import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getSpecialEntries;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
@@ -175,7 +175,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
             .withSupplyForm(
                 GemFaker.fakerValueSet(
                     Darreichungsform.class,
-                    getUpdatedInJulyPlusKPG())) // mapping Kombipackung not possible yet
+                    getSpecialEntries())) // mapping Kombipackung not possible yet
             .withAmount(3, "fl")
             .fake();
     val gemMedication =
@@ -201,8 +201,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
         KbvErpMedicationFreeTextFaker.builder()
             .withFreeText(freitext)
             .withDosageForm(
-                GemFaker.fakerValueSet(Darreichungsform.class, getUpdatedInJulyPlusKPG())
-                    .getDisplay())
+                GemFaker.fakerValueSet(Darreichungsform.class, getSpecialEntries()).getDisplay())
             .fake();
     val gemMedication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvMedicationFreeText)

@@ -28,7 +28,7 @@ import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.EuVersion;
 import de.gematik.test.erezept.fhir.r4.eu.EuAccessPermission;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -80,7 +80,7 @@ public class ErxEuAccessPermissionVerifier {
         .accept();
   }
 
-  public static VerificationStep<EuAccessPermission> hasIsoCountry(IsoCountryCode country) {
+  public static VerificationStep<EuAccessPermission> hasIsoCountry(IsoCountryCodeNCPeH country) {
     Predicate<EuAccessPermission> predicate = perm -> perm.getIsoCountryCode().equals(country);
 
     return new VerificationStep.StepBuilder<EuAccessPermission>(

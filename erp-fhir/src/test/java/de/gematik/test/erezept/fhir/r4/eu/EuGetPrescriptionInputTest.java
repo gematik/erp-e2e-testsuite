@@ -20,12 +20,13 @@
 
 package de.gematik.test.erezept.fhir.r4.eu;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.builder.eu.EuGetPrescriptionInputBuilder;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import de.gematik.test.erezept.fhir.valuesets.eu.EuRequestType;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class EuGetPrescriptionInputTest {
       EuGetPrescriptionInputBuilder.forRequestType(EuRequestType.DEMOGRAPHICS)
           .kvnr(KVNR.randomGkv())
           .accessCode(EuAccessCode.random())
-          .countryCode(IsoCountryCode.AT)
+          .countryCode(IsoCountryCodeNCPeH.AT)
           .practitionerName("Practitioners Name")
           .practitionerRole(EuOrganizationProfession.getDefaultPharmacist())
           .pointOfCare("carePoint")
@@ -43,14 +44,16 @@ class EuGetPrescriptionInputTest {
 
   @Test
   void shouldGetCountryCodeCorrect() {
-    val euGetPrescription = euGetPrescriptionBundleBuilder.countryCode(IsoCountryCode.FR).build();
-    assertEquals(IsoCountryCode.FR, euGetPrescription.getIsoCountyCode());
+    val euGetPrescription =
+        euGetPrescriptionBundleBuilder.countryCode(IsoCountryCodeNCPeH.FR).build();
+    assertEquals(IsoCountryCodeNCPeH.FR, euGetPrescription.getIsoCountyCode());
   }
 
   @Test
   void shouldFailWhileGetCountryCode() {
-    val euGetPrescription = euGetPrescriptionBundleBuilder.countryCode(IsoCountryCode.DE).build();
-    assertNotEquals(IsoCountryCode.FR, euGetPrescription.getIsoCountyCode());
+    val euGetPrescription =
+        euGetPrescriptionBundleBuilder.countryCode(IsoCountryCodeNCPeH.DE).build();
+    assertNotEquals(IsoCountryCodeNCPeH.FR, euGetPrescription.getIsoCountyCode());
   }
 
   @Test

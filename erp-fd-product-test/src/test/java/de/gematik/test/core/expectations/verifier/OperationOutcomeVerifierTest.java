@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
+import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -169,6 +170,36 @@ class OperationOutcomeVerifierTest {
     oOResource.addIssue().getDetails().setText("FHIR-Validation error");
     val step = operationOutcomeContainsInDetailText("FHIR-Validation error", ErpAfos.A_23888);
     step.apply(oOResource);
+  }
+
+  @Test
+  void shouldVerifyDetailedTextContainsOneOf() {
+    val oOResource = createOperationOutcome();
+    oOResource.addIssue().getDetails().setText("FHIR-Validation error");
+    val step =
+        operationOutcomeContainsInDiagnosticsOneOf(
+            List.of("additional diagnostics about the error", " bla "), ErpAfos.A_23888);
+    step.apply(oOResource);
+  }
+
+  @Test
+  void shouldVerifyDetailedTextContainsOtherOneOf() {
+    val oOResource = createOperationOutcome();
+    oOResource.addIssue().getDetails().setText("FHIR-Validation error");
+    val step =
+        operationOutcomeContainsInDiagnosticsOneOf(
+            List.of("bla about the error", "additional diagnostics"), ErpAfos.A_23888);
+    step.apply(oOResource);
+  }
+
+  @Test
+  void shouldFailWhileVerifyVerifyDetailedTextContainsOneOf() {
+    val oOResource = createOperationOutcome();
+    oOResource.addIssue().getDetails().setText("FHIR-Validation error");
+    val step =
+        operationOutcomeContainsInDiagnosticsOneOf(
+            List.of("additional diagnostics bla bla", " bla "), ErpAfos.A_23888);
+    assertThrows(AssertionError.class, () -> step.apply(oOResource));
   }
 
   @Test

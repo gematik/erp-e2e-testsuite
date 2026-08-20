@@ -26,7 +26,7 @@ import de.gematik.test.erezept.fhir.builder.eu.EuAccessPermissionRequestBuilder;
 import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
 import de.gematik.test.erezept.fhir.r4.eu.EuAccessPermission;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +36,7 @@ class EuGrantAccessPostCommandTest {
 
   private final EuAccessPermission euAccessPermission =
       EuAccessPermissionRequestBuilder.euAccessCode(testcode)
-          .countryCode(IsoCountryCode.DE)
+          .countryCode(IsoCountryCodeNCPeH.DE)
           .build();
 
   @Test
@@ -50,7 +50,8 @@ class EuGrantAccessPostCommandTest {
 
   @Test
   void shouldUsePostMethodAndCorrectUrl() {
-    EuGrantAccessPostCommand command = new EuGrantAccessPostCommand(testcode, IsoCountryCode.NL);
+    EuGrantAccessPostCommand command =
+        new EuGrantAccessPostCommand(testcode, IsoCountryCodeNCPeH.NL);
 
     assertEquals(de.gematik.bbriccs.rest.HttpRequestMethod.POST, command.getMethod());
     assertEquals("/$grant-eu-access-permission", command.getRequestLocator());

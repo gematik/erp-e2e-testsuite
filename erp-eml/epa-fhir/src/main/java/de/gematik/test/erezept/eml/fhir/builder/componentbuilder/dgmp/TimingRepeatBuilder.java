@@ -54,33 +54,23 @@ public class TimingRepeatBuilder extends TimingBuilder<TimingRepeatBuilder> {
    * Sets the period (the duration of one cycle) for the event.
    *
    * @param period the period value (e.g., 1 for every periodUnit)
-   * @return this builder
-   */
-  public TimingRepeatBuilder period(int period) {
-    this.period = period;
-    return this;
-  }
-
-  /**
-   * Sets the period unit using a string code (e.g., "d" for days).
-   *
-   * @param periodUnit the period unit as string
-   * @return this builder
-   */
-  public TimingRepeatBuilder periodUnit(String periodUnit) {
-    return periodUnit(Timing.UnitsOfTime.fromCode(periodUnit));
-  }
-
-  /**
-   * Sets the period unit using the FHIR UnitsOfTime enum.
-   *
    * @param periodUnit the period unit as enum Timing.UnitsOfTime (e.g., Timing.UnitsOfTime.D for
    *     days)
    * @return this builder
    */
-  public TimingRepeatBuilder periodUnit(Timing.UnitsOfTime periodUnit) {
+  public TimingRepeatBuilder period(int period, Timing.UnitsOfTime periodUnit) {
+    this.period = period;
     this.periodUnit = periodUnit;
     return this;
+  }
+
+  /**
+   * @param period
+   * @param periodUnit
+   * @return
+   */
+  public TimingRepeatBuilder period(int period, String periodUnit) {
+    return period(period, Timing.UnitsOfTime.fromCode(periodUnit));
   }
 
   /**
@@ -163,7 +153,7 @@ public class TimingRepeatBuilder extends TimingBuilder<TimingRepeatBuilder> {
 
   /**
    * Adds a single day of the week when the event should occur. If {@code this.dayOfWeek} is null,
-   * the builder instantiate an new ArrqaList().
+   * the builder instantiate a new ArrqaList().
    *
    * @param dayOfWeek FHIR DayOfWeek enum
    * @return this builder
@@ -247,19 +237,13 @@ public class TimingRepeatBuilder extends TimingBuilder<TimingRepeatBuilder> {
     return this;
   }
 
-  public TimingRepeatBuilder boundsDuration(long boundsDuration, UnitsOfTimeDE unitsOfTime) {
+  public TimingRepeatBuilder boundsDuration(double boundsDuration, UnitsOfTimeDE unitsOfTime) {
     val bd =
         new Duration()
             .setValue(boundsDuration)
-            .setUnit(unitsOfTime.getSingular())
+            .setUnit(unitsOfTime.getKbvUnit())
             .setValue(boundsDuration)
             .setCode(unitsOfTime.getCode());
-    this.boundsDuration = bd.setSystem(UCUM.getCanonicalUrl());
-    return this;
-  }
-
-  public TimingRepeatBuilder boundsDuration(long boundsDuration, String unit, String code) {
-    val bd = new Duration().setValue(boundsDuration).setUnit(unit).setCode(code);
     this.boundsDuration = bd.setSystem(UCUM.getCanonicalUrl());
     return this;
   }

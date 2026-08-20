@@ -32,7 +32,7 @@ import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.BSNR;
 import de.gematik.test.erezept.fhir.values.KZVA;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.Address;
@@ -44,7 +44,7 @@ class EuOrganizationTest extends ErpFhirParsingTest {
   private final EuOrganizationBuilder builder =
       EuOrganizationBuilder.builder("Test Pharmacy")
           .version(EuVersion.getDefaultVersion())
-          .ncpehCountry(IsoCountryCode.BE)
+          .ncpehCountry(IsoCountryCodeNCPeH.BE)
           .identifier(TelematikID.from("12345678901234567890"))
           .identifier(
               new Identifier()
@@ -134,8 +134,8 @@ class EuOrganizationTest extends ErpFhirParsingTest {
 
   @Test
   void shouldGetCountryCodeCorrect() {
-    val org = builder.ncpehCountry(IsoCountryCode.FR).build();
-    assertEquals(IsoCountryCode.FR, org.getEuCountry().orElseThrow());
+    val org = builder.ncpehCountry(IsoCountryCodeNCPeH.FR).build();
+    assertEquals(IsoCountryCodeNCPeH.FR, org.getEuCountry().orElseThrow());
   }
 
   @Test

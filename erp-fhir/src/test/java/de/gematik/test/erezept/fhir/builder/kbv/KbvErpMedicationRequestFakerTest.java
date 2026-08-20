@@ -24,16 +24,22 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class KbvErpMedicationRequestFakerTest extends ErpFhirParsingTest {
   @Test
@@ -145,7 +151,43 @@ class KbvErpMedicationRequestFakerTest extends ErpFhirParsingTest {
         KbvErpMedicationRequestFaker.builder().withDosageInstruction(dosageText).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
     assertTrue(result.isSuccessful());
-    assertEquals(dosageText, medicationRequest.getDosageInstruction().get(0).getText());
+    assertEquals(dosageText, medicationRequest.getDosageInstruction().getFirst().getText());
+  }
+
+  @Test
+  void buildFakerMedicationRequestWithDgmp() {
+    val dosageDgmp = DosageDgMPBuilder.dosageBuilder().text("Dosage Instruction").build();
+    val medicationRequest =
+        KbvErpMedicationRequestFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withDgmp(dosageDgmp)
+            .fake();
+    val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
+    assertTrue(result.isSuccessful());
+    assertEquals(
+        "Dosage Instruction", medicationRequest.getDosageInstruction().getFirst().getText());
+  }
+
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Build KBV MedicationRequest with given EMP-Identifier KbvItaErpVersion {0}")
+  @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")
+  void buildFakerMedicationRequestWithEmpIdentifier(
+      KbvItaForVersion forVersion, KbvItaErpVersion erpVersion) {
+    val identifier = UUID.randomUUID();
+    val medicationRequest =
+        KbvErpMedicationRequestFaker.builder(erpVersion, forVersion)
+            .withEmpIdentifier(identifier)
+            .fake();
+
+    val result = ValidatorUtil.encodeAndValidate(parser, medicationRequest);
+    assertTrue(result.isSuccessful());
+
+    if (erpVersion.isSmallerThanOrEqualTo(KbvItaErpVersion.V1_3_0)) {
+      assertTrue(medicationRequest.getEmpIdentifier().isEmpty());
+    } else {
+      assertTrue(medicationRequest.getEmpIdentifier().isPresent());
+      assertEquals(identifier.toString(), medicationRequest.getEmpIdentifier().get());
+    }
   }
 
   @Test

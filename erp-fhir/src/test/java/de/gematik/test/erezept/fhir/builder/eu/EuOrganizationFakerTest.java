@@ -27,7 +27,7 @@ import de.gematik.test.erezept.fhir.profiles.version.EuVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.BSNR;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import lombok.val;
 import org.hl7.fhir.r4.model.Identifier;
 import org.junit.jupiter.api.Test;
@@ -45,9 +45,9 @@ class EuOrganizationFakerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldCreateOrganizationWithCountry() {
-    var org = EuOrganizationFaker.faker().withNcpehCountry(IsoCountryCode.FR).fake();
+    var org = EuOrganizationFaker.faker().withNcpehCountry(IsoCountryCodeNCPeH.FR).fake();
     assertTrue(org.getEuCountry().isPresent());
-    assertInstanceOf(IsoCountryCode.class, org.getEuCountry().get());
+    assertInstanceOf(IsoCountryCodeNCPeH.class, org.getEuCountry().get());
   }
 
   @Test

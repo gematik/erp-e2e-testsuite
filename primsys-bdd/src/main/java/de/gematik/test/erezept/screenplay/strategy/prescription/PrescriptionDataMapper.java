@@ -223,7 +223,6 @@ public abstract class PrescriptionDataMapper {
 
     val timing =
         TimingBuilder.forRepeatComp()
-            .periodUnit(medMap.get("periodUnit"))
             .timeOfDay(medMap.get("timeOfDay"))
             .dayOfWeek(dayOfWeek)
             .when(when);
@@ -232,7 +231,7 @@ public abstract class PrescriptionDataMapper {
       timing.frequency(Integer.parseInt(frequency));
     }
     if (period != null) {
-      timing.period(Integer.parseInt(period));
+      timing.period(Integer.parseInt(period), medMap.get("periodUnit"));
     }
     value.ifPresent(
         v ->

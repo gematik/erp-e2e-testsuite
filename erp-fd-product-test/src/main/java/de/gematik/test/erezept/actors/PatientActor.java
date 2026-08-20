@@ -26,9 +26,11 @@ import com.ibm.icu.impl.Pair;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.Egk;
+import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
+import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage.CommunicationDisReqMessageV3Builder;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.PayorType;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
@@ -101,6 +103,18 @@ public class PatientActor extends ErpActor {
   public InsuranceTypeDe getCoverageInsuranceType() {
     val bd = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
     return bd.getCoverageInsuranceType();
+  }
+
+  public CommunicationDisReqMessageV3Builder messageFakerForText(String text) {
+
+    val pb = SafeAbility.getAbility(this, ProvidePatientBaseData.class);
+    return pb.communicationFakerV3ForText(text);
+  }
+
+  public CommunicationDisReqMessageV3Builder messageFakerForOrder(
+      SupplyOptionsType supplyOptionsType) {
+    return SafeAbility.getAbility(this, ProvidePatientBaseData.class)
+        .communicationFakerV3ForOrder(supplyOptionsType);
   }
 
   /**
