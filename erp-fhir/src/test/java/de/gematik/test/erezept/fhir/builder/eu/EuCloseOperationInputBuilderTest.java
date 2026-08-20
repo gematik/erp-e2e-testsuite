@@ -21,21 +21,19 @@
 package de.gematik.test.erezept.fhir.builder.eu;
 
 import static de.gematik.test.erezept.fhir.valuesets.eu.EuPartNaming.*;
-import static de.gematik.test.erezept.fhir.valuesets.eu.EuPartNaming.COUNTRY_CODE;
-import static de.gematik.test.erezept.fhir.valuesets.eu.EuPartNaming.HEALTHCARE_FACILITY_TYPE;
-import static de.gematik.test.erezept.fhir.valuesets.eu.EuPartNaming.POINT_OF_CARE;
-import static de.gematik.test.erezept.fhir.valuesets.eu.EuPartNaming.PRACTITIONER_NAME;
-import static de.gematik.test.erezept.fhir.valuesets.eu.EuPartNaming.PRACTITIONER_ROLE;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.profiles.version.EuVersion;
-import de.gematik.test.erezept.fhir.r4.eu.*;
+import de.gematik.test.erezept.fhir.r4.eu.EuHealthcareFacilityType;
+import de.gematik.test.erezept.fhir.r4.eu.EuMedication;
+import de.gematik.test.erezept.fhir.r4.eu.EuMedicationDispense;
+import de.gematik.test.erezept.fhir.r4.eu.EuOrganizationProfession;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import de.gematik.test.erezept.fhir.valuesets.eu.EuRequestType;
 import lombok.val;
 import org.hl7.fhir.r4.model.Parameters;
@@ -68,7 +66,10 @@ class EuCloseOperationInputBuilderTest extends ErpFhirParsingTest {
         .addPart()
         .setName(ACCESS_CODE.getCode())
         .setValue(EuAccessCode.random().asIdentifier());
-    parameters.addPart().setName(COUNTRY_CODE.getCode()).setValue(IsoCountryCode.BG.asCoding());
+    parameters
+        .addPart()
+        .setName(COUNTRY_CODE.getCode())
+        .setValue(IsoCountryCodeNCPeH.BG.asCoding());
     parameters
         .addPart()
         .setName(PRACTITIONER_NAME.getCode())
@@ -117,7 +118,7 @@ class EuCloseOperationInputBuilderTest extends ErpFhirParsingTest {
         EuGetPrescriptionInputBuilder.forRequestType(EuRequestType.DEMOGRAPHICS)
             .kvnr(KVNR.randomGkv())
             .accessCode(EuAccessCode.random())
-            .countryCode(IsoCountryCode.AT)
+            .countryCode(IsoCountryCodeNCPeH.AT)
             .practitionerName("Practitioners Name")
             .practitionerRole(EuOrganizationProfession.getDefaultPharmacist())
             .pointOfCare("carePoint")

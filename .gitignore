@@ -24,5 +24,6 @@ CI
 *.pcs
 **/nginx.conf
 **/.env
+/primsys-bdd/src/main/resources/**
 
 /primsys-rest/primsys-rest-server/src/test/http/http-client.private.env.json

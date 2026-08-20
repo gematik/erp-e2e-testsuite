@@ -93,8 +93,7 @@ class ErxMedicationDispenseTest extends ErpFhirParsingTest {
         DosageDgMPBuilder.dosageBuilder(4, BmpDosiereinheit.MIO_E)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(2)
-                    .periodUnit(Timing.UnitsOfTime.H)
+                    .period(2, Timing.UnitsOfTime.H)
                     .timeOfDay("0800")
                     .frequency(5)
                     .build())
@@ -117,8 +116,7 @@ class ErxMedicationDispenseTest extends ErpFhirParsingTest {
         DosageDgMPBuilder.dosageBuilder(4, BmpDosiereinheit.MIO_E)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(2)
-                    .periodUnit(Timing.UnitsOfTime.H)
+                    .period(2, Timing.UnitsOfTime.H)
                     .timeOfDay("0800")
                     .frequency(5)
                     .build())

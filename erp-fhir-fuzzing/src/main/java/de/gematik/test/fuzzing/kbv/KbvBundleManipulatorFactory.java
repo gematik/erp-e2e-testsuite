@@ -34,6 +34,7 @@ import de.gematik.bbriccs.fhir.de.HL7StructDef;
 import de.gematik.bbriccs.fhir.de.valueset.IdentifierTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
+import de.gematik.test.erezept.fhir.profiles.definitions.DgMPStructDef;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvBasisStructDef;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaForStructDef;
@@ -93,6 +94,9 @@ public class KbvBundleManipulatorFactory {
     manipulators.addAll(getResourceIdReduceManipulators());
     manipulators.addAll(getResourceIdAndFullUrlDiffManipulators());
     manipulators.addAll(getCompositionReferencedManipulators());
+    manipulators.addAll(getDosageAndDosageFlagManipulators());
+    manipulators.addAll(getDosageAndDosageFlagManipulatorsForTPrescription());
+    manipulators.addAll(getDosageFlagManipulators());
 
     if (includeMvo) {
       manipulators.addAll(MvoExtensionManipulatorFactory.getMvoExtensionKennzeichenFalsifier());
@@ -632,6 +636,81 @@ public class KbvBundleManipulatorFactory {
   }
 
   public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>
+      getDosageAndDosageFlagManipulatorsForTPrescription() {
+    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>();
+    manipulators.add(
+        NamedEnvelope.of(
+            "MedicationRequest in T-Prescription got removed DosageFlag, DosageMeta, Dosage and"
+                + " rendered DosageInstr.",
+            b -> {
+              b.getMedicationRequest()
+                  .getExtension()
+                  .removeIf(KbvItaErpStructDef.DOSAGE_FLAG::matches);
+              b.getMedicationRequest()
+                  .getExtension()
+                  .removeIf(DgMPStructDef.MR_RENDERED_DOSAGE_INSTRUCTION::matches);
+              b.getMedicationRequest()
+                  .getExtension()
+                  .removeIf(DgMPStructDef.GENERATE_DOSAGE_INSTRUCTION_META::matches);
+              b.getMedicationRequest().setDosageInstruction(null);
+            }));
+
+    return manipulators;
+  }
+
+  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>
+      getDosageAndDosageFlagManipulators() {
+    val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>();
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "MedicationRequest DosageFlag was set from true to false",
+            b -> {
+              val dosageFlagUrl = KbvItaErpStructDef.DOSAGE_FLAG.getCanonicalUrl();
+              b.getMedicationRequest().getExtension().stream()
+                  .filter(extension -> dosageFlagUrl.equals(extension.getUrl()))
+                  .forEach(extension -> extension.setValue(new BooleanType(false)));
+              b.getMedicationRequest()
+                  .getDosageInstruction()
+                  .forEach(
+                      dosage ->
+                          dosage.getExtension().stream()
+                              .filter(extension -> dosageFlagUrl.equals(extension.getUrl()))
+                              .forEach(extension -> extension.setValue(new BooleanType(false))));
+            }));
+    manipulators.add(
+        NamedEnvelope.of(
+            "MedicationRequest DosageFlag extension is removed",
+            b -> {
+              val dosageFlagUrl = KbvItaErpStructDef.DOSAGE_FLAG.getCanonicalUrl();
+              b.getMedicationRequest()
+                  .getExtension()
+                  .removeIf(extension -> dosageFlagUrl.equals(extension.getUrl()));
+              b.getMedicationRequest()
+                  .getDosageInstruction()
+                  .forEach(
+                      dosage ->
+                          dosage
+                              .getExtension()
+                              .removeIf(extension -> dosageFlagUrl.equals(extension.getUrl())));
+            }));
+
+    manipulators.add(
+        NamedEnvelope.of(
+            "MedicationRequest DosageFlag = true exist but Dosage was removed",
+            b -> {
+              b.getMedicationRequest().setDosageInstruction(null);
+              b.getMedicationRequest()
+                  .getExtension()
+                  .removeIf(DgMPStructDef.MR_RENDERED_DOSAGE_INSTRUCTION::matches);
+              b.getMedicationRequest()
+                  .getExtension()
+                  .removeIf(DgMPStructDef.GENERATE_DOSAGE_INSTRUCTION_META::matches);
+            }));
+    return manipulators;
+  }
+
+  public static List<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>
       getMedicationRequestManipulators() {
     val manipulators = new LinkedList<NamedEnvelope<FuzzingMutator<KbvErpBundle>>>();
 
@@ -1134,9 +1213,16 @@ public class KbvBundleManipulatorFactory {
     manipulators.add(
         NamedEnvelope.of(
             "Delete DosageFlag in MedicationRequest|1.5",
-            b ->
-                b.getMedicationRequest().getDosageInstruction().stream()
-                    .map(dosage -> dosage.setExtension(List.of()))));
+            b -> {
+              val dosageFlagUrl = KbvItaErpStructDef.DOSAGE_FLAG.getCanonicalUrl();
+              b.getMedicationRequest()
+                  .getDosageInstruction()
+                  .forEach(
+                      dosage ->
+                          dosage
+                              .getExtension()
+                              .removeIf(extension -> dosageFlagUrl.equals(extension.getUrl())));
+            }));
     return manipulators;
   }
 

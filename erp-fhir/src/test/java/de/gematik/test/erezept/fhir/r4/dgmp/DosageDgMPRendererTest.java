@@ -42,9 +42,8 @@ class DosageDgMPRendererTest {
         DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.STUECK)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(1)
+                    .period(1, Timing.UnitsOfTime.D)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .timeOfDay("22:00:00")
                     .build())
             .build());
@@ -52,9 +51,8 @@ class DosageDgMPRendererTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.STUECK)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(1)
+                    .period(1, Timing.UnitsOfTime.D)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .timeOfDay("18:00:00")
                     .build())
             .build());
@@ -62,9 +60,8 @@ class DosageDgMPRendererTest {
         DosageDgMPBuilder.dosageBuilder(3, BmpDosiereinheit.STUECK)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(1)
+                    .period(1, Timing.UnitsOfTime.D)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .timeOfDay("01:00:00")
                     .build())
             .build());
@@ -82,9 +79,8 @@ class DosageDgMPRendererTest {
         DosageDgMPBuilder.dosageBuilder(2.5, BmpDosiereinheit.STUECK)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(1)
+                    .period(1, Timing.UnitsOfTime.D)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .timeOfDay("22:00:00")
                     .build())
             .build());
@@ -92,9 +88,8 @@ class DosageDgMPRendererTest {
         DosageDgMPBuilder.dosageBuilder(1.25, BmpDosiereinheit.STUECK)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(1)
+                    .period(1, Timing.UnitsOfTime.D)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .timeOfDay("18:00:00")
                     .build())
             .build());
@@ -102,9 +97,8 @@ class DosageDgMPRendererTest {
         DosageDgMPBuilder.dosageBuilder(3, BmpDosiereinheit.STUECK)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(1)
+                    .period(1, Timing.UnitsOfTime.D)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .timeOfDay("01:00:00")
                     .build())
             .build());

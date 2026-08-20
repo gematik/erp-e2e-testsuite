@@ -20,10 +20,12 @@
 
 package de.gematik.test.erezept.eml.fhir.r4.componentbuilder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.UnitsOfTimeDE;
 import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import java.util.Collections;
@@ -93,7 +95,34 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG).text("1 Tablette morgens").build();
     val d2 =
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG).text("1 Tablette morgens").build();
-    assertTrue(d1.equals(d2)); // NOSONAR
+    assertEquals(d1, d2);
+  }
+
+  @Test
+  void shouldCompareValues() {
+    val d1 =
+        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG).text("1 Tablette morgens").build();
+    val d2 =
+        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG).text("1 Tablette morgens").build();
+
+    assertEquals(d1, d2);
+    assertEquals(d2, d1);
+  }
+
+  @Test
+  void shouldDetectDifferentValuesWithoutTiming() {
+    val d1 = DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG).text("1 Tablette").build();
+    val d2 =
+        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG).text("1 Tablette morgens").build();
+
+    compareBothSidesAsFalse(d1, d2);
+  }
+
+  @Test
+  void shouldReturnFalseWhenComparingValuesWithNull() {
+    val d1 = DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG).build();
+
+    assertNotEquals(null, d1);
   }
 
   @Test
@@ -102,7 +131,7 @@ class DosageDgMPTest {
 
     val d2 =
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG).text("1 Tablette morgens").build();
-    assertFalse(d1.equals(d2)); // NOSONAR
+    assertNotEquals(d1, d2);
   }
 
   @Test
@@ -114,7 +143,7 @@ class DosageDgMPTest {
     val d2 =
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG).text("1 Tablette morgens").build();
 
-    assertFalse(d1.equals(d2)); // NOSONAR
+    assertNotEquals(d1, d2);
   }
 
   @Test
@@ -125,7 +154,7 @@ class DosageDgMPTest {
             .build();
     val d2 =
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG).text("1 Tablette morgens").build();
-    assertFalse(d1.equals(d2)); // NOSONAR
+    assertNotEquals(d1, d2);
   }
 
   @Test
@@ -134,9 +163,8 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -149,9 +177,8 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -160,22 +187,22 @@ class DosageDgMPTest {
                     .dayOfWeek(Timing.DayOfWeek.THU)
                     .build())
             .build();
-    assertTrue(d1.equals(d2)); // NOSONAR
-    assertTrue(d2.equals(d1)); // NOSONAR
+    assertEquals(d1, d2);
+    assertEquals(d2, d1);
   }
 
   @Test
   void shouldBuildWithBoundsDuration() {
     val d1 =
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
-            .timing(TimingBuilder.forRepeatComp().boundsDuration(7, "Woche(n)", "wk").build())
+            .timing(TimingBuilder.forRepeatComp().boundsDuration(7, UnitsOfTimeDE.WOCHE).build())
             .build();
     val d2 =
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
-            .timing(TimingBuilder.forRepeatComp().boundsDuration(7, "Woche(n)", "wk").build())
+            .timing(TimingBuilder.forRepeatComp().boundsDuration(7, UnitsOfTimeDE.WOCHE).build())
             .build();
-    assertTrue(d1.equals(d2)); // NOSONAR
-    assertTrue(d2.equals(d1)); // NOSONAR
+    assertEquals(d1, d2);
+    assertEquals(d2, d1);
   }
 
   @Test
@@ -184,9 +211,8 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .boundsDuration(7, "Woche(n)", "wk")
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .boundsDuration(7, UnitsOfTimeDE.WOCHE)
+                    .period(3, Timing.UnitsOfTime.D)
                     .when("EVE")
                     .build())
             .build();
@@ -194,9 +220,8 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .boundsDuration(8, "Woche(n)", "wk")
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .boundsDuration(8, UnitsOfTimeDE.WOCHE)
+                    .period(3, Timing.UnitsOfTime.D)
                     .when("EVE")
                     .build())
             .build();
@@ -209,9 +234,8 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .boundsDuration(7, "Woche", "wk")
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .boundsDuration(7, UnitsOfTimeDE.MONAT)
+                    .period(3, Timing.UnitsOfTime.D)
                     .when("EVE")
                     .build())
             .build();
@@ -219,34 +243,8 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .boundsDuration(7, "Woche(n)", "wk")
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
-                    .when("EVE")
-                    .build())
-            .build();
-    compareBothSidesAsFalse(d1, d2);
-  }
-
-  @Test
-  void shouldDetectDfferentBoundsDurationsCode() {
-    val d1 =
-        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
-            .timing(
-                TimingBuilder.forRepeatComp()
-                    .boundsDuration(7, "Woche", "wk")
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
-                    .when("EVE")
-                    .build())
-            .build();
-    val d2 =
-        DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
-            .timing(
-                TimingBuilder.forRepeatComp()
-                    .boundsDuration(7, "Woche", "d")
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .boundsDuration(7, UnitsOfTimeDE.WOCHE)
+                    .period(3, Timing.UnitsOfTime.D)
                     .when("EVE")
                     .build())
             .build();
@@ -259,8 +257,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .when("EVE")
                     .dayOfWeek(Timing.DayOfWeek.THU)
                     .build())
@@ -269,14 +266,13 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .when("EVE")
                     .dayOfWeek(Timing.DayOfWeek.THU)
                     .build())
             .build();
-    assertTrue(d1.equals(d2)); // NOSONAR
-    assertTrue(d2.equals(d1)); // NOSONAR
+    assertEquals(d1, d2);
+    assertEquals(d2, d1);
   }
 
   @Test
@@ -285,9 +281,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(2, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -300,9 +294,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -320,9 +312,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.APPLIKATORFUELLUNG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -335,9 +325,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -355,9 +343,8 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
+                    .period(3, Timing.UnitsOfTime.WK)
                     .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.WK)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -370,9 +357,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -390,9 +375,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("10:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -404,9 +387,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -424,9 +405,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -439,9 +418,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -459,9 +436,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .timeOfDay("12:00:00")
                     .when("MORN")
@@ -475,9 +450,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -495,9 +468,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.FRI)
@@ -511,9 +482,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -531,9 +500,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.FRI)
@@ -548,9 +515,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -568,9 +533,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.FRI)
@@ -586,9 +549,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -606,9 +567,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -623,9 +582,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .when("MORN")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -643,13 +600,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .timeOfDay("08:00:00")
-                    .timeOfDay("18:00:00")
-                    .dayOfWeek(Timing.DayOfWeek.MON)
-                    .dayOfWeek(Timing.DayOfWeek.THU)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .when("MORN")
                     .when("EVE")
                     .build())
@@ -658,19 +609,13 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .timeOfDay("08:00:00")
-                    .timeOfDay("18:00:00")
-                    .dayOfWeek(Timing.DayOfWeek.MON)
-                    .dayOfWeek(Timing.DayOfWeek.THU)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .when("MORN")
                     .when("EVE")
                     .build())
             .build();
-    assertTrue(d1.equals(d2)); // NOSONAR
-    assertTrue(d2.equals(d1)); // NOSONAR
+    assertEquals(d1, d2);
+    assertEquals(d2, d1);
   }
 
   @Test
@@ -679,13 +624,12 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
+                    .period(3, Timing.UnitsOfTime.D)
                     .frequency(1)
                     .timeOfDay("18:00:00")
                     .timeOfDay("08:00:00")
                     .dayOfWeek(Timing.DayOfWeek.MON)
                     .dayOfWeek(Timing.DayOfWeek.THU)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .when("MORN")
                     .when("EVE")
                     .build())
@@ -694,19 +638,18 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
+                    .period(3, Timing.UnitsOfTime.D)
                     .frequency(1)
                     .timeOfDay("08:00:00")
                     .timeOfDay("18:00:00")
                     .dayOfWeek(Timing.DayOfWeek.MON)
                     .dayOfWeek(Timing.DayOfWeek.THU)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .when("MORN")
                     .when("EVE")
                     .build())
             .build();
-    assertTrue(d1.equals(d2)); // NOSONAR
-    assertTrue(d2.equals(d1)); // NOSONAR
+    assertEquals(d1, d2);
+    assertEquals(d2, d1);
   }
 
   @Test
@@ -715,9 +658,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .timeOfDay("18:00:00")
                     .dayOfWeek(Timing.DayOfWeek.THU)
@@ -730,9 +671,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .timeOfDay("18:00:00")
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -741,8 +680,8 @@ class DosageDgMPTest {
                     .when("EVE")
                     .build())
             .build();
-    assertTrue(d1.equals(d2)); // NOSONAR
-    assertTrue(d2.equals(d1)); // NOSONAR
+    assertEquals(d1, d2);
+    assertEquals(d2, d1);
   }
 
   @Test
@@ -751,13 +690,7 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .timeOfDay("08:00:00")
-                    .timeOfDay("18:00:00")
-                    .dayOfWeek(Timing.DayOfWeek.MON)
-                    .dayOfWeek(Timing.DayOfWeek.THU)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .when("EVE")
                     .when("MORN")
                     .build())
@@ -766,19 +699,13 @@ class DosageDgMPTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.MG)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
-                    .frequency(1)
-                    .timeOfDay("08:00:00")
-                    .timeOfDay("18:00:00")
-                    .dayOfWeek(Timing.DayOfWeek.MON)
-                    .dayOfWeek(Timing.DayOfWeek.THU)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .when("MORN")
                     .when("EVE")
                     .build())
             .build();
-    assertTrue(d1.equals(d2)); // NOSONAR
-    assertTrue(d2.equals(d1)); // NOSONAR
+    assertEquals(d1, d2);
+    assertEquals(d2, d1);
   }
 
   @Test
@@ -790,7 +717,9 @@ class DosageDgMPTest {
   }
 
   private static void compareBothSidesAsFalse(DosageDgMP d1, DosageDgMP d2) {
-    assertFalse(d1.equals(d2)); // NOSONAR
-    assertFalse(d2.equals(d1)); // NOSONAR
+    assertNotEquals(d1, d2);
+    assertNotEquals(d2, d1);
+    assertNotEquals(d1, d2);
+    assertNotEquals(d2, d1);
   }
 }

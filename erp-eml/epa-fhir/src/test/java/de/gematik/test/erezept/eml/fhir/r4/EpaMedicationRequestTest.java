@@ -46,7 +46,7 @@ class EpaMedicationRequestTest {
                 TimingBuilder.forRepeatComp()
                     .frequency(1)
                     .dayOfWeek(Timing.DayOfWeek.MON)
-                    .period(3)
+                    .period(3, Timing.UnitsOfTime.D)
                     .build())
             .build();
     medRequest

@@ -5,14 +5,13 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>erp-fhir</artifactId>
     <name>E-Rezept FHIR</name>
     <description>E-Rezept FHIR handling</description>
-
 
     <dependencies>
         <dependency>
@@ -60,7 +59,6 @@
         <dependency>
             <groupId>de.gematik.bbriccs</groupId>
             <artifactId>resource-loader-brick</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>de.gematik.bbriccs</groupId>
@@ -108,6 +106,12 @@
             <artifactId>jackson-core</artifactId>
             <version>2.22.0</version>
         </dependency>
+        <!-- still required to validate json content -->
+        <dependency>
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>1.5.6</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -115,7 +119,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
                 <configuration>
                     <excludes>
                         <exclude>**/logback.xml</exclude>

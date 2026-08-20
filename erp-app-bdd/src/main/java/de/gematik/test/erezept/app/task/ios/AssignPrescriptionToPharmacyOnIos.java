@@ -22,9 +22,11 @@ package de.gematik.test.erezept.app.task.ios;
 
 import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.exceptions.AppStateMissmatchException;
+import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.*;
 import de.gematik.test.erezept.app.mobile.elements.OperatingSystem;
 import de.gematik.test.erezept.app.questions.HasSentDispReq;
@@ -32,6 +34,7 @@ import de.gematik.test.erezept.app.questions.MovingToPrescription;
 import de.gematik.test.erezept.app.task.EnsureTheCorrectProfile;
 import de.gematik.test.erezept.app.task.RefreshPrescriptions;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.abilities.ManageCommunications;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
@@ -76,7 +79,23 @@ public class AssignPrescriptionToPharmacyOnIos implements Task {
                     new MissingPreconditionError(
                         format("Prescription with TaskID {0} was not found", dmc.getTaskId())));
 
-    // value of the Nachrichten Button Badge before the Dispense Request was sent
+    val isTPrescription = dmc.getTaskId().getFlowType().equals(PrescriptionFlowType.FLOW_TYPE_166);
+
+    if (isTPrescription) {
+      // check that the T-Prescription chip is shown
+      app.swipeIntoView(SwipeDirection.DOWN, PrescriptionDetails.T_PRESCRIPTION_CHIP);
+      assertTrue(
+          app.isDisplayed(PrescriptionDetails.T_PRESCRIPTION_CHIP),
+          "T-Prescription chip was not shown in the full detail view of the prescription.");
+
+      // check that the T-Prescription info item is shown
+      app.swipeIntoView(SwipeDirection.UP, PrescriptionDetails.T_PRESCRIPTION_INFO_ITEM);
+      assertTrue(
+          app.isDisplayed(PrescriptionDetails.T_PRESCRIPTION_INFO_ITEM),
+          "T-Prescription info item was not shown in the full detail view of the prescription.");
+    }
+
+    // value of the messages button badge before the dispense request was sent
     val oldMessagesButtonValue = app.getText(BottomNav.MESSAGES_BUTTON);
 
     app.tap(PrescriptionDetails.ASSIGN_TO_PHARMACY_BUTTON);

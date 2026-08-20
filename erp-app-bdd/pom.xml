@@ -6,11 +6,12 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
     </parent>
 
     <artifactId>erp-app-bdd</artifactId>
     <name>E-Rezept App-Testsuite</name>
+    <description>BDD testsuite for the Gematik E-Rezept application</description>
 
     <properties>
         <tags/>
@@ -99,7 +100,6 @@
             <scope>test</scope>
         </dependency>
 
-
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -134,7 +134,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
-                        <version>3.3.0</version>
                         <configuration>
                             <archive>
                                 <manifest>
@@ -280,7 +279,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -328,6 +326,7 @@
                                     <includes>**/*.class</includes>
                                 </artifactItem>
                             </artifactItems>
+
                         </configuration>
                     </execution>
                 </executions>

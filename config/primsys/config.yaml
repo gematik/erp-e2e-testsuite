@@ -234,43 +234,6 @@ environments:
     tRegisterMockClient:
       tRegisterMockUrl: https://t-register.dev.gematik.solutions:443
 
-  - name: TITUS
-    ti:
-      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
-      discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
-      fdBaseUrl: https://fd.erezept-instanz1.titus.gematik.solutions
-      subscriptionServiceUrl: wss://subscription.erezept-instanz1.titus.gematik.solutions/subscription  # TODO: needs to be fixed!
-      userAgent: DUMMY VALUE
-    internet:
-      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
-      discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
-      fdBaseUrl: https://erp-ref.app.ti-dienste.de
-      xapiKey: DUMMY VALUE
-      userAgent: DUMMY VALUE
-    epaMockClient:
-      epaMockUrl: https://epa-as-mock.test.epa4all.de:4433
-      epaMockApiKey: DUMMY VALUE
-      logRetrieveInterval: 10000
-      maxWait: 360000
-
-  - name: LOCAL
-    ti:
-      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
-      discoveryDocumentUrl: http://127.0.0.1:8590/auth/realms/idp/.well-known/openid-configuration
-      fdBaseUrl: http://127.0.0.1:3000
-      subscriptionServiceUrl: wss://127.0.0.1:3000/subscription
-      userAgent: eRp-Testsuite
-    internet:
-      discoveryDocumentUrl: http://127.0.0.1:8590/auth/realms/idp/.well-known/openid-configuration
-      fdBaseUrl: http://127.0.0.1:3000
-      xapiKey: refimpldoesnotcheckanyways==
-      userAgent: eRp-Testsuite
-    epaMockClient:
-      epaMockUrl: https://epa-as-mock.test.epa4all.de:4433
-      epaMockApiKey: DUMMY VALUE
-      logRetrieveInterval: 10000
-      maxWait: 360000
-
 konnektors:
   - name: "Soft-Konn"
     context:

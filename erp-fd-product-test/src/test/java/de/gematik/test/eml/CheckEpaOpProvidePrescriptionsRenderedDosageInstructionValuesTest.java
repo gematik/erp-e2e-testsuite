@@ -93,8 +93,7 @@ class CheckEpaOpProvidePrescriptionsRenderedDosageInstructionValuesTest
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.STUECK)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(1)
-                    .periodUnit("d")
+                    .period(1, "d")
                     .frequency(1)
                     .when(Timing.EventTiming.MORN)
                     .build())

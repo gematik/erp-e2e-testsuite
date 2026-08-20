@@ -6,9 +6,12 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>bdd-testsuite</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+
+    <name>ERP Client LEI Steps</name>
+    <description>Cucumber-Steps for the ERP Leistungserbringer</description>
 
     <artifactId>erp-client-lei-steps</artifactId>
 
@@ -27,7 +30,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -42,7 +44,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-common</artifactId>
-            <version>1.6.0</version>
+            <version>1.7.1</version>
         </dependency>
     </dependencies>
 

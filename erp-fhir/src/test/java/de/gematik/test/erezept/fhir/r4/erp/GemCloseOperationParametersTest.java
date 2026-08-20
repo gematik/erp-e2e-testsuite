@@ -41,7 +41,7 @@ class GemCloseOperationParametersTest extends ErpFhirParsingTest {
     val mdList = assertDoesNotThrow(closeParams::getMedicationDispenses);
     assertEquals(1, mdList.size());
 
-    val md = mdList.get(0);
+    val md = mdList.getFirst();
     assertEquals("160.065.873.704.859.46", md.getPrescriptionId().getValue());
   }
 }

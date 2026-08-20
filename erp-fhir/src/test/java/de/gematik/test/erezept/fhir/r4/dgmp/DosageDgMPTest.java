@@ -20,15 +20,20 @@
 
 package de.gematik.test.erezept.fhir.r4.dgmp;
 
+import static de.gematik.test.erezept.fhir.builder.dgmp.RenderedDosageInstructionUtil.render;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.UnitsOfTimeDE;
+import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.dgmp.RenderedDosageInstructionUtil;
 import de.gematik.test.erezept.fhir.profiles.systems.KbvCodeSystem;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import java.io.File;
+import java.util.List;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -56,7 +61,7 @@ class DosageDgMPTest extends ErpFhirParsingTest {
   @MethodSource
   void shouldNotThrowOnUnsupportedDosageInstruction(KbvErpMedicationRequest mr) {
     val dis = mr.getDosageInstructionDgMPs();
-    val rendered = assertDoesNotThrow(() -> RenderedDosageInstructionUtil.render(dis));
+    val rendered = assertDoesNotThrow(() -> render(dis));
     log.debug(rendered);
   }
 
@@ -71,7 +76,7 @@ class DosageDgMPTest extends ErpFhirParsingTest {
     assertFalse(mr.getDosageInstructionDgMPs().isEmpty());
 
     val original = mr.getRenderedDosageInstruction().orElseThrow();
-    val rendered = RenderedDosageInstructionUtil.render(mr.getDosageInstructionDgMPs());
+    val rendered = render(mr.getDosageInstructionDgMPs());
     log.debug(rendered);
     assertEquals(original, rendered, "Calculate DosageInstruction MUST match the original one");
   }
@@ -144,5 +149,105 @@ class DosageDgMPTest extends ErpFhirParsingTest {
     }
 
     return mr;
+  }
+
+  @Test
+  void shouldReduceComma() {
+    val dosageList =
+        List.of(
+            DosageDgMPBuilder.dosageWhenEntry(
+                2.0,
+                BmpDosiereinheit.STUECK,
+                List.of(Timing.EventTiming.NOON),
+                14.0,
+                UnitsOfTimeDE.TAG,
+                1,
+                Timing.UnitsOfTime.WK,
+                List.of(Timing.DayOfWeek.MON)),
+            DosageDgMPBuilder.dosageWhenEntry(
+                1,
+                BmpDosiereinheit.STUECK,
+                List.of(Timing.EventTiming.MORN, Timing.EventTiming.EVE),
+                14.0,
+                UnitsOfTimeDE.TAG,
+                1,
+                Timing.UnitsOfTime.WK,
+                List.of(Timing.DayOfWeek.WED)),
+            DosageDgMPBuilder.dosageWhenEntry(
+                2.0,
+                BmpDosiereinheit.STUECK,
+                List.of(Timing.EventTiming.NOON),
+                14.0,
+                UnitsOfTimeDE.TAG,
+                1,
+                Timing.UnitsOfTime.WK,
+                List.of(Timing.DayOfWeek.FRI)),
+            DosageDgMPBuilder.dosageWhenEntry(
+                1,
+                BmpDosiereinheit.STUECK,
+                List.of(Timing.EventTiming.NIGHT),
+                14.0,
+                UnitsOfTimeDE.TAG,
+                1,
+                Timing.UnitsOfTime.WK,
+                List.of(Timing.DayOfWeek.SUN)));
+
+    val rendered = render(dosageList);
+
+    assertNotNull(rendered);
+    assertEquals(
+        "für 14 Tage: montags 0-2-0-0 Stück; mittwochs 1-0-1-0 Stück; freitags 0-2-0-0 Stück;"
+            + " sonntags 0-0-0-1 Stück",
+        rendered);
+  }
+
+  @Test
+  void shouldReduceCommaOnlyWithFollowingZeros() {
+    val dosageList =
+        List.of(
+            DosageDgMPBuilder.dosageWhenEntry(
+                2.2,
+                BmpDosiereinheit.STUECK,
+                List.of(Timing.EventTiming.NOON),
+                14.5,
+                UnitsOfTimeDE.TAG,
+                1,
+                Timing.UnitsOfTime.WK,
+                List.of(Timing.DayOfWeek.MON)),
+            DosageDgMPBuilder.dosageWhenEntry(
+                1,
+                BmpDosiereinheit.STUECK,
+                List.of(Timing.EventTiming.MORN, Timing.EventTiming.EVE),
+                14.5,
+                UnitsOfTimeDE.TAG,
+                1,
+                Timing.UnitsOfTime.WK,
+                List.of(Timing.DayOfWeek.WED)),
+            DosageDgMPBuilder.dosageWhenEntry(
+                2.0,
+                BmpDosiereinheit.STUECK,
+                List.of(Timing.EventTiming.NOON),
+                14.5,
+                UnitsOfTimeDE.TAG,
+                1,
+                Timing.UnitsOfTime.WK,
+                List.of(Timing.DayOfWeek.FRI)),
+            DosageDgMPBuilder.dosageWhenEntry(
+                1,
+                BmpDosiereinheit.STUECK,
+                List.of(Timing.EventTiming.NIGHT),
+                14.5,
+                UnitsOfTimeDE.TAG,
+                1,
+                Timing.UnitsOfTime.WK,
+                List.of(Timing.DayOfWeek.SUN)));
+
+    val rendered = render(dosageList);
+
+    assertNotNull(rendered);
+    assertEquals(
+        "für 14,5 Tage: montags 0-2,2-0-0 Stück; mittwochs 1-0-1-0 Stück; freitags 0-2-0-0 Stück;"
+            + " sonntags 0-0-0-1 Stück",
+        rendered);
   }
 }

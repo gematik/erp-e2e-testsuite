@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
-import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getUpdatedInJulyPlusKPG;
+import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getSpecialEntries;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
@@ -44,7 +44,7 @@ public class KbvErpMedicationPZNFaker {
 
   private KbvErpMedicationPZNFaker(KbvItaErpVersion version) {
     this.version = version;
-    val supplyForm = fakerValueSet(Darreichungsform.class, getUpdatedInJulyPlusKPG());
+    val supplyForm = fakerValueSet(Darreichungsform.class, getSpecialEntries());
 
     this.withPznMedication(PZN.random(), fakerDrugName())
         .withType(BaseMedicationType.MEDICAL_PRODUCT)

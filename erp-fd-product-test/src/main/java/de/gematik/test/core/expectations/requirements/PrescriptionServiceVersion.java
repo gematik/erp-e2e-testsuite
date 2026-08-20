@@ -28,6 +28,8 @@ public enum PrescriptionServiceVersion {
   V_1_20_0("1.20.0"),
   V_1_21_0("1.21.0"),
   V_1_22_0("1.22.0"),
+  V_1_23_0("1.23.0"),
+  V_1_24_0("1.24.0"),
   UNKNOWN("unknown");
 
   private final String version;

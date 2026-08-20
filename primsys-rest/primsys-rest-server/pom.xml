@@ -5,13 +5,14 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>primsys-rest</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>primsys-rest-server</artifactId>
     <name>PrimSys REST-Server</name>
+    <description>PrimSys REST-Server for simulating E-Rezept CLient System</description>
 
     <properties>
         <maven.compiler.target>${version.java}</maven.compiler.target>
@@ -69,10 +70,10 @@
         </dependency>
 
         <!-- Provides ObjectMapper and SerializationConfig -->
-<!--        <dependency>-->
-<!--            <groupId>tools.jackson.core</groupId>-->
-<!--            <artifactId>jackson-databind</artifactId>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>tools.jackson.core</groupId>-->
+        <!--            <artifactId>jackson-databind</artifactId>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>tools.jackson.jakarta.rs</groupId>
             <artifactId>jackson-jakarta-rs-xml-provider</artifactId>
@@ -149,7 +150,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
-                        <version>3.3.0</version>
                         <configuration>
                             <archive>
                                 <manifest>
@@ -195,7 +195,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
                 <inherited>true</inherited>
                 <configuration>
                     <source>${maven.compiler.source}</source>

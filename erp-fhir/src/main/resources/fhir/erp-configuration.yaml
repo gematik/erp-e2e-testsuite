@@ -3,29 +3,31 @@
   profiles:
     # E-Rezepte relevante Haupt-Profile
     - name: "kbv.ita.erp"
-      snapshot: "kbv.ita.erp-1.4.2-snapshots.tgz"
-      version: "1.4.2"
-      compatibleVersions: [ "1.4", "1.4.0", "1.4.1" ]
+      snapshot: "kbv.ita.erp-1.4.4-snapshots.tgz"
+      version: "1.4.4"
+      compatibleVersions: [ "1.4", "1.4.0", "1.4.1", "1.4.2" ]
     - name: "de.gematik.erezept-workflow.r4"
       snapshot: "de.gematik.erezept-workflow.r4-1.6.2-snapshots.tgz"
       version: "1.6.2"
       compatibleVersions: [ "1.6" ]
 
-    - name: "kbv.ita.for"
+    - name: "kbv.ita.for" # important to validate aktual kbvItaErp 1.4.4
       snapshot: "kbv.ita.for-1.3.1-snapshots.tgz"
       version: "1.3.1"
       compatibleVersions: [ "1.3", "1.3.0" ]
+    - name: "kbv.ita.for"  #only to validate EVDGA with contained KBV.ITA.FOR|1.2
+      snapshot: "kbv.ita.for-1.2.1-snapshots.tgz"
+      compatibleVersions: [ "1.2" ]
     - name: "kbv.itv.evdga"
       snapshot: "kbv.itv.evdga-1.2.2-snapshots.tgz"
       version: "1.2.2"
       compatibleVersions: [ "1.2", "1.2.1", "1.2.0" ]
-
     # T-Rezept
+
     - name: "de.gematik.erp.t-prescription"
       snapshot: "de.gematik.erp.t-prescription-1.1.0-snapshots.tgz"
       version: "1.1.0"
       compatibleVersions: [ "1.1" ]
-
     # E-Rezept PKV Patientenrechnung
     - name: "de.gematik.erezept-patientenrechnung.r4"
       snapshot: "de.gematik.erezept-patientenrechnung.r4-1.1.0-snapshots.tgz"
@@ -38,20 +40,20 @@
       snapshot: "de.abda.erezeptabgabedaten-1.5.0-snapshots.tgz"
       version: "1.5.0"
       compatibleVersions: "1.5"
+
     - name: "de.abda.erezeptabgabedatenpkv"
       snapshot: "de.abda.erezeptabgabedatenpkv-1.4.0-snapshots.tgz"
       version: "1.4.0"
       compatibleVersions: "1.4"
-
     # Unterstützende Basis-Profile
     - name: "de.basisprofil.r4"
       snapshot: "de.basisprofil.r4-1.5.2-snapshots.tgz"
     - name: "kbv.basis"
       snapshot: "kbv.basis-1.7.0-snapshots.tgz"
-    - name: "de.basisprofil.r4"
+
+    - name: "de.basisprofil.r4"   # for kbv.ita.erp 1.4.4
       snapshot: "de.basisprofil.r4-1.5.4-snapshots.tgz"
       version: "1.5.4"
-
     - name: "de.gematik.epa.medication"
       snapshot: "de.gematik.epa.medication-1.3.2-snapshots.tgz"
       version: "1.3.2"
@@ -63,8 +65,8 @@
       snapshot: "de.gematik.ti-1.2.0-snapshots.tgz"
       version: "1.2.0"
     - name: "de.fhir.medication"
-      snapshot: "de.fhir.medication-1.0.4-snapshots.tgz"
-      version: "1.0.4"
+      snapshot: "de.fhir.medication-1.0.7-snapshots.tgz"
+      version: "1.0.7"
     - name: "kbv.all.st"  # neueste Version 1.41.0 aber ohne DARREICHUNGSFORM v 1.6
       snapshot: "kbv.all.st-combined-1.40.0-snapshots.tgz"
       version: "1.40.0"
@@ -78,19 +80,16 @@
       snapshot: "dvmd.kdl.r4-2025.0.1-snapshots.tgz"
       version: "2025.0.1"
     - name: "hl7.terminology"
-      snapshot: "hl7.terminology.r4-7.1.0-snapshots.tgz"
-      version: "7.0.1"
+      snapshot: "hl7.terminology.r4-7.2.0-snapshots.tgz"
+      version: "7.2.0"
     - name: "hl7.fhir.uv.extensions.r4"
-      snapshot: "hl7.fhir.uv.extensions.r4-5.2.0-snapshots.tgz"
+      snapshot: "hl7.fhir.uv.extensions.r4-5.3.0-snapshots.tgz"
       version: "5.2.0"
     - name: "hl7.fhir.r4.core"
       snapshot: "hl7.fhir.r4.core-4.0.1-snapshots.tgz"
     - name: "hl7.fhir.xver-extensions"
       snapshot: "hl7.fhir.xver-extensions-0.1.0-snapshots.tgz"
       version: "0.1.0"
-    - name: "kbv.ita.for"  #only to validate EVDGA with contained KBV.ITA.FOR|1.2
-      snapshot: "kbv.ita.for-1.2.1-snapshots.tgz"
-      compatibleVersions: [ "1.2" ]
     - name: "de.gematik.terminology"
       snapshot: "de.gematik.terminology-1.0.9-snapshots.tgz"
       version: "1.0.9"
@@ -112,6 +111,8 @@
     - "http://ig.fhir.de/igs/medication/ValueSet/PeriodUnitsOfTimeDgMP"
     - "http://ig.fhir.de/igs/medication/ValueSet/DosageUnitsOfTimeDgMP"
     - "https://fhir.kbv.de/ValueSet/KBV_VS_SFHIR_BMP_DOSIEREINHEIT"
+
+
 - id: "1.5.0"
   note: "erp-workflow valid from 1.10.25"
   profiles:

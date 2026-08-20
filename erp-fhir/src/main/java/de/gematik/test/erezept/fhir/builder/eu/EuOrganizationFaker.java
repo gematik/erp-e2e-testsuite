@@ -24,7 +24,7 @@ import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.profiles.version.EuVersion;
 import de.gematik.test.erezept.fhir.r4.eu.EuHealthcareFacilityType;
 import de.gematik.test.erezept.fhir.r4.eu.EuOrganization;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -70,7 +70,7 @@ public class EuOrganizationFaker {
     return this;
   }
 
-  public EuOrganizationFaker withNcpehCountry(IsoCountryCode ncpehCountry) {
+  public EuOrganizationFaker withNcpehCountry(IsoCountryCodeNCPeH ncpehCountry) {
     builderConsumers.put("ncpehCountry", b -> b.ncpehCountry(ncpehCountry));
     return this;
   }

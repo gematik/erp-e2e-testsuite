@@ -25,14 +25,14 @@ import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.EuVersion;
 import de.gematik.test.erezept.fhir.r4.eu.EuAccessPermission;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import lombok.val;
 
 public class EuAccessPermissionRequestBuilder
     extends ResourceBuilder<EuAccessPermission, EuAccessPermissionRequestBuilder> {
 
   private EuVersion version = EuVersion.getDefaultVersion();
-  private IsoCountryCode countryCode;
+  private IsoCountryCodeNCPeH countryCode;
   private final EuAccessCode euAccessCode;
 
   private EuAccessPermissionRequestBuilder(EuAccessCode euAccessCode) {
@@ -55,7 +55,7 @@ public class EuAccessPermissionRequestBuilder
     return new EuAccessPermissionRequestBuilder(euAccessCode);
   }
 
-  public EuAccessPermissionRequestBuilder countryCode(IsoCountryCode countryCode) {
+  public EuAccessPermissionRequestBuilder countryCode(IsoCountryCodeNCPeH countryCode) {
     this.countryCode = countryCode;
     return this;
   }

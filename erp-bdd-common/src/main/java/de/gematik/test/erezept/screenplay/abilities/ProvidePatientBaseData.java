@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.screenplay.abilities;
 
+import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 import static java.text.MessageFormat.format;
 
 import com.google.common.base.Strings;
@@ -30,19 +31,20 @@ import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientBuilder;
+import de.gematik.test.erezept.fhir.extensions.erp.CommunicationPayloadType;
+import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxConsent;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.values.InsuranceCoverageInfo;
-import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
-import de.gematik.test.erezept.fhir.valuesets.PayorType;
-import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
-import de.gematik.test.erezept.fhir.valuesets.Wop;
+import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage.CommunicationDisReqMessageV3Builder;
+import de.gematik.test.erezept.fhir.valuesets.*;
 import java.util.Date;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.val;
 import net.serenitybdd.screenplay.Ability;
@@ -184,6 +186,46 @@ public class ProvidePatientBaseData implements Ability, HasTeardown {
 
   public Optional<ErxConsent> getRememberedConsent() {
     return Optional.ofNullable(erxConsent);
+  }
+
+  public CommunicationDisReqMessageV3Builder communicationFakerV3ForText(@NonNull String text) {
+    val builder = getPrefilledBuilder();
+    builder.communicationType(CommunicationPayloadType.TEXT.getLabel());
+    builder.text(text);
+
+    return builder;
+  }
+
+  public CommunicationDisReqMessageV3Builder communicationFakerV3ForOrder(
+      SupplyOptionsType supplyOptionType) {
+    val builder = getPrefilledBuilder();
+    builder.supplyOptionsType(supplyOptionType);
+    builder.communicationType(CommunicationPayloadType.ORDER);
+    builder.phone(fakePhoneNumberWithStartingDoubleOAsE164());
+    if (!supplyOptionType.equals(SupplyOptionsType.ON_PREMISE)) {
+      builder.address(this.street);
+      builder.firstname(this.firstName);
+      builder.lastname(this.lastName);
+      builder.postcode(this.postal);
+      builder.city(this.city);
+      builder.country(randomElement(IsoCountryCodeNCPeH.values()).getCode());
+    }
+    return builder;
+  }
+
+  private CommunicationDisReqMessageV3Builder getPrefilledBuilder() {
+    val builder = new CommunicationDisReqMessageV3Builder();
+    builder.firstname(this.firstName);
+    builder.lastname(this.lastName);
+    if (fakerBool()) {
+      builder.address(this.street);
+    }
+    if (fakerBool()) builder.postcode(this.postal);
+    if (fakerBool()) builder.city(this.city);
+    if (fakerBool()) builder.country(randomElement(IsoCountryCodeNCPeH.values()).getCode());
+    if (fakerBool()) builder.phone(fakePhoneNumberWithStartingDoubleOAsE164());
+    if (fakerBool()) builder.email(GemFaker.fakerEMail());
+    return builder;
   }
 
   public static ProvidePatientBaseData forGkvPatient(KVNR kvnr, String name) {

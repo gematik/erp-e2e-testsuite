@@ -35,7 +35,7 @@ import de.gematik.test.erezept.fhir.r4.AbstractOrganization;
 import de.gematik.test.erezept.fhir.r4.ErpFhirResource;
 import de.gematik.test.erezept.fhir.values.BSNR;
 import de.gematik.test.erezept.fhir.values.KZVA;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import java.util.List;
 import java.util.Optional;
 import lombok.val;
@@ -44,11 +44,11 @@ import org.hl7.fhir.r4.model.*;
 @SuppressWarnings({"java:S110"})
 public class EuOrganization extends AbstractOrganization implements ErpFhirResource {
 
-  public Optional<IsoCountryCode> getEuCountry() {
+  public Optional<IsoCountryCodeNCPeH> getEuCountry() {
     return Optional.ofNullable(
         this.getExtension().stream()
             .filter(GemErpEuStructDef.NCPEH_COUNTRY_EXT::matches)
-            .map(code -> IsoCountryCode.fromCode(code.castToCoding(code.getValue()).getCode()))
+            .map(code -> IsoCountryCodeNCPeH.fromCode(code.castToCoding(code.getValue()).getCode()))
             .findFirst()
             .orElseThrow(() -> new MissingFieldException(this.getClass(), COUNTRY_CODE.getCode())));
   }

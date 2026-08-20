@@ -116,3 +116,16 @@ Funktionalität: E-Rezepte per Nachricht bestellen
     Dann kann die Apotheke Adelheid Ulmendorfer für das letzte dispensierte E-Rezept den Workflow abschliessen
     Und hat die Versicherte Alice das letzte E-Rezept elektronisch erhalten
     Und hat die Apotheke Adelheid Ulmendorfer genau 1 Quittung für Alice vorliegen
+
+  @TCID:ERP_FDV_BESTELLEN_07
+  Szenario: Bestellung eines T-Rezeptes
+
+    Wenn die Ärztin Adelheid Ulmenwald der Versicherten Alice folgendes apothekenpflichtiges Medikament verschreibt:
+      | Workflow | Verordnungskategorie | Reichdauer in Wochen |
+      |   166    |          02          |          4           |
+    Und die Versicherte Alice ihr letztes E-Rezept in der App der Apotheke Adelheid Ulmendorfer per Nachricht zuweist
+    Und die Apotheke Adelheid Ulmendorfer die letzte Zuweisung per Nachricht von Alice akzeptiert
+    Und die Apotheke Adelheid Ulmendorfer für das letzte akzeptierte E-Rezept von Alice die Dispensierinformationen zeitnah bereitstellt
+    Dann kann die Apotheke Adelheid Ulmendorfer für das letzte dispensierte E-Rezept den Workflow abschliessen
+    Und hat die Versicherte Alice das letzte E-Rezept elektronisch erhalten
+    Und hat die Apotheke Adelheid Ulmendorfer genau 1 Quittung für Alice vorliegen

@@ -22,20 +22,20 @@ package de.gematik.test.erezept.fhir.values.json;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import de.gematik.test.erezept.fhir.extensions.erp.CommunicationPayloadType;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import java.util.List;
 import java.util.UUID;
+import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class CommunicationReplyMessageTest {
 
-  private final ObjectMapper mapper = new ObjectMapper();
-
   @Test
   void shouldBuildV1CommunicationReplyMessageCorrectly() {
-    var msg =
+    val msg =
         CommunicationReplyMessage.forV1()
+            .version(1) // simply for coverage
             .supplyOptionsType(SupplyOptionsType.ON_PREMISE)
             .infoText("info-text")
             .url("http://test.url")
@@ -52,9 +52,42 @@ class CommunicationReplyMessageTest {
   }
 
   @Test
+  void shouldBuildV3CommunicationReplyMessageCorrectly() {
+    val msg =
+        CommunicationReplyMessage.forV3()
+            .version(3) // simply for coverage
+            .communicationType(CommunicationPayloadType.PICKUP_CODE_DMC)
+            .text("info-text")
+            .transactionID(UUID.randomUUID())
+            .pickupCodeDMC("DMC123")
+            .build();
+
+    assertEquals(3, msg.version());
+    assertEquals(CommunicationPayloadType.PICKUP_CODE_DMC.getLabel(), msg.communicationType());
+    assertEquals("info-text", msg.text());
+    assertEquals("DMC123", msg.pickupCodeDMC());
+  }
+
+  @Test
+  void shouldBuildV3CommunicationPickUpHRReplyMessageCorrectly() {
+    val msg =
+        CommunicationReplyMessage.forV3()
+            .communicationType(CommunicationPayloadType.PICKUP_CODE_HR)
+            .text("info-text")
+            .transactionID(UUID.randomUUID())
+            .pickupCodeHR("0815")
+            .build();
+
+    assertEquals(3, msg.version());
+    assertEquals(CommunicationPayloadType.PICKUP_CODE_HR.getLabel(), msg.communicationType());
+    assertEquals("info-text", msg.text());
+    assertEquals("0815", msg.pickupCodeHR());
+  }
+
+  @Test
   void shouldSupportUuidAndDefaults() {
 
-    var msg = CommunicationReplyMessage.forV3().build();
+    val msg = CommunicationReplyMessage.forV3().build();
 
     assertNotNull(msg.transactionID());
     assertNotNull(msg.text());
@@ -65,7 +98,7 @@ class CommunicationReplyMessageTest {
   @Test
   void shouldRespectNullableFields() {
 
-    var msg = CommunicationReplyMessage.forV1().build();
+    val msg = CommunicationReplyMessage.forV1().build();
 
     assertNull(msg.transactionID());
     assertNull(msg.text());
@@ -75,7 +108,7 @@ class CommunicationReplyMessageTest {
   @Test
   void shouldBuildV3CommunicationReplyMessageWithTransportFieldsCorrectly() {
 
-    var msg =
+    val msg =
         CommunicationReplyMessage.forV3()
             .communicationType("deliveryStatus")
             .deliveryStatus("inTransport")
@@ -99,12 +132,12 @@ class CommunicationReplyMessageTest {
   @Test
   void shouldBuildV3CommunicationReplyMessage() {
 
-    var msg =
+    val msg =
         CommunicationReplyMessage.forV3()
-            .communicationType("deliveryStatus")
+            .communicationType(CommunicationPayloadType.DELIVERY_STATUS)
             .transactionID(UUID.randomUUID())
             .deliveryStatus("inTransport")
-            .readyForCollection("nextDay")
+            .readyForCollecting("nextDay")
             .totalAmount(12345)
             .paymentMethods(
                 List.of(
@@ -122,5 +155,21 @@ class CommunicationReplyMessageTest {
     assertEquals("https://example.com", msg.url());
     assertEquals("custom-text", msg.text());
     assertNotNull(msg.paymentMethods());
+  }
+
+  @Test
+  void shouldNotHaveTextInReservationStatus() {
+    val msg =
+        CommunicationReplyMessage.forV3()
+            .communicationType(CommunicationPayloadType.RESERVATION_STATUS)
+            .transactionID(UUID.randomUUID())
+            .readyForCollecting("immediately")
+            .text("custom-text") // text should be ignored for reservation status
+            .build();
+
+    assertEquals(3, msg.version());
+    assertEquals("reservationStatus", msg.communicationType());
+    assertEquals("immediately", msg.readyForCollection());
+    assertNull(msg.text(), "Text should be null for reservation status messages");
   }
 }

@@ -22,6 +22,7 @@ package de.gematik.test.eu.integration;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLog;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
+import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIsBetween;
 import static de.gematik.test.core.expectations.verifier.MedicationDispenseBundleVerifier.*;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
 import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.*;
@@ -47,6 +48,8 @@ import de.gematik.test.erezept.fhir.r4.kbv.KbvBaseBundle;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.fuzzing.core.FuzzingMutator;
+import de.gematik.test.fuzzing.core.NamedEnvelope;
 import de.gematik.test.fuzzing.eu.EuCloseOperationManipulatorFactory;
 import groovy.util.logging.Slf4j;
 import java.time.LocalDate;
@@ -54,6 +57,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.hl7.fhir.r4.model.Task;
@@ -61,6 +65,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @Slf4j
@@ -75,6 +80,9 @@ class CloseEuPrescriptionsIT extends ErpTest {
 
   @Actor(name = "Hanna Bäcker")
   private PatientActor patientAtJourney;
+
+  @Actor(name = "Sina Hüllmann")
+  private PatientActor sina;
 
   @Actor(name = "Hannes Vogt")
   private EuPharmacyActor euPharmacist;
@@ -130,7 +138,7 @@ class CloseEuPrescriptionsIT extends ErpTest {
     return euPrescriptions.getPrescriptionIds();
   }
 
-  @TestcaseId("ERP_EU_CLOSE_001")
+  @TestcaseId("ERP_EU_CLOSE_01")
   @ParameterizedTest(
       name = "[{index}] -> Erfolgreiche Übermittlung von Abgabeinformationen für {0} E-Rezepte")
   @DisplayName("Erfolgreiche Übermittlung von Abgabeinformationen durch den Fachdienst")
@@ -204,7 +212,7 @@ class CloseEuPrescriptionsIT extends ErpTest {
   }
 
   @Test
-  @TestcaseId("ERP_EU_CLOSE_002")
+  @TestcaseId("ERP_EU_CLOSE_02")
   @DisplayName("Erfolglose Übermittlung von Abgabeinformationen an den Fachdienst ohne Accept")
   void shouldDenySendingEuCloseInputParamWithoutAccept() {
     preparePrescriptions();
@@ -234,7 +242,7 @@ class CloseEuPrescriptionsIT extends ErpTest {
   }
 
   @Test
-  @TestcaseId("ERP_EU_CLOSE_003")
+  @TestcaseId("ERP_EU_CLOSE_03")
   @DisplayName("Erfolglose Übermittlung von Abgabeinformationen an den Fachdienst ohne EuConsent")
   void shouldDenySendingEuCloseInputParamWithoutConsent() {
     val euPrescriptionIds = preparePrescriptions();
@@ -275,7 +283,7 @@ class CloseEuPrescriptionsIT extends ErpTest {
   }
 
   @Test
-  @TestcaseId("ERP_EU_CLOSE_004")
+  @TestcaseId("ERP_EU_CLOSE_04")
   @DisplayName("Zugriffsberechtigung nicht Korrekt, da revoke-eu-access-permission für das Land LI")
   void shouldFailWhileCloseEuPrescriptionWithoutAccessPermission() {
     val euPrescriptionIds = preparePrescriptions();
@@ -316,7 +324,7 @@ class CloseEuPrescriptionsIT extends ErpTest {
   // Prio-2
 
   @Test
-  @TestcaseId("ERP_EU_CLOSE_005")
+  @TestcaseId("ERP_EU_CLOSE_05")
   @DisplayName("Deutscher LEI darf den Endpunkt $eu-close nicht benutzen")
   void shouldFailWhileClosEuWithWrongOid() {
     val euPrescriptionIds = preparePrescriptions();
@@ -349,7 +357,7 @@ class CloseEuPrescriptionsIT extends ErpTest {
   }
 
   @Test
-  @TestcaseId("ERP_EU_CLOSE_006")
+  @TestcaseId("ERP_EU_CLOSE_06")
   @DisplayName(
       "Fehlgeschlagene Übermittlung von Abgabeinformationen durch fehlerhaften request body")
   void shouldFailClosingEuPrescriptionCausedByInvalidRequestBody() {
@@ -388,7 +396,7 @@ class CloseEuPrescriptionsIT extends ErpTest {
   }
 
   @Test
-  @TestcaseId("ERP_EU_CLOSE_007")
+  @TestcaseId("ERP_EU_CLOSE_07")
   @DisplayName(
       "Nachtest B_FD-1349, Erfolgreiche Übermittlung von Abgabeinformationen nach einstellen einer"
           + " deutschen und einer europäischen Dispensiereung und Herausgabe an den Patienten")
@@ -467,7 +475,7 @@ class CloseEuPrescriptionsIT extends ErpTest {
   }
 
   @Test
-  @TestcaseId("ERP_EU_CLOSE_008")
+  @TestcaseId("ERP_EU_CLOSE_08")
   @DisplayName(
       "Erfolgreiche Übermittlung von Abgabeinformationen und überprüfung des Systemzeitstempels"
           + " beim Dispensieren im EuAusland")
@@ -522,5 +530,48 @@ class CloseEuPrescriptionsIT extends ErpTest {
                   .and(prescriptionHasStatus(Task.TaskStatus.COMPLETED, ErpAfos.A_27072))
                   .isCorrect());
         });
+  }
+
+  private static Stream<NamedEnvelope<FuzzingMutator<EuCloseOperationInput>>>
+      mismatchingIdentifierManipulators() {
+    return EuCloseOperationManipulatorFactory.getMedicationDispenseConsistencyManipulator()
+        .stream();
+  }
+
+  @ParameterizedTest(name = "[{index}] -> {0}")
+  @TestcaseId("ERP_EU_CLOSE_09")
+  @DisplayName(
+      "Fehlgeschlagene Übermittlung von Abgabeinformationen durch abweichende Identifier im"
+          + " MedicationDispense")
+  @MethodSource("mismatchingIdentifierManipulators")
+  void shouldFailClosingEuPrescriptionWithMismatchingIdentifierInMedicationDispense(
+      NamedEnvelope<FuzzingMutator<EuCloseOperationInput>> manipulator) {
+    val euPrescriptionIds = preparePrescriptions(2);
+    val acceptedPrescriptionsInteraction =
+        euPharmacist.performs(
+            RetrievalEuPrescriptions.forPatient(patientAtJourney)
+                .withPrescriptionIds(euPrescriptionIds)
+                .withAccessCode(accessCode));
+    euPharmacist.attemptsTo(
+        Verify.that(acceptedPrescriptionsInteraction)
+            .withExpectedType()
+            .hasResponseWith(returnCodeIs(200))
+            .isCorrect());
+
+    val kbvBundles = acceptedPrescriptionsInteraction.getExpectedResponse().getKbvErpBundles();
+    val prescriptionToDispense = kbvBundles.get(0);
+
+    val closeEuPrescription =
+        CloseEuPrescription.with(accessCode, patientAtJourney.getKvnr())
+            .withResourceManipulator(manipulator)
+            .withAccepted(prescriptionToDispense);
+
+    val closeResponse = euPharmacist.performs(closeEuPrescription);
+
+    euPharmacist.attemptsTo(
+        Verify.that(closeResponse)
+            .withOperationOutcome(ErpAfos.A_27069_01)
+            .hasResponseWith(returnCodeIsBetween(400, 404)) // 404 if prescription not found
+            .isCorrect());
   }
 }

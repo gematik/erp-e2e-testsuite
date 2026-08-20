@@ -25,18 +25,20 @@ import static de.gematik.test.core.expectations.verifier.TaskVerifier.isInReadyS
 
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
-import de.gematik.test.core.expectations.requirements.ErpAfos;
+import de.gematik.test.core.expectations.requirements.ErpBfd;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.IssuePrescription;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageBuilder;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
 import de.gematik.test.erezept.fhir.values.GkvInsuranceCoverageInfo;
 import de.gematik.test.erezept.fhir.valuesets.PayorType;
 import de.gematik.test.erezept.fhir.valuesets.PersonGroup;
 import de.gematik.test.erezept.fhir.valuesets.VersichertenStatus;
-import de.gematik.test.erezept.toggle.ErpEnableCheckExclusionPayor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
@@ -47,13 +49,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @Slf4j
 @ExtendWith(SerenityJUnit5Extension.class)
-@ExtendWith(SerenityJUnit5Extension.class)
-@DisplayName("ERP_DIFFERENT_INSURANCE_TYPES_01")
+@DisplayName("Prüfe, dass alternative Kostenträger vom FD akzeptiert werden")
 @Tag("ErpDifferentInsuranceTypes")
 class DifferentInsuranceTypesIT extends ErpTest {
-
-  private static final Boolean EXPECT_ENABLE_CHECK_EXCLUSION_PAYOR =
-      featureConf.getToggle(new ErpEnableCheckExclusionPayor());
 
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
@@ -84,19 +82,11 @@ class DifferentInsuranceTypesIT extends ErpTest {
     val activation =
         doctor.performs(IssuePrescription.forPatient(sina).withKbvBundleFrom(kbvBundle));
 
-    if (!EXPECT_ENABLE_CHECK_EXCLUSION_PAYOR) {
-      doctor.attemptsTo(
-          Verify.that(activation)
-              .withExpectedType(ErpAfos.A_22222)
-              .hasResponseWith(returnCode(200))
-              .and(isInReadyStatus())
-              .isCorrect());
-    } else {
-      doctor.attemptsTo(
-          Verify.that(activation)
-              .withOperationOutcome(ErpAfos.A_22222)
-              .hasResponseWith(returnCode(400))
-              .isCorrect());
-    }
+    doctor.attemptsTo(
+        Verify.that(activation)
+            .withExpectedType(ErpBfd.B_FD_1357)
+            .hasResponseWith(returnCode(200))
+            .and(isInReadyStatus())
+            .isCorrect());
   }
 }

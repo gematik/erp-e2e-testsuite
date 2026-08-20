@@ -31,7 +31,7 @@ import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.BSNR;
 import de.gematik.test.erezept.fhir.values.KZVA;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import lombok.val;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Identifier;
@@ -59,9 +59,9 @@ class EuOrganizationBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldBuildOrganizationWithCountry() {
-    val org = orgBuilder.ncpehCountry(IsoCountryCode.DE).build();
+    val org = orgBuilder.ncpehCountry(IsoCountryCodeNCPeH.DE).build();
     assertTrue(org.getEuCountry().isPresent());
-    assertEquals(IsoCountryCode.DE, org.getEuCountry().get());
+    assertEquals(IsoCountryCodeNCPeH.DE, org.getEuCountry().get());
     val res = ValidatorUtil.encodeAndValidate(parser, org);
     assertTrue(res.isSuccessful());
   }

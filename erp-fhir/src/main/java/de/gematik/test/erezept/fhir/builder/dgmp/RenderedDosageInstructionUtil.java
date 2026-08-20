@@ -726,11 +726,12 @@ public class RenderedDosageInstructionUtil {
    * places for whole numbers.
    *
    * @param value Numeric value
-   * @return Formatted value (e.g., "1" instead of "1,0", "1,5" kept as is)
+   * @return Formatted value (e.g., "1" or "2,5" instead of "1.0", "2.5" kept as is)
    */
   private static String formatDecimalValue(BigDecimal value) {
-    if (value.scale() == 0) return value.toPlainString();
-    return String.valueOf(value)
+    return value
+        .stripTrailingZeros()
+        .toPlainString()
         // use comma as decimal separator for german format
         .replace(".", ",");
   }

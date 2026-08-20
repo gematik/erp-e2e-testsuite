@@ -17,6 +17,17 @@ services:
       - NO_PROXY=${NO_PROXY:-127.0.0.1,localhost,.splitdns.ti-dienste.de}
     env_file:
       - .env
+    # Note: extra hosts not needed if IPv6 is disabled
+#    extra_hosts:
+#      - "erp-ref.zentral.erp.splitdns.ti-dienste.de:10.31.195.10"
+    dns_opt:
+      # force separate TCP connections for A and AAAA queries instead of waiting for IPv6 timeout.
+      - "single-request-reopen"
+      - "timeout:2"
+      - "attempts:3"
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: "1"
+      net.ipv6.conf.default.disable_ipv6: "1"
 
   primsys-tu:
     image: europe-west3-docker.pkg.dev/gematik-all-infra-prod/e-rezept/primsys-rest
@@ -28,6 +39,14 @@ services:
       - VAU_CONNECTION_TIMEOUT=30
     env_file:
       - .env
+    dns_opt:
+      # force separate TCP connections for A and AAAA queries instead of waiting for IPv6 timeout.
+      - "single-request-reopen"
+      - "timeout:2"
+      - "attempts:3"
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: "1"
+      net.ipv6.conf.default.disable_ipv6: "1"
 
   primsys-rudev:
     image: europe-west3-docker.pkg.dev/gematik-all-infra-prod/e-rezept/primsys-rest
@@ -38,11 +57,22 @@ services:
       - VAU_CONNECTION_TIMEOUT=30
     env_file:
       - .env
+      # Note: extra hosts not needed if IPv6 is disabled
+#    extra_hosts:
+#      - "erp-dev.zentral.erp.splitdns.ti-dienste.de:10:31.194.12"
+    dns_opt:
+      # force separate TCP connections for A and AAAA queries instead of waiting for IPv6 timeout.
+      - "single-request-reopen"
+      - "timeout:2"
+      - "attempts:3"
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: "1"
+      net.ipv6.conf.default.disable_ipv6: "1"
 
-  erpione-dev:
+  erpione-test:
     image: europe-west3-docker.pkg.dev/gematik-all-infra-prod/e-rezept/erpione-server:latest
-    container_name: erpione-server
-    hostname: erpione-dev
+    container_name: erpione-server-tu
+    hostname: erpione-test
     restart: unless-stopped
     environment:
       - ERP_FHIR_PROFILE=${PROFILES_TU}
@@ -53,3 +83,34 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+    dns_opt:
+      # force separate TCP connections for A and AAAA queries instead of waiting for IPv6 timeout.
+      - "single-request-reopen"
+      - "timeout:2"
+      - "attempts:3"
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: "1"
+      net.ipv6.conf.default.disable_ipv6: "1"
+
+  erpione-dev:
+    image: europe-west3-docker.pkg.dev/gematik-all-infra-prod/e-rezept/erpione-server:latest
+    container_name: erpione-server-dev
+    hostname: erpione-dev
+    restart: unless-stopped
+    environment:
+      - ERP_FHIR_PROFILE=${PROFILES_RU_DEV}
+      - ACTIVE_SPRING_PROFILES=rudev,noauth
+    healthcheck:
+      test: "wget -T5 -qO- 127.0.0.1:8080/actuator/health | grep UP || exit 1"
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    dns_opt:
+      # force separate TCP connections for A and AAAA queries instead of waiting for IPv6 timeout.
+      - "single-request-reopen"
+      - "timeout:2"
+      - "attempts:3"
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: "1"
+      net.ipv6.conf.default.disable_ipv6: "1"

@@ -30,7 +30,7 @@ import de.gematik.test.erezept.fhir.r4.eu.EuOrganization;
 import de.gematik.test.erezept.fhir.r4.eu.NcpehCountryExt;
 import de.gematik.test.erezept.fhir.values.BSNR;
 import de.gematik.test.erezept.fhir.values.KZVA;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -65,7 +65,7 @@ public class EuOrganizationBuilder extends ResourceBuilder<EuOrganization, EuOrg
     return this;
   }
 
-  public EuOrganizationBuilder ncpehCountry(IsoCountryCode ncpehCountry) {
+  public EuOrganizationBuilder ncpehCountry(IsoCountryCodeNCPeH ncpehCountry) {
     this.ncpehCountry = new NcpehCountryExt(ncpehCountry);
     return this;
   }

@@ -20,11 +20,10 @@
 
 package de.gematik.test.erezept.ci;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import groovy.lang.GroovyShell;
+import jakarta.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,6 +52,32 @@ class JenkinsfileSyntaxValidationTest {
     assertFalse(
         jenkinsfiles.isEmpty(), () -> "No Jenkinsfiles found in " + ciDirectory.toAbsolutePath());
 
+    var failures = validate(jenkinsfiles);
+
+    if (!failures.isEmpty()) {
+      fail("Syntax errors found in Jenkinsfiles:\n - " + String.join("\n - ", failures));
+    }
+  }
+
+  @Test
+  void shouldValidateAllJenkinsfilesInRoot() throws IOException {
+    var projectRoot = resolveProjectRoot();
+    assertTrue(
+        Files.isDirectory(projectRoot), () -> "Missing root: " + projectRoot.toAbsolutePath());
+
+    var jenkinsfiles = listJenkinsfiles(projectRoot);
+    assertFalse(
+        jenkinsfiles.isEmpty(), () -> "No Jenkinsfiles found in " + projectRoot.toAbsolutePath());
+
+    var failures = validate(jenkinsfiles);
+
+    if (!failures.isEmpty()) {
+      fail("Syntax errors found in Jenkinsfiles:\n - " + String.join("\n - ", failures));
+    }
+  }
+
+  @Nonnull
+  private static ArrayList<String> validate(List<Path> jenkinsfiles) throws IOException {
     var failures = new ArrayList<String>();
     for (var jenkinsfile : jenkinsfiles) {
       var content = Files.readString(jenkinsfile);
@@ -64,20 +89,22 @@ class JenkinsfileSyntaxValidationTest {
         failures.add(jenkinsfile.getFileName() + ": " + compactError(exception));
       }
     }
-
-    if (!failures.isEmpty()) {
-      fail("Syntax errors found in Jenkinsfiles:\n - " + String.join("\n - ", failures));
-    }
+    return failures;
   }
 
   private static List<Path> listJenkinsfiles(Path ciDirectory) throws IOException {
     try (Stream<Path> stream = Files.list(ciDirectory)) {
       return stream
           .filter(Files::isRegularFile)
-          .filter(path -> path.getFileName().toString().endsWith(".Jenkinsfile"))
+          .filter(JenkinsfileSyntaxValidationTest::isJenkinsfile)
           .sorted(Comparator.comparing(path -> path.getFileName().toString()))
           .toList();
     }
+  }
+
+  private static boolean isJenkinsfile(Path path) {
+    var fileName = path.getFileName().toString();
+    return fileName.endsWith(".Jenkinsfile") || fileName.equals("JENKINSFILE");
   }
 
   private static Path resolveCiDirectory() {
@@ -95,6 +122,25 @@ class JenkinsfileSyntaxValidationTest {
     }
 
     return directCandidate;
+  }
+
+  private static Path resolveProjectRoot() {
+    var fromMavenProperty = Path.of(System.getProperty("maven.multiModuleProjectDirectory", "."));
+    if (Files.isDirectory(fromMavenProperty.resolve("CI"))) {
+      return fromMavenProperty.normalize();
+    }
+
+    var fromUserDir = Path.of(System.getProperty("user.dir", "."));
+    if (Files.isDirectory(fromUserDir.resolve("CI"))) {
+      return fromUserDir.normalize();
+    }
+
+    var moduleParentCandidate = fromUserDir.resolve("..").normalize();
+    if (Files.isDirectory(moduleParentCandidate.resolve("CI"))) {
+      return moduleParentCandidate;
+    }
+
+    return fromMavenProperty.normalize();
   }
 
   private static String compactError(CompilationFailedException exception) {

@@ -483,8 +483,7 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
             .timing(
                 TimingBuilder.forRepeatComp()
                     .frequency(1)
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .build())
             .build();
@@ -501,8 +500,7 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
             .timing(
                 TimingBuilder.forRepeatComp()
                     .frequency(1)
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .build())
             .build();
@@ -519,8 +517,7 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
             .timing(
                 TimingBuilder.forRepeatComp()
                     .frequency(1)
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .build())
             .build();
@@ -537,8 +534,7 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
             .timing(
                 TimingBuilder.forRepeatComp()
                     .frequency(1)
-                    .period(4)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(4, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .build())
             .build();
@@ -555,8 +551,7 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
             .timing(
                 TimingBuilder.forRepeatComp()
                     .frequency(2)
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .build())
             .build();
@@ -573,8 +568,7 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
             .timing(
                 TimingBuilder.forRepeatComp()
                     .frequency(1)
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.WK)
+                    .period(3, Timing.UnitsOfTime.WK)
                     .timeOfDay("08:00:00")
                     .build())
             .build();

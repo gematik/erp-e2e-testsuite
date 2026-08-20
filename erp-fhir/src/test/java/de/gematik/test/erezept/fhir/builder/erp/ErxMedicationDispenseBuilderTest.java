@@ -33,6 +33,7 @@ import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
+import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.UnitsOfTimeDE;
 import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
@@ -278,10 +279,9 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
         DosageDgMPBuilder.dosageBuilder(5, BmpDosiereinheit.AUGENBADEWANNE)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .boundsDuration(8, "Woche(n)", "wk")
+                    .boundsDuration(8, UnitsOfTimeDE.WOCHE)
                     .frequency(1)
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .when("EVE")
                     .build())
             .build();
@@ -312,10 +312,9 @@ class ErxMedicationDispenseBuilderTest extends ErpFhirParsingTest {
         DosageDgMPBuilder.dosageBuilder(5, BmpDosiereinheit.AUGENBADEWANNE)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .boundsDuration(8, "Woche(n)", "wk")
+                    .boundsDuration(8, UnitsOfTimeDE.WOCHE)
                     .frequency(1)
-                    .period(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
+                    .period(3, Timing.UnitsOfTime.D)
                     .when("EVE")
                     .build())
             .build();

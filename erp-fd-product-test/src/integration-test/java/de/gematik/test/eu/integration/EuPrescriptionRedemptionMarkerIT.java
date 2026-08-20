@@ -22,6 +22,7 @@ package de.gematik.test.eu.integration;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLog;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.*;
+import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeContainsInDetailText;
 import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.hasRedeemableByPropertiesForBundlePrescription;
 import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.prescriptionInStatus;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
@@ -32,11 +33,13 @@ import de.gematik.test.core.ArgumentComposer;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
+import de.gematik.test.core.expectations.requirements.ErpBfd;
 import de.gematik.test.core.expectations.requirements.PrescriptionServiceVersion;
 import de.gematik.test.core.expectations.verifier.TaskVerifier;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.*;
 import de.gematik.test.erezept.actions.eu.EuGrantConsent;
+import de.gematik.test.erezept.actions.eu.GrantEuConsent;
 import de.gematik.test.erezept.actions.eu.PatchPrescriptionForEuRedemption;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -352,13 +355,16 @@ class EuPrescriptionRedemptionMarkerIT extends ErpTest {
         Verify.that(patchResponse)
             .withOperationOutcome()
             .hasResponseWith(returnCode(403))
+            .and(
+                operationOutcomeContainsInDetailText(
+                    "Operation only allowed by insurant owning the task and task status is ready",
+                    ErpBfd.B_FD_1506))
             .isCorrect());
   }
 
   @Test
-  @Tag("B_FD-1506")
   @TestcaseId("ERP_EU_PATCH_PRESCRIPTION_06")
-  @DisplayName("Markieren eines abgeschlossenen E-Rezepts im EU-Ausland schlägt NICHT fehl")
+  @DisplayName("Markieren eines abgeschlossenen E-Rezepts im EU-Ausland schlägt fehl")
   void shouldRejectPatchForClosedPrescription() {
     val erxTask =
         doctor
@@ -387,6 +393,44 @@ class EuPrescriptionRedemptionMarkerIT extends ErpTest {
     val patchResponse = sina.performs(PatchPrescriptionForEuRedemption.of(taskId));
 
     sina.attemptsTo(
-        Verify.that(patchResponse).withExpectedType().hasResponseWith(returnCode(200)).isCorrect());
+        Verify.that(patchResponse)
+            .withOperationOutcome()
+            .hasResponseWith(returnCode(403, ErpAfos.A_28910))
+            .and(
+                operationOutcomeContainsInDetailText(
+                    "Operation only allowed by insurant owning the task and task status is ready",
+                    ErpBfd.B_FD_1506))
+            .isCorrect());
+  }
+
+  @TestcaseId("ERP_PATCH_EU_PRESCRIPTION_07")
+  @Test
+  @DisplayName("E-Rezept im Status READY wird erfolgreich für EU-Einlösung markiert")
+  void shouldPatchEuPrescriptionWhenStatusIsReady() {
+    val activation =
+        doctor.performs(
+            IssuePrescription.forPatient(sina)
+                .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                .withRandomKbvBundle());
+
+    doctor.attemptsTo(
+        Verify.that(activation)
+            .withExpectedType()
+            .hasResponseWith(returnCode(200))
+            .and(isInReadyStatus())
+            .isCorrect());
+
+    sina.performs(GrantEuConsent.forPatient());
+
+    val taskId = activation.getExpectedResponse().getTaskId();
+    val patchResponse = sina.performs(PatchPrescriptionForEuRedemption.of(taskId));
+
+    sina.attemptsTo(
+        Verify.that(patchResponse)
+            .withExpectedType()
+            .hasResponseWith(returnCode(200))
+            .and(hasRedeemableByProperties(true))
+            .and(hasRedeemableByPatientAuthorization(true))
+            .isCorrect());
   }
 }

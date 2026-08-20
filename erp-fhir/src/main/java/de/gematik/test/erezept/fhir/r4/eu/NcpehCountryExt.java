@@ -21,18 +21,18 @@
 package de.gematik.test.erezept.fhir.r4.eu;
 
 import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import org.hl7.fhir.r4.model.Extension;
 
 public class NcpehCountryExt {
 
-  private IsoCountryCode isoCountryCode;
+  private IsoCountryCodeNCPeH isoCountryCodeNCPeH;
 
-  public NcpehCountryExt(IsoCountryCode isoCountryCode) {
-    this.isoCountryCode = isoCountryCode;
+  public NcpehCountryExt(IsoCountryCodeNCPeH isoCountryCodeNCPeH) {
+    this.isoCountryCodeNCPeH = isoCountryCodeNCPeH;
   }
 
   public Extension asExtension() {
-    return GemErpEuStructDef.NCPEH_COUNTRY_EXT.asExtension(isoCountryCode.asCoding());
+    return GemErpEuStructDef.NCPEH_COUNTRY_EXT.asExtension(isoCountryCodeNCPeH.asCoding());
   }
 }

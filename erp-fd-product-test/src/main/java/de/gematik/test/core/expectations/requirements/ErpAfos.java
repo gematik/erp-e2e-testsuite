@@ -268,7 +268,8 @@ public enum ErpAfos implements RequirementsSet {
       "E-Rezept-Fachdienst - eu-prescription abfragen - Abfrage aller einlösbaren"
           + " Verordnungsinformationen "),
   A_27068("A_27068", "E-Rezept-Fachdienst - Task schließen - EU - Rollenprüfung"),
-  A_27069("A_27069", " E-Rezept-Fachdienst - Task schließen - EU - Schemaprüfung"),
+  A_27069("A_27069", "E-Rezept-Fachdienst - Task schließen - EU - Schemaprüfung"),
+  A_27069_01("A_27069_01", "E-Rezept-Fachdienst - Task schließen - EU - Schemaprüfung"),
   A_27070("A_27070", "E-Rezept-Fachdienst - Task schließen - EU - Prüfung Einwilligung für KVNR"),
   A_27071("A_27071", "E-Rezept-Fachdienst - Task schließen - EU - Prüfung Zugriffsberechtigung"),
   A_27072("A_27072", "E-Rezept-Fachdienst - Task schließen - EU - Statusprüfung"),
@@ -327,7 +328,8 @@ public enum ErpAfos implements RequirementsSet {
           + " LEI speichern"),
   A_28411(
       "A_28411",
-      "E-Rezept-Fachdienst - Task schließen - Telematik-ID der abgebenden LEI speichern");
+      "E-Rezept-Fachdienst - Task schließen - Telematik-ID der abgebenden LEI speichern"),
+  A_28910("A_28910", "E-Rezept-Fachdienst -Task markieren - Versicherter - nur zur Einlösung");
   private final Requirement requirement;
 
   ErpAfos(String id, String description) {

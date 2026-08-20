@@ -27,7 +27,7 @@ import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
 import de.gematik.test.erezept.abilities.ProvidePharmacyBaseData;
 import de.gematik.test.erezept.config.dto.actor.EuPharmacyConfiguration;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import lombok.val;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ class EuPharmacyActorTest {
     pharmacy.can(useSmcb);
 
     val cfg = new EuPharmacyConfiguration();
-    cfg.setCountryCode(IsoCountryCode.NL.getCode());
+    cfg.setCountryCode(IsoCountryCodeNCPeH.NL.getCode());
     pharmacy.can(ProvidePharmacyBaseData.fromConfiguration(cfg));
 
     assertNotNull(pharmacy.getCommonName());

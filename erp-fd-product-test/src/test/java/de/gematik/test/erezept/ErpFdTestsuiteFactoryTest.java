@@ -20,11 +20,14 @@
 
 package de.gematik.test.erezept;
 
+import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_CONFIG;
+import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
+import de.gematik.bbriccs.fhir.conf.ProfilesConfigurator;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.abilities.*;
 import de.gematik.test.erezept.actors.*;
@@ -33,6 +36,7 @@ import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.actor.EuPharmacyConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
+import de.gematik.test.erezept.config.exceptions.ConfigurationMappingException;
 import de.gematik.test.erezept.exceptions.MissingAbilityException;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
@@ -169,6 +173,7 @@ class ErpFdTestsuiteFactoryTest {
     val patient = new PatientActor(patientName);
 
     try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
+
       val erpClient = mock(ErpClient.class);
       erpClientFactoryMockedStatic
           .when(() -> ErpClientFactory.createErpClient(any(), any(PatientConfiguration.class)))
@@ -178,6 +183,9 @@ class ErpFdTestsuiteFactoryTest {
       assertDoesNotThrow(patient::getEgk);
       assertNotNull(patient.abilityTo(UseTheErpClient.class));
       assertNotNull(patient.abilityTo(ProvidePatientBaseData.class));
+      assertNotNull(patient.abilityTo(ProvideEGK.class));
+      assertNotNull(patient.abilityTo(ManageDataMatrixCodes.class));
+      assertNotNull(patient.abilityTo(ManageCommunications.class));
       assertNotNull(patient.getDescription());
       assertDoesNotThrow(patient::toString);
     }
@@ -333,5 +341,53 @@ class ErpFdTestsuiteFactoryTest {
     assertDoesNotThrow(
         () -> SafeAbility.getAbility(actor, OCSPAbility.class).config().getDefaultBaseUrl());
     assertNotNull(config.getActiveEnvironment().getTi().getFdBaseUrl());
+  }
+
+  @Test
+  void shouldFailWhenEquippingPatientActorWithUnknownActor() {
+    val config = ErpFdTestsuiteFactory.create();
+    val patient = new PatientActor("Fridolin");
+
+    assertThrows(
+        ConfigurationMappingException.class,
+        () -> config.equipAsPatientWithInvalidIdpToken(patient));
+  }
+
+  @Test
+  void shouldEquipPatientActorWithInvalidIdpToken() {
+    val patientName = "Fridolin Straßer";
+    val config = ErpFdTestsuiteFactory.create();
+    val patient = new PatientActor(patientName);
+
+    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
+      val erpClient = mock(ErpClient.class);
+      val erpClientInvalidToken = mock(ErpClient.class);
+
+      // fhir profile manuell konfigurieren / setzen für createErpClient()
+      ProfilesConfigurator.getConfiguration(ERP_FHIR_PROFILES_CONFIG, ERP_FHIR_PROFILES_TOGGLE);
+      erpClientFactoryMockedStatic
+          .when(() -> ErpClientFactory.createErpClient(any(), any(PatientConfiguration.class)))
+          .thenReturn(erpClient);
+
+      erpClientFactoryMockedStatic
+          .when(
+              () ->
+                  ErpClientFactory.createErpClientWithInvalidIdpToken(
+                      any(), any(PatientConfiguration.class)))
+          .thenReturn(erpClientInvalidToken);
+
+      assertDoesNotThrow(() -> config.equipAsPatientWithInvalidIdpToken(patient));
+
+      assertNotNull(patient.abilityTo(UseTheErpClient.class));
+      assertNotNull(patient.abilityTo(ProvideEGK.class));
+      assertNotNull(patient.abilityTo(ProvidePatientBaseData.class));
+      assertNotNull(patient.abilityTo(ManageDataMatrixCodes.class));
+      assertNotNull(patient.abilityTo(ManageCommunications.class));
+
+      erpClientFactoryMockedStatic.verify(
+          () ->
+              ErpClientFactory.createErpClientWithInvalidIdpToken(
+                  any(), any(PatientConfiguration.class)));
+    }
   }
 }

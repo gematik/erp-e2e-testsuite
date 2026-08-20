@@ -42,6 +42,7 @@ import de.gematik.test.erezept.actions.TaskCreate;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
+import de.gematik.test.erezept.arguments.InsuranceFlowAndAssignmentComposer;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
@@ -53,7 +54,6 @@ import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.toggle.ErpDarreichungsformJuly26Active;
 import de.gematik.test.erezept.toggle.KbvDmpKennzeichenOktober26;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -80,8 +80,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 class TaskActivateIT extends ErpTest {
   private static final Boolean KBV_DMP_OKTOBER_26 =
       featureConf.getToggle(new KbvDmpKennzeichenOktober26());
-  private static final Boolean DARREICHUNGSFORM_JULY_26_ACTIVE =
-      featureConf.getToggle(new ErpDarreichungsformJuly26Active());
 
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
@@ -110,24 +108,10 @@ class TaskActivateIT extends ErpTest {
   }
 
   static Stream<Arguments> prescriptionTypesProvider() {
-    return ArgumentComposer.composeWith()
-        .arguments(
-            InsuranceTypeDe.GKV, // given insurance kind
-            PrescriptionAssignmentKind.PHARMACY_ONLY, // given assignment kind
-            PrescriptionFlowType.FLOW_TYPE_160) // expected flow type
-        .arguments(
-            InsuranceTypeDe.GKV,
-            PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
-            PrescriptionFlowType.FLOW_TYPE_169)
-        .arguments(
-            InsuranceTypeDe.PKV,
-            PrescriptionAssignmentKind.PHARMACY_ONLY,
-            PrescriptionFlowType.FLOW_TYPE_200)
-        .arguments(
-            InsuranceTypeDe.PKV,
-            PrescriptionAssignmentKind.DIRECT_ASSIGNMENT,
-            PrescriptionFlowType.FLOW_TYPE_209)
-        .multiplyAppend(MedicationCategory.class)
+    return ArgumentComposer.composeWith(
+            InsuranceFlowAndAssignmentComposer.prescriptionTypesProviderWithExpectation()
+                .multiplyAppend(MedicationCategory.class)
+                .create())
         .create();
   }
 
@@ -143,24 +127,19 @@ class TaskActivateIT extends ErpTest {
   }
 
   static Stream<Arguments> prescriptionTypesProviderDarreichungsformen() {
-    val dfList = new LinkedList<>();
-    if (DARREICHUNGSFORM_JULY_26_ACTIVE) {
-      dfList.addAll(
-          List.of(
-              Darreichungsform.KEINE_DARREICHUNGSFORM,
-              Darreichungsform.DIG,
-              Darreichungsform.IFF,
-              Darreichungsform.PIF,
-              Darreichungsform.RKA,
-              Darreichungsform.RKT,
-              Darreichungsform.SUF,
-              Darreichungsform.TLE,
-              Darreichungsform.TMR,
-              Darreichungsform.TPO));
-    } else {
-      dfList.add(Darreichungsform.PSE);
-      dfList.add(Darreichungsform.LYE);
-    }
+    val dfList =
+        List.of(
+            Darreichungsform.KEINE_DARREICHUNGSFORM,
+            Darreichungsform.DIG,
+            Darreichungsform.IFF,
+            Darreichungsform.PIF,
+            Darreichungsform.RKA,
+            Darreichungsform.RKT,
+            Darreichungsform.SUF,
+            Darreichungsform.TLE,
+            Darreichungsform.TMR,
+            Darreichungsform.TPO);
+
     return ArgumentComposer.composeWith(prescriptionTypesProvider()).multiply(2, dfList).create();
   }
 
@@ -213,13 +192,13 @@ class TaskActivateIT extends ErpTest {
   @TestcaseId("ERP_TASK_ACTIVATE_02")
   @ParameterizedTest(
       name =
-          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit Darreichungsform {2}"
-              + " aus")
+          "[{index}] -> Verordnender Arzt stellt ein {0} E-Rezept für {1} mit kürzlich"
+              + " hinzugefügter Darreichungsform {2} aus")
   @DisplayName(
-      "E-Rezept als Verordnender Arzt an eine/n Versicherte/n ausstellen mit definierter"
+      "E-Rezept als Verordnender Arzt an eine/n Versicherte/n ausstellen mit neuer definierter"
           + " Darreichungsform")
   @MethodSource("prescriptionTypesProviderDarreichungsformen")
-  void activatePrescriptionWithDarreichungsformen(
+  void activatePrescriptionWithLastUpdatedDarreichungsformen(
       InsuranceTypeDe insuranceType,
       PrescriptionAssignmentKind assignmentKind,
       Darreichungsform df,

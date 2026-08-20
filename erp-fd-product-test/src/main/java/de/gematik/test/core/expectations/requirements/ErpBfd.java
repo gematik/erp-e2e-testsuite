@@ -23,15 +23,23 @@ package de.gematik.test.core.expectations.requirements;
 import lombok.Getter;
 
 public enum ErpBfd implements RequirementsSet {
+  B_FD_1357(
+      "B_FD-1357", "C_12295 E-Rezept: Verordnungen zu Lasten sonstiger Kostenträger ermöglichen"),
+  B_FD_1506("B_FD-1506", "Patch Task schlägt mit HTTP 500 fehl - PatchTaskHandler.cxx:50"),
+
   B_FD_1661(
       "B_FD-1661",
       "Dosierungstext: Unterschied 'nachts' und 'zur Nacht',"
           + " https://service.gematik.de/browse/B_FD-1661"),
   B_FD_1659(
-      "B-FD_1569",
+      "B-FD_1659",
       "Sortierung von Dosierungen im Uhrzeiten-Schema,"
           + " https://service.gematik.de/browse/B_FD-1659"),
   B_FD_1676("B_FD-1676", "Strukturierte Dosierungen: Angabe mehrfacher Schemata eingrenzen"),
+  B_FD_1685("B_FD-1685", "Update kbv.ita.erp 1.4.4"),
+  B_FD_1687("B_FD-1687", "Strukturiere Dosierung: boundsDuration"),
+  B_FD_1699(
+      "B-FD_1699", "Abweichende Generierung / Validierung der Strukturierten Dosierinformationen"),
   ;
 
   @Getter private final Requirement requirement;

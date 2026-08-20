@@ -37,8 +37,7 @@ class TimingRepeatBuilderTest {
     val tRC =
         TimingRepeatBuilder.forRepeatComp()
             .frequency(3)
-            .period(2)
-            .periodUnit(Timing.UnitsOfTime.D)
+            .period(2, Timing.UnitsOfTime.D)
             .timeOfDay("08:00:00")
             .dayOfWeek(Timing.DayOfWeek.MON)
             // Setter tests special usecase e.g. in real Testcase like using a space-separated
@@ -59,7 +58,7 @@ class TimingRepeatBuilderTest {
     assertEquals(Timing.EventTiming.C, tRC.getRepeat().getWhen().get(0).getValue());
     assertNotNull(tRC.getRepeat().getBoundsDuration());
     assertEquals(5, tRC.getRepeat().getBoundsDuration().getValue().intValue());
-    assertEquals("Monat", tRC.getRepeat().getBoundsDuration().getUnit());
+    assertEquals("Monat(e)", tRC.getRepeat().getBoundsDuration().getUnit());
     assertEquals("mo", tRC.getRepeat().getBoundsDuration().getCode());
   }
 
@@ -68,13 +67,12 @@ class TimingRepeatBuilderTest {
     val tRC =
         TimingRepeatBuilder.forRepeatComp()
             .frequency(5)
-            .period(1)
-            .periodUnit(Timing.UnitsOfTime.fromCode("d"))
+            .period(1, Timing.UnitsOfTime.fromCode("d"))
             .timeOfDay("08:00:00")
             .timeOfDay("10:00:00")
             .timeOfDay("12:00:00")
             .dayOfWeek("mon thu")
-            .boundsDuration(5, UnitsOfTimeDE.fromCode("d").getSingular(), "d")
+            .boundsDuration(5, UnitsOfTimeDE.fromCode("d"))
             .build();
 
     assertNotNull(tRC);
@@ -97,10 +95,9 @@ class TimingRepeatBuilderTest {
     val tRC =
         TimingRepeatBuilder.forRepeatComp()
             .frequency(5)
-            .period(1)
+            .period(1, "d")
             .when(Timing.EventTiming.MORN)
             .when(eventTimings)
-            .periodUnit("d")
             .timeOfDay(timeOfDays)
             .dayOfWeek(dayList)
             .build();
@@ -133,7 +130,7 @@ class TimingRepeatBuilderTest {
     val tRC =
         TimingRepeatBuilder.forRepeatComp()
             .frequency(5)
-            .period(1)
+            .period(1, "wk")
             .when("")
             .when(eventTimingsNull)
             .when(eventTimings)

@@ -39,7 +39,7 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -64,7 +64,8 @@ class DeleteEuAccessPermissionIT extends ErpTest {
   void shouldDeleteAccessPermission() {
     sina.performs(EuGrantConsent.forOneSelf().withDefaultConsent());
     val response =
-        sina.performs(GrantEuAccessPermission.withRandomAccessCode().forCountry(IsoCountryCode.MT));
+        sina.performs(
+            GrantEuAccessPermission.withRandomAccessCode().forCountry(IsoCountryCodeNCPeH.MT));
 
     sina.attemptsTo(
         Verify.that(response)

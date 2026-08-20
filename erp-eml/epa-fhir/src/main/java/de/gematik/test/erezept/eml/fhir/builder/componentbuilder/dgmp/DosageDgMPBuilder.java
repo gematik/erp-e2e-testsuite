@@ -27,6 +27,7 @@ import de.gematik.bbriccs.fhir.builder.ElementBuilder;
 import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.AccessLevel;
@@ -35,6 +36,7 @@ import lombok.val;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Timing;
 
+@SuppressWarnings("java:S107")
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class DosageDgMPBuilder extends ElementBuilder<DosageDgMP, DosageDgMPBuilder> {
 
@@ -47,18 +49,98 @@ public class DosageDgMPBuilder extends ElementBuilder<DosageDgMP, DosageDgMPBuil
     return new DosageDgMPBuilder(null);
   }
 
-  public static DosageDgMPBuilder dosageBuilder(long value, BmpDosiereinheit code) {
+  public static DosageDgMPBuilder dosageBuilder(double value, BmpDosiereinheit code) {
     Quantity quantity = new Quantity();
     quantity.setUnit(code.getDisplay()).setCode(code.getCode());
     quantity.setValue(value);
     return new DosageDgMPBuilder(quantity);
   }
 
-  public static DosageDgMPBuilder dosageBuilder(double value, BmpDosiereinheit code) {
-    Quantity quantity = new Quantity();
-    quantity.setUnit(code.getDisplay()).setCode(code.getCode());
-    quantity.setValue(value);
-    return new DosageDgMPBuilder(quantity);
+  public static DosageDgMP dosageTimeOfDayEntry(
+      double quantityValue,
+      BmpDosiereinheit code,
+      List<String> timeOfDayList,
+      double boundDuration,
+      UnitsOfTimeDE boundsUnit,
+      int period,
+      Timing.UnitsOfTime periodUnit) {
+    return dosageBuilder(quantityValue, code)
+        .timing(
+            TimingBuilder.forRepeatComp()
+                .boundsDuration(boundDuration, boundsUnit)
+                .timeOfDay(timeOfDayList)
+                .period(period, periodUnit)
+                .frequency(timeOfDayList.size())
+                .build())
+        .build();
+  }
+
+  public static DosageDgMP dosageTimeOfDayEntry(
+      double quantityValue,
+      BmpDosiereinheit code,
+      List<String> timeOfDayList,
+      int period,
+      Timing.UnitsOfTime periodUnit) {
+    return dosageBuilder(quantityValue, code)
+        .timing(
+            TimingBuilder.forRepeatComp()
+                .timeOfDay(timeOfDayList)
+                .period(period, periodUnit)
+                .frequency(timeOfDayList.size())
+                .build())
+        .build();
+  }
+
+  public static DosageDgMP dosageWhenEntry(
+      double doseQuantity,
+      BmpDosiereinheit code,
+      List<Timing.EventTiming> eventTimingList,
+      double boundDuration,
+      UnitsOfTimeDE boundsUnit,
+      int period,
+      Timing.UnitsOfTime periodUnit) {
+    return dosageWhenEntry(
+        doseQuantity, code, eventTimingList, boundDuration, boundsUnit, period, periodUnit, null);
+  }
+
+  public static DosageDgMP dosageWhenEntry(
+      double doseQuantity,
+      BmpDosiereinheit code,
+      List<Timing.EventTiming> eventTimingList,
+      double boundDuration,
+      UnitsOfTimeDE boundsUnit,
+      int period,
+      Timing.UnitsOfTime periodUnit,
+      List<Timing.DayOfWeek> dayOfWeek) {
+    return dosageBuilder(doseQuantity, code)
+        .timing(
+            TimingBuilder.forRepeatComp()
+                .boundsDuration(boundDuration, boundsUnit)
+                .when(eventTimingList)
+                .period(period, periodUnit)
+                .frequency(eventTimingList.size() * (dayOfWeek != null ? dayOfWeek.size() : 1))
+                .dayOfWeek(dayOfWeek)
+                .build())
+        .build();
+  }
+
+  public static DosageDgMP dosageDayOfWeekEntry(
+      double quantityValue,
+      BmpDosiereinheit code,
+      List<Timing.DayOfWeek> listDaysOfWeek,
+      double boundDuration,
+      UnitsOfTimeDE boundsUnit,
+      int period,
+      Timing.UnitsOfTime periodUnit) {
+    return dosageBuilder(quantityValue, code)
+        .timing(
+            TimingBuilder.forRepeatComp()
+                .boundsDuration(boundDuration, boundsUnit)
+                .dayOfWeek(listDaysOfWeek)
+                .period(period, periodUnit)
+                .frequency(listDaysOfWeek.size())
+                .build())
+        .build();
   }
 
   /**

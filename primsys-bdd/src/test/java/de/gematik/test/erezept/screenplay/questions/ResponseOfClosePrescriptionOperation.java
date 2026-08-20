@@ -22,7 +22,7 @@ package de.gematik.test.erezept.screenplay.questions;
 
 import static de.gematik.test.erezept.fhir.r4.erp.GemErpMedication.getKombipackungFrom;
 import static de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication.isKPG;
-import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getUpdatedInJulyPlusKPG;
+import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getSpecialEntries;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.PZN;
@@ -218,7 +218,7 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
     val darreichungsCode =
         medMap.getOrDefault(
             "Darreichungsform",
-            GemFaker.fakerValueSet(Darreichungsform.class, getUpdatedInJulyPlusKPG()).getCode());
+            GemFaker.fakerValueSet(Darreichungsform.class, getSpecialEntries()).getCode());
     val sizeCode = medMap.getOrDefault("Normgröße", StandardSize.random().getCode());
 
     val medication =
@@ -275,8 +275,7 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
             val darreichungsCode =
                 medMap.getOrDefault(
                     "Darreichungsform",
-                    GemFaker.fakerValueSet(Darreichungsform.class, getUpdatedInJulyPlusKPG())
-                        .getCode());
+                    GemFaker.fakerValueSet(Darreichungsform.class, getSpecialEntries()).getCode());
             val sizeCode = medMap.getOrDefault("Normgröße", StandardSize.random().getCode());
 
             val gemErpMedication =
@@ -319,7 +318,6 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
 
     val timing =
         TimingBuilder.forRepeatComp()
-            .periodUnit(medMap.get("periodUnit"))
             .timeOfDay(medMap.get("timeOfDay"))
             .dayOfWeek(dayOfWeek)
             .when(when);
@@ -328,7 +326,7 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
       timing.frequency(Integer.parseInt(frequency));
     }
     if (period != null) {
-      timing.period(Integer.parseInt(period));
+      timing.period(Integer.parseInt(period), medMap.get("periodUnit"));
     }
 
     Optional.ofNullable(dosageText).ifPresent(medicationDisp::dosageInstruction);

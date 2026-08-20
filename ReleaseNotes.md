@@ -1,5 +1,29 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 1.7.0
+
+* erp-bdd-common
+    - ProvidePatientBaseData has been updated to to build communicationV3 payloads
+        - Available by calling patient.communicationFakerV3ForOrder ()
+    - PharmacyActor got some useful CommunicationPayloadV3 Faker Methods
+
+* erp-client:
+    - extend erpclient to generate erp requests with invalid idptoken
+
+* erp-fd-product-test:
+    - implement negativ testcase with invalid idptoken
+    - extend patch operation testcases for afo A_28910
+    - implement negative testcases for eu close endpoint to test the dispensation informations (prescription id and
+      kvnr)
+
+* erp-fhir:
+    - add kbv.ita.erp 1.4.4 (and dependencies)
+    - add communication-payload faker to PatientActor und PharmacyActor for easy communicationV3 building
+
+* CICD:
+    - Umbau der InternalRelease.Jenkinsfile (-pipeline), diese sollte jetzt mit einem Befehl alle releases durchführen,
+      die gebraucht werden.
+
 ## Release 1.6.0
 
 * primsys-bbd:
@@ -20,9 +44,10 @@
     - implement toggle to switch Darreichungsform https://applications.kbv.de/S_KBV_DARREICHUNGSFORM_V1.16.xhtml active
       form 01.07.26
     - implement testcases for Communication v3 payload
-    - implement negativ testcases ( role authorisation ) for chargeitem 
+    - implement negativ testcases (role authorisation ) for chargeitem
     - implement ability and question for popp-token testcases
-    - - implement negativ testcases ( role authorisation ) for auditevent 
+    - implement negativ testcases (role authorisation ) for auditevent
+    - implement testcases for GET /Subscription
 * erp-client:
     - extract konnektor functionality and move to Bricks, now imported as dependency
 
@@ -45,11 +70,10 @@
 * erp-fhir:
     - implement TimingRepeatBuilder and Adapt DosageDgmpBuilder to handle TimingRepeat with several Values and
       boundsDuration
-    - move DosageDgmp to Epa-FHIR and Implement equals() to compare Values contained in DosageAndRate an
+    - move DosageDgmp to Epa-FHIR and Implement equals () to compare Values contained in DosageAndRate an
       TimimngComponent
     - move DosageDgmpBuilder to Epa-FHIR and adapt it to handle DosageAndRate and TimingComponent with several values
-      and
-      boundsDuration
+      and boundsDuration
     - move TimingRepeatBuilder to Epa-FHIR and adapt it to handle TimingRepeat with several Values and boundsDuration
 
 
@@ -179,9 +203,8 @@ Module:
 * erp-fd-product-test:
     - Adapted the TestSzenario to validate the availability of PUE and LYE
     - Add toggle to activate Validation for PUE and LYE
-    - GemErpMedicationBuilder got a "from()" Method to map KbvMedications to GemErpMedication in types of: ingredient,
-      compounding,
-      freetext and PZN. you´ll need it to transfer Medications from Version 1.3 and below up to 1.4.x
+    - GemErpMedicationBuilder got a "from ()" Method to map KbvMedications to GemErpMedication in types of: ingredient,
+      compounding, freetext and PZN. you´ll need it to transfer Medications from Version 1.3 and below up to 1.4.x
 
 * erp-fhir:
     - Extension of the key table "Darreichungsform" to include "PUE - Pulver zum Einnehmen" and "LYE - Lyophilisat zum
@@ -200,10 +223,10 @@ Module:
     - add Verifier for Eml-MedicationDispense
     - EpaFhir Version 1.0.3
 * erp-fd-product-test:
-    - new Testcase for epa-op-provide-prescription-erp-input-parameters with
-      6 validators for epa-op-provide-prescription-erp-input-parameters
-    - new Testcase for epa-op-provide-dispensation-erp-input-parameters with
-      5 validators for epa-op-provide-prescription-erp-input-parameters
+    - new Testcase for epa-op-provide-prescription-erp-input-parameters with 6 validators for
+      epa-op-provide-prescription-erp-input-parameters
+    - new Testcase for epa-op-provide-dispensation-erp-input-parameters with 5 validators for
+      epa-op-provide-prescription-erp-input-parameters
     - Add two verifiers for epa-op-cancel-prescription-erp-input-parameters
     - Add two verifiers for epa-op-cancel-dispensation-erp-input-parameters
     - new Testcases for epa-op-cancel-prescription-erp-input-parameters
@@ -285,8 +308,7 @@ Implemented Features:
 - Add Manipulators in KbvBundleManipulatorFactory.class for MedicationCategory, MedicationType, StandardSize and
   Darreichungsform
 - Add actions for RejectConsent, ReadConsent, DeposeConsent, extends their Builder classes and Constructors, add
-  Verifier
-  for Consent
+  Verifier for Consent
 - CR0071: Extension of the key table "Darreichungsform" to include "Lyophilizate for the preparation of a solution for
   infusion"
 - Add action "GetMessage" (as Communications)
@@ -329,32 +351,29 @@ Implemented Features:
 
 Implemented features:
 
-- Fhir Profile Support for KBV, DAV, GKV, PKV and gematik for the generation of test data and
-  validation of fhir resources from July 1, 2023
+- Fhir Profile Support for KBV, DAV, GKV, PKV and gematik for the generation of test data and validation of fhir
+  resources from July 1, 2023
     - An overview of the Fhir profile versions can be found
       at https://github.com/gematik/api-erp/blob/master/docs/erp_fhirversion.adoc#%C3%BCbersicht-timeline
 - Refactoring of the smartcard module
-- Expansion of test cases of the test preparation for the admission tests for the e-prescription
-  service
-  for version 1.9.0
+- Expansion of test cases of the test preparation for the admission tests for the e-prescription service for version
+  1.9.0
 
 ## Release 0.2.0
 
 Implemented features:
 
-- Additional test cases (E2E and product tests) for the feature "Egk in the pharmacy" are
-  implemented
+- Additional test cases (E2E and product tests) for the feature "Egk in the pharmacy" are implemented
 - Support different versions of fhir profiles for validation and generation of fhir resources
 - Migration to Java 17
 
 ## Release 0.1.3
 
-This is the initial release of the erp e2e testsuite and their modules.
-For usage instructions and further information please look at [README.md](README.md)
+This is the initial release of the erp e2e testsuite and their modules. For usage instructions and further information
+please look at [README.md](README.md)
 
 Implemented features:
 
 - Test scenarios for the e-prescription Worfklow 160 are specified and implemented
 - Test scenarios for the e-prescription Worfklow 169 are specified and implemented
-- Test scenarios for the e-prescription Worfklow 200 are specified and
-  implemented (Expansion Stage 1)
+- Test scenarios for the e-prescription Worfklow 200 are specified and implemented (Expansion Stage 1)

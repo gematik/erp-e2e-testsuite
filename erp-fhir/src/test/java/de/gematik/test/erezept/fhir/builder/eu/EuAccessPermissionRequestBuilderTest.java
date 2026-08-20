@@ -21,14 +21,13 @@
 package de.gematik.test.erezept.fhir.builder.eu;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.r4.eu.EuAccessPermission;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import java.time.Instant;
 import java.util.Optional;
 import lombok.val;
@@ -44,7 +43,7 @@ class EuAccessPermissionRequestBuilderTest extends ErpFhirParsingTest {
     val testCods = EuAccessCode.random();
     val euAP =
         EuAccessPermissionRequestBuilder.euAccessCode(testCods)
-            .countryCode(IsoCountryCode.DE)
+            .countryCode(IsoCountryCodeNCPeH.DE)
             .build();
 
     assertEquals(testCods, euAP.getAccessCode());
@@ -58,7 +57,7 @@ class EuAccessPermissionRequestBuilderTest extends ErpFhirParsingTest {
     val testCods = EuAccessCode.random();
     val euAP =
         EuAccessPermissionRequestBuilder.euAccessCode(testCods)
-            .countryCode(IsoCountryCode.DE)
+            .countryCode(IsoCountryCodeNCPeH.DE)
             .build();
     euAP.getParameter().get(0).setName("wrongname");
     euAP.getParameter().get(1).setName("wrongname");
@@ -69,7 +68,7 @@ class EuAccessPermissionRequestBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldGetAccessCode() {
-    val tescode = IsoCountryCode.NL;
+    val tescode = IsoCountryCodeNCPeH.NL;
     val euAP =
         EuAccessPermissionRequestBuilder.euAccessCode(EuAccessCode.random())
             .countryCode(tescode)
@@ -93,7 +92,7 @@ class EuAccessPermissionRequestBuilderTest extends ErpFhirParsingTest {
   void shouldBuildCorrect() {
     val euAP =
         EuAccessPermissionRequestBuilder.euAccessCode(EuAccessCode.random())
-            .countryCode(IsoCountryCode.DE)
+            .countryCode(IsoCountryCodeNCPeH.DE)
             .build();
 
     assertNotNull(euAP);
@@ -105,7 +104,7 @@ class EuAccessPermissionRequestBuilderTest extends ErpFhirParsingTest {
   void shouldBuildWithoutAccessCode() {
     val euAP =
         EuAccessPermissionRequestBuilder.withRandomAccessCode()
-            .countryCode(IsoCountryCode.DE)
+            .countryCode(IsoCountryCodeNCPeH.DE)
             .build();
 
     assertNotNull(euAP);
@@ -117,7 +116,7 @@ class EuAccessPermissionRequestBuilderTest extends ErpFhirParsingTest {
   void shouldBuildWithInvalidAccessCode() {
     val euAP =
         EuAccessPermissionRequestBuilder.withUncheckedAccessCode(EuAccessCode.from("123"))
-            .countryCode(IsoCountryCode.DE)
+            .countryCode(IsoCountryCodeNCPeH.DE)
             .build();
 
     assertNotNull(euAP);
@@ -163,7 +162,7 @@ class EuAccessPermissionRequestBuilderTest extends ErpFhirParsingTest {
   private static EuAccessPermission getEuAccessPermissionResponse(Instant until, Instant created) {
     val euAP =
         EuAccessPermissionRequestBuilder.euAccessCode(EuAccessCode.random())
-            .countryCode(IsoCountryCode.DE)
+            .countryCode(IsoCountryCodeNCPeH.DE)
             .build();
 
     euAP.getMeta()

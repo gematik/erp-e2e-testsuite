@@ -20,10 +20,13 @@
 
 package de.gematik.test.erezept.app.steps;
 
+import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_CONFIG;
+import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
 import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
+import de.gematik.bbriccs.fhir.conf.ProfilesConfigurator;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.PrimSysBddFactory;
 import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
@@ -65,7 +68,10 @@ public class AppInitializationSteps {
   private Actor testReporter;
 
   @BeforeAll
+  @SuppressWarnings("unused")
   public static void init() {
+    val profilesConfiguration =
+        ProfilesConfigurator.getConfiguration(ERP_FHIR_PROFILES_CONFIG, ERP_FHIR_PROFILES_TOGGLE);
     smartcards = SmartcardArchive.fromResources();
     config = ConfigurationReader.forAppConfiguration().wrappedBy(ErpAppConfiguration::fromDto);
     primsysConfig =

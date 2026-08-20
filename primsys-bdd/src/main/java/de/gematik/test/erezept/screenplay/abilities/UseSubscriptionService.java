@@ -30,9 +30,9 @@ import net.serenitybdd.screenplay.Ability;
 @Slf4j
 public class UseSubscriptionService implements Ability {
 
-  @Setter @Getter private String authorization;
+  @Getter @Setter private String authorization;
 
-  @Setter @Getter private String subscriptionId;
+  @Getter @Setter private String subscriptionId;
 
   @Getter private WebSocketClient websocket;
 

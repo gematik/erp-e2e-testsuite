@@ -32,7 +32,7 @@ import de.gematik.bbriccs.rest.fd.FhirClient;
 import de.gematik.bbriccs.rest.fd.MediaType;
 import de.gematik.bbriccs.rest.headers.HttpHeader;
 import de.gematik.bbriccs.smartcards.Smartcard;
-import de.gematik.idp.client.IdpClient;
+import de.gematik.idp.client.IIdpClient;
 import de.gematik.idp.client.IdpClientRuntimeException;
 import de.gematik.idp.client.IdpTokenResult;
 import de.gematik.idp.crypto.model.PkiIdentity;
@@ -69,7 +69,7 @@ public class ErpClient implements FhirClient {
   private final boolean validateRequest;
 
   // client capabilities
-  private final IdpClient idpClient;
+  private final IIdpClient idpClient;
   private final FhirCodec fhir;
   private final FhirBResponseCreator responseFactory;
   private final HttpBClient vauClient;

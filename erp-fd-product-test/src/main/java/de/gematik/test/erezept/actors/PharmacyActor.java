@@ -20,9 +20,19 @@
 
 package de.gematik.test.erezept.actors;
 
+import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
+
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.extensions.erp.CommunicationPayloadType;
+import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
+import de.gematik.test.erezept.fhir.valuesets.DeliveryStatus;
+import de.gematik.test.erezept.fhir.valuesets.ReadyForCollecting;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -43,5 +53,82 @@ public class PharmacyActor extends ErpActor {
   public TelematikID getTelematikId() {
     val useSmcb = SafeAbility.getAbility(this, UseSMCB.class);
     return TelematikID.from(useSmcb.getTelematikID());
+  }
+
+  public CommunicationReplyMessage.CommunicationReplyMessageV3Builder communicationReplayFakerText(
+      String text) {
+    val builder = new CommunicationReplyMessage.CommunicationReplyMessageV3Builder();
+    builder.text(
+        Objects.requireNonNullElseGet(text, () -> GemFaker.getFaker().chuckNorris().fact()));
+    builder.communicationType(CommunicationPayloadType.TEXT);
+    return builder;
+  }
+
+  public CommunicationReplyMessage.CommunicationReplyMessageV3Builder communicationReplayFakerLink(
+      String text, String link) {
+    val builder = new CommunicationReplyMessage.CommunicationReplyMessageV3Builder();
+    builder.text(
+        Objects.requireNonNullElseGet(text, () -> GemFaker.getFaker().chuckNorris().fact()));
+    builder.communicationType(CommunicationPayloadType.LINK);
+    builder.url(link);
+
+    return builder;
+  }
+
+  public CommunicationReplyMessage.CommunicationReplyMessageV3Builder
+      communicationReplayFakerPickupCodeHR(int pickUpCode, String text) {
+    val builder = new CommunicationReplyMessage.CommunicationReplyMessageV3Builder();
+    builder.text(
+        Objects.requireNonNullElseGet(text, () -> GemFaker.getFaker().chuckNorris().fact()));
+    builder.communicationType(CommunicationPayloadType.PICKUP_CODE_HR);
+    builder.pickupCodeHR(String.valueOf(pickUpCode));
+    return builder;
+  }
+
+  public CommunicationReplyMessage.CommunicationReplyMessageV3Builder
+      communicationReplayFakerPickupCodeDMC(int pickUpCodeDMC, String text) {
+    val builder = new CommunicationReplyMessage.CommunicationReplyMessageV3Builder();
+    builder.text(
+        Objects.requireNonNullElseGet(text, () -> GemFaker.getFaker().chuckNorris().fact()));
+    builder.communicationType(CommunicationPayloadType.PICKUP_CODE_DMC);
+    builder.pickupCodeDMC(String.valueOf(pickUpCodeDMC));
+    return builder;
+  }
+
+  public CommunicationReplyMessage.CommunicationReplyMessageV3Builder
+      communicationReplayFakerDeliveryStatus(String text, DeliveryStatus deliveryStatus) {
+    val builder = new CommunicationReplyMessage.CommunicationReplyMessageV3Builder();
+    builder.text(
+        Objects.requireNonNullElseGet(text, () -> GemFaker.getFaker().chuckNorris().fact()));
+    builder.communicationType(CommunicationPayloadType.DELIVERY_STATUS);
+    builder.deliveryStatus(
+        deliveryStatus != null
+            ? deliveryStatus.getCode()
+            : randomElement(DeliveryStatus.values()).getCode());
+    return builder;
+  }
+
+  public CommunicationReplyMessage.CommunicationReplyMessageV3Builder
+      communicationReplayFakerPaymentInfo(
+          @Nullable String text,
+          int totalAmount,
+          @Nullable List<CommunicationReplyMessage.PaymentMethod> paymentMethod) {
+    val builder = new CommunicationReplyMessage.CommunicationReplyMessageV3Builder();
+    builder.text(
+        Objects.requireNonNullElseGet(text, () -> GemFaker.getFaker().chuckNorris().fact()));
+    builder.communicationType(CommunicationPayloadType.PAYMENT_INFO);
+    builder.totalAmount(totalAmount);
+
+    builder.paymentMethods(paymentMethod);
+    return builder;
+  }
+
+  public CommunicationReplyMessage.CommunicationReplyMessageV3Builder
+      communicationReplayFakerReservationStatus(ReadyForCollecting whenIsAvailable) {
+    val builder = new CommunicationReplyMessage.CommunicationReplyMessageV3Builder();
+    builder.communicationType(CommunicationPayloadType.RESERVATION_STATUS);
+    builder.text(null);
+    builder.readyForCollecting(whenIsAvailable.getCode());
+    return builder;
   }
 }

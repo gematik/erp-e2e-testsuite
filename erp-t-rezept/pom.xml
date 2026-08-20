@@ -6,11 +6,12 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>erezept-testsuite</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
     </parent>
 
     <artifactId>erp-t-rezept</artifactId>
-
+    <name>T-Rezept Mock</name>
+    <description>T-Rezept Mock</description>
 
     <dependencies>
         <dependency>

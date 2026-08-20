@@ -29,7 +29,7 @@ import de.gematik.test.erezept.fhir.r4.eu.*;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import de.gematik.test.erezept.fhir.valuesets.eu.EuRequestType;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
@@ -54,7 +54,7 @@ class EuCloseOperationManipulatorFactoryTest extends ErpFhirParsingTest {
         EuGetPrescriptionInputBuilder.forRequestType(EuRequestType.DEMOGRAPHICS)
             .kvnr(kvnr)
             .accessCode(EuAccessCode.random())
-            .countryCode(IsoCountryCode.AT)
+            .countryCode(IsoCountryCodeNCPeH.AT)
             .practitionerName("Practitioners Name")
             .practitionerRole(EuOrganizationProfession.getDefaultPharmacist())
             .pointOfCare("carePoint")
@@ -135,6 +135,98 @@ class EuCloseOperationManipulatorFactoryTest extends ErpFhirParsingTest {
   void shouldUseAllManipulators() {
     val manipulators = EuCloseOperationManipulatorFactory.getAllEuCloseOperationManipulators();
     assertEquals(34, manipulators.size(), "There should be 34 different manipulators");
+  }
+
+  @Test
+  void shouldProvideFourMedicationDispenseConsistencyManipulators() {
+    val manipulators =
+        EuCloseOperationManipulatorFactory.getMedicationDispenseConsistencyManipulator();
+
+    assertEquals(4, manipulators.size(), "There should be 4 different manipulators");
+  }
+
+  @Test
+  void shouldSetRandomPrescriptionId() {
+    var closeOperationInput = getCloseBuilder().build();
+    val originalPrescriptionId =
+        dispensationOf(closeOperationInput).getIdentifierFirstRep().getValue();
+
+    val manipulators =
+        EuCloseOperationManipulatorFactory.getMedicationDispenseConsistencyManipulator();
+
+    applyMutators(List.of(manipulators.get(0)), closeOperationInput);
+
+    val res = ValidatorUtil.encodeAndValidate(parser, closeOperationInput);
+    assertTrue(res.isSuccessful(), "manipulated PrescriptionId should still be schema-valid");
+
+    val manipulatedPrescriptionId =
+        dispensationOf(closeOperationInput).getIdentifierFirstRep().getValue();
+    assertNotEquals(
+        originalPrescriptionId,
+        manipulatedPrescriptionId,
+        "PrescriptionId in MedicationDispense.identifier should differ from the original");
+  }
+
+  @Test
+  void shouldSetInvalidHelloWorldValueForPrescriptionId() {
+    var closeOperationInput = getCloseBuilder().build();
+
+    val manipulators =
+        EuCloseOperationManipulatorFactory.getMedicationDispenseConsistencyManipulator();
+
+    applyMutators(List.of(manipulators.get(1)), closeOperationInput);
+
+    val manipulatedPrescriptionId =
+        dispensationOf(closeOperationInput).getIdentifierFirstRep().getValue();
+    assertEquals(
+        "HelloWorld",
+        manipulatedPrescriptionId,
+        "MedicationDispense.identifier should be set to the invalid literal value");
+  }
+
+  @Test
+  void shouldSetRandomForeignKvnr() {
+    var closeOperationInput = getCloseBuilder().build();
+    val originalKvnr = dispensationOf(closeOperationInput).getSubject().getIdentifier().getValue();
+
+    val manipulators =
+        EuCloseOperationManipulatorFactory.getMedicationDispenseConsistencyManipulator();
+
+    applyMutators(List.of(manipulators.get(2)), closeOperationInput);
+
+    val res = ValidatorUtil.encodeAndValidate(parser, closeOperationInput);
+    assertTrue(res.isSuccessful(), "manipulated KVNR should still be schema-valid");
+
+    val manipulatedKvnr =
+        dispensationOf(closeOperationInput).getSubject().getIdentifier().getValue();
+    assertNotEquals(
+        originalKvnr,
+        manipulatedKvnr,
+        "KVNR in MedicationDispense.subject:identifier should differ from the original");
+  }
+
+  @Test
+  void shouldSetInvalidHelloWorldValueForKvnr() {
+    var closeOperationInput = getCloseBuilder().build();
+
+    val manipulators =
+        EuCloseOperationManipulatorFactory.getMedicationDispenseConsistencyManipulator();
+
+    applyMutators(List.of(manipulators.get(3)), closeOperationInput);
+
+    val manipulatedKvnr =
+        dispensationOf(closeOperationInput).getSubject().getIdentifier().getValue();
+    assertEquals(
+        "HelloWorld",
+        manipulatedKvnr,
+        "MedicationDispense.subject:identifier should be set to the invalid literal value");
+  }
+
+  private EuMedicationDispense dispensationOf(EuCloseOperationInput eCOI) {
+    return eCOI.getFirstRxDispension().stream()
+        .map(p -> (EuMedicationDispense) p.getPartFirstRep().getResource())
+        .findFirst()
+        .orElseThrow();
   }
 
   void applyMutators(

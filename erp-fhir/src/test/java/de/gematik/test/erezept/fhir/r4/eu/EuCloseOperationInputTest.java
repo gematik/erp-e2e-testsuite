@@ -27,7 +27,7 @@ import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.fhir.builder.eu.*;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import de.gematik.test.erezept.fhir.valuesets.eu.EuRequestType;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
@@ -61,7 +61,7 @@ class EuCloseOperationInputTest extends ErpFhirParsingTest {
         EuGetPrescriptionInputBuilder.forRequestType(EuRequestType.DEMOGRAPHICS)
             .kvnr(kvnr)
             .accessCode(EuAccessCode.random())
-            .countryCode(IsoCountryCode.AT)
+            .countryCode(IsoCountryCodeNCPeH.AT)
             .practitionerName("Practitioners Name")
             .practitionerRole(EuOrganizationProfession.getDefaultPharmacist())
             .pointOfCare("carePoint")

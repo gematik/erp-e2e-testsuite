@@ -20,14 +20,15 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.coding.version.VersionUtil;
 import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.EuVersion;
 import de.gematik.test.erezept.fhir.r4.eu.EuAccessPermission;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -54,7 +55,7 @@ class ErxEuAccessPermissionVerifierTest {
     return perm;
   }
 
-  private EuAccessPermission withCountry(IsoCountryCode country) {
+  private EuAccessPermission withCountry(IsoCountryCodeNCPeH country) {
     val perm = newPermission();
     perm.addParameter().setName("countryCode").setValue(country.asCoding());
     return perm;
@@ -100,15 +101,15 @@ class ErxEuAccessPermissionVerifierTest {
 
   @Test
   void shouldVerifyIsoCountryCorrectly() {
-    val permission = withCountry(IsoCountryCode.LI);
-    val step = ErxEuAccessPermissionVerifier.hasIsoCountry(IsoCountryCode.LI);
+    val permission = withCountry(IsoCountryCodeNCPeH.LI);
+    val step = ErxEuAccessPermissionVerifier.hasIsoCountry(IsoCountryCodeNCPeH.LI);
     assertTrue(step.getPredicate().test(permission));
   }
 
   @Test
   void shouldFailDifferentIsoCountry() {
-    val permission = withCountry(IsoCountryCode.DE);
-    val step = ErxEuAccessPermissionVerifier.hasIsoCountry(IsoCountryCode.LI);
+    val permission = withCountry(IsoCountryCodeNCPeH.DE);
+    val step = ErxEuAccessPermissionVerifier.hasIsoCountry(IsoCountryCodeNCPeH.LI);
     assertFalse(step.getPredicate().test(permission));
   }
 

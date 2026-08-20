@@ -7,11 +7,13 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
     </parent>
 
     <artifactId>erp-fd-product-test</artifactId>
+
     <name>E-Rezept Produkt-Testsuite</name>
+    <description>System Testsuite for the E-Prescription Service (E-Rezept-FD)</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -102,7 +104,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-t-rezept</artifactId>
-            <version>1.6.0</version>
+            <version>1.7.1</version>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>

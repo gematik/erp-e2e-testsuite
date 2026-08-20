@@ -7,7 +7,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
     </parent>
 
     <artifactId>erp-tools</artifactId>
@@ -19,8 +19,7 @@
     </modules>
     <packaging>pom</packaging>
 
-
-    <dependencyManagement>
+<dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -84,8 +83,7 @@
         </dependencies>
     </dependencyManagement>
 
-
-    <dependencies>
+<dependencies>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>

@@ -90,6 +90,20 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     return PoppTokenGenerator.from(cfg);
   }
 
+  private UseTheErpClient useTheErpClientWithInvalidIdpToken(PatientConfiguration config) {
+
+    return UseTheErpClient.with(
+        ErpClientFactory.createErpClientWithInvalidIdpToken(getActiveEnvironment(), config),
+        stopwatch);
+  }
+
+  public <A extends Actor> void equipAsPatientWithInvalidIdpToken(A actor) {
+    this.equipAsPatient(actor);
+    val cfg = this.getPatientConfig(actor.getName());
+    val egk = actor.abilityTo(ProvideEGK.class).getEgk();
+    actor.can(useTheErpClientWithInvalidIdpToken(cfg).authenticatingWith(egk));
+  }
+
   public <A extends Actor> void equipAsDoctor(A actor) {
     val name = actor.getName();
     log.info("Equip Doctor {}", name);
@@ -222,11 +236,11 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
     givenThat(actor)
         .describedAs("Ein/e 'E-Rezept-ready' Versicherte/r der E-Rezepte erhalten kann")
-        .whoCan(ProvidePatientBaseData.forGkvPatient(KVNR.from(egk.getKvnr()), name))
+        .whoCan(useTheErpClientFrom(cfg).authenticatingWith(egk))
+        .can(ProvidePatientBaseData.forGkvPatient(KVNR.from(egk.getKvnr()), name))
         .can(ProvideEGK.sheOwns(egk))
         .can(ManageDataMatrixCodes.heGetsPrescribed())
-        .can(ManageCommunications.heExchanges())
-        .can(useTheErpClientFrom(cfg).authenticatingWith(egk));
+        .can(ManageCommunications.heExchanges());
   }
 
   public <A extends Actor> void equipWithRawHttp(A actor) {

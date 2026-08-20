@@ -340,7 +340,12 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
   void shouldSetIncorrectDosageDgmpAsList() {
     val incorrectDosage =
         DosageDgMPBuilder.dosageBuilder(5, BmpDosiereinheit.AUGENBADEWANNE)
-            .timing(TimingBuilder.forRepeatComp().period(3).frequency(2).timeOfDay("08:00").build())
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .period(3, Timing.UnitsOfTime.D)
+                    .frequency(2)
+                    .timeOfDay("08:00")
+                    .build())
             .text("this Text is to much following anm KBV constrained")
             .build();
 
@@ -409,9 +414,8 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.AUGENBADEWANNE)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
+                    .period(3, Timing.UnitsOfTime.D)
                     .frequency(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .timeOfDay("08:00:00")
                     .timeOfDay("12:00:00")
                     .timeOfDay("18:00:00")
@@ -422,9 +426,8 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.AUGENBADEWANNE)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(3)
+                    .period(3, Timing.UnitsOfTime.D)
                     .frequency(3)
-                    .periodUnit(Timing.UnitsOfTime.D)
                     .timeOfDay("12:00:00")
                     .timeOfDay("18:00:00")
                     .timeOfDay("08:00:00")
@@ -467,9 +470,8 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.AUGENBADEWANNE)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(1)
+                    .period(1, Timing.UnitsOfTime.WK)
                     .frequency(6)
-                    .periodUnit(Timing.UnitsOfTime.WK)
                     .dayOfWeek(Timing.DayOfWeek.MON)
                     .dayOfWeek(Timing.DayOfWeek.WED)
                     .dayOfWeek(Timing.DayOfWeek.FRI)
@@ -482,9 +484,8 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
         DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.AUGENBADEWANNE)
             .timing(
                 TimingBuilder.forRepeatComp()
-                    .period(1)
+                    .period(1, Timing.UnitsOfTime.WK)
                     .frequency(6)
-                    .periodUnit(Timing.UnitsOfTime.WK)
                     .dayOfWeek(Timing.DayOfWeek.FRI)
                     .dayOfWeek(Timing.DayOfWeek.WED)
                     .dayOfWeek(Timing.DayOfWeek.MON)
@@ -526,9 +527,8 @@ class KbvErpMedicationRequestBuilderTest extends ErpFhirParsingTest {
       DosageDgMPBuilder.dosageBuilder(1, BmpDosiereinheit.AUGENBADEWANNE)
           .timing(
               TimingBuilder.forRepeatComp()
-                  .period(3)
+                  .period(3, Timing.UnitsOfTime.D)
                   .frequency(1)
-                  .periodUnit(Timing.UnitsOfTime.D)
                   .timeOfDay("08:00:00")
                   .build())
           .build();

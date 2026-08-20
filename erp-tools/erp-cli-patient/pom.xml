@@ -5,20 +5,20 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>erp-tools</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
     </parent>
 
-  <artifactId>erp-cli-patient</artifactId>
-  <name>E-Rezept CLI Patient</name>
-  <description>CLI Tool for Patient (FdV) operations</description>
+    <artifactId>erp-cli-patient</artifactId>
+    <name>E-Rezept CLI Patient</name>
+    <description>CLI Tool for Patient (FdV) operations</description>
 
-  <properties>
-    <maven.compiler.source>${version.java}</maven.compiler.source>
-    <maven.compiler.target>${version.java}</maven.compiler.target>
-    <maven.compiler.release>${version.java}</maven.compiler.release>
+    <properties>
+        <maven.compiler.source>${version.java}</maven.compiler.source>
+        <maven.compiler.target>${version.java}</maven.compiler.target>
+        <maven.compiler.release>${version.java}</maven.compiler.release>
 
-    <main.class>de.gematik.test.erezept.cli.Main</main.class>
-  </properties>
+        <main.class>de.gematik.test.erezept.cli.Main</main.class>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -35,9 +35,9 @@
         </dependency>
         <!-- this dependency is required until Bricks moved to the new jackson groupId (version 3.x.x) -->
         <dependency>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-core</artifactId>
-          <version>2.22.0</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.22.0</version>
         </dependency>
         <!-- NOTE:
         if this dependency is not included, the execution from IntelliJ fails with a ClassNotFoundException
@@ -187,36 +187,34 @@
             </testResource>
         </testResources>
 
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
-        <inherited>true</inherited>
-        <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
-          <release>${maven.compiler.release}</release>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.3.0</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>${main.class}</mainClass>
-              <addDefaultImplementationEntries>
-                true
-              </addDefaultImplementationEntries>
-            </manifest>
-          </archive>
-          <excludes>
-            <exclude>**/*.ppcs</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <inherited>true</inherited>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <release>${maven.compiler.release}</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${main.class}</mainClass>
+                            <addDefaultImplementationEntries>
+                                true
+                            </addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                    <excludes>
+                        <exclude>**/*.ppcs</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

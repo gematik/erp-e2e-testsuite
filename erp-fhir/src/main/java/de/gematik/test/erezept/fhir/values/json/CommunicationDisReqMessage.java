@@ -20,8 +20,11 @@
 
 package de.gematik.test.erezept.fhir.values.json;
 
+import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
+import de.gematik.test.erezept.fhir.extensions.erp.CommunicationPayloadType;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import java.util.List;
 import java.util.UUID;
@@ -63,8 +66,7 @@ public record CommunicationDisReqMessage(
 
     private int version = 1;
 
-    private String supplyOptionsType =
-        GemFaker.randomElement(SupplyOptionsType.values()).getLabel();
+    private String supplyOptionsType = randomElement(SupplyOptionsType.values()).getLabel();
 
     private String name = GemFaker.fakerFirstName() + " " + GemFaker.fakerLastName();
     private List<String> addressLines;
@@ -157,24 +159,22 @@ public record CommunicationDisReqMessage(
 
   public static class CommunicationDisReqMessageV3Builder {
 
-    private String communicationType = "order";
-    private String supplyOptionsType =
-        GemFaker.randomElement(SupplyOptionsType.values()).getLabel();
+    private String communicationType;
+    private String supplyOptionsType;
 
     private UUID transactionID = UUID.randomUUID();
 
-    private String firstname = GemFaker.fakerFirstName();
-    private String lastname = GemFaker.fakerLastName();
+    private String firstname;
+    private String lastname;
+    private String address;
+    private String postcode;
+    private String city;
+    private String country;
 
-    private String address = GemFaker.fakerStreetName();
-    private String postcode = GemFaker.fakerZipCode();
-    private String city = GemFaker.fakerCity();
-    private String country = GemFaker.fakerCountry().getCode();
-
-    private String phone = GemFaker.fakerPhone();
-    private String email = GemFaker.fakerEMail();
-    private String text = GemFaker.fakerCommunicationReplyMessage();
-    private String hint = GemFaker.getFaker().lorem().sentence();
+    private String phone;
+    private String email;
+    private String text;
+    private String hint;
 
     private String url;
 
@@ -183,6 +183,12 @@ public record CommunicationDisReqMessage(
 
     public CommunicationDisReqMessageV3Builder communicationType(String communicationType) {
       this.communicationType = communicationType;
+      return this;
+    }
+
+    public CommunicationDisReqMessageV3Builder communicationType(
+        CommunicationPayloadType communicationPayloadType) {
+      this.communicationType = communicationPayloadType.getLabel();
       return this;
     }
 
@@ -227,8 +233,14 @@ public record CommunicationDisReqMessage(
       return this;
     }
 
-    public CommunicationDisReqMessageV3Builder country(String country) {
-      this.country = country;
+    /**
+     * Caused by Specification the CountryCode has to be a 2 or 3 digits Code!!
+     *
+     * @param countryCode IsoCountryCode
+     * @return CommunicationDisReqMessageV3Builder
+     */
+    public CommunicationDisReqMessageV3Builder country(String countryCode) {
+      this.country = countryCode;
       return this;
     }
 
@@ -268,6 +280,13 @@ public record CommunicationDisReqMessage(
     }
 
     public CommunicationDisReqMessage build() {
+      if (this.communicationType != null
+          && this.communicationType.equalsIgnoreCase("order")
+          && this.supplyOptionsType == null)
+        this.supplyOptionsType = randomElement(SupplyOptionsType.values()).getLabel();
+
+      if (this.communicationType == null || this.communicationType.equalsIgnoreCase("text"))
+        hint = null;
       return new CommunicationDisReqMessage(
           3,
           supplyOptionsType,

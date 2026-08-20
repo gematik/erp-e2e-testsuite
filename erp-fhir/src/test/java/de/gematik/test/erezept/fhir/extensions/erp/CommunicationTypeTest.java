@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.fhir.extensions.erp;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,11 +28,11 @@ class CommunicationTypeTest {
 
   @Test
   void shouldHaveCorrectLabels() {
-    assertEquals("text", CommunicationType.TEXT.getLabel());
-    assertEquals("link", CommunicationType.LINK.getLabel());
-    assertEquals("paymentInfo", CommunicationType.PAYMENT_INFO.getLabel());
-    assertEquals("deliveryStatus", CommunicationType.DELIVERY_STATUS.getLabel());
-    assertEquals("reservationStatus", CommunicationType.RESERVATION_STATUS.getLabel());
-    assertEquals("order", CommunicationType.ORDER.getLabel());
+    assertEquals("text", CommunicationPayloadType.TEXT.getLabel());
+    assertEquals("link", CommunicationPayloadType.LINK.getLabel());
+    assertEquals("paymentInfo", CommunicationPayloadType.PAYMENT_INFO.getLabel());
+    assertEquals("deliveryStatus", CommunicationPayloadType.DELIVERY_STATUS.getLabel());
+    assertEquals("reservationStatus", CommunicationPayloadType.RESERVATION_STATUS.getLabel());
+    assertEquals("order", CommunicationPayloadType.ORDER.getLabel());
   }
 }

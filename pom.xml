@@ -7,7 +7,7 @@
 
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erezept-testsuite</artifactId>
-    <version>1.6.0</version>
+    <version>1.7.1</version>
     <packaging>pom</packaging>
 
     <name>E-Rezept E2E Testsuite</name>
@@ -85,7 +85,7 @@
         <version.maven-javadoc-plugin>3.5.0</version.maven-javadoc-plugin>
         <version.maven-owasp-plugin>8.2.1</version.maven-owasp-plugin>
         <version.serenity>5.3.10</version.serenity>
-        <version.idp-client>28.0.2</version.idp-client>
+        <version.idp-client>30.1.0</version.idp-client>
         <version.spotless>2.41.1</version.spotless>
 
         <version.jackson.core>3.2.0</version.jackson.core>
@@ -125,6 +125,7 @@
             **/test/erezept/operator/jframe/*.java,
             **/test/erezept/app/questions/*.java,
             **/test/erezept/app/task/*.java,
+            **/test/erezept/app/task/ios/*.java,
             **/test/erezept/app/mobile/*.java,
             **/test/erezept/app/mobile/elements/*.java
         </sonar.exclusions>
@@ -158,87 +159,87 @@
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>smartcard</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-client</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir-fuzzing</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-mock-client</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-fhir</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-fhir</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-bdd-common</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-cli-common</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-data</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-client</artifactId>
-                <version>1.6.0</version>
+                <version>1.7.1</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.idp</groupId>
@@ -699,6 +700,21 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.15.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.5.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -746,6 +762,7 @@
                 <version>${version.maven-owasp-plugin}</version>
                 <configuration>
                     <!--                    <failBuildOnCVSS>8</failBuildOnCVSS>--> <!-- activate once we've fixed all bad dependencies -->
+
                     <skipProvidedScope>true</skipProvidedScope>
                     <skipRuntimeScope>true</skipRuntimeScope>
                     <skip>true</skip>
@@ -762,7 +779,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -809,6 +826,35 @@
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>${version.spotless}</version>
                 <configuration>
+                    <!--generischer ansatz-->
+                    <formats>
+                        <format>
+                            <includes>
+                                <include>**/pom.xml</include>
+                            </includes>
+                            <trimTrailingWhitespace/>
+                            <endWithNewline/>
+                            <indent>
+                                <spaces>true</spaces>
+                                <spacesPerTab>4</spacesPerTab>
+                            </indent>
+                            <replaceRegex>
+                                <name>Reduce multiple blank lines to one</name>
+                                <searchRegex>(\r?\n\s*){3,}</searchRegex>
+                                <replacement>${line.separator}${line.separator}</replacement>
+                            </replaceRegex>
+                        </format>
+                    </formats>
+
+                    <!-- extra pom formatter :
+                    <pom>
+                        <sortPom>
+                            <expandEmptyElements>false</expandEmptyElements>
+                            <keepBlankLines>true</keepBlankLines>
+                            <nrOfIndentSpace>4</nrOfIndentSpace>
+                            <endWithNewline>true</endWithNewline>
+                        </sortPom>
+                    </pom>-->
                     <java>
                         <!-- make sure every file has the following copyright header.
                           optionally, Spotless can set copyright years by digging
@@ -845,7 +891,23 @@
                             <file>COPYRIGHT_HEADER</file>
                         </licenseHeader>
                     </kotlin>
+
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.4.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>3.1.3</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.1.3</version>
             </plugin>
         </plugins>
     </build>
@@ -977,4 +1039,3 @@
         </profile>
     </profiles>
 </project>
-

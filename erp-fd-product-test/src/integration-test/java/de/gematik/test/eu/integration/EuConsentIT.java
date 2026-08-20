@@ -38,7 +38,7 @@ import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.fhir.builder.eu.EuConsentBuilder;
 import de.gematik.test.erezept.fhir.r4.eu.EuConsent;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import de.gematik.test.erezept.fhir.valuesets.eu.EuConsentType;
 import java.time.LocalDate;
 import java.util.Date;
@@ -46,7 +46,10 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Reference;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -282,7 +285,7 @@ class EuConsentIT extends ErpTest {
     val accessCode = EuAccessCode.random();
     val grantEuAccessPermission =
         leonie.performs(
-            GrantEuAccessPermission.withAccessCode(accessCode).forCountry(IsoCountryCode.MT));
+            GrantEuAccessPermission.withAccessCode(accessCode).forCountry(IsoCountryCodeNCPeH.MT));
     leonie.attemptsTo(
         Verify.that(grantEuAccessPermission)
             .withExpectedType()

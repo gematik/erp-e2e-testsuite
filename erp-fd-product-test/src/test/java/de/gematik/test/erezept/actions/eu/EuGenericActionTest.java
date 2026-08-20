@@ -32,7 +32,7 @@ import de.gematik.test.erezept.actors.EuPharmacyActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.config.dto.actor.EuPharmacyConfiguration;
 import de.gematik.test.erezept.fhir.values.TaskId;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import java.util.function.Supplier;
@@ -53,7 +53,7 @@ public class EuGenericActionTest {
     CoverageReporter.getInstance().startTestcase("don't care");
 
     val cfg = new EuPharmacyConfiguration();
-    cfg.setCountryCode(IsoCountryCode.NL.getCode());
+    cfg.setCountryCode(IsoCountryCodeNCPeH.NL.getCode());
     euPharmacy = new EuPharmacyActor("Hannes Vogt");
     euPharmacy.can(mock(UseTheErpClient.class));
     euPharmacy.can(ProvidePharmacyBaseData.fromConfiguration(cfg));
@@ -69,7 +69,9 @@ public class EuGenericActionTest {
     return Stream.of(
         Arguments.of(
             (Supplier<ErpAction<?>>)
-                () -> GrantEuAccessPermission.withRandomAccessCode().forCountry(IsoCountryCode.NL)),
+                () ->
+                    GrantEuAccessPermission.withRandomAccessCode()
+                        .forCountry(IsoCountryCodeNCPeH.NL)),
         Arguments.of(
             (Supplier<ErpAction<?>>)
                 () -> GrantEuAccessPermission.withRandomAccessCode().forCountryOf(euPharmacy)),

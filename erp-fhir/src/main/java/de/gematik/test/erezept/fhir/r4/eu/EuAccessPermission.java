@@ -23,7 +23,7 @@ package de.gematik.test.erezept.fhir.r4.eu;
 import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import java.time.Instant;
 import java.util.Optional;
 import org.hl7.fhir.r4.model.Parameters;
@@ -34,12 +34,13 @@ public class EuAccessPermission extends Parameters {
 
   private static final String ACCESS_CODE = "accessCode";
 
-  public IsoCountryCode getIsoCountryCode() {
+  public IsoCountryCodeNCPeH getIsoCountryCode() {
     return this.getParameter().stream()
         .filter(p -> p.getName().equals("countryCode"))
         .map(
             para ->
-                IsoCountryCode.fromCode(para.getValue().castToCoding(para.getValue()).getCode()))
+                IsoCountryCodeNCPeH.fromCode(
+                    para.getValue().castToCoding(para.getValue()).getCode()))
         .findFirst()
         .orElseThrow(() -> new MissingFieldException(this.getClass(), "countryCode"));
   }

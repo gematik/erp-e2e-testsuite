@@ -26,7 +26,7 @@ import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCode;
+import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import de.gematik.test.erezept.fhir.valuesets.eu.EuRequestType;
 import java.util.List;
 import lombok.val;
@@ -35,12 +35,13 @@ import org.hl7.fhir.r4.model.Parameters;
 @ResourceDef(name = "Parameters")
 public class EuGetPrescriptionInput extends Parameters {
 
-  public IsoCountryCode getIsoCountyCode() {
+  public IsoCountryCodeNCPeH getIsoCountyCode() {
     return getRequestData().getPart().stream()
         .filter(p -> p.getName().equals(COUNTRY_CODE.getCode()))
         .map(
             para ->
-                IsoCountryCode.fromCode(para.getValue().castToCoding(para.getValue()).getCode()))
+                IsoCountryCodeNCPeH.fromCode(
+                    para.getValue().castToCoding(para.getValue()).getCode()))
         .findFirst()
         .orElseThrow(() -> new MissingFieldException(this.getClass(), COUNTRY_CODE.getCode()));
   }

@@ -26,10 +26,13 @@ import de.gematik.bbriccs.fhir.codec.FhirCodec;
 import de.gematik.bbriccs.rest.fd.FhirBResponseCreator;
 import de.gematik.bbriccs.rest.headers.AuthHttpHeaderKey;
 import de.gematik.bbriccs.rest.headers.StandardHttpHeaderKey;
+import de.gematik.idp.client.IIdpClient;
 import de.gematik.idp.client.IdpClient;
+import de.gematik.idp.token.JsonWebToken;
 import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.UnirestRetryWrapper;
+import de.gematik.test.erezept.client.idpclient.InvalidIdpClient;
 import de.gematik.test.erezept.client.vau.VauClient;
 import de.gematik.test.erezept.client.vau.VauException;
 import de.gematik.test.erezept.config.dto.actor.BaseActorConfiguration;
@@ -84,14 +87,47 @@ public class ErpClientFactory {
    */
   private static ErpClient createErpClient(
       ErpClientConfiguration cfg, X509Certificate vauCertificate) {
-    // build and configure the IDP-Client
-    val idp =
+    return createErpClient(cfg, vauCertificate, false);
+  }
+
+  /**
+   * Build, configure and assemble the E-Rezept Client from a given configuration with an IDP client
+   * that manipulates the access token for negative test scenarios.
+   *
+   * @param actor is the given Configuration
+   * @return a properly configured {@link ErpClient} with an invalid IDP token provider
+   */
+  public static ErpClient createErpClientWithInvalidIdpToken(
+      EnvironmentConfiguration environment, PatientConfiguration actor) {
+
+    val erpClientConfig = toErpClientConfig(environment.getInternet(), ClientType.FDV, actor);
+
+    erpClientConfig.setXApiKey(environment.getInternet().getXapiKey());
+
+    return createErpClient(erpClientConfig, getVauCertificate(erpClientConfig), true);
+  }
+
+  private static ErpClient createErpClient(
+      ErpClientConfiguration cfg, X509Certificate vauCertificate, boolean invalidIdpToken) {
+
+    IIdpClient idp =
         IdpClient.builder()
             .clientId(cfg.getClientId())
             .redirectUrl(cfg.getRedirectUrl())
             .discoveryDocumentUrl(cfg.getDiscoveryDocumentUrl())
             .scopes(cfg.getErpScopes())
             .build();
+
+    if (invalidIdpToken) {
+      idp =
+          new InvalidIdpClient(
+              idp,
+              token -> {
+                token.setAccessToken(
+                    new JsonWebToken(token.getAccessToken().getRawString() + "invalid"));
+                return token;
+              });
+    }
 
     // build and configure the VAU-Client
     val vau =
@@ -193,9 +229,17 @@ public class ErpClientFactory {
     }
 
     log.info("Request {} Certificate from {}", certificateFactory.getType(), certUrl);
-    val req = Unirest.get(certUrl).headers(headers);
+    try (val client = Unirest.spawnInstance()) {
+      val conf =
+          client
+              .config()
+              .defaultBaseUrl(clientConfig.getFdBaseUrl())
+              .connectTimeout(UnirestRetryWrapper.CONNECT_TIMEOUT * 1000)
+              .verifySsl(false);
+      headers.forEach(conf::addDefaultHeader);
 
-    try {
+      val req = client.get("/VAUCertificate");
+
       val response = retryWrapper.requestWithRetries(req);
       val data = response.getBody();
       log.info(

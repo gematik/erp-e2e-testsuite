@@ -28,6 +28,7 @@ import de.gematik.test.erezept.client.usecases.DispensePrescriptionCommand;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemDispenseCloseOperationPharmaceuticalsBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
+import de.gematik.test.erezept.fhir.r4.erp.GemDispensingOperationParameters;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
@@ -156,5 +157,33 @@ public abstract class AbstractDispensingUseCase {
             operationBuilder, prescriptionId, kvnr, medications, isSubstituted);
     val tid = TaskId.from(prescriptionId);
     return new DispensePrescriptionCommand(tid, secret, operationParams);
+  }
+
+  protected <P extends GemDispensingOperationParameters> P decodeParametersFor(
+      String prescriptionId, Class<P> type, String input) {
+    val accepted = this.getAcceptedPrescription(prescriptionId);
+    return decodeParametersFor(accepted, type, input);
+  }
+
+  protected <P extends GemDispensingOperationParameters> P decodeParametersFor(
+      AcceptedPrescriptionDto accepted, Class<P> type, String input) {
+    val fhirParams = pharmacy.decode(type, input);
+
+    // adjust the fhir params
+    fhirParams
+        .getMedicationDispenses()
+        .forEach(
+            md -> {
+              md.getIdentifierFirstRep()
+                  .setValue(accepted.getPrescriptionId()); // adjust the prescription ID
+              md.getSubject().getIdentifier().setValue(accepted.getForKvnr()); // adjust the KVNR
+              md.getPerformerFirstRep()
+                  .getActor()
+                  .getIdentifier()
+                  .setValue(pharmacy.getSmcb().getTelematikId());
+              md.setWhenHandedOver(new Date());
+            });
+
+    return fhirParams;
   }
 }
