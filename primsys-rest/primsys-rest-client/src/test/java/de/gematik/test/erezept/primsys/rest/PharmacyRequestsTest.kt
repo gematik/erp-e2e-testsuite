@@ -40,7 +40,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import java.util.*
 
-@WireMockTest(httpPort = RestTest.REST_PORT)
+@WireMockTest
 class PharmacyRequestsTest : RestTest() {
 
     private fun setupPositiveAccept(): StubMapping {
@@ -50,7 +50,7 @@ class PharmacyRequestsTest : RestTest() {
 
         val response = om.writeValueAsString(acceptResponseDto)
 
-        return stubFor(
+        return wiremockExtension.stubFor(
             post(urlMatching("/pharm/([a-zA-Z0-9]*)/accept\\?taskId=(.*)&ac=(.*)"))
                 .willReturn(
                     aResponse()
@@ -68,7 +68,7 @@ class PharmacyRequestsTest : RestTest() {
 
         val response = om.writeValueAsString(dispenseResponseDto)
 
-        return stubFor(
+        return wiremockExtension.stubFor(
             post(urlMatching("/pharm/([a-zA-Z0-9]*)/close\\?taskId=(.*)&secret=(.*)"))
                 .willReturn(
                     aResponse()
@@ -80,7 +80,7 @@ class PharmacyRequestsTest : RestTest() {
     }
 
     private fun setupPositiveReject(): StubMapping {
-        return stubFor(
+        return wiremockExtension.stubFor(
             post(urlMatching("/pharm/([a-zA-Z0-9]*)/reject\\?taskId=(.*)&ac=(.*)&secret=(.*)"))
                 .willReturn(
                     aResponse()
@@ -92,7 +92,7 @@ class PharmacyRequestsTest : RestTest() {
     }
 
     private fun setupPositiveReply(): StubMapping {
-        return stubFor(
+        return wiremockExtension.stubFor(
             post(urlMatching("/pharm/([a-zA-Z0-9]*)/reply\\?taskId=(.*)&kvnr=(.*)"))
                 .willReturn(
                     aResponse()
@@ -104,7 +104,7 @@ class PharmacyRequestsTest : RestTest() {
     }
 
     private fun setupPositiveCommunicationSearch(): StubMapping {
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathMatching("/pharm/([a-zA-Z0-9]*)/communications"))
                 .withQueryParam("sender", or(absent(), matching("[A-Z][0-9]{9}")))
                 .withQueryParam("receiver", or(absent(), matching("[A-Z][0-9]{9}")))
@@ -118,7 +118,7 @@ class PharmacyRequestsTest : RestTest() {
     }
 
     private fun setupPositiveCommunicationDelete(): StubMapping {
-        return stubFor(
+        return wiremockExtension.stubFor(
             delete(urlPathMatching("/pharm/([a-zA-Z0-9]*)/communication/([a-zA-Z0-9]*)"))
                 .willReturn(
                     aResponse()
@@ -130,7 +130,7 @@ class PharmacyRequestsTest : RestTest() {
     }
 
     private fun setupPositiveGetPrescriptionsByPoppToken(): StubMapping {
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlMatching("/pharm/([a-zA-Z0-9]*)/withPoppToken\\?poppToken=(.*)"))
                 .willReturn(
                     aResponse()
@@ -145,7 +145,7 @@ class PharmacyRequestsTest : RestTest() {
     fun shouldAccept() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveAccept()
@@ -162,7 +162,7 @@ class PharmacyRequestsTest : RestTest() {
     fun shouldAbort() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveAbort()
@@ -183,7 +183,7 @@ class PharmacyRequestsTest : RestTest() {
     fun shouldDispensePrescribed() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveDispense()
@@ -200,7 +200,7 @@ class PharmacyRequestsTest : RestTest() {
     fun shouldDispenseNegativeAmount() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveDispense()
@@ -217,7 +217,7 @@ class PharmacyRequestsTest : RestTest() {
     fun shouldDispenseNRandom(num: Int) {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveDispense()
@@ -234,7 +234,7 @@ class PharmacyRequestsTest : RestTest() {
     fun shouldDispenseCustom() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveDispense()
@@ -258,7 +258,7 @@ class PharmacyRequestsTest : RestTest() {
     fun shouldReject() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveReject()
@@ -274,7 +274,7 @@ class PharmacyRequestsTest : RestTest() {
     fun shouldSendReply() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveReply()
@@ -295,7 +295,7 @@ class PharmacyRequestsTest : RestTest() {
     fun shouldSearchCommunications(sender: String?, receiver: String?) {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveCommunicationSearch()
@@ -311,7 +311,7 @@ class PharmacyRequestsTest : RestTest() {
     fun shouldSearchCommunicationsWithoutFilters() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveCommunicationSearch()
@@ -327,7 +327,7 @@ class PharmacyRequestsTest : RestTest() {
     fun shouldDeleteCommunication() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveCommunicationDelete()
@@ -343,7 +343,7 @@ class PharmacyRequestsTest : RestTest() {
     fun shouldGetPrescriptionsByPoppToken() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveGetPrescriptionsByPoppToken()

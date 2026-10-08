@@ -26,6 +26,7 @@ import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
 import de.gematik.test.erezept.eml.fhir.values.RxPrescriptionId;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.val;
@@ -49,10 +50,14 @@ public class EpaMedication extends Medication {
   }
 
   public Optional<ATC> getAtc() {
+    return this.getAtcList().stream().findFirst();
+  }
+
+  public List<ATC> getAtcList() {
     return this.getCode().getCoding().stream()
         .filter(DeBasisProfilCodeSystem.ATC::matches)
         .map(ATC::from)
-        .findFirst();
+        .toList();
   }
 
   public Optional<RxPrescriptionId> getRxPrescriptionId() {
@@ -81,6 +86,15 @@ public class EpaMedication extends Medication {
     return isEmptyName
         ? Optional.ofNullable(this.getCode().getCodingFirstRep().getDisplay())
         : name;
+  }
+
+  public List<ATC> getIngredientAtcList() {
+    return this.getIngredient().stream()
+        .map(MedicationIngredientComponent::getItemCodeableConcept)
+        .flatMap(cc -> cc.getCoding().stream())
+        .filter(DeBasisProfilCodeSystem.ATC::matches)
+        .map(ATC::from)
+        .toList();
   }
 
   private static Function<MedicationIngredientComponent, String> getCCTextOrEmpty() {

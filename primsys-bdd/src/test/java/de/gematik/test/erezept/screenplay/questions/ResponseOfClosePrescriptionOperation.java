@@ -259,7 +259,6 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
 
     if (isKpg()) {
       buildKombipackung(strategy, performerId, paramsBuilder);
-
     } else {
       replacementMedications.forEach(
           medMap -> {
@@ -368,10 +367,9 @@ public class ResponseOfClosePrescriptionOperation extends FhirResponseQuestion<E
             .whenPrepared(new Date())
             .whenHandedOver(new Date())
             .wasSubstituted(true)
-            .medication(kombiPackung)
-            .build();
-
-    paramsBuilder.with(medicationDisp, kombiPackung);
+            .medication(kombiPackung);
+    replacementMedications.forEach(medMap -> generateDosageDgMP(medMap, medicationDisp));
+    paramsBuilder.with(medicationDisp.build(), kombiPackung);
   }
 
   public static class ResponseOfDispenseMedicationOperationBuilder {

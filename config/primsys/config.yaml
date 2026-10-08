@@ -92,12 +92,12 @@ actors:
       smcbIccsn: 80276883110000163973
       konnektor: Soft-Konn
 
-    - name: NordApotheke  # Apotheke mit abgelaufener SMCB
+    - name: NordApotheke  # Apotheke mit abgelaufener SMCB (RSA) ECC bis 2030
       smcbIccsn: 80276883110000092475
       konnektor: Soft-Konn
 
     - name: Stadtapotheke
-      smcbIccsn: 80276883110000092475
+      smcbIccsn: 80276883110000092475 # selbe Iccsn wie NordApo (RSA abgelaufen, ECC bis 2030)
       konnektor: Soft-Konn
 
     - name: Keine Apotheke
@@ -106,6 +106,7 @@ actors:
       konnektor: Soft-Konn
 
     - name: Am Waldesrand
+      description: "KrankenhausApotheke"
       smcbIccsn: 80276001011699900861
       konnektor: Soft-Konn
 
@@ -121,7 +122,7 @@ actors:
       smcbIccsn: 80276001011699902303
       konnektor: Soft-Konn
 
-    - name: An der Schule
+    - name: An der Schule # ECC bis 2030 gültig, RSA abgelaufen
       smcbIccsn: 80276883110000147759
       konnektor: Soft-Konn
 
@@ -180,6 +181,7 @@ environments:
       fdBaseUrl: https://erp-test.zentral.erp.splitdns.ti-dienste.de
       subscriptionServiceUrl: wss://subscription-test.zentral.erp.splitdns.ti-dienste.de/subscription
       userAgent: DUMMY VALUE
+      ocsp: http://ehca-testref.komp-ca.telematik-test/status/ecc-qocsp
     internet:
       tslBaseUrl: https://download-test.tsl.ti-dienste.de/ECC
       discoveryDocumentUrl: https://idp-test.app.ti-dienste.de/.well-known/openid-configuration
@@ -201,6 +203,7 @@ environments:
       fdBaseUrl: https://erp-ref.zentral.erp.splitdns.ti-dienste.de
       subscriptionServiceUrl: wss://subscription-ref.zentral.erp.splitdns.ti-dienste.de/subscription
       userAgent: DUMMY VALUE
+      ocsp: http://ehca-testref.komp-ca.telematik-test/status/ecc-qocsp
     internet:
       tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC
       discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
@@ -220,6 +223,7 @@ environments:
       fdBaseUrl: https://erp-dev.zentral.erp.splitdns.ti-dienste.de
       subscriptionServiceUrl: wss://subscription-dev.zentral.erp.splitdns.ti-dienste.de/subscription
       userAgent: DUMMY VALUE
+      ocsp: http://ehca-testref.komp-ca.telematik-test/status/ecc-qocsp
     internet:
       tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC
       discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration

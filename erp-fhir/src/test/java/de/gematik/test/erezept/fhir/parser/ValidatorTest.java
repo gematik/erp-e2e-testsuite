@@ -27,7 +27,6 @@ import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import java.io.File;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -37,7 +36,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junitpioneer.jupiter.ClearSystemProperty;
 
-@Slf4j
 class ValidatorTest extends ErpFhirParsingTest {
 
   @ParameterizedTest
@@ -49,10 +47,8 @@ class ValidatorTest extends ErpFhirParsingTest {
   static Stream<Arguments> shouldPassValidResources() {
     return ResourceLoader.getResourceDirectoryStructure("fhir/valid/", true).stream()
         .filter(File::isFile)
-        .filter(
-            f ->
-                !f.getAbsolutePath()
-                    .contains("epa")) // TODO: why do we need validating epa resources?
+        // TODO: why do we need validating epa resources?
+        .filter(f -> !f.getAbsolutePath().replace('\\', '/').contains("/fhir/valid/epa/"))
         .map(Arguments::of);
   }
 

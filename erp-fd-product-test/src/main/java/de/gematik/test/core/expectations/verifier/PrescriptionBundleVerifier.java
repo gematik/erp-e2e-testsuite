@@ -180,7 +180,7 @@ public class PrescriptionBundleVerifier {
       hasRedeemableByPropertiesForBundlePrescription(boolean expected) {
 
     Predicate<ErxPrescriptionBundle> predicate =
-        bundle -> ErxTask.fromTask(bundle.getTask()).isRedeemableByProperties(expected);
+        bundle -> ErxTask.fromTask(bundle.getTask()).isRedeemableByProperties() == expected;
 
     return new VerificationStep.StepBuilder<ErxPrescriptionBundle>(
             Requirement.custom("A_27063"),

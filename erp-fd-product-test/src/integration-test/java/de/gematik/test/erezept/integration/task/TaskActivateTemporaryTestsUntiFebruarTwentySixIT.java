@@ -36,7 +36,6 @@ import de.gematik.test.erezept.fhir.profiles.definitions.KbvItaErpStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +43,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-@Slf4j
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("E-Rezept ausstellen")
 @Tag("ActivateWithOltProfiles")
@@ -59,7 +57,7 @@ class TaskActivateTemporaryTestsUntiFebruarTwentySixIT extends ErpTest {
   private PatientActor patient;
 
   @TestcaseId("ERP_TASK_ACTIVATE_TEMP_01")
-  @Test()
+  @Test
   @DisplayName(
       "Es muss geprüft werden, dass Bei einer PZN-Verordnung, Freitextverordnung oder"
           + " Wirkstoffverordnung muss OHNE Dosierkennzeichen und MIT Dosierung der Fachdienst den"

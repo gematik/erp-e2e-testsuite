@@ -21,10 +21,9 @@
 package de.gematik.test.fuzzing.fhirfuzz.utils;
 
 import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+import java.math.BigDecimal;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.RepeatedTest;
@@ -77,5 +76,19 @@ class FuzzerContextTest {
   @RepeatedTest(REPETITIONS)
   void shouldGetRandomTime() {
     assertNotNull(fuzzerContext.getRandomDate());
+  }
+
+  @RepeatedTest(REPETITIONS)
+  void shouldGetAnotherIntValue() {
+    val res = fuzzerContext.getAnother(1);
+    assertNotNull(res);
+    assertTrue(res != 1);
+  }
+
+  @RepeatedTest(REPETITIONS)
+  void shouldGetAnotherBigDecValue() {
+    val res2 = fuzzerContext.getAnother(BigDecimal.valueOf(1));
+    assertNotNull(res2);
+    assertTrue(res2.compareTo(BigDecimal.valueOf(1)) != 0);
   }
 }

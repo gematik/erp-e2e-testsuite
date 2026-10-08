@@ -44,7 +44,7 @@ public class KbvPznMedicationDataMapper extends DataMapper<PznMedicationDto, Kbv
   }
 
   protected void complete() {
-    ensure(dto::getCategory, dto::setCategory, () -> fakerValueSet(MedicationCategoryDto.class));
+    ensure(dto::getCategory, dto::setCategory, () -> MedicationCategoryDto.C_00);
     ensure(dto::getName, dto::setName, GemFaker::fakerDrugName);
     ensure(dto::getType, dto::setType, () -> MedicationTypeDto.PZN);
     if (dto.getType().equals(MedicationTypeDto.PZN)) {
@@ -69,13 +69,17 @@ public class KbvPznMedicationDataMapper extends DataMapper<PznMedicationDto, Kbv
         .darreichungsform(this.getDarreichungsform())
         .packagingSize(dto.getPackagingSize(), dto.getPackagingUnit())
         .pzn(dto.getPzn(), dto.getName())
-        .category(MedicationCategory.C_00)
+        .category(this.getCategory())
         .ingredientText("Wirkstoff") // required with
         .build();
   }
 
   private StandardSize getStandardSize() {
     return StandardSize.fromCode(dto.getStandardSize().getCode());
+  }
+
+  private MedicationCategory getCategory() {
+    return MedicationCategory.fromCode(dto.getCategory().getCode());
   }
 
   private Darreichungsform getDarreichungsform() {

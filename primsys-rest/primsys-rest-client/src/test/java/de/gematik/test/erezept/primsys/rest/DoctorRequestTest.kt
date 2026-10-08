@@ -37,7 +37,7 @@ import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
 import kotlin.io.path.Path
 
-@WireMockTest(httpPort = RestTest.REST_PORT)
+@WireMockTest
 class DoctorRequestTest : RestTest() {
 
     private fun setupPositivePrescribe(kvnr: String): StubMapping {
@@ -47,7 +47,7 @@ class DoctorRequestTest : RestTest() {
 
         val prescription = om.writeValueAsString(prescriptionDto)
 
-        return stubFor(
+        return wiremockExtension.stubFor(
             post(urlPathTemplate("/doc/{docId}/prescribe"))
                 .willReturn(
                     aResponse()
@@ -65,7 +65,7 @@ class DoctorRequestTest : RestTest() {
 
         val prescription = om.writeValueAsString(prescriptionDto)
 
-        return stubFor(
+        return wiremockExtension.stubFor(
             post(urlPathTemplate("/doc/{docId}/xml/prescribe"))
                 .willReturn(
                     aResponse()
@@ -83,7 +83,7 @@ class DoctorRequestTest : RestTest() {
 
         val prescription = om.writeValueAsString(prescriptionDto)
 
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathTemplate("/prescription/prescribed/{prescriptionId}"))
                 .willReturn(
                     aResponse()
@@ -102,7 +102,7 @@ class DoctorRequestTest : RestTest() {
 
         val prescription = om.writeValueAsString(prescriptionDto)
 
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathTemplate("/prescription/accepted/{prescriptionId}"))
                 .willReturn(
                     aResponse()
@@ -120,7 +120,7 @@ class DoctorRequestTest : RestTest() {
 
         val prescription = om.writeValueAsString(prescriptionDto)
 
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathTemplate("/prescription/dispensed/{prescriptionId}"))
                 .willReturn(
                     aResponse()
@@ -141,7 +141,7 @@ class DoctorRequestTest : RestTest() {
         }
         val prescriptions = om.writeValueAsString(prescriptionDtos)
 
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathTemplate("/prescription/prescribed"))
                 .willReturn(
                     aResponse()
@@ -161,7 +161,7 @@ class DoctorRequestTest : RestTest() {
         }
         val prescriptions = om.writeValueAsString(prescriptionDtos)
 
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathTemplate("/prescription/accepted"))
                 .willReturn(
                     aResponse()
@@ -180,7 +180,7 @@ class DoctorRequestTest : RestTest() {
         }
         val prescriptions = om.writeValueAsString(prescriptionDtos)
 
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathTemplate("/prescription/dispensed"))
                 .willReturn(
                     aResponse()
@@ -197,7 +197,7 @@ class DoctorRequestTest : RestTest() {
     fun shouldPrescribe(asDirectAssignment: Boolean?) {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         val doc = clientFactory.getRandomDoctorClient()
@@ -218,7 +218,7 @@ class DoctorRequestTest : RestTest() {
     fun shouldPrescribeKbvBundle(asDirectAssignment: Boolean?) {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         val doc = clientFactory.getRandomDoctorClient()
@@ -238,7 +238,7 @@ class DoctorRequestTest : RestTest() {
     fun shouldAbort() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveAbort()
@@ -258,7 +258,7 @@ class DoctorRequestTest : RestTest() {
     fun shouldGetOpenPrescriptionsById() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveReadyPrescriptionById()
@@ -276,7 +276,7 @@ class DoctorRequestTest : RestTest() {
     fun shouldGetAllOpenPrescriptions(kvnr: String?) {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveReadyPrescriptions(
@@ -298,7 +298,7 @@ class DoctorRequestTest : RestTest() {
     fun shouldGetAcceptedPrescriptionsById() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveAcceptedPrescriptionById()
@@ -316,7 +316,7 @@ class DoctorRequestTest : RestTest() {
     fun shouldGetAllAcceptedPrescriptions(kvnr: String?) {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveAcceptedPrescriptions(
@@ -338,7 +338,7 @@ class DoctorRequestTest : RestTest() {
     fun shouldGetDispensedPrescriptionsById() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveDispensedPrescriptionById()
@@ -356,7 +356,7 @@ class DoctorRequestTest : RestTest() {
     fun shouldGetAllDispensedPrescriptions(kvnr: String?) {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         removeAllMappings()
         setupPositiveDispensedPrescriptions(

@@ -80,6 +80,8 @@ class NavigateThroughCardwallTest {
     verify(app, times(1)).tap(CardWall.CONTINUE_AFTER_BIOMETRY_CHECK_BUTTON);
 
     verify(app, times(1)).tap(CardWall.START_NFC_READOUT_BUTTON);
-    verify(app, times(1)).waitUntilElementIsVisible(BottomNav.SETTINGS_BUTTON, 60000);
+    verify(app, times(1))
+        .waitUntilElementIsVisible(PushNotification.PUSH_NOTIFICATION_DIALOG, 60000);
+    verify(app, times(1)).dismissAlert();
   }
 }

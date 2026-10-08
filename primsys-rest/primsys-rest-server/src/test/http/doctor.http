@@ -29,6 +29,27 @@ apikey: {{apikey}}
     "kvnr": "S040464113"
   }
 }
+> {%
+  client.assert(response.status == 202, "prescribing with FHIR+XML template must work")
+  console.log("Created prescription: " + client.global.get("prescriptionId"))
+  client.global.set("prescriptionId", response.body["prescriptionId"])
+  client.global.set("accessCode", response.body["accessCode"])
+%}
+
+### DOC-PHARMACEUTICAL-PRESCRIBE-03
+# prescribe a completly random T-E-Rezept prescription
+POST {{host}}/doc/{{doctor}}/prescribe
+Content-Type: application/json
+apikey: {{apikey}}
+
+{
+  "patient": {
+    "kvnr": "S040464113"
+  },
+  "medication": {
+    "category": "02"
+  }
+}
 
 ### DOC-PHARMACEUTICAL-DELETE-01
 # prescribe a completly random pharmaceutical prescription

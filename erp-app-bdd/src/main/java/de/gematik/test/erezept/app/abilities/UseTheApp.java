@@ -242,6 +242,10 @@ public abstract class UseTheApp<T extends AppiumDriver> implements Ability {
     driver.switchTo().alert().accept();
   }
 
+  public void dismissAlert() {
+    driver.switchTo().alert().dismiss();
+  }
+
   public void swipe(SwipeDirection direction) {
     swipe(direction, 0.5f);
   }

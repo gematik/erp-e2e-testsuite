@@ -205,6 +205,29 @@
                 "value": 1
               }
             },
+            "ingredient": [
+              {
+                "itemCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://fhir.de/CodeSystem/ask",
+                      "code": "03876"
+                    }
+                  ],
+                  "text": "Doxycyclin"
+                },
+                "strength": {
+                  "numerator": {
+                    "value": 200,
+                    "unit": "mg"
+                  },
+                  "denominator": {
+                    "value": 1,
+                    "unit": "Tbl."
+                  }
+                }
+              }
+            ],
             "batch": {
               "lotNumber": "3391617402"
             }

@@ -26,6 +26,8 @@ import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.r4.ErpFhirResource;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import org.hl7.fhir.r4.model.Parameters;
 
 @ResourceDef(name = "Parameters")
@@ -43,6 +45,18 @@ public class ErpTPrescriptionCarbonCopy extends Parameters implements ErpFhirRes
         .map(p -> ErpTPrescriptionMedication.fromMedication(p.getResource()))
         .findFirst()
         .orElseThrow(() -> new MissingFieldException(this.getClass(), MEDICATION.getCode()));
+  }
+
+  public String getPrescriptionSignatureDate() {
+    DateTimeFormatter formatter =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").withZone(ZoneOffset.UTC);
+
+    return this.getRxPrescriptionParameter().getPart().stream()
+        .filter(p -> p.getName().equals("prescriptionSignatureDate"))
+        .map(p -> p.getValue().castToInstant(p.getValue()).getValue())
+        .findFirst()
+        .map(i -> formatter.format(i.toInstant()))
+        .orElseThrow(() -> new MissingFieldException(this.getClass(), "prescriptionSignatureDate"));
   }
 
   public ErpTPrescriptionMedication getMedicationFromDispensation() {

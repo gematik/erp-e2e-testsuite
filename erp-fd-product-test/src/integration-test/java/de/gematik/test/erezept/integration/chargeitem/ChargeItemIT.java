@@ -103,10 +103,12 @@ public class ChargeItemIT extends ErpTest {
         flughafenApo.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
     flughafenApo.performs(ClosePrescription.acceptedWith(acceptation));
     val davAbgabedatenBundle = DavPkvAbgabedatenFaker.builder(task.getPrescriptionId()).fake();
-    flughafenApo.performs(
-        PostChargeItem.forPatient(sina)
-            .davBundle(davAbgabedatenBundle)
-            .withAcceptBundle(acceptation));
+    flughafenApo
+        .performs(
+            PostChargeItem.forPatient(sina)
+                .davBundle(davAbgabedatenBundle)
+                .withAcceptBundle(acceptation))
+        .getExpectedResponse();
 
     // patients verification
     val chargeItem =

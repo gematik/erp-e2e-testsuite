@@ -20,7 +20,6 @@
 
 package de.gematik.test.erezept.screenplay.strategy.prescription;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.EncodingType;
@@ -98,7 +97,9 @@ class PrescriptionDataMapperTest extends ErpFhirParsingTest {
                 "WirkstoffMenge",
                 "0.14",
                 "WirkstoffMengeEinheit",
-                "l"));
+                "l",
+                "Manually-Defined-EMP-Identifier",
+                "random-UUID"));
     val prescriptionDataMapper =
         new PrescriptionDataMapperPZN(patient, prescriptionAssignmentKind, medications);
 
@@ -115,6 +116,9 @@ class PrescriptionDataMapperTest extends ErpFhirParsingTest {
     assertTrue(vr.isSuccessful());
     assertEquals(expectedFlowType, flowtype);
     assertFalse(kbvBundle.getMedicationRequest().isMultiple());
+    assertEquals(
+        "random-UUID",
+        kbvBundle.getMedicationRequest().getBasedOn().get(0).getIdentifier().getValue());
   }
 
   private final KbvItaForVersion kbvItaForVersion = KbvItaForVersion.V1_3_0;
@@ -146,7 +150,9 @@ class PrescriptionDataMapperTest extends ErpFhirParsingTest {
                 "Reichdauer in Wochen",
                 "4",
                 "Verordnungskategorie",
-                "02"));
+                "02",
+                "EMP-Identifier",
+                "random"));
     val prescriptionDataMapper =
         new PrescriptionDataMapperPZN(
             patient, PrescriptionAssignmentKind.PHARMACY_ONLY, medications);
@@ -164,6 +170,18 @@ class PrescriptionDataMapperTest extends ErpFhirParsingTest {
 
     val vr = ValidatorUtil.encodeAndValidate(parser, kbvBundle);
     assertTrue(vr.isSuccessful());
+    assertNotEquals(
+        "random", kbvBundle.getMedicationRequest().getBasedOn().get(0).getIdentifier().getValue());
+    assertNotNull(kbvBundle.getMedicationRequest().getBasedOn().get(0).getIdentifier().getValue());
+    assertTrue(
+        kbvBundle
+            .getMedicationRequest()
+            .getBasedOn()
+            .get(0)
+            .getIdentifier()
+            .getValue()
+            .matches(
+                "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"));
   }
 
   @Test

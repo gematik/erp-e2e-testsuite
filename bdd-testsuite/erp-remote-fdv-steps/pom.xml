@@ -6,7 +6,7 @@
     <parent>
         <artifactId>bdd-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.7.1</version>
+        <version>1.8.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -25,12 +25,12 @@
         <dependency>
             <groupId>de.gematik.erezept.remotefdv</groupId>
             <artifactId>test-driver-interface-client</artifactId>
-            <version>1.1.2-SNAPSHOT</version>
+            <version>1.1.6</version>
         </dependency>
         <dependency>
             <groupId>de.gematik.erezept.remotefdv</groupId>
             <artifactId>test-driver-interface-data</artifactId>
-            <version>1.1.2-SNAPSHOT</version>
+            <version>1.1.6</version>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
@@ -61,7 +61,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-common</artifactId>
-            <version>1.7.1</version>
+            <version>1.8.0</version>
         </dependency>
         <dependency>
             <groupId>tools.jackson.core</groupId>
@@ -93,7 +93,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.1.0</version>
                 <configuration>
                     <includes>
                         <include>**/${bdd.testsuite}.java</include>

@@ -14,7 +14,7 @@ actors:
 
 
   pharmacies:
-    - name: Am Flughafen
+    - name: Am Flughafen # seit DEZ 2024 abgelaufen
       apoVzdName: Apotheke am FlughafenTEST-ONLY
       smcbIccsn: 80276883110000116873
       konnektor: Soft-Konn
@@ -30,8 +30,9 @@ actors:
       konnektor: Soft-Konn
 
   patients:
-    - name: Fridolin Straßer
-      egkIccsn: 80276883110000113311
+    - name: Fridolin Straßer # cert ist abgelaufen
+      egkIccsn: 80276883110000163961
 
     - name: Hanna Bäcker
-      egkIccsn: 80276883110000108142
+      egkIccsn: 80276883110000163962
+

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+  <id>jar-with-dependencies</id>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <formats>
+    <format>jar</format>
+  </formats>
+
+
+  <dependencySets>
+    <!-- all runtime deps except smartcards-brick -->
+    <dependencySet>
+      <scope>runtime</scope>
+      <unpack>true</unpack>
+      <excludes>
+        <exclude>de.gematik.bbriccs:smartcards-brick</exclude>
+      </excludes>
+    </dependencySet>
+
+    <!-- This descriptor is required because smartcards-brick brings its own resources (smartcards.json)
+    which occasionally conflict with the resources of the erp-smartcards.
+    Therefore, we unpack only the classes of smartcards-brick and drop its resources. -->
+    <!-- smartcards-brick: keep classes only, drop resources -->
+    <dependencySet>
+      <scope>runtime</scope>
+      <unpack>true</unpack>
+      <includes>
+        <include>de.gematik.bbriccs:smartcards-brick</include>
+      </includes>
+      <unpackOptions>
+        <includes>
+          <include>**/*.class</include>
+        </includes>
+      </unpackOptions>
+    </dependencySet>
+  </dependencySets>
+
+  <containerDescriptorHandlers>
+    <!-- Merge META-INF/services entries from all dependency jars so ServiceLoader works in the fat jar. -->
+    <containerDescriptorHandler>
+      <handlerName>metaInf-services</handlerName>
+    </containerDescriptorHandler>
+  </containerDescriptorHandlers>
+
+  <fileSets>
+    <fileSet>
+      <directory>${project.build.outputDirectory}</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>

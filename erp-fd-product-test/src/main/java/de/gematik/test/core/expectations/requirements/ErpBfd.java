@@ -40,8 +40,11 @@ public enum ErpBfd implements RequirementsSet {
   B_FD_1687("B_FD-1687", "Strukturiere Dosierung: boundsDuration"),
   B_FD_1699(
       "B-FD_1699", "Abweichende Generierung / Validierung der Strukturierten Dosierinformationen"),
-  ;
-
+  B_FD_1698(
+      "B-FD_1698",
+      "Fix für fehlende Version in Medication.code:atc"
+          + "https://service.gematik.de/browse/B_FD-1698"),
+  B_FD_1729("B-FD_1729", "DosageDgMP -> 500 Internal Server Error");
   @Getter private final Requirement requirement;
 
   ErpBfd(String id, String description) {

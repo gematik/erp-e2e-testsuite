@@ -22,7 +22,7 @@ package de.gematik.test.erezept.abilities;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.pki.gemlibpki.tsl.TslConverter;
+import de.gematik.pki.gemlibpki.commons.tsl.TslConverter;
 import de.gematik.test.erezept.actions.rawhttpactions.pki.TslListWrapper;
 import eu.europa.esig.trustedlist.jaxb.tsl.TrustStatusListType;
 import kong.unirest.core.HttpResponse;

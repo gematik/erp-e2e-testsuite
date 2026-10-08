@@ -404,6 +404,7 @@ class EuPrescriptionRedemptionMarkerIT extends ErpTest {
   }
 
   @TestcaseId("ERP_PATCH_EU_PRESCRIPTION_07")
+  @Tag("MissingFdFeature")
   @Test
   @DisplayName("E-Rezept im Status READY wird erfolgreich für EU-Einlösung markiert")
   void shouldPatchEuPrescriptionWhenStatusIsReady() {

@@ -20,9 +20,7 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBool;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerLotNumber;
-import static de.gematik.test.erezept.fhir.builder.GemFaker.getFaker;
+import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mockStatic;
@@ -138,7 +136,8 @@ class GemErpMedicationIngredientFakerTest extends ErpFhirParsingTest {
               .withIngredientWithContainedAsk(numerator, denominator, ask)
               .withVaccineTrue(isVaccine)
               .withAmount(numerator, "mg")
-              .withLotNumber(lotNumber);
+              .withLotNumber(lotNumber)
+              .withIngredientWithContainedATC(numerator, denominator, atc);
 
       val result = faker.fake();
 

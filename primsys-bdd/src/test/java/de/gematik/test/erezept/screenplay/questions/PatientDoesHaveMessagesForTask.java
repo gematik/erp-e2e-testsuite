@@ -22,11 +22,11 @@ package de.gematik.test.erezept.screenplay.questions;
 
 import de.gematik.test.erezept.client.usecases.search.CommunicationSearch;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
+import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
-import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,9 +51,8 @@ public class PatientDoesHaveMessagesForTask implements Question<Boolean> {
     val response = erpClient.request(cmd);
     val searchBundle = response.getExpectedResource();
     return searchBundle.getCommunications().stream()
-        .map(ErxCommunication::getAboutReference)
-        .filter(Optional::isPresent)
-        .map(Optional::orElseThrow)
+        .map(ErxCommunication::getBasedOnReferenceId)
+        .map(TaskId::getValue)
         .anyMatch(ref -> ref.contains(taskId.getValue()));
   }
 

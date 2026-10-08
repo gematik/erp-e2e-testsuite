@@ -26,14 +26,10 @@ import ca.uhn.fhir.model.api.annotation.ResourceDef;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.profiles.definitions.KbvItvEvdgaStructDef;
 import de.gematik.test.erezept.fhir.util.FhirEntryReplacer;
-import de.gematik.test.erezept.fhir.values.BaseANR;
 import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.ResourceType;
 
 @Slf4j
@@ -54,39 +50,6 @@ public class KbvEvdgaBundle extends KbvBaseBundle {
             () ->
                 new MissingFieldException(
                     this.getClass(), KbvItvEvdgaStructDef.HEALTH_APP_REQUEST));
-  }
-
-  public List<KbvPractitioner> getAllPractitioners() {
-    return this.entry.stream()
-        .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Practitioner))
-        .filter(
-            practitionerEntry ->
-                ((Practitioner) practitionerEntry.getResource())
-                    .getIdentifier().stream()
-                        .map(identifier -> identifier.getType().getCodingFirstRep())
-                        .anyMatch(BaseANR::isPractitioner))
-        .map(
-            entry ->
-                FhirEntryReplacer.cast(
-                    KbvPractitioner.class, entry, KbvPractitioner::fromPractitioner))
-        .toList();
-  }
-
-  public Optional<KbvPractitionerRole> getPractitionerRole() {
-    return this.entry.stream()
-        .filter(
-            entry -> entry.getResource().getResourceType().equals(ResourceType.PractitionerRole))
-        .map(
-            entry ->
-                FhirEntryReplacer.cast(
-                    KbvPractitionerRole.class,
-                    entry,
-                    resource -> {
-                      val pr = new KbvPractitionerRole();
-                      resource.copyValues(pr);
-                      return pr;
-                    }))
-        .findFirst();
   }
 
   @Override

@@ -1,0 +1,116 @@
+== Dispense Requests versenden
+
+Dieses Tutorial beschreibt, wie ein Dispense Request (Abgabewunsch) fuer ein E-Rezept mit `erp-cli-patient` vorbereitet und an eine Apotheke gesendet werden kann.
+
+Das Vorgehen besteht aus vier Schritten:
+
+. eine geeignete KVNR aus dem CLI ermitteln
+. für diese KVNR ein E-Rezept bereitstellen
+. eine JSON-Payload für den Dispense Request vorbereiten
+. den Dispense Request über das CLI an die gewünschte Apotheke (Telematik-ID) senden
+
+=== Voraussetzungen
+
+Für dieses Tutorial werden folgende Dinge benötigt:
+
+- ein gebautes und startbares `erp-cli-patient`
+- eine KVNR, die im CLI bekannt ist
+- die Möglichkeit für diese KVNR ein E-Rezept zu erzeugen (z. B. über die Erpione-Weboberfläche oder ein echtes Primärsystem)
+- die Telematik-ID der Zielapotheke
+
+IMPORTANT: Wenn Sie `erpp` als fertiges JAR nutzen, benötigen Sie zusätzlich eine separate Konfiguration mit eigenem API-Key und User-Agent, welche Sie in der Kofigurationsdatei hinterlegen müssen. Siehe <<section-create-own-config>>
+
+[[section-create-own-config]]
+=== 0. Eigene Konfiguration für das CLI erstellen
+
+NOTE: Ein gesonderter API-Key kann im link:https://fachportal.gematik.de/shop/e-rezept-fachdienst-api-key?ai%5Baction%5D=detail&ai%5Bcontroller%5D=Catalog&ai%5Bd_name%5D=e-rezept-fachdienst-api-key_2f543&ai%5Bd_pos%5D=4[Fachportal Shop der Gematik] kostenfrei beantragt werden.
+
+Sobald Sie einen eigenen API-Key und User-Agent haben, können Sie eine eigene Konfiguration für das CLI erstellen. Dazu legen Sie eine Datei z.B. unter `~/.erpp/config.yml` an, die die Umgebungen und deren Konfigurationen enthält.
+
+[source,yaml]
+----
+environments:
+  - name: RU
+    internet:
+      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
+      discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
+      fdBaseUrl: https://erp-ref.app.ti-dienste.de
+      xapiKey: DUMMY VALUE
+      userAgent: DUMMY VALUE
+
+  - name: RU-DEV
+    internet:
+      tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
+      discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
+      fdBaseUrl: https://erp-dev.app.ti-dienste.de
+      xapiKey: DUMMY VALUE
+      userAgent: DUMMY VALUE
+----
+
+Anschließend hinterlegen Sie den Pfad zu dieser Konfigurationsdatei in der Umgebungsvariable `ERP_CLI_PATIENT_ENVS` wo `erp-cli-patient` diese dann auslesen kann.
+
+=== 1. Verfügbare KVNRs im CLI anzeigen
+
+Zuerst muss eine KVNR bestimmt werden, für die später das E-Rezept und der Dispense Request verwendet werden.
+
+Beispiel:
+
+[source,bash]
+----
+erpp lsp
+----
+
+
+=== 2. E-Rezept für die gewählte KVNR bereitstellen
+
+Für die ausgewählte KVNR muss anschließend ein E-Rezept vorhanden sein. Dieses kann zum Beispiel über die Erpione-Weboberfläche oder über ein echtes Primärsystem erzeugt werden.
+
+Wichtig ist, dass das Rezept später im CLI identifizierbar ist, da zum Senden des Dispense Requests die Prescription-ID benötigt wird. Das kann zur Kontrolle für die KVNR über das CLI folgendermaßen überprüft werden:
+
+[source,shell]
+----
+erpp prescriptions show --kvnr X110603293
+----
+
+=== 3. Beispiel-Payload für den Dispense Request vorbereiten
+
+Die Nutzlast für den Dispense Request wird als JSON-Datei an das CLI übergeben.
+
+Beispielhafte Payloads können über die link:https://gematik.github.io/interactive-api-erp/erp-fd-communications/index.html[Interactive API des E-Rezept-Fachdienstes] erzeugt und heruntergeladen werden.
+
+Die Datei sollte lokal gespeichert werden, damit sie später an den CLI-Befehl übergeben werden kann.
+
+=== 4. Dispense Request senden
+
+Der eigentliche Versand erfolgt über den Command `communications request`.
+
+Der Command erwartet mindestens:
+
+- die Zielapotheke als Telematik-ID über `--to`
+- die Prescription-ID über `--prescriptionid` beziehungsweise `--pid`
+- eine JSON-Datei mit der Communication-Payload als positionsbasierten Parameter
+
+Beispiel:
+
+[source,shell]
+----
+erpp communication request --env ru-dev --kvnr X110603293 --pid 160.000.125.486.263.14 --to 5-2-KH-APO-Waldesrand-01 <PATH-TO-COMMUNICATION-PAYLOAD-FILE>
+----
+
+=== 5. Ergebnis prüfen
+
+Nach dem Versand kann geprüft werden, ob die Communication im Fachdienst angekommen ist.
+
+Beispiel:
+
+[source,bash]
+----
+erpp communication show --env ru-dev --kvnr X110603293 --sort=DESCENDING
+----
+
+Und sobald die Wunsch-Apotheke das E-Rezept abgeholt und/oder dispensiert hat, kann der Status des E-Rezeptes über das CLI überprüft werden:
+
+[source,shell]
+----
+erpp prescriptions show --kvnr X110603293
+----

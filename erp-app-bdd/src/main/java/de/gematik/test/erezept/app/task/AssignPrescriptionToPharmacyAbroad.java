@@ -84,7 +84,7 @@ public class AssignPrescriptionToPharmacyAbroad implements Task {
             .getExpectedResource()
             .getTask();
     assertTrue(
-        erxTask.getRedeemableByProperties(),
+        erxTask.isRedeemableByProperties(),
         "Prescription is not marked as EU redeemable on FD, but should be.");
 
     // Select the country

@@ -58,7 +58,12 @@ abstract class PrimSysClient(
     suspend fun <T> perform(request: PrimSysBaseGenericRequest<T>): PrimSysResponse<T> {
         val rb = this.initRequestBuilder()
         request.finalizeRequest(rb, this.objectMapper)
-        return performHttpRequest(request.responseType, rb)
+
+        try {
+            return performHttpRequest(request.responseType, rb)
+        } catch (e: Exception) {
+            throw PrimSysRestException(500, "Failed to perform request: ${e.message}")
+        }
     }
 
     fun <T> performBlocking(request: PrimSysBaseGenericRequest<T>): PrimSysResponse<T> = runBlocking {

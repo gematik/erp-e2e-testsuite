@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.actions.rawhttpactions.pki;
 
-import de.gematik.pki.gemlibpki.tsl.TslInformationProvider;
+import de.gematik.pki.gemlibpki.commons.tsl.TslInformationProvider;
 import de.gematik.test.erezept.actions.rawhttpactions.pki.dto.TslExtension;
 import eu.europa.esig.trustedlist.jaxb.tsl.TrustStatusListType;
 import java.io.ByteArrayInputStream;

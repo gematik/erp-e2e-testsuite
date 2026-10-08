@@ -25,6 +25,7 @@ import static java.text.MessageFormat.format;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.test.erezept.cli.converter.PrescriptionIdConverter;
+import de.gematik.test.erezept.cli.exceptions.CliException;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
@@ -34,9 +35,13 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
+import java.io.File;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import picocli.CommandLine;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 @Slf4j
 @CommandLine.Command(
@@ -61,6 +66,12 @@ public class CommunicationDispenseRequestSender extends BaseRemoteCommand {
       converter = PrescriptionIdConverter.class,
       description = "The id of the corresponding prescription")
   private PrescriptionId prescriptionId;
+
+  @CommandLine.Parameters(
+      paramLabel = "<COMMUNICATION-PAYLOAD-FILE>",
+      type = File.class,
+      description = "Communication payload file to send (JSON)")
+  private File communicationPayloadFile;
 
   @Override
   public void performFor(Egk egk, ErpClient erpClient) {
@@ -90,13 +101,31 @@ public class CommunicationDispenseRequestSender extends BaseRemoteCommand {
               .basedOn(taskId, accessCode)
               .flowType(flowType);
     } else {
+      val payloadMessage = createDispenseRequestMessage();
       builder =
-          ErxCommunicationBuilder.forDispenseRequest(CommunicationDisReqMessage.forV1().build())
+          ErxCommunicationBuilder.forDispenseRequest(payloadMessage)
               .basedOn(taskId, accessCode)
               .sender(kvnr)
               .flowType(flowType);
     }
 
     return builder.receiver(receiver).sender(kvnr).build();
+  }
+
+  private CommunicationDisReqMessage createDispenseRequestMessage() {
+    // Note: Optional for future extension, for now the communicationPayloadFile is required
+    // because we don't have a faker for the CommunicationDisReqMessage yet
+    return Optional.ofNullable(communicationPayloadFile)
+        .map(
+            it -> {
+              try {
+                return new JsonMapper().readValue(it, CommunicationDisReqMessage.class);
+              } catch (JacksonException e) {
+                throw new CliException(
+                    format(
+                        "Unable to read communication payload file {0}: {1}", it, e.getMessage()));
+              }
+            })
+        .orElseGet(() -> CommunicationDisReqMessage.forV3().build());
   }
 }

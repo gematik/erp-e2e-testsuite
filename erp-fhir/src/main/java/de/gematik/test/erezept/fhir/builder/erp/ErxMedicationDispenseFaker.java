@@ -27,6 +27,7 @@ import de.gematik.test.erezept.eml.fhir.r4.dgmp.DosageDgMP;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import java.util.Date;
+import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.Medication;
 
@@ -92,6 +93,11 @@ public class ErxMedicationDispenseFaker
 
   public ErxMedicationDispenseFaker withDgmp(DosageDgMP dosage) {
     builderConsumers.put("dgmp", b -> b.dgmp(dosage));
+    return this;
+  }
+
+  public ErxMedicationDispenseFaker withDgmp(List<DosageDgMP> dosage) {
+    builderConsumers.put("dgmpList", b -> b.dgmp(dosage));
     return this;
   }
 }

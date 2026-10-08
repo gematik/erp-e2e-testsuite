@@ -23,7 +23,8 @@ package de.gematik.test.erezept.app.task.ios;
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static de.gematik.test.erezept.app.mocker.ConfigurationMocker.createDefaultTestConfiguration;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
@@ -174,7 +175,7 @@ class SetUpIosDeviceTest {
     val app = actor.abilityTo(UseIOSApp.class);
 
     when(app.isDisplayed(Onboarding.START_BUTTON)).thenReturn(true);
-    when(app.getText(Profile.USER_KVNR)).thenReturn("X110406067");
+    when(app.getText(Profile.USER_KVNR)).thenReturn("X110571801");
     when(app.getText(Profile.USER_INSURANCE)).thenReturn("GKVInsurance");
     when(app.getText(FeatureFlagScreen.ENABLE_EU_REDEEM_FEATURE_SWITCH)).thenReturn("0");
 
@@ -229,7 +230,7 @@ class SetUpIosDeviceTest {
 
     val baseData = actor.abilityTo(ProvidePatientBaseData.class);
     assertNotNull(baseData);
-    assertEquals("X110406067", baseData.getKvnr().getValue());
+    assertEquals("X110571801", baseData.getKvnr().getValue());
     assertEquals(InsuranceTypeDe.GKV, baseData.getPatientInsuranceType());
   }
 

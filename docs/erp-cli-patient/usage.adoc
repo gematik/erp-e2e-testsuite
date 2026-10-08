@@ -2,6 +2,11 @@
 == Installation
 Das Tool `erp-cli-patient` ist aktuell nicht im Docker-Repository verfügbar und muss daher vorerst direkt über das JAR ausgeführt werden.
 
+=== Voraussetzungen
+* Java 21 oder höher
+
+NOTE: In diesem Dokument werden die Kommandos mit `erpp` beschrieben. Das ist die Kurzform für `java -jar erp-cli-patient.jar`. Die Kurzform kann in der Regel auch als Alias in der Shell oder als Script hinterlegt werden.
+
 === Hilfe
 Dieses User Manual dient als ein Einstiegspunkt und Anleitung um dem Benutzer eine Übersicht über die gängigsten Anwendungsfälle, Kommandos, Argumente und Schalter von {APP} zu vermitteln. Es nicht das Ziel und auch nicht möglich den vollen Umfang mit allen Variationen zu dokumentieren. {APP} nutzt einen Linux-Unterbau und folgt in der Regel auch den Linux-Konventionen für CLI wie z.B. link:https://clig.dev/#guidelines[CLI Guidlines].
 

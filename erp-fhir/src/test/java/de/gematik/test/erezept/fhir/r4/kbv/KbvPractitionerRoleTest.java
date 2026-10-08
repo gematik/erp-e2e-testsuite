@@ -20,6 +20,8 @@
 
 package de.gematik.test.erezept.fhir.r4.kbv;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
@@ -31,6 +33,19 @@ import org.junit.jupiter.api.Test;
 class KbvPractitionerRoleTest extends ErpFhirParsingTest {
 
   private static final String BASE_PATH_1_1 = "fhir/valid/kbv_evdga/1.1/";
+
+  @Test
+  void shouldGetAsvTeamNumber() {
+    val bundleName = "EVDGA_Bundle_Krankenhaus";
+    val fileName = bundleName + ".xml";
+
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1 + fileName);
+    val bundle = parser.decode(KbvEvdgaBundle.class, content);
+    val practitionerRole = bundle.getPractitionerRole().orElseThrow();
+
+    val asvnr = assertDoesNotThrow(practitionerRole::getTeamNumber);
+    assertEquals("000001365", asvnr.getValueAsString());
+  }
 
   @Test
   void shouldThrowOnMissingTeamNumber01() {

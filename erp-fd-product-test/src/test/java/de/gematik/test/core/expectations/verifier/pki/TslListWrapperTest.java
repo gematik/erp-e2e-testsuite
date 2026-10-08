@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.pki.gemlibpki.tsl.TslConverter;
+import de.gematik.pki.gemlibpki.commons.tsl.TslConverter;
 import de.gematik.test.erezept.actions.rawhttpactions.pki.TslListWrapper;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,10 +33,10 @@ import org.junit.jupiter.api.Test;
 class TslListWrapperTest {
 
   private static final String CORRECT_CERT_BODY_PATH = "tslexamples/ECC_RSA_TSLCerts.txt";
-  private static final String CERT_BODY_PATH_WithoutExtensions =
+  private static final String CERT_BODY_PATH_WITHOUT_EXTENSIONS =
       "tslexamples/ECC_RSA_TSLCerts_Without_ExtensionEndsWith202Or203.txt";
 
-  private static final String CERT_BODY_PATH_Without_202_Ext =
+  private static final String CERT_BODY_PATH_WITHOUT_202_EXT =
       "tslexamples/ECC_RSA_TSLCerts_Without_ExtensionEndsWith202Or203.txt";
 
   private TslListWrapper tslListWrapper;
@@ -59,14 +59,14 @@ class TslListWrapperTest {
 
   @Test
   void shouldGetListWithoutExtensions() {
-    val respBody = ResourceLoader.readFileFromResource(CERT_BODY_PATH_WithoutExtensions);
+    val respBody = ResourceLoader.readFileFromResource(CERT_BODY_PATH_WITHOUT_EXTENSIONS);
     val tslListWrapper1 = new TslListWrapper(TslConverter.bytesToTslUnsigned(respBody.getBytes()));
     assertTrue(tslListWrapper1.getFilteredForFDSicAndEncX509Certificates().isEmpty());
   }
 
   @Test
   void shouldGetExtensionsThatEndsWith203() {
-    val respBody = ResourceLoader.readFileFromResource(CERT_BODY_PATH_Without_202_Ext);
+    val respBody = ResourceLoader.readFileFromResource(CERT_BODY_PATH_WITHOUT_202_EXT);
     val tslListWrapper1 = new TslListWrapper(TslConverter.bytesToTslUnsigned(respBody.getBytes()));
     assertTrue(tslListWrapper1.getFilteredForFDSicAndEncX509Certificates().isEmpty());
   }

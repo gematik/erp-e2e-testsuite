@@ -39,4 +39,5 @@ public class BackendRouteConfiguration {
   private String redirectUrl = "http://test-ps.gematik.de/erezept";
 
   private String vsdServiceHMacKey;
+  private String ocsp;
 }

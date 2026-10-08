@@ -149,6 +149,14 @@ public class GemErpMedicationIngredientFaker implements GemErpMedicationFaker {
     return this;
   }
 
+  public GemErpMedicationIngredientFaker withIngredientWithContainedATC(
+      int numerator, int denominator, ATC atc) {
+    builderConsumers.put(
+        "ingredientComponentList",
+        b -> b.ingredientComponent(buildIngredient(numerator, denominator, atc)));
+    return this;
+  }
+
   public GemErpMedicationIngredientFaker withVaccineTrue(boolean isVaccine) {
     builderConsumers.put("vaccine", b -> b.isVaccine(isVaccine));
     return this;
@@ -179,6 +187,15 @@ public class GemErpMedicationIngredientFaker implements GemErpMedicationFaker {
             Quantity.fromUcum(String.valueOf(num), "mg"),
             Quantity.fromUcum(String.valueOf(denom), "mg"))
         .ask(ask)
+        .build();
+  }
+
+  private GemErpIngredientComponent buildIngredient(int num, int denom, ATC atc) {
+    return GemErpIngredientComponentBuilder.builder()
+        .ingredientStrength(
+            Quantity.fromUcum(String.valueOf(num), "mg"),
+            Quantity.fromUcum(String.valueOf(denom), "mg"))
+        .atc(atc)
         .build();
   }
 

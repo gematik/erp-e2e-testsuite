@@ -48,7 +48,14 @@ public enum EmlAfos implements RequirementsSet {
   A_25955(
       "A_25955",
       "E-Rezept-Fachdienst - ePA - Übermittlung - Löschinformation von Dispensierinformationen"),
-  ;
+  A_29378(
+      "A_29378",
+      "E-Rezept-Fachdienst - Task schließen - EU - Daten ePA Medication Service bereitstellen"
+          + " (Dispensierinformationen)"),
+  A_29379(
+      "A_29379",
+      "E-Rezept-Fachdienst - ePA - provide-dispensation-erp - Organisation-Ressource - nach EU"
+          + " Abgabe");
 
   @Getter private final Requirement requirement;
 

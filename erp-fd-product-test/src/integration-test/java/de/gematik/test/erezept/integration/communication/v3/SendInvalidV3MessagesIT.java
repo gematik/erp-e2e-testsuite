@@ -35,9 +35,12 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.fhir.extensions.erp.CommunicationPayloadType;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
+import de.gematik.test.fuzzing.core.FuzzingMutator;
+import de.gematik.test.fuzzing.core.NamedEnvelope;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.stream.Stream;
@@ -235,31 +238,49 @@ class SendInvalidV3MessagesIT extends ErpTest {
   @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_V3_05")
   @ParameterizedTest(
       name =
-          "[{index}] -> Die Stadtapotheke sendet eine V3 Reply mit ungültigem totalAmount (negativ)"
-              + " mit {0} und SupplyOption {1} an den Versicherten!")
+          "[{index}] -> Die Stadtapotheke sendet eine V3 Reply mit ungültigem totalAmount als"
+              + " String mit {0} und SupplyOption {1} an den Versicherten!")
   @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationReply in V3 nur gültige Werte "
-          + "für totalAmount (>= 0) akzeptiert")
+      "Es wird geprüft, dass der Fachdienst CommunicationReply in V3 totalAmount nur als"
+          + " numerischen Wert akzeptiert")
   @MethodSource("communicationTestComposer")
   void shouldRejectInvalidTotalAmount(
       PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
 
     val task = doc.prescribeFor(patient, assignmentKind);
 
+    val totalAmountAsStringManipulator =
+        NamedEnvelope.of(
+            "HelloWorld",
+            (FuzzingMutator<ErxCommunication>)
+                communication -> {
+                  val content = communication.getPayloadFirstRep().getContentStringType();
+                  content.setValue(
+                      content
+                          .getValue()
+                          .replace(
+                              "\"totalAmount\":10", "\"totalAmount\":\"invalid_total_amount\""));
+                });
+
     val request =
         CommunicationReplyMessage.forV3()
             .communicationType(CommunicationPayloadType.PAYMENT_INFO.getLabel())
-            .totalAmount(-10) //  negative amount
+            .totalAmount(10)
             .text("test")
             .build();
 
-    val response = pharma.performs(SendMessages.to(patient).forTask(task).asReply(request, pharma));
+    val response =
+        pharma.performs(
+            SendMessages.to(patient)
+                .forTask(task)
+                .addManipulator(totalAmountAsStringManipulator)
+                .asReply(request, pharma));
 
     pharma.attemptsTo(
         Verify.that(response)
-            .withOperationOutcome(ErpAfos.A_23879)
+            .withOperationOutcome(ErpAfos.A_23877_02)
             .hasResponseWith(returnCode(400))
-            .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23879))
+            .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23877_02))
             .isCorrect());
   }
 
@@ -285,37 +306,6 @@ class SendInvalidV3MessagesIT extends ErpTest {
                     new CommunicationReplyMessage.PaymentMethod(
                         "bitcoin", "BTC", "https://pay.example.com")))
             .text(getRandomString(200))
-            .build();
-
-    val response = pharma.performs(SendMessages.to(patient).forTask(task).asReply(request, pharma));
-
-    pharma.attemptsTo(
-        Verify.that(response)
-            .withOperationOutcome(ErpAfos.A_23879)
-            .hasResponseWith(returnCode(400))
-            .and(operationOutcomeContainsInDetailText(INVALID_JSON_PAYLOAD, ErpAfos.A_23879))
-            .isCorrect());
-  }
-
-  @TestcaseId("ERP_COMMUNICATION_SEND_INVALID_V3_07")
-  @ParameterizedTest(
-      name =
-          "[{index}] -> Die Stadtapotheke sendet eine V3 Reply mit fehlendem totalAmount (null)"
-              + " mit {0} und SupplyOption {1} an den Versicherten!")
-  @DisplayName(
-      "Es wird geprüft, dass der Fachdienst CommunicationReply in V3 kein null für totalAmount"
-          + " akzeptiert")
-  @MethodSource("communicationTestComposer")
-  void shouldRejectNullTotalAmount(
-      PrescriptionAssignmentKind assignmentKind, SupplyOptionsType supplyOptionsType) {
-
-    val task = doc.prescribeFor(patient, assignmentKind);
-
-    val request =
-        CommunicationReplyMessage.forV3()
-            .communicationType(CommunicationPayloadType.PAYMENT_INFO.getLabel())
-            .totalAmount(0)
-            .text("test")
             .build();
 
     val response = pharma.performs(SendMessages.to(patient).forTask(task).asReply(request, pharma));

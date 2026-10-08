@@ -28,12 +28,7 @@ import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.eml.tasks.CheckEpaOpCancelPrescriptionWithTask;
 import de.gematik.test.erezept.ErpTest;
-import de.gematik.test.erezept.actions.AcceptPrescription;
-import de.gematik.test.erezept.actions.DownloadAuditEvent;
-import de.gematik.test.erezept.actions.GetPrescriptionById;
-import de.gematik.test.erezept.actions.IssuePrescription;
-import de.gematik.test.erezept.actions.TaskAbort;
-import de.gematik.test.erezept.actions.Verify;
+import de.gematik.test.erezept.actions.*;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.GemaTestActor;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -42,35 +37,31 @@ import de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationCompoundingFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationFreeTextBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.time.LocalDate;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.runner.RunWith;
 
 @Slf4j
-@RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Cancel Prescription with Consent Decision")
 @Tag("CancelEmlPrescription")
 @Tag("EpaEml")
-public class CancelPrescriptionWithConsentIT extends ErpTest {
+class CancelPrescriptionWithConsentIT extends ErpTest {
 
   private static final String MEDICATION_PZN = "Medication PZN";
   private static final String MEDICATION_INGREDIENT = "Medication Ingredient";
@@ -86,8 +77,23 @@ public class CancelPrescriptionWithConsentIT extends ErpTest {
   @Actor(name = "Stadtapotheke")
   private PharmacyActor pharmacy;
 
+  private final ErpInteractionPoller pollerBuilder = ErpInteractionPoller.builder().build();
+
   static Stream<Arguments> prescriptionTypesProvider() {
     return WorkflowAndMedicationComposer.workflowAndMedicationComposer().create();
+  }
+
+  private static @NonNull Predicate<ErxAuditEventBundle> getErxAuditEventBreakOutPredicate() {
+    return aeb ->
+        aeb.getAuditEvents().stream()
+            .anyMatch(
+                ae ->
+                    ae.getFirstText()
+                            .contains(
+                                "Die Verordnung konnte nicht in die Patientenakte übertragen"
+                                    + " werden")
+                        || ae.getFirstText()
+                            .contains("Die Verordnung wurde in die Patientenakte übertragen"));
   }
 
   @TestcaseId("EML_CANCEL_PRESCRIPTION_WITH_CONSENT_DECISION_APPLY_AS_PATIENT_01")
@@ -145,8 +151,10 @@ public class CancelPrescriptionWithConsentIT extends ErpTest {
             .sortedBy("date", SortOrder.DESCENDING)
             .createParameter();
 
-    val auditEvents = patient.performs(DownloadAuditEvent.withQueryParams(searchParams));
-
+    val auditEvents =
+        pollerBuilder.poll(
+            () -> patient.performs(DownloadAuditEvent.withQueryParams(searchParams)),
+            getErxAuditEventBreakOutPredicate());
     patient.attemptsTo(
         Verify.that(auditEvents)
             .withExpectedType()
@@ -208,7 +216,10 @@ public class CancelPrescriptionWithConsentIT extends ErpTest {
             .sortedBy("date", SortOrder.DESCENDING)
             .createParameter();
 
-    val auditEvents = patient.performs(DownloadAuditEvent.withQueryParams(searchParams));
+    val auditEvents =
+        pollerBuilder.poll(
+            () -> patient.performs(DownloadAuditEvent.withQueryParams(searchParams)),
+            getErxAuditEventBreakOutPredicate());
 
     patient.attemptsTo(
         Verify.that(auditEvents)
@@ -276,7 +287,10 @@ public class CancelPrescriptionWithConsentIT extends ErpTest {
             .sortedBy("date", SortOrder.DESCENDING)
             .createParameter();
 
-    val auditEvents = patient.performs(DownloadAuditEvent.withQueryParams(searchParams));
+    val auditEvents =
+        pollerBuilder.poll(
+            () -> patient.performs(DownloadAuditEvent.withQueryParams(searchParams)),
+            getErxAuditEventBreakOutPredicate());
 
     patient.attemptsTo(
         Verify.that(auditEvents)

@@ -272,39 +272,34 @@ class ErxTaskTest extends ErpFhirParsingTest {
   @Test
   void shouldBeRedeemableByPropertiesWhenExtensionMatches() {
     val task = new ErxTask();
-    task.addExtension(
-        new Extension(
-            GemErpEuStructDef.EXT_REDEEMABLE_BY_PROPERTIES.getCanonicalUrl(),
-            new BooleanType(true)));
+    task.addExtension(GemErpEuStructDef.EXT_REDEEMABLE_BY_PROPERTIES.asBooleanExtension(true));
 
-    assertTrue(task.isRedeemableByProperties(true));
+    assertTrue(task.isRedeemableByProperties());
     assertFalse(task.isRedeemableByProperties(false));
   }
 
   @Test
   void shouldBeRedeemableByPropertiesWhenExtensionIsMissing() {
     val task = new ErxTask();
-    assertFalse(task.isRedeemableByProperties(true));
-    assertFalse(task.isRedeemableByProperties(false));
+    assertFalse(task.isRedeemableByProperties());
+    assertTrue(task.isRedeemableByProperties(false));
   }
 
   @Test
   void shouldBeRedeemableByAuthorizationWhenExtensionMatches() {
     val task = new ErxTask();
     task.addExtension(
-        new Extension(
-            GemErpEuStructDef.EXT_REDEEMABLE_BY_PATIENT_AUTHORIZATION.getCanonicalUrl(),
-            new BooleanType(false)));
+        GemErpEuStructDef.EXT_REDEEMABLE_BY_PATIENT_AUTHORIZATION.asBooleanExtension(false));
 
     assertTrue(task.isRedeemableByAuthorization(false));
-    assertFalse(task.isRedeemableByAuthorization(true));
+    assertFalse(task.isRedeemableByAuthorization());
   }
 
   @Test
   void shouldBeRedeemableByAuthorizationWhenExtensionIsMissing() {
     val task = new ErxTask();
     assertFalse(task.isRedeemableByAuthorization(true));
-    assertFalse(task.isRedeemableByAuthorization(false));
+    assertFalse(task.isRedeemableByAuthorization());
   }
 
   @Test
@@ -314,13 +309,13 @@ class ErxTaskTest extends ErpFhirParsingTest {
         new Extension(
             GemErpEuStructDef.EXT_REDEEMABLE_BY_PROPERTIES.getCanonicalUrl(),
             new BooleanType(true)));
-    assertTrue(task.getRedeemableByProperties());
+    assertTrue(task.isRedeemableByProperties());
   }
 
   @Test
   void shouldBeFalseForRedeemableByPropertiesWhenExtensionIsMissing() {
     val task = new ErxTask();
-    assertFalse(task.getRedeemableByProperties());
+    assertFalse(task.isRedeemableByProperties());
   }
 
   @Test

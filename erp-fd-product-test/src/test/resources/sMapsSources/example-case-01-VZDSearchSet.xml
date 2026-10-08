@@ -1,0 +1,128 @@
+<Bundle xmlns='http://hl7.org/fhir'>
+    <id value='VZD-SearchSet-Bundle'/>
+    <meta>
+        <lastUpdated value='2025-06-19T08:42:40.732+02:00'/>
+    </meta>
+    <type value='searchset'/>
+    <total value='3'/>
+    <entry>
+        <fullUrl value='https://fhir-directory-ref.vzd.ti-dienste.de/search/HealthcareService/a4f1b52e-c5de-47eb-874c-990c2b39bb77'/>
+        <resource>
+            <HealthcareService>
+                <id value='a4f1b52e-c5de-47eb-874c-990c2b39bb77'/>
+                <meta>
+                    <versionId value='2'/>
+                    <lastUpdated value='2024-03-27T17:49:37.898+01:00'/>
+                    <profile value='http://hl7.org/fhir/StructureDefinition/HealthcareService'/>
+                    <profile value='https://gematik.de/fhir/directory/StructureDefinition/HealthcareServiceDirectory'/>
+                    <tag>
+                        <system value='https://gematik.de/fhir/directory/CodeSystem/Origin'/>
+                        <code value='owner'/>
+                    </tag>
+                </meta>
+                <identifier>
+                    <system value='http://hl7.org/fhir/sid/us-npi'/>
+                    <value value='1b9b1767-5496-4c20-bfc1-32ad6d96adbc'/>
+                </identifier>
+                <providedBy>
+                    <reference value='Organization/4f5a9754-2a9d-486d-9eec-a5c6b5f95016'/>
+                </providedBy>
+                <location>
+                    <reference value='Location/9514f96e-897d-492d-950f-aea11d6f2bb4'/>
+                </location>
+                <telecom>
+                    <system value='phone'/>
+                    <value value='1234'/>
+                    <use value='work'/>
+                </telecom>
+                <endpoint>
+                    <reference value='Endpoint/11d91987-d31e-468f-962e-845bb0c743c3'/>
+                </endpoint>
+            </HealthcareService>
+        </resource>
+        <search>
+            <mode value='match'/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl value='https://fhir-directory-ref.vzd.ti-dienste.de/search/Organization/4f5a9754-2a9d-486d-9eec-a5c6b5f95016'/>
+        <resource>
+            <Organization>
+                <id value='4f5a9754-2a9d-486d-9eec-a5c6b5f95016'/>
+                <meta>
+                    <versionId value='1'/>
+                    <lastUpdated value='2023-03-23T14:14:28.492+01:00'/>
+                    <profile value='http://hl7.org/fhir/StructureDefinition/Organization'/>
+                    <profile value='https://gematik.de/fhir/directory/StructureDefinition/OrganizationDirectory'/>
+                    <tag>
+                        <system value='https://gematik.de/fhir/directory/CodeSystem/Origin'/>
+                        <code value='owner'/>
+                    </tag>
+                </meta>
+                <identifier>
+                    <system value='http://hl7.org/fhir/sid/us-npi'/>
+                    <value value='44bb2f53-cdd7-4098-9d52-a6c5ac0ddc8d'/>
+                </identifier>
+                <identifier>
+                    <type>
+                        <coding>
+                            <system value='http://terminology.hl7.org/CodeSystem/v2-0203'/>
+                            <code value='PRN'/>
+                        </coding>
+                    </type>
+                    <system value='https://gematik.de/fhir/sid/telematik-id'/>
+                    <value value='3-SMC-B-Testkarte--883110000163973'/>
+                </identifier>
+                <active value='true'/>
+                <type>
+                    <coding>
+                        <system value='https://gematik.de/fhir/directory/CodeSystem/OrganizationProfessionOID'/>
+                        <code value='1.2.276.0.76.4.54'/>
+                        <display value='Arminius ApothekeTEST-ONLY'/>
+                    </coding>
+                </type>
+                <name value='Arminius ApothekeTEST-ONLY'/>
+                <alias value='Arminius ApothekeTEST-ONLY'/>
+            </Organization>
+        </resource>
+        <search>
+            <mode value='include'/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl value='https://fhir-directory-ref.vzd.ti-dienste.de/search/Location/9514f96e-897d-492d-950f-aea11d6f2bb4'/>
+        <resource>
+            <Location>
+                <id value='9514f96e-897d-492d-950f-aea11d6f2bb4'/>
+                <meta>
+                    <versionId value='1'/>
+                    <lastUpdated value='2023-03-23T14:14:28.492+01:00'/>
+                    <profile value='http://hl7.org/fhir/StructureDefinition/Location'/>
+                    <profile value='https://gematik.de/fhir/directory/StructureDefinition/LocationDirectory'/>
+                    <tag>
+                        <system value='https://gematik.de/fhir/directory/CodeSystem/Origin'/>
+                        <code value='owner'/>
+                    </tag>
+                </meta>
+                <identifier>
+                    <system value='http://hl7.org/fhir/sid/us-npi'/>
+                    <value value='995d8a48-f7fc-4ffb-a676-feb18c7c052c'/>
+                </identifier>
+                <name value='Location of Organisation 3-SMC-B-Testkarte--883110000163973'/>
+                <address>
+                    <use value='work'/>
+                    <type value='postal'/>
+                    <text value='Langensalzaer Str. 25, 99974, Mühlhausen'/>
+                    <line value='Langensalzaer Str. 25'/>
+                    <city value='Mühlhausen'/>
+                    <state value='Bayern'/>
+                    <postalCode value='99974'/>
+                    <country value='DE'/>
+                </address>
+            </Location>
+        </resource>
+        <search>
+            <mode value='include'/>
+        </search>
+    </entry>
+</Bundle>

@@ -55,7 +55,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
@@ -65,8 +64,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@Slf4j
-// @RunWith(SerenityParameterizedRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("E-Rezept als Mehrfachverordnung ausstellen")
 @Tag("Feature:MVO")

@@ -335,14 +335,6 @@ public class KbvBundleManipulatorFactory {
             b ->
                 changeExtensionCode(
                     b.getCoverage(), DeBasisProfilStructDef.GKV_DMP_KENNZEICHEN, "0")));
-
-    manipulators.add(
-        NamedEnvelope.of(
-            "DMP Code 13",
-            b ->
-                changeExtensionCode(
-                    b.getCoverage(), DeBasisProfilStructDef.GKV_DMP_KENNZEICHEN, "13")));
-
     manipulators.add(
         NamedEnvelope.of(
             "DMP Code Asthma",
@@ -884,7 +876,7 @@ public class KbvBundleManipulatorFactory {
         NamedEnvelope.of(
             "Leerzeichen nach der Organization-Adresse",
             b -> {
-              val addressLine = b.getPatient().getAddressFirstRep().getLine().get(0);
+              val addressLine = b.getPatient().getAddressFirstRep().getLine().getFirst();
               addressLine.setValue("Bahnhofstr.  14");
               addressLine
                   .getExtensionByUrl(HL7StructDef.STREET_NAME.getCanonicalUrl())

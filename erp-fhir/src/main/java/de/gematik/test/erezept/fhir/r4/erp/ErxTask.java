@@ -38,7 +38,6 @@ import de.gematik.test.erezept.fhir.valuesets.PerformerType;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.time.Instant;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -194,19 +193,26 @@ public class ErxTask extends Task {
     }
   }
 
+  /**
+   * This method is deprecated and will be removed in future versions. Use {@link
+   * #isRedeemableByProperties()} instead.
+   *
+   * @param expected the expected value of the redeemable by properties extension
+   * @return true if the redeemable by properties extension matches the expected value, false
+   *     otherwise
+   * @deprecated Use {@link #isRedeemableByProperties()} instead.
+   */
+  @Deprecated(forRemoval = true)
   public boolean isRedeemableByProperties(boolean expected) {
-    List<BooleanType> values =
-        this.getExtension().stream()
-            .filter(GemErpEuStructDef.EXT_REDEEMABLE_BY_PROPERTIES::matches)
-            .map(Extension::getValue)
-            .filter(BooleanType.class::isInstance)
-            .map(BooleanType.class::cast)
-            .toList();
-
-    return values.size() == 1 && values.get(0).booleanValue() == expected;
+    return this.isRedeemableByProperties() == expected;
   }
 
-  public boolean getRedeemableByProperties() {
+  /**
+   * Check if the ErxTask is redeemable by properties based on the extension value.
+   *
+   * @return true if the redeemable by properties extension is present and true, false otherwise
+   */
+  public boolean isRedeemableByProperties() {
     return this.getExtension().stream()
         .filter(GemErpEuStructDef.EXT_REDEEMABLE_BY_PROPERTIES::matches)
         .map(Extension::getValue)
@@ -217,16 +223,34 @@ public class ErxTask extends Task {
         .orElse(false);
   }
 
+  /**
+   * This method is deprecated and will be removed in future versions. Use {@link
+   * #isRedeemableByAuthorization()} instead.
+   *
+   * @param expected the expected value of the redeemable by authorization extension
+   * @return true if the redeemable by authorization extension matches the expected value, false
+   *     otherwise
+   * @deprecated Use {@link #isRedeemableByAuthorization()} instead.
+   */
+  @Deprecated(forRemoval = true)
   public boolean isRedeemableByAuthorization(boolean expected) {
-    List<BooleanType> values =
-        this.getExtension().stream()
-            .filter(GemErpEuStructDef.EXT_REDEEMABLE_BY_PATIENT_AUTHORIZATION::matches)
-            .map(Extension::getValue)
-            .filter(BooleanType.class::isInstance)
-            .map(BooleanType.class::cast)
-            .toList();
+    return this.isRedeemableByAuthorization() == expected;
+  }
 
-    return values.size() == 1 && values.get(0).booleanValue() == expected;
+  /**
+   * Check if the ErxTask is redeemable by authorization based on the extension value.
+   *
+   * @return true if the redeemable by authorization extension is present and true, false otherwise
+   */
+  public boolean isRedeemableByAuthorization() {
+    return this.getExtension().stream()
+        .filter(GemErpEuStructDef.EXT_REDEEMABLE_BY_PATIENT_AUTHORIZATION::matches)
+        .map(Extension::getValue)
+        .filter(BooleanType.class::isInstance)
+        .map(BooleanType.class::cast)
+        .map(BooleanType::booleanValue)
+        .findFirst()
+        .orElse(false);
   }
 
   public static ErxTask fromTask(Resource adaptee) {

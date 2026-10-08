@@ -49,7 +49,7 @@ class QesVerifierTest {
     onlineOcspToken =
         OcspTokenGenerator.with(
                 hba.getQesCertificate(CryptoSystem.DEFAULT_CRYPTO_SYSTEM).getX509Certificate())
-            .asOnlineToken();
+            .asOnlineToken("http://ehca-testref.komp-ca.telematik-test/status/ecc-qocsp");
 
     val producedAt = ZonedDateTime.now();
     val updatedAt = producedAt.minusDays(5);

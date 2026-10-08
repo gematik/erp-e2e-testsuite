@@ -20,15 +20,21 @@
 
 package de.gematik.test.erezept.eml.fhir.r4;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import java.util.List;
 import lombok.val;
+import org.hl7.fhir.r4.model.Coding;
 import org.junit.jupiter.api.Test;
 
 class EpaOrganisationTest {
+
+  private static final String COUNTRY_EXTENSION_URL =
+      "https://gematik.de/fhir/ti/StructureDefinition/ncpeh-country-extension";
 
   @Test
   void shouldGetCorrectTelematikId() {
@@ -37,5 +43,22 @@ class EpaOrganisationTest {
     epaOrganisation.setIdentifier(
         List.of(DeBasisProfilNamingSystem.TELEMATIK_ID_SID.asIdentifier("123.asd")));
     assertEquals(TelematikID.from("123.asd"), epaOrganisation.getTelematikId());
+  }
+
+  @Test
+  void shouldGetCorrectCountryCode() {
+    val epaOrganisation = new EpaOrganisation();
+    val expectedCoding = new Coding().setSystem("urn:iso:std:iso:3166").setCode("DE");
+
+    epaOrganisation.addExtension(COUNTRY_EXTENSION_URL, expectedCoding);
+
+    assertTrue(expectedCoding.equalsDeep(epaOrganisation.getCountryCode()));
+  }
+
+  @Test
+  void shouldReturnNullWhenCountryCodeExtensionIsMissing() {
+    val epaOrganisation = new EpaOrganisation();
+
+    assertNull(epaOrganisation.getCountryCode());
   }
 }

@@ -53,7 +53,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @DisplayName("Get MedicationDispense by Id should fail")
 @Tag("MedicationDispense")
 @Tag("GetMedDspByIdShouldFail")
-public class GetNoMedicationDispenseByIdIT extends ErpTest {
+class GetNoMedicationDispenseByIdIT extends ErpTest {
 
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;

@@ -23,6 +23,7 @@ package de.gematik.test.trezept.integration;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeContainsInDiagnostics;
 
+import de.gematik.bbriccs.konnektor.SoftKonVerifier;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
@@ -30,6 +31,7 @@ import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.*;
 import de.gematik.test.erezept.actions.trezept.RetrieveCarbonCopy;
 import de.gematik.test.erezept.actions.trezept.VerifyTRegisterCarbonCopy;
+import de.gematik.test.erezept.actions.trezept.VerifyTRegisterCarbonCopyUsingStructureMaps;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.GemaTestActor;
 import de.gematik.test.erezept.actors.PatientActor;
@@ -38,6 +40,8 @@ import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.GemCloseOperationParameters;
+import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import java.util.List;
@@ -74,7 +78,7 @@ class DispenseTRezeptIT extends ErpTest {
   }
 
   @Test
-  @TestcaseId("ERP_DISPENSE_TREZEPT_01")
+  @TestcaseId("ERP_DISPENSE_TREZEPT_01_A")
   @DisplayName("Die Abgabe eines T-Rezepts erzeugt Digitalen Durchschlag im T-Register")
   void shouldCreateDigitalCarbonCopyAfterSuccessfulClose() {
 
@@ -103,7 +107,49 @@ class DispenseTRezeptIT extends ErpTest {
     val logs = tRegisterChecker.asksFor(RetrieveCarbonCopy.forTask(task));
 
     tRegisterChecker.attemptsTo(
-        VerifyTRegisterCarbonCopy.from(logs, task.getPrescriptionId(), medDisp, null));
+        VerifyTRegisterCarbonCopy.from(logs, task.getPrescriptionId(), medDisp, false));
+  }
+
+  @Test
+  @TestcaseId("ERP_DISPENSE_TREZEPT_01_B")
+  @DisplayName("Die Abgabe eines T-Rezepts erzeugt Digitalen Durchschlag im T-Register")
+  void shouldCreateDigitalCarbonCopyAfterSuccessfulCloseAndCompareWithStructureMaps() {
+
+    val kbvErpBundleFaker =
+        KbvErpBundleFaker.builder().withMedication(KbvErpMedicationPZNFaker.asTPrescription());
+
+    val task =
+        doctor
+            .performs(
+                IssuePrescription.forPatient(sina).asTPrescription(kbvErpBundleFaker.toBuilder()))
+            .getExpectedResponse();
+
+    val accept = flughafen.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
+
+    val taskAccepted = accept.getSignedKbvBundle();
+    val kbvBundleAccepted = SoftKonVerifier.parse(taskAccepted).getDocument();
+    val kbvBundle =
+        doctor
+            .abilityTo(UseTheErpClient.class)
+            .getFhir()
+            .decode(KbvErpBundle.class, kbvBundleAccepted);
+
+    val closeInteraction = flughafen.performs(ClosePrescription.acceptedWith(accept));
+
+    flughafen.attemptsTo(
+        Verify.that(closeInteraction)
+            .withExpectedType()
+            .hasResponseWith(returnCode(200))
+            .isCorrect());
+
+    val medDisp =
+        sina.performs(GetMedicationDispense.fromPerformer(flughafen.getTelematikId()))
+            .getExpectedResponse();
+    val logs = tRegisterChecker.asksFor(RetrieveCarbonCopy.forTask(task));
+
+    tRegisterChecker.attemptsTo(
+        VerifyTRegisterCarbonCopyUsingStructureMaps.from(
+            logs, task.getPrescriptionId(), medDisp, false, task, kbvBundle, flughafen));
   }
 
   @Test

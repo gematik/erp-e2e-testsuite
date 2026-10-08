@@ -90,9 +90,9 @@ Funktionalität: Apothekenpflichtige Verordnungstypen für Versicherte und Selbs
     Und die Versicherte Sina Hüllmann ihr letztes ausgestelltes E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
     Dann kann die Apotheke Am Flughafen das letzte akzeptierte E-Rezept mit den folgenden Medikamenten korrekt an Sina Hüllmann dispensiert:
-      | Name                    | PZN      | Kategorie | Normgröße | Menge | Einheit | Darreichungsform | WirkstoffmengeNum | WirkstoffEinheitNum | WirkstoffmengeDenom | WirkstoffeinheitDemon | Wirkstoffname          |
-      | Allergodil Augentropfen | 01038246 | 00        | N1        | 1     | Stk     | KPG              | 0.015             | mg                  | 1.5                 | Tropfen               | Azelastin hydrochlorid |
-      | Allergodil Nasenspray   | 01038246 | 00        | N1        | 1     | Stk     | KPG              | 0.14              | mg                  | 1.2                 | Sprühstoß             | Azelastin hydrochlorid |
+      | Name                    | PZN      | Kategorie | Normgröße | Menge | Einheit | Darreichungsform | WirkstoffmengeNum | WirkstoffEinheitNum | WirkstoffmengeDenom | WirkstoffeinheitDemon | Wirkstoffname          | Dosierung                          |
+      | Allergodil Augentropfen | 01038246 | 00        | N1        | 1     | Stk     | KPG              | 0.015             | mg                  | 1.5                 | Tropfen               | Azelastin hydrochlorid | maximal 2 Tropfen je Anwendung     |
+      | Allergodil Nasenspray   | 01038246 | 00        | N1        | 1     | Stk     | KPG              | 0.14              | mg                  | 1.2                 | Sprühstoß             | Azelastin hydrochlorid | nicht länger als 1 wochen am Stück |
 
     Beispiele:
       | Versicherungsart | Name                         | Freitext             | PZN      | Menge | isVaccine | WirkstoffmengeNum | WirkstoffEinheitNum | WirkstoffmengeDenom | WirkstoffeinheitDemon | Wirkstoffname          | DarrerichungsformCode |
@@ -134,6 +134,25 @@ Funktionalität: Apothekenpflichtige Verordnungstypen für Versicherte und Selbs
     Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgende apothekenpflichtige Rezeptur Verordnung verschreibt:
       | Name         | Menge | Einheit | Dosierung                |
       | Ohrentropfen | 100   | ml      | morgens 3 Tropfen je Ohr |
+    Und die Versicherte Sina Hüllmann ihr letztes ausgestelltes E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
+    Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
+
+    Dann kann die Apotheke Am Flughafen das letzte E-Rezept für Sina Hüllmann beim Abschluss des Workflows die Dispensierinformationen ändern in:
+      | Name              | Normgröße | Menge | Einheit | Dosierung                | Gebrauchsanweisung                            |
+      | Ohrentropfen akut | N1        | 10    | Stk     | morgens 3 Tropfen je Ohr | aber erst NACH dem herausnehmen der Ohrhörer! |
+
+  @WIP
+  @TCID:ERP_EE_REZEPTVARIANTEN_06
+  @AFO-ID:C_12563
+  @TESTFALL:positiv
+  @Hauptdarsteller:Arzt
+  Szenario: Einstellen eines Apothekenpflichtigen E-Rezeptes falschem EMP-Identifier
+
+    Und die GKV Versicherte Sina Hüllmann hat Zugriff auf ihre eGK
+
+    Wenn die Ärztin Dr. Schraßer der Versicherten Sina Hüllmann folgende apothekenpflichtiges Medikament verschreibt:
+      | Name         | Menge | Einheit | Dosierung                | Manually-Defined-EMP-Identifier |
+      | Ohrentropfen | 100   | ml      | morgens 3 Tropfen je Ohr | random-UUID                     |
     Und die Versicherte Sina Hüllmann ihr letztes ausgestelltes E-Rezept der Apotheke Am Flughafen via Data Matrix Code zuweist
     Und die Apotheke Am Flughafen das letzte zugewiesene E-Rezept beim Fachdienst akzeptiert
 

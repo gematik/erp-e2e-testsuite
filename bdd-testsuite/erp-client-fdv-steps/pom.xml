@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>bdd-testsuite</artifactId>
-        <version>1.7.1</version>
+        <version>1.8.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-common</artifactId>
-            <version>1.7.1</version>
+            <version>1.8.0</version>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>

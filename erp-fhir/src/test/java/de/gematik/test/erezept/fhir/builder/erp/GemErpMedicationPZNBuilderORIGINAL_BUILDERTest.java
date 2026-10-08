@@ -131,7 +131,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
             .withSupplyForm(
                 GemFaker.fakerValueSet(
                     Darreichungsform.class,
-                    Darreichungsform.KPG)) // mapping Kombipackung not possible yet
+                    Darreichungsform.getSpecialEntries())) // mapping Kombipackung not possible yet
             .withAmount(100, "Packung")
             .fake();
 
