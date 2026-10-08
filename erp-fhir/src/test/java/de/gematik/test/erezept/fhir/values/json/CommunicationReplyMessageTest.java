@@ -90,9 +90,8 @@ class CommunicationReplyMessageTest {
     val msg = CommunicationReplyMessage.forV3().build();
 
     assertNotNull(msg.transactionID());
-    assertNotNull(msg.text());
+    assertNull(msg.text());
     assertEquals(3, msg.version());
-    assertEquals("text", msg.communicationType());
   }
 
   @Test
@@ -114,11 +113,13 @@ class CommunicationReplyMessageTest {
             .deliveryStatus("inTransport")
             .inTransportPosition(new CommunicationReplyMessage.InTransportPosition(52.52, 13.38))
             .inTransportETA(new CommunicationReplyMessage.InTransportETA(1735736400L, 1735741800L))
+            .text("Der Bote is jetzt unterwegs!")
             .build();
 
     assertEquals(3, msg.version());
     assertEquals("deliveryStatus", msg.communicationType());
     assertEquals("inTransport", msg.deliveryStatus());
+    assertEquals("Der Bote is jetzt unterwegs!", msg.text());
 
     assertNotNull(msg.inTransportPosition());
     assertEquals(52.52, msg.inTransportPosition().lat());
@@ -171,5 +172,15 @@ class CommunicationReplyMessageTest {
     assertEquals("reservationStatus", msg.communicationType());
     assertEquals("immediately", msg.readyForCollection());
     assertNull(msg.text(), "Text should be null for reservation status messages");
+  }
+
+  @Test
+  void shouldNotHaveTextInTextOrLinkNoTextIsGiven() {
+    val textMsg =
+        CommunicationReplyMessage.forV3().communicationType(CommunicationPayloadType.TEXT).build();
+    assertNull(textMsg.text());
+    val linkMsg =
+        CommunicationReplyMessage.forV3().communicationType(CommunicationPayloadType.LINK).build();
+    assertNull(linkMsg.text());
   }
 }

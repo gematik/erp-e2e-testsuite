@@ -15,13 +15,13 @@ actors:
       konnektor: Soft-Konn
 
     - name: Dr. Schraßer
-      smcbIccsn: 80276883110000117369 #Praxis Bloch-Bauer
+      smcbIccsn: 80276883110000163972 #Praxis Peer Graf von Müller
       hbaIccsn: 80276883110000095767 #Arzt Sam Schraßer
       qualificationType: Arzt
       konnektor: Soft-Konn
 
   pharmacies:
-    - name: Am Flughafen
+    - name: Am Flughafen # seit DEZ 2024 abgelaufen
       apoVzdName: Apotheke am FlughafenTEST-ONLY
       smcbIccsn: 80276883110000116873
       konnektor: Soft-Konn
@@ -38,10 +38,10 @@ actors:
 
   patients:
     - name: Fridolin Straßer
-      egkIccsn: 80276883110000113311
+      egkIccsn: 80276883110000163961
 
     - name: Hanna Bäcker
-      egkIccsn: 80276883110000108142
+      egkIccsn: 80276883110000163962
 
 environments:
   - name: LOCAL

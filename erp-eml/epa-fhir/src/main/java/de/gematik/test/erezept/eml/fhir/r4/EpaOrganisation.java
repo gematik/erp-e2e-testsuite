@@ -23,7 +23,9 @@ package de.gematik.test.erezept.eml.fhir.r4;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.test.erezept.eml.fhir.profile.GematikTiStructDef;
 import lombok.val;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Resource;
 
@@ -39,6 +41,12 @@ public class EpaOrganisation extends Organization {
             () ->
                 new MissingFieldException(
                     this.getClass(), DeBasisProfilNamingSystem.TELEMATIK_ID_SID));
+  }
+
+  public Coding getCountryCode() {
+    val countryCodeExtension =
+        this.getExtensionByUrl(GematikTiStructDef.NCPEH_COUNTRY_EXT.getCanonicalUrl());
+    return countryCodeExtension != null ? (Coding) countryCodeExtension.getValue() : null;
   }
 
   public static EpaOrganisation fromEpaOrganization(Organization adaptee) {

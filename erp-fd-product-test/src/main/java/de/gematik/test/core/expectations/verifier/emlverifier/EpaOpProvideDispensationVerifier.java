@@ -24,9 +24,11 @@ import static de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef.DR
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
+import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.core.expectations.requirements.EmlAfos;
 import de.gematik.test.core.expectations.requirements.EmlBfd;
+import de.gematik.test.core.expectations.requirements.ErpBfd;
 import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
 import de.gematik.test.erezept.fhir.profiles.definitions.DgMPStructDef;
@@ -46,6 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.MedicationDispense;
 import org.jetbrains.annotations.NotNull;
 
 @Slf4j
@@ -263,7 +266,74 @@ public class EpaOpProvideDispensationVerifier {
 
     return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
             EmlBfd.B_FD_1571.getRequirement(),
-            "Medication in Dispensation contains Coding without Version.")
+            "Medication in Dispensation contains Coding with Version.")
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<EpaOpProvideDispensation> emlOrganizationCountryCodeMapsTo(
+      Coding expectedCountryCode) {
+    Predicate<EpaOpProvideDispensation> predicate =
+        r -> {
+          val actualCoding = r.getEpaOrganisation().getCountryCode();
+          return actualCoding != null && actualCoding.equalsDeep(expectedCountryCode);
+        };
+    return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
+            EmlAfos.A_29379.getRequirement(),
+            "Organization.extension[ncpehCountryEx].valueCoding sollte dem übermittelten"
+                + " countryCode entsprechen")
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<EpaOpProvideDispensation>
+      emlMedicationDispenseStatusIsCompleted() {
+    Predicate<EpaOpProvideDispensation> predicate =
+        r ->
+            MedicationDispense.MedicationDispenseStatus.COMPLETED.equals(
+                r.getEpaMedicationDispense().getStatus());
+    return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
+            EmlAfos.A_29378.getRequirement(),
+            "MedicationDispense sollte mit Status COMPLETED an den ePA Medication Service"
+                + " übermittelt werden")
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<EpaOpProvideDispensation>
+      emlMedicationDispenseCodeCodingVersionContains(String version) {
+    Predicate<EpaOpProvideDispensation> predicate =
+        dispensation ->
+            dispensation.getEpaMedication().getCode().getCoding().stream()
+                .filter(DeBasisProfilCodeSystem.ATC::matches)
+                .allMatch(co -> Objects.equals(co.getVersion(), version));
+    return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
+            ErpBfd.B_FD_1698.getRequirement(),
+            format("MedicationCodeCodingATC sollte als Version {0} enthalten", version))
+        .predicate(predicate)
+        .accept();
+  }
+
+  public static VerificationStep<EpaOpProvideDispensation>
+      emlMedicationIngredientAtcCodingVersionContains(int version) {
+    Predicate<EpaOpProvideDispensation> predicate =
+        dispensation -> {
+          val atcCodings = dispensation.getEpaMedication().getIngredientAtcList();
+
+          return !atcCodings.isEmpty()
+              && atcCodings.stream()
+                  .allMatch(
+                      co ->
+                          Optional.ofNullable(co)
+                              .map(ATC::getVersion)
+                              .flatMap(optionalVersion -> optionalVersion)
+                              .map(String.valueOf(version)::equals)
+                              .orElse(false));
+        };
+
+    return new VerificationStep.StepBuilder<EpaOpProvideDispensation>(
+            ErpBfd.B_FD_1698.getRequirement(),
+            format("MedicationIngredientCodingATC sollte als Version {0} enthalten", version))
         .predicate(predicate)
         .accept();
   }

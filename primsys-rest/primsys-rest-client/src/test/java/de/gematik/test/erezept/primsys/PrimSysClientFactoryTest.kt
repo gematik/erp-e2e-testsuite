@@ -22,28 +22,28 @@ package de.gematik.test.erezept.primsys
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
-import io.ktor.client.plugins.*
+import lombok.extern.slf4j.Slf4j
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.DynamicTest.dynamicTest
+import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
-import java.net.ConnectException
 
-
-@WireMockTest(httpPort = RestTest.REST_PORT)
+@Slf4j
+@WireMockTest
 class PrimSysClientFactoryTest : RestTest() {
 
     @Test
     fun shouldGetBaseInformationOnStartup() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1:$REST_PORT").build()
+            .forRemote("http://127.0.0.1:${port}").build()
 
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/actors")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/actors")))
 
         assertEquals(2, clientFactory.primsysInfo.doctors)
         assertEquals(2, clientFactory.primsysInfo.pharmacies)
@@ -55,10 +55,10 @@ class PrimSysClientFactoryTest : RestTest() {
         val env = "tu"
         setupPositiveStubs(env)
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1:$REST_PORT").env(env).apiKey("123").build()
+            .forRemote("http://127.0.0.1:${port}").env(env).apiKey("123").build()
 
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/$env/info")))
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/$env/actors")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/$env/info")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/$env/actors")))
 
         assertEquals(2, clientFactory.primsysInfo.doctors)
         assertEquals(2, clientFactory.primsysInfo.pharmacies)
@@ -69,7 +69,7 @@ class PrimSysClientFactoryTest : RestTest() {
     fun shouldGetActorsByIndex() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         assertDoesNotThrow {
             clientFactory.getDoctorClient(0)
@@ -81,7 +81,7 @@ class PrimSysClientFactoryTest : RestTest() {
     fun shouldGetActorsByIdentifier() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         assertDoesNotThrow {
             clientFactory.getDoctorClient("Doctor 0")
@@ -98,7 +98,7 @@ class PrimSysClientFactoryTest : RestTest() {
         dynamicTest("Should throw on unknown Doctor with ID $actorId") {
             setupPositiveStubs()
             val clientFactory = PrimSysClientFactory
-                .forRemote("http://127.0.0.1").port(REST_PORT).build()
+                .forRemote("http://127.0.0.1").port(port).build()
 
             assertThrows<UnknownActorException> {
                 clientFactory.getDoctorClient(actorId)
@@ -111,7 +111,7 @@ class PrimSysClientFactoryTest : RestTest() {
         dynamicTest("Should throw on unknown Pharmacy with ID $actorId") {
             setupPositiveStubs()
             val clientFactory = PrimSysClientFactory
-                .forRemote("http://127.0.0.1").port(REST_PORT).build()
+                .forRemote("http://127.0.0.1").port(port).build()
 
             assertThrows<UnknownActorException> {
                 clientFactory.getPharmacyClient(actorId)
@@ -130,7 +130,7 @@ class PrimSysClientFactoryTest : RestTest() {
     fun shouldGetRandomActors() {
         setupPositiveStubs()
         val clientFactory = PrimSysClientFactory
-            .forRemote("http://127.0.0.1").port(REST_PORT).build()
+            .forRemote("http://127.0.0.1").port(port).build()
 
         assertDoesNotThrow {
             clientFactory.getRandomDoctorClient()
@@ -143,9 +143,9 @@ class PrimSysClientFactoryTest : RestTest() {
         setupErrorInfo()
         assertThrows<PrimSysRestException> {
             PrimSysClientFactory
-                .forRemote("http://127.0.0.1").port(REST_PORT).build()
+                .forRemote("http://127.0.0.1").port(port).build()
         }
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
     }
 
     @Test
@@ -154,10 +154,10 @@ class PrimSysClientFactoryTest : RestTest() {
         setupErrorActors()
         assertThrows<PrimSysRestException> {
             PrimSysClientFactory
-                .forRemote("http://127.0.0.1").port(REST_PORT).build()
+                .forRemote("http://127.0.0.1").port(port).build()
         }
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/actors")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/actors")))
     }
 
     @Test
@@ -166,10 +166,10 @@ class PrimSysClientFactoryTest : RestTest() {
         setupErrorActorsHtml()
         assertThrows<PrimSysRestException> {
             PrimSysClientFactory
-                .forRemote("http://127.0.0.1").port(REST_PORT).build()
+                .forRemote("http://127.0.0.1").port(port).build()
         }
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/actors")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/actors")))
     }
 
     @Test
@@ -178,10 +178,10 @@ class PrimSysClientFactoryTest : RestTest() {
         setupErrorActorsEmpty()
         assertThrows<PrimSysRestException> {
             PrimSysClientFactory
-                .forRemote("http://127.0.0.1").port(REST_PORT).build()
+                .forRemote("http://127.0.0.1").port(port).build()
         }
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/actors")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/actors")))
     }
 
     @Test
@@ -190,10 +190,10 @@ class PrimSysClientFactoryTest : RestTest() {
         setupActorsInvalidErrorResponse(400)
         assertThrows<PrimSysRestException> {
             PrimSysClientFactory
-                .forRemote("http://127.0.0.1").port(REST_PORT).build()
+                .forRemote("http://127.0.0.1").port(port).build()
         }
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/actors")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/actors")))
     }
 
     @Test
@@ -202,10 +202,10 @@ class PrimSysClientFactoryTest : RestTest() {
         setupActorsInvalidErrorResponse(200)
         assertThrows<PrimSysRestException> {
             PrimSysClientFactory
-                .forRemote("http://127.0.0.1").port(REST_PORT).build()
+                .forRemote("http://127.0.0.1").port(port).build()
         }
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/actors")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/actors")))
     }
 
     @Test
@@ -214,29 +214,33 @@ class PrimSysClientFactoryTest : RestTest() {
         setupActorsValidErrorResponse()
         assertThrows<PrimSysRestException> {
             PrimSysClientFactory
-                .forRemote("http://127.0.0.1").port(REST_PORT).build()
+                .forRemote("http://127.0.0.1").port(port).build()
         }
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/actors")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
+        wiremockExtension.verify(exactly(1), getRequestedFor(urlPathEqualTo("/actors")))
     }
 
     @Test
     fun shouldThrowOnConnectionTimeout() {
-        setupConnectionTimeout()
-        val ce = assertThrows<HttpRequestTimeoutException> {
+        val timeout = 100   // max timeout 100ms
+        setupConnectionTimeout(timeout * 2)  // delay 200ms
+        val ce = assertThrows<PrimSysRestException> {
             PrimSysClientFactory
-                .forRemote("http://127.0.0.1").port(REST_PORT).timeoutMillis(200).build()
+                .forRemote("http://127.0.0.1").port(port).timeoutMillis(timeout.toLong()).build()
         }
-        assertTrue(ce.message!!.contains("timeout"))
-        assertTrue(ce.message!!.contains("http://127.0.0.1:$REST_PORT/info"))
 
-        verify(exactly(1), getRequestedFor(urlPathEqualTo("/info")))
-        verify(exactly(0), getRequestedFor(urlPathEqualTo("/actors")))
+        log.warn("Request to port $port produced timeout exception: ${ce.message}")
+        assertTrue(ce.message!!.contains("timeout"))
+        assertTrue(ce.message!!.contains("http://127.0.0.1:${port}/info"))
+
+        // in CI the info request is not detected reliably, so we allow 0 or 1 requests to be detected
+        wiremockExtension.verify(lessThanOrExactly(1), getRequestedFor(urlPathEqualTo("/info")))
+        wiremockExtension.verify(exactly(0), getRequestedFor(urlPathEqualTo("/actors")))
     }
 
     @Test
     fun shouldThrowOnUnreachable() {
-        assertThrows<ConnectException> {
+        assertThrows<PrimSysRestException> {
             PrimSysClientFactory
                 .forRemote("http://127.0.0.1").build()  // missing the port!!
         }

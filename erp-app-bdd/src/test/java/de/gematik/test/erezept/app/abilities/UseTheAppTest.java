@@ -528,6 +528,22 @@ class UseTheAppTest {
     verify(alert, times(1)).accept();
   }
 
+  @Test
+  void shouldDismissAlert() {
+    val driver = mock(IOSDriver.class);
+    val app = new UseIOSApp(driver, appiumConfig);
+
+    val targetLocator = mock(WebDriver.TargetLocator.class);
+    val alert = mock(Alert.class);
+    when(driver.switchTo()).thenReturn(targetLocator);
+    when(targetLocator.alert()).thenReturn(alert);
+
+    assertDoesNotThrow(app::dismissAlert);
+
+    verify(targetLocator, times(1)).alert();
+    verify(alert, times(1)).dismiss();
+  }
+
   @ParameterizedTest
   @ValueSource(ints = {200, 500})
   void shouldReportScenarioStatus(int status) {

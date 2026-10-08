@@ -49,6 +49,7 @@ public enum ErpAfos implements RequirementsSet {
 
   A_19284("A_19284-04", "Versichertenprotokoll zu Operationen"),
   A_19284_11("A_19284_11", "E-Rezept-Fachdienst - Versichertenprotokoll zu Operationen"),
+  A_19297("A_19297-01", "FHIR-Ressource MedicationDispense - Profilkonformität"),
   A_19395("A_19395", "E-Rezept-Fachdienst - Rollenprüfung Versicherter liest AuditEvent"),
   A_19405("A_19405-01", "E-Rezept-Fachdienst - Rollenprüfung Versicherter liest MedicationDispens"),
   A_19445("A_19445-08", "FHIR FlowType für Prozessparameter"),
@@ -65,6 +66,7 @@ public enum ErpAfos implements RequirementsSet {
       "A_20159-04",
       "E-Rezept-Fachdienst - Task aktivieren - QES Prüfung Signaturzertifikat des HBA"),
   A_20165("A_20165-05", "Performance – E-Rezept-Fachdienst - Bearbeitungszeit unter Last"),
+  A_20213("A_20213_01", "FHIR-Ressource Bundle Verordnungsdatensatz-FHIR Konformität"),
   A_20513("A_20513", "E-Rezept-Fachdienst - nicht mehr benötigte Einlösekommunikation"),
   A_21782("A_21782-01", "E-Rezept-Fachdienst - Schnittstellenadressierung Internet"),
   A_22110("A_22110", "Task akzeptieren - Flowtype 200/209 - Einwilligung ermitteln"),
@@ -120,6 +122,7 @@ public enum ErpAfos implements RequirementsSet {
   A_22351("A_22351", "E-Rezept-Fachdienst - Consent schreiben - FHIR-Validierung"),
   A_22362_01("A_22362_01", "E-Rezept-Fachdienst – Subscription registrieren – Rollenprüfung"),
   A_22369("A_22369", "E-Rezept-Fachdienst - Subscription Service - Prüfung Bearer-Token"),
+  A_23384("A_23384-06", " E-Rezept-Fachdienst - Prüfung Gültigkeit FHIR Ressourcen"),
   A_23399(
       "A_23399-01",
       "E-Rezept-Fachdienst - Rezepte lesen - Apotheke - PoPP - Zeitraum Akzeptanz PoPP-Token"),
@@ -139,6 +142,10 @@ public enum ErpAfos implements RequirementsSet {
   A_23454("A_23454", "E-Rezept-Fachdienst - Prüfung Prüfziffer"),
   A_23456(
       "A_23456-01", "E-Rezept-Fachdienst - Prüfung Prüfziffer - Berechnung HMAC der Prüfziffer"),
+  A_23877_02(
+      "A_23877_02",
+      "E-Rezept - Nachrichtenaustausch - Nachricht durch Abgebenden übermitteln - Datenstruktur"
+          + " Nachricht"),
   A_23878("A_23878", "E-RezeptFachdienst, validierung des Payload des DispenseRequest"),
   A_23878_01(
       "A_23878_01",

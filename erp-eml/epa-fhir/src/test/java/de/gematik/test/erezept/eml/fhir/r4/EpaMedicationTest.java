@@ -22,6 +22,8 @@ package de.gematik.test.erezept.eml.fhir.r4;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.de.value.ASK;
+import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
 import de.gematik.test.erezept.eml.fhir.testutil.EpaFhirParsingTest;
@@ -113,5 +115,37 @@ class EpaMedicationTest extends EpaFhirParsingTest {
             new Medication.MedicationIngredientComponent()
                 .setItem(new CodeableConcept().setText("testCode")));
     assertEquals(Optional.of("testCode"), med.getName());
+  }
+
+  @Test
+  void getIngredientAtcListShouldWork() {
+    val med = new EpaMedication();
+    med.getIngredient()
+        .add(
+            new Medication.MedicationIngredientComponent()
+                .setItem(
+                    new CodeableConcept().addCoding(ATC.from("123", "AtcCodeDisplay").asCoding())));
+    assertFalse(med.getIngredientAtcList().isEmpty());
+  }
+
+  @Test
+  void getIngredientAtcListShouldWork2() {
+    val med = new EpaMedication();
+    med.getIngredient()
+        .add(
+            new Medication.MedicationIngredientComponent()
+                .setItem(
+                    new CodeableConcept().addCoding(ATC.from("123", "AtcCodeDisplay").asCoding())));
+    assertEquals("123", med.getIngredientAtcList().get(0).getValue());
+  }
+
+  @Test
+  void getIngredientAtcListShouldWorkWithEmptyList() {
+    val med = new EpaMedication();
+    med.getIngredient()
+        .add(
+            new Medication.MedicationIngredientComponent()
+                .setItem(new CodeableConcept().addCoding(ASK.from("123").asCoding())));
+    assertTrue(med.getIngredientAtcList().isEmpty());
   }
 }

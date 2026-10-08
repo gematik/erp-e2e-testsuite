@@ -7,7 +7,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.7.1</version>
+        <version>1.8.0</version>
     </parent>
 
     <artifactId>erp-fd-product-test</artifactId>
@@ -76,6 +76,10 @@
 
         <dependency>
             <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>crypto-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
             <artifactId>fhir-codec-brick</artifactId>
             <scope>test</scope>
             <type>test-jar</type>
@@ -104,7 +108,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-t-rezept</artifactId>
-            <version>1.7.1</version>
+            <version>1.8.0</version>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
@@ -157,6 +161,14 @@
         </dependency>
         <dependency>
             <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>fhir-comparator-fhirpatch-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>fhir-smaps-transformation-brick</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
             <artifactId>ca-supplier-brick</artifactId>
         </dependency>
         <dependency>
@@ -184,7 +196,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.6.2</version>
                 <executions>
                     <execution>
                         <id>add-integration-test-source</id>
@@ -214,7 +226,6 @@
             </plugin>
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.1.0</version>
                 <configuration>
                     <includes>
                         <!-- integration test against SUT everything in de.gematik.test.erezept -->

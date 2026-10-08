@@ -119,7 +119,7 @@ public abstract class GemErpMedicationBuilder<B extends GemErpMedicationBuilder<
   public B atc(ATC atc) {
     val coding = atc.asCoding();
     if (version.isBiggerThan(ErpWorkflowVersion.V1_5)) {
-      // version is mandatory until ErpWorkflowVersion.V_6
+      // version is mandatory until ErpWorkflowVersion.V1_6
       coding.setVersion("2026");
     }
     this.codes.add(coding);

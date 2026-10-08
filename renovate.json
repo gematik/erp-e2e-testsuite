@@ -1,0 +1,17 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "ignorePaths": [
+    "**/fhir/profiles/**"
+  ],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "net.bytebuddy:byte-buddy",
+        "net.bytebuddy:byte-buddy-agent"
+      ],
+      "allowedVersions": "!/-jdk5$/"
+    }
+  ]
+}

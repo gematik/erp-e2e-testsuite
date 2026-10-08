@@ -5,7 +5,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.7.1</version>
+        <version>1.8.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -34,6 +34,15 @@
             <groupId>tools.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
         </dependency>
+
+        <!-- jackson 2.x is still required by HAPI -->
+        <!-- planned for November 2026 https://github.com/hapifhir/hapi-fhir/pull/8130#issuecomment-5059947626 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.22.3</version>
+        </dependency>
+
         <dependency>
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
@@ -95,22 +104,33 @@
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>
+        <!--  <dependency>
+              <groupId>de.gematik.bbriccs</groupId>
+              &lt;!&ndash;<artifactId>smaps-comparator-fhirpatch-brick</artifactId>&ndash;&gt;
+              <artifactId>fhir-comparator-jsondiff-brick</artifactId>
+              <version>${version.bricks}</version>
+          </dependency>-->
+        <dependency>
+            <groupId>de.gematik.bbriccs</groupId>
+            <artifactId>fhir-smaps-transformation-brick</artifactId>
+        </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>epa-fhir</artifactId>
         </dependency>
 
-        <!-- still required until bricks fhir configuration moved to jackson 3 -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.22.0</version>
-        </dependency>
-        <!-- still required to validate json content -->
+        <!-- required to validate json content of communication payloads -->
         <dependency>
             <groupId>com.networknt</groupId>
             <artifactId>json-schema-validator</artifactId>
-            <version>1.5.6</version>
+            <version>3.0.8</version>
+            <exclusions>
+                <exclusion>
+                    <!-- date-time validation will use java.time.OffsetDateTime instead of the ITU library -->
+                    <groupId>com.ethlo.time</groupId>
+                    <artifactId>itu</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

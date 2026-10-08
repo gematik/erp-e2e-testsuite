@@ -31,7 +31,7 @@ actors:
       fhirValidator: NONE
 
     - name: Stadtapotheke
-      smcbIccsn: 80276883110000163973
+      smcbIccsn: 80276883110000092475
       konnektor: Soft-Konn
       algorithm: E256
       fhirValidator: NONE

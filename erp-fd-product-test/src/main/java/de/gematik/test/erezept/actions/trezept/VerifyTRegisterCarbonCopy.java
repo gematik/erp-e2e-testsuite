@@ -23,12 +23,12 @@ package de.gematik.test.erezept.actions.trezept;
 import static de.gematik.test.core.expectations.verifier.tprescriptionverifier.CarbonCopyVerifier.*;
 
 import de.gematik.test.core.expectations.verifier.tprescriptionverifier.CarbonCopyVerifier;
-import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.r4.erp.tprescription.ErpTPrescriptionCarbonCopy;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.trezept.TRegisterLog;
 import java.util.ArrayList;
 import java.util.List;
@@ -87,7 +87,11 @@ public class VerifyTRegisterCarbonCopy implements Performable {
     Optional.ofNullable(medDispenseBundle)
         .ifPresent(
             medDispBundle -> {
-              val carbCopy = new FhirParser().decode(ErpTPrescriptionCarbonCopy.class, body);
+              val carbCopy =
+                  actor
+                      .abilityTo(UseTheErpClient.class)
+                      .getFhir()
+                      .decode(ErpTPrescriptionCarbonCopy.class, body);
 
               List<Pair<ErxMedicationDispense, GemErpMedication>> medDisp =
                   medDispenseBundle.getDispensePairBy(prescriptionId);

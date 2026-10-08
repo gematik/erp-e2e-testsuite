@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.pki.gemlibpki.tsl.TslConverter;
+import de.gematik.pki.gemlibpki.commons.tsl.TslConverter;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.actions.rawhttpactions.pki.TslListWrapper;
 import lombok.SneakyThrows;

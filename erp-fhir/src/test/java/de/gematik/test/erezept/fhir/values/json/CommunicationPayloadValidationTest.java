@@ -24,20 +24,21 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.fakePhoneNumberWithS
 import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.reflections.Reflections.log;
 
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.Error;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.extensions.erp.CommunicationPayloadType;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+@Slf4j
 class CommunicationPayloadValidationTest {
 
   private static CommunicationPayloadValidation communicationDspReqValidator;
@@ -56,7 +57,7 @@ class CommunicationPayloadValidationTest {
     assertTrue(communicationDspReqValidator.isValid(result));
   }
 
-  private void logIfFail(Set<ValidationMessage> errors) {
+  private void logIfFail(List<Error> errors) {
     errors.forEach(e -> log.info(e.getMessage()));
   }
 

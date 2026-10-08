@@ -24,6 +24,7 @@ import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.fhir.compare.fhirpatch.HapiPatchComparator;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.konnektor.Konnektor;
 import de.gematik.bbriccs.konnektor.cfg.KonnektorConfiguration;
@@ -34,7 +35,6 @@ import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.bbriccs.vsdm.VsdmService;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.abilities.*;
-import de.gematik.test.erezept.abilities.UsePoppTokenGenerator;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.ErpActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
@@ -106,6 +106,8 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
   public <A extends Actor> void equipAsDoctor(A actor) {
     val name = actor.getName();
+    // TODO tbd
+    // val useResourceComparator = UseResourceComparator.with(new StructureMapsHapiComparator());
     log.info("Equip Doctor {}", name);
 
     val cfg = this.getDoctorConfig(name);
@@ -119,6 +121,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
         .describedAs(cfg.getDescription())
         .whoCan(UseSMCB.itHasAccessTo(smcb))
         .can(UsePoppTokenGenerator.with(getPoppTokenGenerator(), smcb))
+        // .can(useResourceComparator)
         .can(UseHBA.itHasAccessTo(hba))
         .can(useTheKonnektor)
         .can(useTheErpClientFrom(cfg).authenticatingWith(useTheKonnektor))
@@ -162,10 +165,11 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
       builder = builder.proxy(gemProxy, GEM_PROXY_PORT);
     }
     // Todo reactivate BRICKS Validator if Profiles are fine
-    val fhirParser = new FhirParser(ValidatorType.NONE);
+    val fhirParser = new FhirParser(ValidatorType.BRICKS);
 
     val tregisterMockClient = TRegisterMockClient.withRestClient(builder.withoutTlsVerification());
     givenThat(actor).can(UseTheTRegisterMockClient.with(tregisterMockClient, fhirParser));
+    givenThat(actor).can(UseResourceComparator.with(new HapiPatchComparator()));
   }
 
   public <A extends Actor> void equipAsPharmacy(A actor) {
@@ -339,6 +343,10 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
   public EnvironmentConfiguration getActiveEnvironment() {
     return this.getConfig(dto.getActiveEnvironment(), dto.getEnvironments());
+  }
+
+  public String getOcsp() {
+    return getActiveEnvironment().getTi().getOcsp();
   }
 
   public DoctorConfiguration getDoctorConfig(String name) {

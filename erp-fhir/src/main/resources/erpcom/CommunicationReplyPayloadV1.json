@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://gematik.de/erpcom/CommunicationReplyPayloadV1.schema.json",
+  "title": "Payload of CommunicationReplyPayload",
+  "type": "object",
+  "properties": {
+    "version": {
+      "enum": [
+        1
+      ]
+    },
+    "supplyOptionsType": {
+      "enum": [
+        "onPremise",
+        "shipment",
+        "delivery"
+      ]
+    },
+    "info_text": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 500
+    },
+    "pickUpCodeHR": {
+      "type": "string",
+      "maxLength": 8
+    },
+    "pickUpCodeDMC": {
+      "type": "string",
+      "maxLength": 128
+    }
+  },
+  "required": [
+    "version",
+    "supplyOptionsType"
+  ],
+  "additionalProperties": false,
+  "version": "1"
+}

@@ -28,14 +28,7 @@ import de.gematik.test.fuzzing.fhirfuzz.impl.stringtypes.StringFuzzImpl;
 import de.gematik.test.fuzzing.fhirfuzz.impl.stringtypes.UrlFuzzImpl;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 import lombok.Getter;
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
@@ -66,7 +59,7 @@ public class FuzzerContext {
     this.random = random;
     this.fuzzConfig = setupDefaultValues(fuzzConfig);
     this.operationLogs = new LinkedList<>();
-    faker = new Faker(new Locale("de"));
+    faker = new Faker(Locale.GERMANY);
     this.stringFuzz = new StringFuzzImpl(this);
     this.urlFuzz = new UrlFuzzImpl(this);
     this.idFuzzer = new IdFuzzerImpl(this);
@@ -144,7 +137,8 @@ public class FuzzerContext {
     if (fuzzConfig.getUseAllMutators() != null && fuzzConfig.getUseAllMutators()) {
       return l;
     }
-    if (fuzzConfig.getUseAllMutators() != null && fuzzConfig.getUsedPercentOfMutators() > 100) {
+    if (fuzzConfig.getUsedPercentOfMutators() != null
+        && fuzzConfig.getUsedPercentOfMutators() >= 100.0f) {
       return l;
     }
     float mutationFactor;
@@ -183,7 +177,7 @@ public class FuzzerContext {
     BigDecimal newEntry = null;
     do {
       newEntry = BigDecimal.valueOf(this.getRandom().nextLong());
-    } while (newEntry.equals(t));
+    } while (newEntry.compareTo(t) == 0);
     return newEntry;
   }
 

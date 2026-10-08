@@ -20,9 +20,12 @@
 
 package de.gematik.test.erezept.app.task;
 
+import static java.text.MessageFormat.format;
+
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import java.time.Duration;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
@@ -33,7 +36,16 @@ public class RefreshPrescriptions implements Task {
   public <T extends Actor> void performAs(T actor) {
     val app = SafeAbility.getAbility(actor, UseTheApp.class);
     app.tap(Mainscreen.REFRESH_BUTTON);
+    val startTime = System.nanoTime();
     app.waitUntilElementIsNotVisible(Mainscreen.LOADING_SPINNER);
+    val refreshDuration = Duration.ofNanos(System.nanoTime() - startTime);
+
+    app.logEvent(
+        format(
+            "Main screen refresh took {0} min {1} sec {2} ms.",
+            refreshDuration.toMinutes(),
+            refreshDuration.toSecondsPart(),
+            refreshDuration.toMillisPart()));
   }
 
   public static RefreshPrescriptions byTap() {

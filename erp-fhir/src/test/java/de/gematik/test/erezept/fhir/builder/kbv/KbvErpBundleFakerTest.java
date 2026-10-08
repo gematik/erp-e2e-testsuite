@@ -49,6 +49,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -353,14 +354,28 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
   }
 
   /**
-   * This UnitTest is similar to the IntegrationTest ACTIVATE_DOSAGE_DGMP_PRESCRIPTIONS_08 It
-   * validates the correct handling of complex dosage instructions with multiple timings and
-   * quantities. was found by Mr. Nighthold and communicated in ANFERP-4169 -
+   * This UnitTest is similar to the IntegrationTest ACTIVATE_DOSAGE_DGMP_PRESCRIPTIONS_08 (dosage
+   * 1-17) It validates the correct handling of complex dosage instructions with multiple timings
+   * and quantities. was found by Mr. Nighthold and communicated in ANFERP-4169 -
    * https://service.gematik.de/browse/ANFERP-4169 and tracked in B-FD_1699, Abweichende Generierung
    * / Validierung der Strukturierten Dosierinformationen
+   *
+   * <p>um die Blöcke zu umgehen wäre folgende Methode möglich
+   *
+   * <p>public DosageDgMP timeOfDayAndDayOfWeek(double dosageValue,@NonNull BmpDosiereinheit code,
+   * double boundsDuration, @NonNull UnitsOfTimeDE boundDurationUnit, int period, Timing.UnitsOfTime
+   * periodUnit, int frequency, List <Timing.DayOfWeek> daysOfWeek, List<String> timesOfDays,
+   * List<Timing.EventTiming> when) {val timing =
+   * TimingBuilder.forRepeatComp().boundsDuration(boundsDuration, boundDurationUnit);
+   * timing.period(period, periodUnit); timing.frequency(frequency);
+   * Optional.ofNullable(daysOfWeek).ifPresent(timing::dayOfWeek);
+   * Optional.ofNullable(timesOfDays).ifPresent(timing::timeOfDay);
+   * Optional.ofNullable(when).ifPresent(timing::when); return
+   * DosageDgMPBuilder.dosageBuilder(dosageValue, code).timing(timing.build()).build(); }
    */
-  @Test
+  @Ignore("this Unittest takes rd. about 10 seconds to run, so it is disabled for now")
   void shouldValidateExtrasBigDosageCorrect() {
+
     val dosageDGMP1 =
         DosageDgMPBuilder.dosageBuilder(0.25, BmpDosiereinheit.STUECK)
             .timing(
@@ -564,6 +579,41 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
                     .timeOfDay(List.of("18:00:00"))
                     .build())
             .build();
+    val dosageDGMP18 =
+        DosageDgMPBuilder.dosageBuilder(0.25, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.SUN)
+                    .timeOfDay(List.of("14:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP19 =
+        DosageDgMPBuilder.dosageBuilder(0.55, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.THU)
+                    .timeOfDay(List.of("10:00:00"))
+                    .build())
+            .build();
+
+    val dosageDGMP20 =
+        DosageDgMPBuilder.dosageBuilder(0.5, BmpDosiereinheit.STUECK)
+            .timing(
+                TimingBuilder.forRepeatComp()
+                    .boundsDuration(12, UnitsOfTimeDE.WOCHE)
+                    .period(1, Timing.UnitsOfTime.WK)
+                    .frequency(1)
+                    .dayOfWeek(Timing.DayOfWeek.FRI)
+                    .timeOfDay(List.of("16:00:00"))
+                    .build())
+            .build();
 
     val bundle =
         KbvErpBundleFaker.builder()
@@ -586,9 +636,17 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
                     dosageDGMP14,
                     dosageDGMP15,
                     dosageDGMP16,
-                    dosageDGMP17))
+                    dosageDGMP17,
+                    dosageDGMP18,
+                    dosageDGMP19,
+                    dosageDGMP20))
             .fake();
-
+    val startTime = System.nanoTime();
     assertTrue(ValidatorUtil.encodeAndValidate(parser, bundle).isSuccessful());
+
+    long end = System.nanoTime();
+    long durationMs = (end - startTime) / 1_000_000;
+
+    System.out.println("Dauer: " + durationMs + " ms");
   }
 }

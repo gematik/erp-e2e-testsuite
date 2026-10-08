@@ -36,17 +36,12 @@ import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import net.serenitybdd.junit.runners.SerenityRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.ThrowingConsumer;
-import org.junit.runner.RunWith;
 
-@Slf4j
-@RunWith(SerenityRunner.class)
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Generate random Prescriptions")
 @Tag("Smoketest")

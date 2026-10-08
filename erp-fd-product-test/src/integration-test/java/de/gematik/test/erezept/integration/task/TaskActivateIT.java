@@ -61,7 +61,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
@@ -73,7 +72,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@Slf4j
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("E-Rezept ausstellen")
 @Tag("TaskActivate")

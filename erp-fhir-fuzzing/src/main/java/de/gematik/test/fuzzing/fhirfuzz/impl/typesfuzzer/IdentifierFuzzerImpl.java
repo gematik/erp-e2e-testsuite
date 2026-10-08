@@ -27,6 +27,7 @@ import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzOperationResult;
 import de.gematik.test.fuzzing.fhirfuzz.utils.FuzzerContext;
 import java.util.LinkedList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
@@ -34,6 +35,7 @@ import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Period;
 
+@Slf4j
 public class IdentifierFuzzerImpl implements FhirTypeFuzz<Identifier> {
 
   private final FuzzerContext fuzzerContext;

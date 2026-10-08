@@ -7,7 +7,7 @@
 
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erezept-testsuite</artifactId>
-    <version>1.7.1</version>
+    <version>1.8.0</version>
     <packaging>pom</packaging>
 
     <name>E-Rezept E2E Testsuite</name>
@@ -78,43 +78,29 @@
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 
-        <version.jacoco>0.8.15</version.jacoco>
-        <version.sonar.jacoco.listener>5.0.1.12818</version.sonar.jacoco.listener>
-        <version.surefire>3.0.0-M2</version.surefire>
-        <version.surefire-report>3.0.0-M2</version.surefire-report>
-        <version.maven-javadoc-plugin>3.5.0</version.maven-javadoc-plugin>
-        <version.maven-owasp-plugin>8.2.1</version.maven-owasp-plugin>
-        <version.serenity>5.3.10</version.serenity>
+        <version.serenity>5.3.11</version.serenity>
         <version.idp-client>30.1.0</version.idp-client>
-        <version.spotless>2.41.1</version.spotless>
-
-        <version.jackson.core>3.2.0</version.jackson.core>
-        <version.jackson.dataformat>3.2.0</version.jackson.dataformat>
-        <version.jackson.jaxrs>3.2.0</version.jackson.jaxrs>
-        <version.jackson.jakarta>3.2.0</version.jackson.jakarta>
-
+        <version.jackson.core>3.2.3</version.jackson.core>
+        <version.jackson.dataformat>3.2.3</version.jackson.dataformat>
+        <version.jackson.jaxrs>3.2.3</version.jackson.jaxrs>
+        <version.jackson.jakarta>3.2.3</version.jackson.jakarta>
         <version.junit>5.14.4</version.junit>
         <version.assertj>3.27.7</version.assertj>
         <version.junit-pioneer>2.3.0</version.junit-pioneer>
-        <version.mockito>5.23.0</version.mockito>
+        <version.mockito>5.24.0</version.mockito>
         <version.wiremock>3.13.2</version.wiremock>
         <version.faker>1.0.2</version.faker>
-        <version.lombok>1.18.46</version.lombok>
-        <version.logback>1.5.37</version.logback>
-        <version.slf4j-api>2.0.18</version.slf4j-api>
-        <version.unirest>4.10.0</version.unirest>
-        <version.bouncycastle>1.84</version.bouncycastle>
+        <version.lombok>1.18.48</version.lombok>
+        <version.logback>1.6.5</version.logback>
+        <version.slf4j-api>2.0.20</version.slf4j-api>
+        <version.unirest>4.10.1</version.unirest>
         <version.zxing>3.5.4</version.zxing>
-        <version.jersey>4.0.2</version.jersey>
+        <version.jersey>4.0.3</version.jersey>
         <version.poto>3.0.3-215</version.poto>
-        <version.bricks>0.11.0</version.bricks>
-
-        <artefact.bouncycastle>jdk18on</artefact.bouncycastle>
+        <version.bricks>0.12.1</version.bricks>
 
         <skip.unittests/>
         <skip.inttests/>
-        <failsafe.fork.count>1</failsafe.fork.count>
-        <surefire.forkCount>1</surefire.forkCount>
 
         <sonar.exclusions>
             **/*Main.java,
@@ -159,87 +145,87 @@
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>smartcard</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-client</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir-fuzzing</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-mock-client</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-fhir</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-fhir</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-bdd-common</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-cli-common</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-data</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-client</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.idp</groupId>
@@ -298,7 +284,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.22.0</version>
+                <version>1.22.1</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
@@ -310,7 +296,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.20.0</version>
+                <version>3.21.0</version>
             </dependency>
 
             <!-- Serenity-BDD -->
@@ -363,7 +349,7 @@
             <dependency>
                 <groupId>io.cucumber</groupId>
                 <artifactId>cucumber-junit-platform-engine</artifactId>
-                <version>7.34.2</version>
+                <version>7.34.9</version>
             </dependency>
 
             <dependency>
@@ -456,7 +442,7 @@
             <dependency>
                 <groupId>de.gematik.refv</groupId>
                 <artifactId>referencevalidator-lib</artifactId>
-                <version>2.12.0</version>
+                <version>2.16.6</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.bbriccs</groupId>
@@ -513,27 +499,31 @@
                 <artifactId>popp-token-generator-brick</artifactId>
                 <version>${version.bricks}</version>
             </dependency>
-
-            <!-- Crypto -->
             <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-${artefact.bouncycastle}</artifactId>
-                <version>${version.bouncycastle}</version>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>fhir-comparator-jsondiff-brick</artifactId>
+                <version>${version.bricks}</version>
             </dependency>
             <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcutil-${artefact.bouncycastle}</artifactId>
-                <version>${version.bouncycastle}</version>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>fhir-smaps-transformation-brick</artifactId>
+                <version>${version.bricks}</version>
             </dependency>
             <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcpkix-${artefact.bouncycastle}</artifactId>
-                <version>${version.bouncycastle}</version>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>fhir-comparator-fhirpatch-brick</artifactId>
+                <version>${version.bricks}</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.pki</groupId>
                 <artifactId>gemLibPki</artifactId>
-                <version>2.1.4</version>
+                <version>5.0.2</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>eu.europa.esig</groupId>
+                        <artifactId>dss-*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- zxing required for creating Data Matrix Codes -->
@@ -551,7 +541,7 @@
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
-                <version>2.2</version>
+                <version>2.7</version>
             </dependency>
             <!-- data fakers/generators -->
             <dependency>
@@ -590,12 +580,12 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.11</version>
+                <version>2.2.55</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-jaxrs2-jakarta</artifactId>
-                <version>2.2.11</version>
+                <version>2.2.55</version>
             </dependency>
 
             <!-- Dependencies for Test-Scope -->
@@ -643,12 +633,12 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.18.8</version>
+                <version>1.18.14</version>
             </dependency>
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy-agent</artifactId>
-                <version>1.18.8</version>
+                <version>1.18.14</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -705,12 +695,21 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.15.0</version>
+                    <version>3.16.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.5.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>13.0.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>3.5.6</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -719,12 +718,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
+                <version>3.5.0</version>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${version.jacoco}</version>
+                <version>0.8.15</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -759,10 +758,8 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>${version.maven-owasp-plugin}</version>
                 <configuration>
                     <!--                    <failBuildOnCVSS>8</failBuildOnCVSS>--> <!-- activate once we've fixed all bad dependencies -->
-
                     <skipProvidedScope>true</skipProvidedScope>
                     <skipRuntimeScope>true</skipRuntimeScope>
                     <skip>true</skip>
@@ -776,41 +773,21 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.5.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireMavenVersion>
-                                    <version>[3.5.4,)</version>
-                                </requireMavenVersion>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.6.0</version>
                 <configuration>
                     <!--suppress UnresolvedMavenProperty -->
-                    <argLine>${surefireArgLine} -Dfile.encoding=UTF-8</argLine>
+                    <argLine>${surefireArgLine} -Dfile.encoding=UTF-8 -Xms256m -Xmx5g -XX:MaxMetaspaceSize=384m
+                    </argLine>
                     <excludes>
                         <exclude>**/*TestSuite.java</exclude>
                     </excludes>
-                    <properties>
-                        <property>
-                            <name>listener</name>
-                            <value>org.sonar.java.jacoco.JUnitListener</value>
-                        </property>
-                    </properties>
+                    <stackTraceMaxFrames>0</stackTraceMaxFrames>
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
                     <skip>${skip.unittests}</skip>
                     <parallel>classes</parallel>
                     <runOrder>random</runOrder>
@@ -819,12 +796,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.12.1</version>
+                <version>3.22.0</version>
             </plugin>
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>${version.spotless}</version>
+                <version>3.10.3</version>
                 <configuration>
                     <!--generischer ansatz-->
                     <formats>
@@ -891,23 +868,22 @@
                             <file>COPYRIGHT_HEADER</file>
                         </licenseHeader>
                     </kotlin>
-
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.5.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
-                <version>3.1.3</version>
+                <version>3.2.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>3.1.3</version>
+                <version>3.2.0</version>
             </plugin>
         </plugins>
     </build>
@@ -917,7 +893,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${version.maven-javadoc-plugin}</version>
+                <version>3.12.0</version>
                 <configuration>
                     <doctitle>${javadoc.doctitle}</doctitle>
                     <header>${javadoc.header}</header>  <!-- let's place icon+link to GitHub here -->
@@ -945,7 +921,6 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>${version.maven-owasp-plugin}</version>
                 <reportSets>
                     <reportSet>
                         <reports>
@@ -978,7 +953,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>3.3.1</version>
+                        <version>3.4.0</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -991,7 +966,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.11.2</version>
+                        <version>3.12.0</version>
                         <configuration>
                             <doclint>none</doclint>
                         </configuration>
@@ -1007,7 +982,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.7</version>
+                        <version>3.2.8</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -1027,7 +1002,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.9.0</version>
+                        <version>0.11.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.7.1</version>
+        <version>1.8.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -172,7 +172,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.1.0</version>
                 <configuration>
                     <includes>
                         <include>**/${bdd.testsuite}.java</include>
@@ -236,7 +235,7 @@
             <plugin>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>bdd-javadocs</artifactId>
-                <version>1.7.1</version>
+                <version>1.8.0</version>
             </plugin>
         </plugins>
     </build>

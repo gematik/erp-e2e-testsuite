@@ -53,7 +53,9 @@ class CallCertificateFromBackendTest {
 
   @RegisterExtension
   static WireMockExtension wiremockExtension =
-      WireMockExtension.newInstance().options(WireMockConfiguration.wireMockConfig()).build();
+      WireMockExtension.newInstance()
+          .options(WireMockConfiguration.options().dynamicPort())
+          .build();
 
   @BeforeEach
   void setup() {
@@ -78,7 +80,6 @@ class CallCertificateFromBackendTest {
   @TestcaseId("ut_httpResponseCallCertificate_01")
   @DisplayName("Positive Unit Test for an Get_Certificate with rootCa")
   void callCertificateShouldWork() {
-
     val actor = OnStage.theActorInTheSpotlight();
     val response =
         assertDoesNotThrow(

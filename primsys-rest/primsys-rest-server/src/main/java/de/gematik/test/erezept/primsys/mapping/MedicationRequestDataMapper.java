@@ -22,6 +22,7 @@ package de.gematik.test.erezept.primsys.mapping;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerAmount;
 
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestBuilder;
 import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvCoverage;
@@ -29,6 +30,7 @@ import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.primsys.data.MedicationRequestDto;
 import de.gematik.test.erezept.primsys.data.MvoDto;
@@ -116,6 +118,15 @@ public class MedicationRequestDataMapper
     } else {
       builder.mvo(MultiplePrescriptionExtension.asNonMultiple());
     }
+
+    val isTPrescription = MedicationCategory.C_02.equals(medication.getCategoryFirstRep());
+    if (isTPrescription) {
+      // supply duration is required, but we have no DTO field for it, so we generate a random value
+      // between 1 and 12 weeks
+      val supplyDuration = GemFaker.getFaker().random().nextInt(1, 12);
+      builder.expectedSupplyDurationInWeeks(supplyDuration);
+    }
+
     return builder.build();
   }
 

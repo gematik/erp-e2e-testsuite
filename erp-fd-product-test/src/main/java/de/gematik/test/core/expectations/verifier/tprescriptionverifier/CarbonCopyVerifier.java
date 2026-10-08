@@ -57,7 +57,7 @@ public class CarbonCopyVerifier {
         carbonCopy -> carbonCopy.getMedicationFromPrescription().getPzn().equals(pzn);
     return new VerificationStep.StepBuilder<ErpTPrescriptionCarbonCopy>(
             ErpAfos.A_27827.getRequirement(),
-            "Die PZN in der CarbonCopy stimmmt mit der PZN der Medication überein")
+            "Die PZN in der CarbonCopy stimmt mit der PZN der Medication überein")
         .predicate(predicate)
         .accept();
   }

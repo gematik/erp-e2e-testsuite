@@ -22,6 +22,7 @@ package de.gematik.test.erezept.primsys.model;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.primsys.actors.Doctor;
 import de.gematik.test.erezept.primsys.data.PatientDto;
@@ -73,9 +74,13 @@ public class PrescribePharmaceuticals extends PrescribeUseCase<KbvErpBundle> {
   }
 
   public Response withKbvBundle(KbvErpBundle kbvBundle) {
-    val insuranceKind =
+    val isTRezept = MedicationCategory.C_02 == kbvBundle.getMedication().getCategoryFirstRep();
+    val insuranceType =
         kbvBundle.getCoverage().getInsuranceKindOptional().orElse(InsuranceTypeDe.GKV);
-    val flowType = PrescriptionFlowType.fromInsuranceKind(insuranceKind, isDirectAssignment);
+    val flowType =
+        isTRezept
+            ? PrescriptionFlowType.FLOW_TYPE_166
+            : PrescriptionFlowType.fromInsuranceKind(insuranceType, isDirectAssignment);
 
     val prescriptionData = this.prescribeFor(kbvBundle, flowType);
     return Response.accepted(prescriptionData).build();

@@ -243,7 +243,7 @@ class CommunicationDisReqMessageTest {
 
     assertEquals(3, msg.version());
     assertEquals("order", msg.communicationType());
-    assertEquals(id, msg.transactionID());
+    assertEquals(id.toString(), msg.transactionID());
     assertEquals("https://test.de", msg.url());
     assertEquals("HR", msg.pickupCodeHR());
     assertEquals("DMC", msg.pickupCodeDMC());

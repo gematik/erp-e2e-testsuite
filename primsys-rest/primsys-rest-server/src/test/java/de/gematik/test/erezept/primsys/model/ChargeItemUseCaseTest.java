@@ -20,12 +20,10 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.rest.fd.FhirBResponse;
@@ -68,7 +66,7 @@ class ChargeItemUseCaseTest extends TestWithActorContext {
   @Test
   void shouldCreateChargeItem() {
     val ctx = ActorContext.getInstance();
-    val pharmacy = ctx.getPharmacies().get(1);
+    val pharmacy = ctx.getPharmacies().get(5);
     val mockClient = pharmacy.getClient();
 
     val mockResponse =
@@ -104,7 +102,7 @@ class ChargeItemUseCaseTest extends TestWithActorContext {
   @Test
   void shouldChangeChargeItem() {
     val ctx = ActorContext.getInstance();
-    val pharmacy = ctx.getPharmacies().get(1);
+    val pharmacy = ctx.getPharmacies().get(5);
     val mockClient = pharmacy.getClient();
 
     val taskId = PrescriptionId.random().getValue();

@@ -20,14 +20,16 @@
 
 package de.gematik.test.eml.integration;
 
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.medicationInProvDispensationContainsAtcCodingWithVersion;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.provDispensationContainsDosageInstruction;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.*;
 import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlMedRequestDosageHasText;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.value.ATC;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
+import de.gematik.test.core.expectations.requirements.ErpAfos;
 import de.gematik.test.eml.tasks.CheckEpaOpProvideDispensation;
 import de.gematik.test.eml.tasks.CheckEpaOpProvidePrescriptionWithTask;
 import de.gematik.test.erezept.ErpTest;
@@ -50,6 +52,9 @@ import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -217,6 +222,7 @@ class MapDosageInstructionTemporaryIT extends ErpTest {
             .withPerformer(pharmacy.getTelematikId().getValue())
             .withDosageInstruction(dosageInstruction)
             .withPatientInstruction(patientInstruction)
+            .withHandedOverDate(new GregorianCalendar(2026, Calendar.AUGUST, 21).getTime())
             .fake();
 
     val paramsBuilder =
@@ -287,6 +293,7 @@ class MapDosageInstructionTemporaryIT extends ErpTest {
             .withMedication(gemMedicationCompounding)
             .withPerformer(pharmacy.getTelematikId().getValue())
             .withPatientInstruction(patientInstruction)
+            .withHandedOverDate(new GregorianCalendar(2026, Calendar.AUGUST, 20).getTime())
             .fake();
 
     val paramsBuilder =
@@ -317,8 +324,8 @@ class MapDosageInstructionTemporaryIT extends ErpTest {
   @TestcaseId("EML_ADD_VERSION_TO_ATC_CODING_05")
   @Test()
   @DisplayName(
-      "Es muss geprüft werden, dass der Fachdienst in der Medication die Codings mit einer Version"
-          + " ergänzt")
+      "Es muss geprüft werden, dass der Fachdienst in der Erx-Medication die ATC-Codings mit einer"
+          + " Version ergänzt")
   void submitPatientInstructionByDispensationToEpaMockWithAtcWithoutVersion() {
     val epaFhirChecker = new GemaTestActor("epaFhirChecker");
     this.config.equipWithEpaMockClient(epaFhirChecker);
@@ -343,9 +350,29 @@ class MapDosageInstructionTemporaryIT extends ErpTest {
 
     // todo map original KBV Medication to GemErpMedication
     val gemMedicationCompounding =
-        GemErpMedicationFaker.forMedicationCompounding(erpWfVersion)
+        GemErpMedicationFaker.forMedicationIngredient(erpWfVersion)
             .withAtc(ATC.from("123456"))
+            .withIngredientWithContainedATC(3, 1, ATC.from("123"))
             .fake();
+
+    gemMedicationCompounding.getCode().getCoding().forEach(c -> c.setVersion(null));
+    gemMedicationCompounding
+        .getIngredient()
+        .forEach(i -> i.getItemCodeableConcept().getCoding().forEach(c -> c.setVersion(null)));
+    assertTrue(
+        gemMedicationCompounding
+            .getIngredient()
+            .get(0)
+            .getItemCodeableConcept()
+            .getCoding()
+            .stream()
+            .anyMatch(c -> c.getVersion() == null),
+        "in Erp-WF Version 1.5.0 ATC Coding do not has to have a version in"
+            + " GemErpMedicationIngredient");
+    assertNull(
+        gemMedicationCompounding.getCode().getCodingFirstRep().getVersion(),
+        "in Erp-WF Version 1.5.0 medication.codeing == ATC Coding do not has to have a version in"
+            + " GemErpMedicationIngredient");
 
     val medDisp =
         ErxMedicationDispenseFaker.builder(erpWfVersion)
@@ -354,6 +381,7 @@ class MapDosageInstructionTemporaryIT extends ErpTest {
             .withMedication(gemMedicationCompounding)
             .withPerformer(pharmacy.getTelematikId().getValue())
             .withPatientInstruction(patientInstruction)
+            .withHandedOverDate(new GregorianCalendar(2026, Calendar.AUGUST, 20).getTime())
             .fake();
 
     val paramsBuilder =
@@ -373,11 +401,125 @@ class MapDosageInstructionTemporaryIT extends ErpTest {
     val dispensation =
         patient.performs(GetMedicationDispense.withQueryParams(searchParams)).getExpectedResponse();
 
+    val handedOverYear =
+        String.valueOf(
+            dispensation
+                .getDispensePairBy(acceptance.getTaskId().toPrescriptionId())
+                .getFirst()
+                .getLeft()
+                .getWhenHandedOver()
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .getYear());
+
     epaFhirChecker.attemptsTo(
         CheckEpaOpProvideDispensation.forDispensationWithAdditionalVerifier(
             dispensation,
             pharmacy.getTelematikId(),
             task.getPrescriptionId(),
-            List.of(medicationInProvDispensationContainsAtcCodingWithVersion())));
+            List.of(
+                medicationInProvDispensationContainsAtcCodingWithVersion(),
+                emlMedicationDispenseCodeCodingVersionContains(handedOverYear))));
+  }
+
+  @TestcaseId("EML_ADD_VERSION_TO_ATC_CODING_05")
+  @Test()
+  @DisplayName(
+      "Es muss geprüft werden, dass der Fachdienst in der Gem-Medication die ATC-Ingredient Codings"
+          + " mit einer Version ergänzt")
+  void submitPatientInstructionByDispensationToEpaMockWithAtcIngredientWithoutVersion() {
+    val epaFhirChecker = new GemaTestActor("epaFhirChecker");
+    this.config.equipWithEpaMockClient(epaFhirChecker);
+    val patientInstruction = "Dosieranweisung im PatientInstruction-field";
+
+    doc.setVersion(itaForVersion);
+    patient.setVersion(itaForVersion);
+
+    val medication =
+        KbvErpMedicationCompoundingFaker.builder(itaErpVersion).withVaccine(false).fake();
+    val activation =
+        doc.performs(
+                IssuePrescription.forPatient(patient)
+                    .withKbvBundleFrom(
+                        KbvErpBundleFaker.builder(itaErpVersion, itaForVersion)
+                            .withMedication(medication)
+                            .toBuilder()))
+            .getExpectedResponse();
+
+    acceptance = pharmacy.performs(AcceptPrescription.forTheTask(activation)).getExpectedResponse();
+    val task = acceptance.getTask();
+
+    val gemMedicationCompounding =
+        GemErpMedicationFaker.forMedicationIngredient(erpWfVersion)
+            .withAtc(ATC.from("123456"))
+            .withIngredientWithContainedATC(3, 1, ATC.from("123"))
+            .fake();
+
+    gemMedicationCompounding.getCode().getCoding().forEach(c -> c.setVersion(null));
+    gemMedicationCompounding
+        .getIngredient()
+        .forEach(i -> i.getItemCodeableConcept().getCoding().forEach(c -> c.setVersion(null)));
+    assertTrue(
+        gemMedicationCompounding
+            .getIngredient()
+            .get(0)
+            .getItemCodeableConcept()
+            .getCoding()
+            .stream()
+            .anyMatch(c -> c.getVersion() == null),
+        "in Erp-WF Version 1.5.0 ATC Coding do not has to have a version in"
+            + " GemErpMedicationIngredient");
+    assertNull(
+        gemMedicationCompounding.getCode().getCodingFirstRep().getVersion(),
+        "in Erp-WF Version 1.5.0 medication.codeing == ATC Coding do not has to have a version in"
+            + " GemErpMedicationIngredient");
+
+    val medDisp =
+        ErxMedicationDispenseFaker.builder(erpWfVersion)
+            .withKvnr(patient.getKvnr())
+            .withPrescriptionId(task.getPrescriptionId())
+            .withMedication(gemMedicationCompounding)
+            .withPerformer(pharmacy.getTelematikId().getValue())
+            .withPatientInstruction(patientInstruction)
+            .withHandedOverDate(new GregorianCalendar(2026, Calendar.AUGUST, 20).getTime())
+            .fake();
+
+    val paramsBuilder =
+        GemOperationInputParameterBuilder.forDispensingPharmaceuticals()
+            .version(erpWfVersion)
+            .with(medDisp, gemMedicationCompounding);
+    val params = paramsBuilder.build();
+
+    pharmacy
+        .performs(
+            DispensePrescriptionNew.withCredentials(acceptance.getTaskId(), acceptance.getSecret())
+                .withParameters(params))
+        .getExpectedResponse();
+    val closeIneraction =
+        pharmacy.performs(
+            ClosePrescriptionWithoutDispensation.forTheTask(task, task.getSecret().orElseThrow()));
+
+    pharmacy.attemptsTo(Verify.that(closeIneraction).withExpectedType(ErpAfos.A_23384).isCorrect());
+
+    val dispensation =
+        patient.performs(GetMedicationDispense.withQueryParams(searchParams)).getExpectedResponse();
+
+    val handedOverYear =
+        dispensation
+            .getDispensePairBy(acceptance.getTaskId().toPrescriptionId())
+            .getFirst()
+            .getLeft()
+            .getWhenHandedOver()
+            .toInstant()
+            .atZone(ZoneId.systemDefault())
+            .getYear();
+    epaFhirChecker.attemptsTo(
+        CheckEpaOpProvideDispensation.forDispensationWithAdditionalVerifier(
+            dispensation,
+            pharmacy.getTelematikId(),
+            task.getPrescriptionId(),
+            List.of(
+                medicationInProvDispensationContainsAtcCodingWithVersion(),
+                emlMedicationIngredientAtcCodingVersionContains(handedOverYear))));
   }
 }

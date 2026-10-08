@@ -167,7 +167,7 @@ class ErxMedicationDispenseFakerTest extends ErpFhirParsingTest {
             .isSuccessful());
 
     Assertions.assertEquals(
-        BigDecimal.valueOf(2.0),
+        BigDecimal.valueOf(2),
         medDisp
             .getDosageInstructionFirstRep()
             .getDoseAndRateFirstRep()

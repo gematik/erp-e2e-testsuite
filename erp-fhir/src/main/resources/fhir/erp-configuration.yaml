@@ -7,11 +7,11 @@
       version: "1.4.4"
       compatibleVersions: [ "1.4", "1.4.0", "1.4.1", "1.4.2" ]
     - name: "de.gematik.erezept-workflow.r4"
-      snapshot: "de.gematik.erezept-workflow.r4-1.6.2-snapshots.tgz"
-      version: "1.6.2"
-      compatibleVersions: [ "1.6" ]
+      snapshot: "de.gematik.erezept-workflow.r4-1.6.4-snapshots.tgz"
+      version: "1.6.4"
+      compatibleVersions: [ "1.6", "1.6.2" ]
 
-    - name: "kbv.ita.for" # important to validate aktual kbvItaErp 1.4.4
+    - name: "kbv.ita.for" # important to validate actual kbvItaErp 1.4.4
       snapshot: "kbv.ita.for-1.3.1-snapshots.tgz"
       version: "1.3.1"
       compatibleVersions: [ "1.3", "1.3.0" ]
@@ -50,20 +50,23 @@
       snapshot: "de.basisprofil.r4-1.5.2-snapshots.tgz"
     - name: "kbv.basis"
       snapshot: "kbv.basis-1.7.0-snapshots.tgz"
-
     - name: "de.basisprofil.r4"   # for kbv.ita.erp 1.4.4
       snapshot: "de.basisprofil.r4-1.5.4-snapshots.tgz"
       version: "1.5.4"
     - name: "de.gematik.epa.medication"
-      snapshot: "de.gematik.epa.medication-1.3.2-snapshots.tgz"
-      version: "1.3.2"
-      compatibleVersions: [ "1.3" , "1.3.0" ]
+      snapshot: "de.gematik.epa.medication-1.3.4-snapshots.tgz"
+      version: "1.3.4"
+      compatibleVersions: [ "1.3" , "1.3.0" , "1.3.2", "1.3.4" ]
     - name: "de.gematik.fhir.directory"
       snapshot: "de.gematik.fhir.directory-1.0.1-snapshots.tgz"
       version: "1.0.1"
     - name: "de.gematik.ti"
-      snapshot: "de.gematik.ti-1.2.0-snapshots.tgz"
-      version: "1.2.0"
+      snapshot: "de.gematik.ti-1.3.1-snapshots.tgz"
+      version: "1.3.1"
+    - name: "de.gematik.epa"
+      snapshot: "de.gematik.epa-1.3.1-snapshots.tgz"
+      version: "1.3.1"
+      compatibleVersions: [ "1.3" , "1.3.0" ]
     - name: "de.fhir.medication"
       snapshot: "de.fhir.medication-1.0.7-snapshots.tgz"
       version: "1.0.7"

@@ -25,9 +25,7 @@ import de.gematik.test.erezept.primsys.data.DispensedMedicationDto;
 import de.gematik.test.erezept.primsys.data.PrescriptionDto;
 import java.util.LinkedList;
 import java.util.List;
-import lombok.Getter;
 
-@Getter
 public class ContextData {
 
   public static final int FIRST_ENTRY = 0;
@@ -42,43 +40,73 @@ public class ContextData {
     this.dispensedMedications = new LinkedList<>();
   }
 
-  public void addPrescription(PrescriptionDto prescription) {
+  public synchronized void addPrescription(PrescriptionDto prescription) {
     ensureMaxLength(readyPrescriptions);
     this.readyPrescriptions.add(prescription);
   }
 
-  public void addAcceptedPrescription(AcceptedPrescriptionDto prescription) {
+  public synchronized void addAcceptedPrescription(AcceptedPrescriptionDto prescription) {
     ensureMaxLength(acceptedPrescriptions);
     this.acceptedPrescriptions.add(prescription);
   }
 
-  public void addDispensedMedications(DispensedMedicationDto dispensed) {
+  public synchronized void addDispensedMedications(DispensedMedicationDto dispensed) {
     ensureMaxLength(dispensedMedications);
     this.dispensedMedications.add(dispensed);
   }
 
   public boolean removeAcceptedPrescription(String prescriptionId) {
-    return this.acceptedPrescriptions.removeIf(
-        prescription -> prescription.getPrescriptionId().equals(prescriptionId));
+    synchronized (this) {
+      return this.acceptedPrescriptions.removeIf(
+          prescription -> prescription.getPrescriptionId().equals(prescriptionId));
+    }
   }
 
   public boolean removeReadyPrescription(String prescriptionId) {
-    return this.readyPrescriptions.removeIf(
-        prescription -> prescription.getPrescriptionId().equals(prescriptionId));
+    synchronized (this) {
+      return this.readyPrescriptions.removeIf(
+          prescription -> prescription.getPrescriptionId().equals(prescriptionId));
+    }
   }
 
   public List<PrescriptionDto> getReadyPrescriptionsByKvnr(String kvnr) {
-    return readyPrescriptions.stream().filter(p -> p.getPatient().getKvnr().equals(kvnr)).toList();
+    synchronized (this) {
+      return readyPrescriptions.stream()
+          .filter(p -> p.getPatient().getKvnr().equals(kvnr))
+          .toList();
+    }
   }
 
   public List<AcceptedPrescriptionDto> getAcceptedPrescriptionsByKvnr(String kvnr) {
-    return acceptedPrescriptions.stream().filter(p -> p.getForKvnr().equals(kvnr)).toList();
+    synchronized (this) {
+      return acceptedPrescriptions.stream().filter(p -> p.getForKvnr().equals(kvnr)).toList();
+    }
   }
 
   public List<DispensedMedicationDto> getDispensedPrescriptionsByKvnr(String kvnr) {
-    return dispensedMedications.stream()
-        .filter(p -> p.getAcceptData().getForKvnr().equals(kvnr))
-        .toList();
+    synchronized (this) {
+      return dispensedMedications.stream()
+          .filter(p -> p.getAcceptData().getForKvnr().equals(kvnr))
+          .toList();
+    }
+  }
+
+  public List<PrescriptionDto> getReadyPrescriptions() {
+    synchronized (this) {
+      return List.copyOf(readyPrescriptions);
+    }
+  }
+
+  public List<AcceptedPrescriptionDto> getAcceptedPrescriptions() {
+    synchronized (this) {
+      return List.copyOf(acceptedPrescriptions);
+    }
+  }
+
+  public List<DispensedMedicationDto> getDispensedMedications() {
+    synchronized (this) {
+      return List.copyOf(dispensedMedications);
+    }
   }
 
   private void ensureMaxLength(List<?> list) {

@@ -22,7 +22,7 @@ package de.gematik.test.erezept.actions;
 
 import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static de.gematik.test.erezept.actions.ClosePrescription.applyMutators;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -36,6 +36,7 @@ import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
+import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.r4.erp.*;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
@@ -47,13 +48,18 @@ import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.fuzzing.core.FuzzingMutator;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import lombok.val;
+import org.hl7.fhir.r4.model.Parameters;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junitpioneer.jupiter.ClearSystemProperty;
+import org.mockito.ArgumentCaptor;
 
 class ClosePrescriptionTest extends ErpFhirBuildingTest {
   private static PharmacyActor pharmacy;
@@ -96,7 +102,7 @@ class ClosePrescriptionTest extends ErpFhirBuildingTest {
     when(mockTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
     when(mockTask.getForKvnr()).thenReturn(Optional.of(KVNR.from("X123456789")));
     when(useErpClient.decode(eq(KbvErpBundle.class), any()))
-        .thenReturn(KbvErpBundleFaker.builder().withKvnr(KVNR.from("X123456789")).fake());
+        .thenReturn(KbvErpBundleFaker.builder().fake());
 
     val acceptResponse =
         FhirBResponse.forPayload(ErxAcceptBundle.class, mockAcceptBundle)
@@ -134,7 +140,7 @@ class ClosePrescriptionTest extends ErpFhirBuildingTest {
     when(mockTask.getForKvnr()).thenReturn(Optional.of(KVNR.from("X123456789")));
     when(mockAcceptBundle.getSignedKbvBundle()).thenReturn(exampleQes);
     when(useErpClient.decode(eq(KbvErpBundle.class), any()))
-        .thenReturn(KbvErpBundleFaker.builder().withKvnr(KVNR.from("X123456789")).fake());
+        .thenReturn(KbvErpBundleFaker.builder().fake());
 
     val acceptResponse =
         FhirBResponse.forPayload(ErxAcceptBundle.class, mockAcceptBundle)
@@ -177,5 +183,91 @@ class ClosePrescriptionTest extends ErpFhirBuildingTest {
 
     verify(mutator1).accept(target);
     verify(mutator2).accept(target);
+  }
+
+  @Test
+  void shouldSetMedicationIfGiven() {
+    reset(useErpClient);
+    val mockAcceptBundle = mock(ErxAcceptBundle.class);
+    val mockTask = mock(ErxTask.class);
+
+    when(mockAcceptBundle.getTaskId()).thenReturn(TaskId.from("1234567890"));
+    when(mockAcceptBundle.getSecret()).thenReturn(Secret.from("secret"));
+    when(mockAcceptBundle.getSignedKbvBundle()).thenReturn(exampleQes);
+    when(mockAcceptBundle.getTask()).thenReturn(mockTask);
+    when(mockTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
+    when(mockTask.getForKvnr()).thenReturn(Optional.of(KVNR.from("X123456789")));
+    when(useErpClient.decode(eq(KbvErpBundle.class), any()))
+        .thenReturn(KbvErpBundleFaker.builder().fake());
+
+    val response =
+        FhirBResponse.forPayload(ErxReceipt.class, new ErxReceipt())
+            .withStatusCode(200)
+            .andValidationResult(createEmptyValidationResult());
+    when(useErpClient.request(any(CloseTaskCommand.class))).thenReturn(response);
+
+    val givenMedication = GemErpMedicationFaker.forPznMedication().fake();
+    ClosePrescription closePrescription =
+        ClosePrescription.alternative()
+            .withAlternativeMedication(givenMedication)
+            .acceptedWith(mockAcceptBundle);
+
+    assertDoesNotThrow(() -> pharmacy.performs(closePrescription));
+
+    val cmdCaptor = ArgumentCaptor.forClass(CloseTaskCommand.class);
+    verify(useErpClient).request(cmdCaptor.capture());
+
+    val closeParameters =
+        assertInstanceOf(GemCloseOperationParameters.class, cmdCaptor.getValue().getRequestBody());
+    val actualMedication =
+        closeParameters.getParameters("rxDispensation").getFirst().getPart().stream()
+            .filter(part -> "medication".equals(part.getName()))
+            .map(Parameters.ParametersParameterComponent::getResource)
+            .findFirst()
+            .orElseThrow();
+    assertSame(givenMedication, actualMedication);
+  }
+
+  @Test
+  void shouldSetEmptyMedicationIfGiven() {
+    reset(useErpClient);
+    val mockAcceptBundle = mock(ErxAcceptBundle.class);
+    val mockTask = mock(ErxTask.class);
+
+    when(mockAcceptBundle.getTaskId()).thenReturn(TaskId.from("1234567890"));
+    when(mockAcceptBundle.getSecret()).thenReturn(Secret.from("secret"));
+    when(mockAcceptBundle.getSignedKbvBundle()).thenReturn(exampleQes);
+    when(mockAcceptBundle.getTask()).thenReturn(mockTask);
+    when(mockTask.getPrescriptionId()).thenReturn(PrescriptionId.random());
+    when(mockTask.getForKvnr()).thenReturn(Optional.of(KVNR.from("X123456789")));
+    when(useErpClient.decode(eq(KbvErpBundle.class), any()))
+        .thenReturn(KbvErpBundleFaker.builder().fake());
+
+    val response =
+        FhirBResponse.forPayload(ErxReceipt.class, new ErxReceipt())
+            .withStatusCode(200)
+            .andValidationResult(createEmptyValidationResult());
+    when(useErpClient.request(any(CloseTaskCommand.class))).thenReturn(response);
+
+    val givenMedication = new GemErpMedication();
+    ClosePrescription closePrescription =
+        ClosePrescription.alternative()
+            .withAlternativeMedication(givenMedication)
+            .acceptedWith(mockAcceptBundle);
+
+    assertDoesNotThrow(() -> pharmacy.performs(closePrescription));
+
+    val cmdCaptor = ArgumentCaptor.forClass(CloseTaskCommand.class);
+    verify(useErpClient).request(cmdCaptor.capture());
+
+    val closeParameters =
+        assertInstanceOf(GemCloseOperationParameters.class, cmdCaptor.getValue().getRequestBody());
+    val actualMedication =
+        closeParameters.getParameters("rxDispensation").getFirst().getPart().stream()
+            .filter(part -> "medication".equals(part.getName()))
+            .map(Parameters.ParametersParameterComponent::getResource)
+            .findFirst()
+            .orElseThrow();
+    assertNotEquals(givenMedication, actualMedication);
   }
 }

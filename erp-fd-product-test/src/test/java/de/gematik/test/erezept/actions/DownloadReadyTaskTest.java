@@ -74,7 +74,7 @@ class DownloadReadyTaskTest extends ErpFhirBuildingTest {
 
     sina = new PatientActor("sina");
     val sca = SmartcardArchive.fromResources();
-    val egk = sca.getEgkByKvnr("X110498565");
+    val egk = sca.getEgkByKvnr("X110614233");
     sina.can(ProvideEGK.sheOwns(egk));
     val providePatientBaseData =
         ProvidePatientBaseData.forGkvPatient(KVNR.from(egk.getKvnr()), "sina");

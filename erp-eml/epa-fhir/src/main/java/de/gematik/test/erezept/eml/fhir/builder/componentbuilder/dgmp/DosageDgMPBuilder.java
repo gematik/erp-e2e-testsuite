@@ -52,7 +52,14 @@ public class DosageDgMPBuilder extends ElementBuilder<DosageDgMP, DosageDgMPBuil
   public static DosageDgMPBuilder dosageBuilder(double value, BmpDosiereinheit code) {
     Quantity quantity = new Quantity();
     quantity.setUnit(code.getDisplay()).setCode(code.getCode());
-    quantity.setValue(value);
+
+    // TODO check why equals() in DosageDGMP changed behavior betrween Maven and IDE runtime.
+    //  The following code is a workaround to avoid the problem with equals() in DosageDGMP
+    if (value % 1 != 0) {
+      quantity.setValue(value);
+    } else {
+      quantity.setValue((int) value);
+    }
     return new DosageDgMPBuilder(quantity);
   }
 

@@ -172,10 +172,17 @@ public abstract class PrescriptionDataMapper {
     Optional.ofNullable(medMap.get("Reichdauer in Wochen"))
         .ifPresent(
             it -> medicationRequestBuilder.expectedSupplyDurationInWeeks(Float.parseFloat(it)));
+
     // eMP ID-Link behavior
     Optional.ofNullable(this.patient.recall("emp-identifier"))
         .filter(String.class::isInstance)
         .map(String.class::cast)
+        .ifPresent(medicationRequestBuilder::basedOnEMP);
+
+    // manually sett eMP-Identifier
+    Optional.ofNullable(medMap.get("Manually-Defined-EMP-Identifier"))
+        .or(() -> Optional.ofNullable(medMap.get("EMP-Identifier")))
+        .map(it -> it.equals("random") ? UUID.randomUUID().toString() : it)
         .ifPresent(medicationRequestBuilder::basedOnEMP);
 
     // rendered and structured Dosage instructions behavior

@@ -196,6 +196,15 @@ public class PatientCommunicationSteps {
         .attemptsTo(Ensure.that(PatientDoesHaveMessagesForTask.fromStack(order)).isFalse());
   }
 
+  @Dann(
+      "^kann (?:der|die) Versicherte (.+) weiterhin die Nachrichten zu (?:seinem|ihrem)"
+          + " (ersten|letzten) E-Rezept abrufen$")
+  public void thenPatientCanGetCommunicationsBasedOnTask(String patientName, String order) {
+    val thePatient = OnStage.theActorCalled(patientName);
+    then(thePatient)
+        .attemptsTo(Ensure.that(PatientDoesHaveMessagesForTask.fromStack(order)).isTrue());
+  }
+
   @Wenn("^(?:der|die) Versicherte (.+) alle (?:seinem|ihre) versendeten Nachrichten löscht$")
   public void whenPatientDeletesAllCommunications(String patientName) {
     val thePatient = OnStage.theActorCalled(patientName);

@@ -35,6 +35,7 @@ import de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispen
 import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
+import de.gematik.test.erezept.eml.fhir.r4.EpaMedication;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
 import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
@@ -52,9 +53,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 import lombok.val;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.MedicationDispense;
-import org.hl7.fhir.r4.model.Timing;
+import org.hl7.fhir.r4.model.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -616,5 +615,181 @@ class EpaOpProvideDispensationVerifierTest extends ErpFhirBuildingTest {
   void shouldVerifyMedicationCodingHasVersion() {
     val step = medicationInProvDispensationContainsAtcCodingWithVersion();
     assertDoesNotThrow(() -> step.apply(epaOpProvideDispensationFromMock));
+  }
+
+  @Test
+  void shouldVerifyMedicationCodeCodingContainsVersion() {
+    val manipulatedEpaOpProvideDispensation =
+        fhir.decode(
+            EpaOpProvideDispensation.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/valid/parameters/1.3.0/epaOpProvDispenseInputFromEpaMock.json"));
+    manipulatedEpaOpProvideDispensation.getParameter().getFirst().getPart().stream()
+        .filter(part -> "medication".equals(part.getName()))
+        .map(Parameters.ParametersParameterComponent::getResource)
+        .filter(EpaMedication.class::isInstance)
+        .map(EpaMedication.class::cast)
+        .map(EpaMedication::getCode)
+        .map(c -> c.addCoding(ATC.from("123", "AtcCodeDisplay").asCoding().setVersion("2025")))
+        .toList();
+    val step = emlMedicationDispenseCodeCodingVersionContains("2025");
+    assertDoesNotThrow(() -> step.apply(manipulatedEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyMedicationCodeCodingContainsVersion1() {
+    val manipulatedEpaOpProvideDispensation = epaOpProvideDispensationFromMock;
+    val step = emlMedicationDispenseCodeCodingVersionContains("2025");
+    assertDoesNotThrow(() -> step.apply(manipulatedEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyMedicationCodeCodingContainsVersion2() {
+    val manipulatedEpaOpProvideDispensation =
+        fhir.decode(
+            EpaOpProvideDispensation.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/valid/parameters/1.3.0/epaOpProvDispenseInputFromEpaMock.json"));
+    manipulatedEpaOpProvideDispensation.getParameter().getFirst().getPart().stream()
+        .filter(part -> "medication".equals(part.getName()))
+        .map(Parameters.ParametersParameterComponent::getResource)
+        .filter(EpaMedication.class::isInstance)
+        .map(EpaMedication.class::cast)
+        .map(EpaMedication::getCode)
+        .map(c -> c.addCoding(ATC.from("123", "AtcCodeDisplay").asCoding()))
+        .toList();
+    val step = emlMedicationDispenseCodeCodingVersionContains("2025");
+    assertThrows(AssertionError.class, () -> step.apply(manipulatedEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyMedicationCodeCodingContainsVersion3() {
+    val manipulatedEpaOpProvideDispensation =
+        fhir.decode(
+            EpaOpProvideDispensation.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/valid/parameters/1.3.0/epaOpProvDispenseInputFromEpaMock.json"));
+    manipulatedEpaOpProvideDispensation.getParameter().getFirst().getPart().stream()
+        .filter(part -> "medication".equals(part.getName()))
+        .map(Parameters.ParametersParameterComponent::getResource)
+        .filter(EpaMedication.class::isInstance)
+        .map(EpaMedication.class::cast)
+        .map(EpaMedication::getCode)
+        .map(c -> c.addCoding(ATC.from("123", "AtcCodeDisplay").asCoding().setVersion("2026")))
+        .toList();
+    val step = emlMedicationDispenseCodeCodingVersionContains("2025");
+    assertThrows(AssertionError.class, () -> step.apply(manipulatedEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shouldVerifyMedicationIngredientCodingContainsAtcVersion() {
+    val manipulatedEpaOpProvideDispensation =
+        fhir.decode(
+            EpaOpProvideDispensation.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/valid/parameters/1.3.0/epaOpProvDispenseInputFromEpaMock.json"));
+    manipulatedEpaOpProvideDispensation.getParameter().getFirst().getPart().stream()
+        .filter(part -> "medication".equals(part.getName()))
+        .map(Parameters.ParametersParameterComponent::getResource)
+        .filter(EpaMedication.class::isInstance)
+        .map(EpaMedication.class::cast)
+        .map(EpaMedication::getIngredientFirstRep)
+        .map(EpaMedication.MedicationIngredientComponent::getItemCodeableConcept)
+        .findFirst()
+        .ifPresent(
+            codeableConcept ->
+                codeableConcept.setCoding(
+                    List.of(ATC.from("123", "AtcCodeDisplay").asCoding().setVersion("2025"))));
+    val step = emlMedicationIngredientAtcCodingVersionContains(2025);
+    assertDoesNotThrow(() -> step.apply(manipulatedEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyMedicationIngredientCodingContainsVersion() {
+    val manipulatedEpaOpProvideDispensation = epaOpProvideDispensationFromMock;
+    manipulatedEpaOpProvideDispensation.getParameter().getFirst().getPart().stream()
+        .filter(part -> "medication".equals(part.getName()))
+        .map(Parameters.ParametersParameterComponent::getResource)
+        .filter(Medication.class::isInstance)
+        .map(EpaMedication.class::cast)
+        .map(EpaMedication::getIngredientFirstRep)
+        .map(EpaMedication.MedicationIngredientComponent::getItemCodeableConcept)
+        .findFirst()
+        .ifPresent(
+            codeableConcept ->
+                codeableConcept.setCoding(
+                    List.of(ATC.from("123", "AtcCodeDisplay").asCoding().setVersion("2026"))));
+
+    val step = emlMedicationIngredientAtcCodingVersionContains(2025);
+    assertThrows(AssertionError.class, () -> step.apply(manipulatedEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyMedicationIngredientCodingContainsVersion1() {
+    val manipulatedEpaOpProvideDispensation = epaOpProvideDispensationFromMock;
+    manipulatedEpaOpProvideDispensation.getParameter().getFirst().getPart().stream()
+        .filter(part -> "medication".equals(part.getName()))
+        .map(Parameters.ParametersParameterComponent::getResource)
+        .filter(EpaMedication.class::isInstance)
+        .map(EpaMedication.class::cast)
+        .map(EpaMedication::getIngredientFirstRep)
+        .map(EpaMedication.MedicationIngredientComponent::getItemCodeableConcept)
+        .findFirst()
+        .ifPresent(
+            codeableConcept ->
+                codeableConcept.setCoding(List.of(ATC.from("123", "AtcCodeDisplay").asCoding())));
+    val step = emlMedicationIngredientAtcCodingVersionContains(2025);
+    assertThrows(AssertionError.class, () -> step.apply(manipulatedEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyMedicationIngredientCodingContainsNoAtc() {
+    val manipulatedEpaOpProvideDispensation = epaOpProvideDispensationFromMock;
+    manipulatedEpaOpProvideDispensation.getParameter().getFirst().getPart().stream()
+        .filter(part -> "medication".equals(part.getName()))
+        .map(Parameters.ParametersParameterComponent::getResource)
+        .filter(EpaMedication.class::isInstance)
+        .map(EpaMedication.class::cast)
+        .map(EpaMedication::getIngredientFirstRep)
+        .map(EpaMedication.MedicationIngredientComponent::getItemCodeableConcept)
+        .findFirst()
+        .ifPresent(codeableConcept -> codeableConcept.setCoding(List.of()));
+    val step = emlMedicationIngredientAtcCodingVersionContains(2025);
+    assertThrows(AssertionError.class, () -> step.apply(manipulatedEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyMedicationIngredientCodingContainsVersion2() {
+    val step = emlMedicationIngredientAtcCodingVersionContains(2025);
+    assertThrows(AssertionError.class, () -> step.apply(epaOpProvideDispensationFromMock));
+  }
+
+  @Test
+  void shouldVerifyMedicationDispenseStatusIsCompletedCorrect() {
+    val step = emlMedicationDispenseStatusIsCompleted();
+    assertDoesNotThrow(() -> step.apply(validEpaOpProvideDispensation));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyMedicationDispenseStatusIsNotCompleted() {
+    val notCompletedDispensation =
+        fhir.decode(
+            EpaOpProvideDispensation.class,
+            ResourceLoader.readFileFromResource(
+                "fhir/valid/parameters/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json"));
+    notCompletedDispensation
+        .getEpaMedicationDispense()
+        .setStatus(MedicationDispense.MedicationDispenseStatus.PREPARATION);
+
+    val step = emlMedicationDispenseStatusIsCompleted();
+    assertThrows(AssertionError.class, () -> step.apply(notCompletedDispensation));
+  }
+
+  @Test
+  void shouldThrowWhileVerifyOrganizationCountryCodeMapsToWrongCode() {
+    val wrongCountryCode =
+        new Coding("http://fhir.de/CodeSystem/iso/ext-country-code", "FR", "Frankreich");
+    val step = emlOrganizationCountryCodeMapsTo(wrongCountryCode);
+    assertThrows(AssertionError.class, () -> step.apply(validEpaOpProvideDispensation));
   }
 }

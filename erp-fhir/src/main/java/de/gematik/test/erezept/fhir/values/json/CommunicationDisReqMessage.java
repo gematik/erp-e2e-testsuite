@@ -34,7 +34,7 @@ public record CommunicationDisReqMessage(
     int version,
     String supplyOptionsType,
     String communicationType,
-    UUID transactionID,
+    String transactionID,
     String name,
     String firstname,
     String lastname,
@@ -162,7 +162,7 @@ public record CommunicationDisReqMessage(
     private String communicationType;
     private String supplyOptionsType;
 
-    private UUID transactionID = UUID.randomUUID();
+    private String transactionID = UUID.randomUUID().toString();
 
     private String firstname;
     private String lastname;
@@ -204,6 +204,10 @@ public record CommunicationDisReqMessage(
     }
 
     public CommunicationDisReqMessageV3Builder transactionID(UUID transactionID) {
+      return this.transactionID(transactionID.toString());
+    }
+
+    public CommunicationDisReqMessageV3Builder transactionID(String transactionID) {
       this.transactionID = transactionID;
       return this;
     }

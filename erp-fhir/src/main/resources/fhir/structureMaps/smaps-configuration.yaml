@@ -1,0 +1,13 @@
+- name: T-Rezept
+  version: 1.1.0-SNAPSHOT
+  corePackage: hl7.fhir.r4.core#4.0.1
+  igResourcePath: /fhir/structureMaps/de.gematik.erp.t-prescription-1.1.0-snapshots.tgz
+  url: https://gematik.de/fhir/erp-t-prescription/StructureMap/ERPTPrescriptionStructureMapCarbonCopy
+
+- name: Erp2Epa
+  version: 1.1.0-SNAPSHOT
+  corePackage: hl7.fhir.r4.core#4.0.1
+  igResourcePath: DUMMY VALUE
+  url: DUMMY VALUE
+
+

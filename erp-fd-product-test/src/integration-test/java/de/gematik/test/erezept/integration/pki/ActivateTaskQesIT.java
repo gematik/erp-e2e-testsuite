@@ -58,6 +58,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @DisplayName("QES Testfälle")
 @Tag("PKI")
 class ActivateTaskQesIT extends ErpTest {
+
   @Actor(name = "Gündüla Gunther")
   private DoctorActor doctor;
 
@@ -94,7 +95,7 @@ class ActivateTaskQesIT extends ErpTest {
     val hba = SafeAbility.getAbility(doctor, UseHBA.class).getHba();
     val ocspToken =
         OcspTokenGenerator.with(hba.getQesCertificate(CryptoSystem.ECC_256).getX509Certificate())
-            .asOnlineToken();
+            .asOnlineToken(config.getOcsp());
     Function<String, byte[]> signingFunc =
         data ->
             SoftKonSigner.signQES(hba, CryptoSystem.ECC_256)
@@ -191,7 +192,7 @@ class ActivateTaskQesIT extends ErpTest {
     val ocspToken =
         OcspTokenGenerator.with(
                 hbaForOcspResp.getQesCertificate(CryptoSystem.ECC_256).getX509Certificate())
-            .asOnlineToken();
+            .asOnlineToken(config.getOcsp());
     Function<String, byte[]> signingFunc =
         data ->
             SoftKonSigner.signQES(hba, CryptoSystem.ECC_256)

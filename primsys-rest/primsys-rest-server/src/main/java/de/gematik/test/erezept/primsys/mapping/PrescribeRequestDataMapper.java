@@ -30,6 +30,8 @@ import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedicationRequest;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
+import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
+import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import de.gematik.test.erezept.primsys.data.MedicationRequestDto;
 import de.gematik.test.erezept.primsys.data.PatientDto;
 import de.gematik.test.erezept.primsys.data.PrescribeRequestDto;
@@ -102,11 +104,19 @@ public class PrescribeRequestDataMapper extends BaseMapper<PrescribeRequestDto> 
   }
 
   public KbvErpBundle createKbvBundle(String doctorName) {
-    val practitioner = KbvPractitionerFaker.builder().withName(doctorName).fake();
+    val medication = this.getMedication();
+    val isTPrescription = MedicationCategory.C_02.equals(medication.getCategoryFirstRep());
+
+    val practitionerBuilder = KbvPractitionerFaker.builder().withName(doctorName);
+
+    // this is required to prevent for example a Midwife from prescribing a T-Rezept, which is not
+    // allowed
+    if (isTPrescription) practitionerBuilder.withQualificationType(QualificationType.DOCTOR);
+
+    val practitioner = practitionerBuilder.fake();
     val organization = KbvMedicalOrganizationFaker.forPractitioner(practitioner).fake();
     val patient = this.getPatient();
     val coverage = this.getCoverage();
-    val medication = this.getMedication();
     val medicationRequest = this.getMedicationRequest(practitioner);
 
     if (!this.getMedicationRequestMapper(practitioner).isMvoValid()) {

@@ -1,5 +1,22 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 1.8.0
+
+* primsys-bbd:
+  - Moved the OCSP URL from ActivateTaskQesIT to the central configuration 
+
+* erp-fhir:
+    - add de.gematik.erezept-workflow.r4-1.6.4
+        * contained dependencies change:
+            - de.gematik.epa.medication-1.3.2 -> 1.3.4
+            - de.gematik.ti-1.2.0 -> 1.3.1
+            - de.gematik.epa-1.3.1
+
+* erp-fd-product-test:
+    - implement generic polling Wrapper
+    - implement Testcase to generate FHIR objects using StructureMaps and compere the Result with Erp-FD generated
+      Result
+
 ## Release 1.7.0
 
 * erp-bdd-common
@@ -15,6 +32,8 @@
     - extend patch operation testcases for afo A_28910
     - implement negative testcases for eu close endpoint to test the dispensation informations (prescription id and
       kvnr)
+    - implement testcases for eu close endpoint to test the dispensation informations in epa mock client
+    - Tested JSON character transformation for the EPA Exporter
 
 * erp-fhir:
     - add kbv.ita.erp 1.4.4 (and dependencies)

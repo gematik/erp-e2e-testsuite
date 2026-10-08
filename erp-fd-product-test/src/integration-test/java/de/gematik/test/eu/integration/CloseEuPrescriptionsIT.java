@@ -540,6 +540,7 @@ class CloseEuPrescriptionsIT extends ErpTest {
 
   @ParameterizedTest(name = "[{index}] -> {0}")
   @TestcaseId("ERP_EU_CLOSE_09")
+  @Tag("MissingFdFeature")
   @DisplayName(
       "Fehlgeschlagene Übermittlung von Abgabeinformationen durch abweichende Identifier im"
           + " MedicationDispense")

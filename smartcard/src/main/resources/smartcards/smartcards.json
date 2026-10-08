@@ -1,210 +1,7 @@
 [
   {
-    "iccsn": "80276883110000113311",
-    "identifier": "X110406067",
-    "type": "EGK",
-    "ownerName": "Fridolin F. D. J. W. SchraßerTEST-ONLY",
-    "stores": [
-      "egk/80276883110000113311/80276883110000113311-C_CH_AUT_E256.p12",
-      "egk/80276883110000113311/80276883110000113311-C_CH_AUT_R2048.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000113298",
-    "identifier": "X110498565",
-    "type": "EGK",
-    "ownerName": "Sina Karla Gräfin HüllmannTEST-ONLY",
-    "stores": [
-      "egk/80276883110000113298/80276883110000113298-C_CH_AUT_E256.p12",
-      "egk/80276883110000113298/80276883110000113298-C_CH_AUT_R2048.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000115195",
-    "identifier": "X110415294",
-    "type": "EGK",
-    "ownerName": "Prof. Dr. Brunhild T. F. Gräfin KoerbérTEST-ONLY",
-    "stores": [
-      "egk/80276883110000115195/80276883110000115195-C_CH_AUT_E256.p12",
-      "egk/80276883110000115195/80276883110000115195-C_CH_AUT_R2048.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000115194",
-    "identifier": "X110467925",
-    "type": "EGK",
-    "ownerName": "Harald E. T.-Y. G. H. Graf Düsterbehn-HardenbergshausenTEST-ONLY",
-    "stores": [
-      "egk/80276883110000115194/80276883110000115194-C_CH_AUT_R2048.p12",
-      "egk/80276883110000115194/80276883110000115194-C_CH_AUT_E256.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000115203",
-    "identifier": "X110477027",
-    "type": "EGK",
-    "ownerName": "Dr. Grace Annemarie Adele H. HubertúsTEST-ONLY",
-    "stores": [
-      "egk/80276883110000115203/80276883110000115203_C.CH.AUT_R2048.p12",
-      "egk/80276883110000115203/80276883110000115203_C.CH.AUT_E256.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000115202",
-    "identifier": "X110471745",
-    "type": "EGK",
-    "ownerName": "Peer Christian Robin Simon Graf SchölzTEST-ONLY",
-    "stores": [
-      "egk/80276883110000115202/80276883110000115202_C.CH.AUT_E256.p12",
-      "egk/80276883110000115202/80276883110000115202_C.CH.AUT_R2048.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000113323",
-    "identifier": "X110465770",
-    "type": "EGK",
-    "ownerName": "Prof. Dr. Günther Wolfgang Graf AngermännTEST-ONLY",
-    "stores": [
-      "egk/80276883110000113323/80276883110000113323-C_CH_AUT_R2048.p12",
-      "egk/80276883110000113323/80276883110000113323-C_CH_AUT_E256.p12"
-    ]
-  },
-  {
-    "iccsn": "80276881046003403749",
-    "identifier": "T010126013",
-    "type": "EGK",
-    "ownerName": "Dr. Satzeins von Gematik 260",
-    "stores": [
-      "egk/80276881046003403749/80276881046003403749_C.CH.AUT_E256_gen.p12",
-      "egk/80276881046003403749/80276881046003403749_C.CH.AUT_R2048_gen.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000113312",
-    "identifier": "X110488614",
-    "type": "EGK",
-    "ownerName": "Leonie Tatjana Amelie S. Freifrau HütterTEST-ONLY",
-    "stores": [
-      "egk/80276883110000113312/80276883110000113312-C_CH_AUT_E256.p12",
-      "egk/80276883110000113312/80276883110000113312-C_CH_AUT_R2048.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000113544",
-    "identifier": "X110468333",
-    "type": "EGK",
-    "ownerName": "Ethan Finn Bruno Rolf Kevin Graf ZapatinskíTEST-ONLY",
-    "stores": [
-      "egk/80276883110000113544/80276883110000113544-C_CH_AUT_R2048.p12",
-      "egk/80276883110000113544/80276883110000113544-C_CH_AUT_E256.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000115198",
-    "identifier": "X110489325",
-    "type": "EGK",
-    "ownerName": "Prof. Dr. Walter D. B. P. LüneburgTEST-ONLY",
-    "stores": [
-      "egk/80276883110000115198/80276883110000115198-C_CH_AUT_E256.p12",
-      "egk/80276883110000115198/80276883110000115198-C_CH_AUT_R2048.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000115196",
-    "identifier": "X110423314",
-    "type": "EGK",
-    "ownerName": "Gisela Annika S. K. M.-E. Gräfin DômbrowskiTEST-ONLY",
-    "stores": [
-      "egk/80276883110000115196/80276883110000115196-C_CH_AUT_E256.p12",
-      "egk/80276883110000115196/80276883110000115196-C_CH_AUT_R2048.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000115197",
-    "identifier": "X110488970",
-    "type": "EGK",
-    "ownerName": "Fabian Luka Peter Norbert Graf VórmwinkelTEST-ONLY",
-    "stores": [
-      "egk/80276883110000115197/80276883110000115197-C_CH_AUT_R2048.p12",
-      "egk/80276883110000115197/80276883110000115197-C_CH_AUT_E256.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000115199",
-    "identifier": "X110434026",
-    "type": "EGK",
-    "ownerName": "Dr. Martin Harald Gernot FörsterTEST-ONLY",
-    "stores": [
-      "egk/80276883110000115199/80276883110000115199-C_CH_AUT_R2048.p12",
-      "egk/80276883110000115199/80276883110000115199-C_CH_AUT_E256.p12"
-    ]
-  },
-  {
-    "iccsn": "80276881025548431301",
-    "identifier": "X110499478",
-    "type": "EGK",
-    "ownerName": "Dr. Hanna Sophie Gisela BäckerTEST-ONLY",
-    "stores": [
-      "egk/80276881025548431301/80276881025548431301-C_CH_AUT_R2048.p12",
-      "egk/80276881025548431301/80276881025548431301-C_CH_AUT_E256.p12"
-    ]
-  },
-  {
-    "iccsn": "80276881046003403674",
-    "identifier": "T010122115",
-    "type": "EGK",
-    "ownerName": "Dr. Satzeins von Gematik 221",
-    "stores": [
-      "egk/80276881046003403674/80276881046003403674_C.CH.AUT_R2048_gen.p12",
-      "egk/80276881046003403674/80276881046003403674_C.CH.AUT_E256_gen.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000115200",
-    "identifier": "X110461302",
-    "type": "EGK",
-    "ownerName": "Steffi Nicole Steffi Gräfin ØzTEST-ONLY",
-    "stores": [
-      "egk/80276883110000115200/80276883110000115200-C_CH_AUT_R2048.p12",
-      "egk/80276883110000115200/80276883110000115200-C_CH_AUT_E256.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000108142",
-    "identifier": "X110499478",
-    "type": "EGK",
-    "ownerName": "Dr. Hanna Sophie Gisela BäckerTEST-ONLY",
-    "stores": [
-      "egk/80276883110000108142/80276883110000108142_EF.C.CH.AUT_ALVI.E256.p12",
-      "egk/80276883110000108142/80276883110000108142-C_CH_AUT_E256.p12",
-      "egk/80276883110000108142/80276883110000108142-C_CH_AUT_R2048.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000113566",
-    "identifier": "X110455134",
-    "type": "EGK",
-    "ownerName": "Annegret-Heidemarie Gräfin SchomakerTEST-ONLY",
-    "stores": [
-      "egk/80276883110000113566/80276883110000113566-C_CH_AUT_E256.p12",
-      "egk/80276883110000113566/80276883110000113566-C_CH_AUT_R2048.p12",
-      "egk/80276883110000113566/80276883110000113566-C_CH_ENC_R2048.p12",
-      "egk/80276883110000113566/80276883110000113566-C_CH_ENC_E256.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000115201",
-    "identifier": "X110463559",
-    "type": "EGK",
-    "ownerName": "Maria Adelheid Lilo Karla H. Gräfin d' AgóstinoTEST-ONLY",
-    "stores": [
-      "egk/80276883110000115201/80276883110000115201-C_CH_AUT_E256.p12",
-      "egk/80276883110000115201/80276883110000115201-C_CH_AUT_R2048.p12"
-    ]
-  },
-  {
     "iccsn": "80276883110000154825",
-    "note": "EML - Alice IBM",
+    "note": "EML - Alice IBM, valid until 11.2028",
     "identifier": "X110571801",
     "type": "EGK",
     "ownerName": "Martin Daniel Freiherr Nullmayr",
@@ -214,7 +11,7 @@
   },
   {
     "iccsn": "80276883110000154826",
-    "note": "EML - Bernd IBM",
+    "note": "EML - Bernd IBM, valid until 11.2028",
     "identifier": "X110562170",
     "type": "EGK",
     "ownerName": "Justin-Alexander E. L. H. G. Wendler-Schonhäuser",
@@ -223,18 +20,8 @@
     ]
   },
   {
-    "iccsn": "80276883110000154831",
-    "note": "EML - Charlie IBM",
-    "identifier": "X110558398",
-    "type": "EGK",
-    "ownerName": "Amelie Edith Abigail M.-E. Gräfin Damaschke",
-    "stores": [
-      "egk/80276883110000154831/80276883110000154831-C_CH_AUT_E256.p12"
-    ]
-  },
-  {
     "iccsn": "80276883110000154830",
-    "note": "EML - Alice Rise",
+    "note": "EML - Alice Rise, valid until 11.2028",
     "identifier": "X110595713",
     "type": "EGK",
     "ownerName": "Sigurd Robin Torben-Tom Graf Schröder",
@@ -243,8 +30,18 @@
     ]
   },
   {
+    "iccsn": "80276883110000154831",
+    "note": "EML - Charlie IBM, valid until 11.2028",
+    "identifier": "X110558398",
+    "type": "EGK",
+    "ownerName": "Amelie Edith Abigail M.-E. Gräfin Damaschke",
+    "stores": [
+      "egk/80276883110000154831/80276883110000154831-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
     "iccsn": "80276883110000154835",
-    "note": "EML - Bernd Rise",
+    "note": "EML - Bernd Rise, valid until 11.2028",
     "identifier": "X110524396",
     "type": "EGK",
     "ownerName": "Ernst-August Johann D.-P. R. Freiherr Özdemir",
@@ -254,7 +51,7 @@
   },
   {
     "iccsn": "80276883110000154836",
-    "note": "EML - Charlie Rise",
+    "note": "EML - Charlie Rise, valid until 11.2028",
     "identifier": "X110521453",
     "type": "EGK",
     "ownerName": "Prof. Dr. Lena Marie-Ella T. Gräfin Düsterbehn",
@@ -264,12 +61,22 @@
   },
   {
     "iccsn": "80276883110000115469",
-    "note": "EML - Ru-Dev IBM",
+    "note": "EML - Ru-Dev IBM, valid until Jan2031",
     "identifier": "X110487636",
     "type": "EGK",
     "ownerName": "Prof. Dr. Dörthe Tanja S. L. Gräfin Ørsted",
     "stores": [
       "egk/80276883110000115469/80276883110000115469_EF.C.CH.AUT.E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000163684",
+    "note": "EML - EMILIA RU IBM Bert , valid until: 23.10.2029, 01:59:59 MESZ",
+    "identifier": "X110632787",
+    "type": "EGK",
+    "ownerName": "Alfons Harald Alfons S. Freiherr HilféTEST-ONLY",
+    "stores": [
+      "egk/80276883110000163684/80276883110000163684-C_CH_AUT_E256.p12"
     ]
   },
   {
@@ -290,16 +97,6 @@
     "ownerName": "Dr. Aphrodite Nicole Leni-Paula Maude Marie-Ella",
     "stores": [
       "egk/80276883110000163686/80276883110000163686-C_CH_AUT_E256.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000163684",
-    "note": "EML - EMILIA RU IBM Bert , valid until: 23.10.2029, 01:59:59 MESZ",
-    "identifier": "X110632787",
-    "type": "EGK",
-    "ownerName": "Alfons Harald Alfons S. Freiherr HilféTEST-ONLY",
-    "stores": [
-      "egk/80276883110000163684/80276883110000163684-C_CH_AUT_E256.p12"
     ]
   },
   {
@@ -350,6 +147,16 @@
     "ownerName": "Prof. Dr. Hans Konstantin H. von MüllerTEST-ONLY",
     "stores": [
       "egk/80276883110000154827/80276883110000154827-C_CH_AUT_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276883110000172966",
+    "note": "EML - EMILIA Alice EY , valid until: 08.10.2030, 01:59:59 MEZ",
+    "identifier": "X110630516",
+    "type": "EGK",
+    "ownerName": "Dr. Elli Dominique-Michelle Melissa Anna Caner",
+    "stores": [
+      "egk/80276883110000172966/80276883110000172966-C_CH_AUT_E256.p12"
     ]
   },
   {
@@ -429,17 +236,6 @@
     ]
   },
   {
-    "iccsn": "833621999741611",
-    "type": "SMC_B",
-    "ownerName": "Arztpraxis Dr. Niedermeyer TEST-ONLY",
-    "stores": [
-      "smcb/833621999741611/833621999741611_c.hci.aut-arge_E256.p12",
-      "smcb/833621999741611/833621999741611_c.hci.osig-arge_E256.p12",
-      "smcb/833621999741611/833621999741611_c.hci.aut-arge_R2048.p12",
-      "smcb/833621999741611/833621999741611_c.hci.osig-arge_R2048.p12"
-    ]
-  },
-  {
     "iccsn": "80276001011699901102",
     "type": "SMC_B",
     "note": "valid until: Thu Nov 09 22:59:59 UTC 2028",
@@ -456,6 +252,7 @@
   {
     "iccsn": "80276001011699902303",
     "type": "SMC_B",
+    "note": "valid until: Jan 25, 2028, 11:59PM",
     "ownerName": "Apotheke Christine Ulmendorfer TEST-ONLY",
     "stores": [
       "smcb/80276001011699902303/80276001011699902303-C_SMCB_HCI_OSIG_E256.p12",
@@ -476,6 +273,7 @@
   {
     "iccsn": "80276001011699902302",
     "type": "SMC_B",
+    "note": "valid until: Jan 25, 2028, 11:59PM",
     "ownerName": "Apotheke Bernd Ulmendorfer TEST-ONLY",
     "stores": [
       "smcb/80276001011699902302/80276001011699902302-C_SMCB_ENC_R2048_X509.p12",
@@ -508,20 +306,6 @@
     ]
   },
   {
-    "iccsn": "80276883110000117369",
-    "type": "SMC_B",
-    "note": "valid until Wed Dec 11 23:59:59 UTC 2024",
-    "ownerName": "Praxis Blôch-BauerTEST-ONLY",
-    "stores": [
-      "smcb/80276883110000117369/80276883110000117369-C_SMCB_AUT_R2048_X509/80276883110000117369-C_SMCB_AUT_R2048_X509.p12",
-      "smcb/80276883110000117369/80276883110000117369-C_SMCB_HCI_OSIG_E256/80276883110000117369-C_SMCB_HCI_OSIG_E256.p12",
-      "smcb/80276883110000117369/80276883110000117369-C_SMCB_HCI_AUT_E256/80276883110000117369-C_SMCB_HCI_AUT_E256.p12",
-      "smcb/80276883110000117369/80276883110000117369-C_SMCB_HCI_ENC_E256/80276883110000117369-C_SMCB_HCI_ENC_E256.p12",
-      "smcb/80276883110000117369/80276883110000117369-C_SMCB_ENC_R2048_X509/80276883110000117369-C_SMCB_ENC_R2048_X509.p12",
-      "smcb/80276883110000117369/80276883110000117369-C_SMCB_OSIG_R2048_X509/80276883110000117369-C_SMCB_OSIG_R2048_X509.p12"
-    ]
-  },
-  {
     "iccsn": "80276883110000092475",
     "type": "SMC_B",
     "ownerName": "Nord ApothekeTEST-ONLY",
@@ -543,6 +327,7 @@
   {
     "iccsn": "80276001011699902301",
     "type": "SMC_B",
+    "note": "valid until: Jan 25, 2028, 11:59PM",
     "ownerName": "Apotheke Adelheid Ulmendorfer TEST-ONLY",
     "stores": [
       "smcb/80276001011699902301/80276001011699902301-C_HCI_ENC_R2048.p12",
@@ -558,35 +343,6 @@
       "smcb/80276001011699902301/80276001011699902301-C_SMCB_AUT_E256_X509/80276001011699902301-C_SMCB_AUT_E256_X509.p12",
       "smcb/80276001011699902301/80276001011699902301-C_SMCB_OSIG_R2048.p12",
       "smcb/80276001011699902301/80276001011699902301-C_SMCB_HCI_OSIG_E256.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000116873",
-    "type": "SMC_B",
-    "note": "valid until Wed Dec 11 23:59:59 UTC 2024",
-    "ownerName": "Apotheke am FlughafenTEST-ONLY",
-    "stores": [
-      "smcb/80276883110000116873/80276883110000116873-C_SMCB_AUT_R2048_X509.p12",
-      "smcb/80276883110000116873/80276883110000116873-C_SMCB_HCI_AUT_E256.p12",
-      "smcb/80276883110000116873/80276883110000116873-C_SMCB_HCI_OSIG_E256.p12",
-      "smcb/80276883110000116873/80276883110000116873-C_SMCB_HCI_ENC_E256.p12",
-      "smcb/80276883110000116873/80276883110000116873-C_SMCB_ENC_R2048_X509.p12",
-      "smcb/80276883110000116873/80276883110000116873-C_SMCB_OSIG_R2048_X509.p12",
-      "smcb/80276883110000116873/80276883110000116873-C_HCI_ENC_R2048.p12"
-    ]
-  },
-  {
-    "iccsn": "80276883110000116872",
-    "type": "SMC_B",
-    "note": "valid until Wed Dec 11 23:59:59 UTC 2024",
-    "ownerName": "Stadt ApothekeTEST-ONLY",
-    "stores": [
-      "smcb/80276883110000116872/80276883110000116872-C_SMCB_HCI_ENC_E256/80276883110000116872-C_SMCB_HCI_ENC_E256.p12",
-      "smcb/80276883110000116872/80276883110000116872-C_SMCB_OSIG_R2048_X509/80276883110000116872-C_SMCB_OSIG_R2048_X509.p12",
-      "smcb/80276883110000116872/80276883110000116872-C_SMCB_HCI_OSIG_E256/80276883110000116872-C_SMCB_HCI_OSIG_E256.p12",
-      "smcb/80276883110000116872/80276883110000116872-C_SMCB_ENC_R2048_X509/80276883110000116872-C_SMCB_ENC_R2048_X509.p12",
-      "smcb/80276883110000116872/80276883110000116872-C_SMCB_HCI_AUT_E256/80276883110000116872-C_SMCB_HCI_AUT_E256.p12",
-      "smcb/80276883110000116872/80276883110000116872-C_SMCB_AUT_R2048_X509/80276883110000116872-C_SMCB_AUT_R2048_X509.p12"
     ]
   },
   {

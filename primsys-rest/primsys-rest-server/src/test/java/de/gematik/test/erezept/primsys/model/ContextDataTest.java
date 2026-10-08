@@ -29,7 +29,13 @@ import de.gematik.test.erezept.primsys.data.AcceptedPrescriptionDto;
 import de.gematik.test.erezept.primsys.data.DispensedMedicationDto;
 import de.gematik.test.erezept.primsys.data.PatientDto;
 import de.gematik.test.erezept.primsys.data.PrescriptionDto;
+import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.val;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -209,5 +215,62 @@ class ContextDataTest {
       contextData.addAcceptedPrescription(acceptData);
     }
     assertFalse(contextData.removeAcceptedPrescription(acceptData2.getPrescriptionId()));
+  }
+
+  /**
+   * This behavior happens under load when multiple threads are adding prescriptions concurrently.
+   * The test simulates this scenario by creating multiple threads that add prescriptions to the
+   * ContextData instance. If the maximum queue length is exceeded, a NullPointerException is
+   * expected to be thrown.
+   */
+  @Test
+  void shouldThrowExceptionWhenAddingPrescriptionsConcurrentlyBeyondMaxQueueLength() {
+    val localContextData = new ContextData();
+    int threadCount = ContextData.MAX_QUEUE_LENGTH * 10;
+    int itemsPerThread = ContextData.MAX_QUEUE_LENGTH * 20;
+
+    try (ExecutorService executor = Executors.newFixedThreadPool(threadCount)) {
+      val tasks = createTasks(threadCount, itemsPerThread, localContextData);
+
+      var exceptionThrown = false;
+      for (var future : executor.invokeAll(tasks)) {
+        try {
+          future.get();
+        } catch (ExecutionException e) {
+          if (e.getCause() instanceof NullPointerException) {
+            exceptionThrown = true;
+            break;
+          }
+          throw new AssertionError("Unexpected exception while adding prescriptions", e);
+        }
+      }
+
+      assertFalse(exceptionThrown, "Expected a NullPointerException to be thrown");
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new AssertionError("Interrupted while waiting for concurrent tasks", e);
+    }
+  }
+
+  private static @NonNull ArrayList<Callable<Void>> createTasks(
+      int threadCount, int itemsPerThread, ContextData localContextData) {
+    val tasks = new ArrayList<Callable<Void>>();
+    for (int threadIndex = 0; threadIndex < threadCount; threadIndex++) {
+      val currentThread = threadIndex;
+      tasks.add(
+          () -> {
+            for (int i = 0; i < itemsPerThread; i++) {
+              localContextData.addPrescription(
+                  PrescriptionDto.builder()
+                      .prescriptionId(currentThread + "-" + i)
+                      .accessCode(currentThread + "-" + i)
+                      .taskId(currentThread + "-" + i)
+                      .patient(PatientDto.withKvnr("X110407071").build())
+                      .build());
+            }
+            return null;
+          });
+    }
+    return tasks;
   }
 }

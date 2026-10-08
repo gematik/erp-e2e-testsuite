@@ -105,15 +105,14 @@ Funktionalität: Nachrichten zwischen Versicherten und Apotheke austauschen
 
   @TCID:ERP_EE_NACHRICHTEN_06
   @TESTFALL:positiv
-  @AFO-ID:A_20513
   @Hauptdarsteller:Fachdienst
-  Szenario: Fachdienst löscht alle Nachrichten zu einem E-Rezept nach dem Einlösen
-  Der Testfall überprüft, ob alle Nachrichten, die sich auf ein E-Rezept beziehen, nach dem erfolgreichem Einlösen vom Fachdienst gelöscht wurden.
+  Szenario: Fachdienst löscht keine Nachrichten zu einem E-Rezept nach dem Einlösen
+  Der Testfall überprüft, ob alle Nachrichten, die sich auf ein E-Rezept beziehen, nach dem erfolgreichem Einlösen vom Fachdienst noch vorhanden sind.
 
     Wenn die Versicherte Sina Hüllmann ihr letztes E-Rezept der Apotheke Am Flughafen per Nachricht zuweist
     Und die Apotheke Am Flughafen die letzte Zuweisung per Nachricht von Sina Hüllmann akzeptiert
     Und die Apotheke Am Flughafen das letzte akzeptierte E-Rezept korrekt an Sina Hüllmann dispensiert
-    Dann kann die Versicherte Sina Hüllmann nicht mehr die Nachrichten zu ihrem letzten E-Rezept abrufen
+    Dann kann die Versicherte Sina Hüllmann weiterhin die Nachrichten zu ihrem letzten E-Rezept abrufen
 
 
   @TCID:ERP_EE_NACHRICHTEN_07

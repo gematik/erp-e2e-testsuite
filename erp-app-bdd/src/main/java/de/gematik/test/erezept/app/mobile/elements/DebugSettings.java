@@ -34,17 +34,13 @@ public enum DebugSettings implements PageElement {
       () -> null,
       () -> AppiumBy.xpath("//*[@label='Einstellungen']")),
   ENVIRONMENT_SELECTOR(
-      "Environment Selector",
-      () -> null,
-      () -> AppiumBy.iOSNsPredicateString("label == \"Environment\"")),
+      "Environment Selector", () -> null, () -> AppiumBy.accessibilityId("Environment")),
   RU_ENVIRONMENT(
       "Environment Selector for the RU", () -> null, () -> AppiumBy.accessibilityId("RU")),
   RU_DEV_ENVIRONMENT(
-      "Environment Selector for the RU-DEV", () -> null, () -> AppiumBy.accessibilityId("RU DEV")),
+      "Environment Selector for the RU-DEV", () -> null, () -> AppiumBy.accessibilityId("RU_DEV")),
   TU_ENVIRONMENT(
-      "Environment Selector for the TU",
-      () -> null,
-      () -> AppiumBy.iOSNsPredicateString("label == \"TU\" AND type == \"XCUIElementTypeButton\"")),
+      "Environment Selector for the TU", () -> null, () -> AppiumBy.accessibilityId("TU")),
   ;
   private final String elementName;
   private final Supplier<By> androidLocator;

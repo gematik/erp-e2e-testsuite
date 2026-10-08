@@ -22,7 +22,7 @@ package de.gematik.test.erezept.primsys
 
 import tools.jackson.databind.ObjectMapper
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration.options
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import de.gematik.test.erezept.primsys.data.actors.ActorDto
@@ -39,13 +39,17 @@ import org.junit.jupiter.api.extension.RegisterExtension
 open class RestTest {
 
     @RegisterExtension
-    val wiremockExtension = WireMockExtension.newInstance().options(WireMockConfiguration.wireMockConfig()).build()
+    val wiremockExtension: WireMockExtension = WireMockExtension.newInstance()
+        .options(options().dynamicPort())
+        .build()
 
     lateinit var om: ObjectMapper
+    var port : Int = 0
 
     @BeforeEach
     fun setup() {
         om = ObjectMapper()
+        port = wiremockExtension.port
     }
 
     fun setupPositiveInfo(env: String? = null): StubMapping {
@@ -59,7 +63,7 @@ open class RestTest {
         val info = om.writeValueAsString(infoDto)
 
         val testUrl = env?.let { "/$it/info" } ?: "/info"
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathEqualTo(testUrl)).willReturn(
                 aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody(info)
             )
@@ -68,7 +72,7 @@ open class RestTest {
 
     fun setupErrorInfo(errorType: ErrorType = ErrorType.INTERNAL): StubMapping {
         val error = om.writeValueAsString(ErrorDto(errorType, "internal error"))
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathEqualTo("/info")).willReturn(
                 aResponse().withStatus(400).withHeader("Content-Type", "application/json").withBody(error)
             )
@@ -83,7 +87,7 @@ open class RestTest {
 
         val actors = om.writeValueAsString(actorsDto)
         val testUrl = env?.let { "/$it/actors" } ?: "/actors"
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathEqualTo(testUrl)).willReturn(
                 aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody(actors)
             )
@@ -92,7 +96,7 @@ open class RestTest {
 
     fun setupErrorActors(errorType: ErrorType = ErrorType.INTERNAL): StubMapping {
         val error = om.writeValueAsString(ErrorDto(errorType, "internal error"))
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathEqualTo("/actors")).willReturn(
                 aResponse().withStatus(400).withHeader("Content-Type", "application/json").withBody(error)
             )
@@ -101,7 +105,7 @@ open class RestTest {
 
     fun setupErrorActorsHtml(): StubMapping {
         val error = "<html><body>internal error</body></html>"
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathEqualTo("/actors")).willReturn(
                 aResponse().withStatus(400).withHeader("Content-Type", "text/html").withBody(error)
             )
@@ -109,7 +113,7 @@ open class RestTest {
     }
 
     fun setupErrorActorsEmpty(): StubMapping {
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathEqualTo("/actors")).willReturn(
                 aResponse().withStatus(400).withHeader("Content-Type", "application/json")
             )
@@ -117,7 +121,7 @@ open class RestTest {
     }
 
     fun setupActorsInvalidErrorResponse(statusCode: Int): StubMapping {
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathEqualTo("/actors")).willReturn(
                 aResponse().withStatus(statusCode).withHeader("Content-Type", "application/json")
                     .withHeader("content-length", "20").withBody("{'a': 'b'}")
@@ -127,7 +131,7 @@ open class RestTest {
 
     fun setupActorsValidErrorResponse(): StubMapping {
         val errorJson = "{\"type\": \"INTERNAL\", \"message\": \"Test Message\"}"
-        return stubFor(
+        return wiremockExtension.stubFor(
             get(urlPathEqualTo("/actors")).willReturn(
                 aResponse().withStatus(400).withHeader("Content-Type", "application/json")
                     .withHeader("content-length", errorJson.length.toString()).withBody(errorJson)
@@ -135,10 +139,10 @@ open class RestTest {
         )
     }
 
-    fun setupConnectionTimeout(): StubMapping {
-        return stubFor(
+    fun setupConnectionTimeout(delayMilliSeconds: Int): StubMapping {
+        return wiremockExtension.stubFor(
             get(urlPathEqualTo("/info")).willReturn(
-                aResponse().withStatus(200).withFixedDelay(20000)
+                aResponse().withStatus(200).withFixedDelay(delayMilliSeconds)
             )
         )
     }
@@ -149,7 +153,7 @@ open class RestTest {
     }
 
     fun setupPositiveAbort(): StubMapping {
-        return stubFor(
+        return wiremockExtension.stubFor(
             delete(urlPathMatching("/(doc|pharm)/[^/]+/abort"))
                 .willReturn(
                     aResponse()
@@ -158,9 +162,5 @@ open class RestTest {
                         .withBody("")
                 )
         )
-    }
-
-    companion object {
-        const val REST_PORT = 9099
     }
 }

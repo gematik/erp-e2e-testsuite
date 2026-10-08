@@ -27,7 +27,10 @@ import de.gematik.test.erezept.fhir.extensions.erp.CommunicationPayloadType;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
+@Slf4j
 @JsonInclude(Include.NON_EMPTY)
 public record CommunicationReplyMessage(
     int version,
@@ -142,7 +145,7 @@ public record CommunicationReplyMessage(
     private String communicationType = "text";
     private String transactionID = UUID.randomUUID().toString();
 
-    private String text = GemFaker.fakerCommunicationReplyMessage();
+    private String text;
 
     private String url;
     private String readyForCollection;
@@ -233,8 +236,18 @@ public record CommunicationReplyMessage(
     public CommunicationReplyMessage build() {
 
       if ("reservationStatus".equals(communicationType)) {
-        // not allowed when type is reservationStatus
+        // Note: Not allowed when type is reservationStatus
         this.text = null;
+      }
+
+      // Note: Error log when an integration test depends on the Faker-generated text property and
+      // doesn't pass it by itself for communicationType=text or communicationType=link
+      val isTextOrLink = communicationType.equals("text") || communicationType.equals("link");
+
+      if (version == 3 && text == null && isTextOrLink) {
+        log.error(
+            "Error missing text property in V3 Communication Reply for communicationType: {}.",
+            communicationType);
       }
 
       return new CommunicationReplyMessage(

@@ -29,10 +29,7 @@ import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationPZNBuilderORIGINAL_BUILDER;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
-import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispense;
-import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
-import de.gematik.test.erezept.fhir.r4.erp.GemCloseOperationParameters;
+import de.gematik.test.erezept.fhir.r4.erp.*;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
@@ -44,6 +41,7 @@ import jakarta.annotation.Nullable;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.annotations.Step;
@@ -62,6 +60,8 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
   private final List<NamedEnvelope<FuzzingMutator<GemCloseOperationParameters>>>
       closeOperationParameterMutators;
 
+  @Nullable private final GemErpMedication alternativeMedication;
+
   @Override
   @Step("{0} dispensiert ein E-Rezept und schließt den Vorgang mit $close ab")
   public ErpInteraction<ErxReceipt> answeredBy(Actor actor) {
@@ -78,16 +78,21 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
 
     val gemOperationBuilder = GemOperationInputParameterBuilder.forClosingPharmaceuticals();
     val kbvMedication = kbvBundle.getMedication();
-    val medication =
-        GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvMedication)
-            .lotNumber(GemFaker.fakerLotNumber())
-            .build();
+
+    val medicationToUse =
+        Optional.ofNullable(alternativeMedication)
+            .filter(it -> !it.isEmpty())
+            .orElseGet(
+                () ->
+                    GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvMedication)
+                        .lotNumber(GemFaker.fakerLotNumber())
+                        .build());
 
     val medicationDispenseBuilder =
         ErxMedicationDispenseBuilder.forKvnr(kvnr)
             .prescriptionId(prescriptionId)
             .performerId(telematikId)
-            .medication(medication);
+            .medication(medicationToUse);
 
     if (preparedDate != null) {
       medicationDispenseBuilder.whenPrepared(preparedDate);
@@ -102,7 +107,8 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
     val medicationDispense = medicationDispenseBuilder.build();
     applyMutators(this.fhirCloseMutators, medicationDispense);
 
-    val gemMedicationDispense = gemOperationBuilder.with(medicationDispense, medication).build();
+    val gemMedicationDispense =
+        gemOperationBuilder.with(medicationDispense, medicationToUse).build();
     applyClosMutators(this.closeOperationParameterMutators, gemMedicationDispense);
 
     val cmd = new CloseTaskCommand(taskId, secret, gemMedicationDispense);
@@ -150,6 +156,8 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
     private final List<NamedEnvelope<FuzzingMutator<GemCloseOperationParameters>>>
         closeOperationParameterMutators = new LinkedList<>();
 
+    @Nullable private GemErpMedication alternativeMedication;
+
     public Builder performer(String telematikId) {
       return this.withResourceManipulator(
           NamedEnvelope.of(
@@ -190,6 +198,11 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
       return this;
     }
 
+    public Builder withAlternativeMedication(GemErpMedication alternativeMedication) {
+      this.alternativeMedication = alternativeMedication;
+      return this;
+    }
+
     public ClosePrescription acceptedWith(ErpInteraction<ErxAcceptBundle> interaction) {
       return acceptedWith(interaction.getExpectedResponse());
     }
@@ -211,7 +224,12 @@ public class ClosePrescription extends ErpAction<ErxReceipt> {
     public ClosePrescription acceptedWith(
         ErxAcceptBundle acceptBundle, Date prepareDate, Date handedOver) {
       Object[] params = {
-        acceptBundle, prepareDate, handedOver, fhirCloseMutators, closeOperationParameterMutators
+        acceptBundle,
+        prepareDate,
+        handedOver,
+        fhirCloseMutators,
+        closeOperationParameterMutators,
+        alternativeMedication
       };
       return new Instrumented.InstrumentedBuilder<>(ClosePrescription.class, params).newInstance();
     }

@@ -23,6 +23,7 @@ package de.gematik.test.erezept.app.task;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.CardWall;
+import de.gematik.test.erezept.app.mobile.elements.PushNotification;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -54,7 +55,9 @@ public class NavigateThroughCardwall implements Task {
     app.tap(CardWall.CONTINUE_AFTER_BIOMETRY_CHECK_BUTTON);
 
     app.tap(CardWall.START_NFC_READOUT_BUTTON);
-    app.waitUntilElementIsVisible(
-        BottomNav.SETTINGS_BUTTON, 60000); // wait until the pairing finished
+    // Wait until the card scan and login is finished
+    app.waitUntilElementIsVisible(PushNotification.PUSH_NOTIFICATION_DIALOG, 60000);
+    // Dismiss the push notifications
+    app.dismissAlert();
   }
 }

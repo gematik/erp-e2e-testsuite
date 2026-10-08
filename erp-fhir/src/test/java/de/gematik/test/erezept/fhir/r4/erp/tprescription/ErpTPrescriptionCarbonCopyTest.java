@@ -23,12 +23,15 @@ package de.gematik.test.erezept.fhir.r4.erp.tprescription;
 import static de.gematik.test.erezept.fhir.valuesets.eu.EuPartNaming.DISPENSEINFORMATION;
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.test.erezept.fhir.profiles.definitions.GemErpTPrescStructDef;
 import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.profiles.version.TPrescrVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import java.util.List;
+import lombok.val;
+import org.hl7.fhir.r4.model.InstantType;
 import org.hl7.fhir.r4.model.Parameters;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -120,5 +123,27 @@ class ErpTPrescriptionCarbonCopyTest extends ErpFhirParsingTest {
     assertNotEquals(
         Darreichungsform.KPG,
         erpTPrescriptionCarbonCopy.getMedicationFromDispensation().getDarreichungsform());
+  }
+
+  @Test
+  void shouldFindNoSignatureDate() {
+    assertThrows(
+        MissingFieldException.class,
+        () -> erpTPrescriptionCarbonCopy.getPrescriptionSignatureDate());
+  }
+
+  @Test
+  void shouldFindSignatureDate() {
+    val cc = new ErpTPrescriptionCarbonCopy();
+    cc.addParameter("rxPrescription", 0);
+
+    cc.getParameterFirstRep()
+        .setPart(
+            List.of(
+                new Parameters.ParametersParameterComponent()
+                    .setName("prescriptionSignatureDate")
+                    .setValue(new InstantType("2026-10-02T09:48:13.000+00:00"))));
+    assertNotNull(cc.getPrescriptionSignatureDate());
+    assertEquals("2026-10-02T09:48:13.000Z", cc.getPrescriptionSignatureDate());
   }
 }

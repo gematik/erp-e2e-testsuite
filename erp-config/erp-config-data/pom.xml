@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>erp-config</artifactId>
-        <version>1.7.1</version>
+        <version>1.8.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -22,13 +22,6 @@
         <dependency>
             <groupId>de.gematik.bbriccs</groupId>
             <artifactId>configuration-api-brick</artifactId>
-        </dependency>
-
-        <!-- remove once Bricks moved to Jackson 3 -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.22.1</version>
         </dependency>
 
         <dependency>

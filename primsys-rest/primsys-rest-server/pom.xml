@@ -5,7 +5,7 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>primsys-rest</artifactId>
-        <version>1.7.1</version>
+        <version>1.8.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -69,11 +69,6 @@
             <artifactId>primsys-rest-data</artifactId>
         </dependency>
 
-        <!-- Provides ObjectMapper and SerializationConfig -->
-        <!--        <dependency>-->
-        <!--            <groupId>tools.jackson.core</groupId>-->
-        <!--            <artifactId>jackson-databind</artifactId>-->
-        <!--        </dependency>-->
         <dependency>
             <groupId>tools.jackson.jakarta.rs</groupId>
             <artifactId>jackson-jakarta-rs-xml-provider</artifactId>
@@ -98,14 +93,14 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.0.0</version>
+            <version>6.1.0</version>
         </dependency>
 
         <!-- shouldn't be required once de.gematik.test.erezept.primsys.rest.data is refactored -->
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>4.0.2</version>
+            <version>4.0.5</version>
         </dependency>
 
         <dependency>
@@ -164,7 +159,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-assembly-plugin</artifactId>
-                        <version>3.5.0</version>
+                        <version>3.8.0</version>
                         <executions>
                             <execution>
                                 <id>make-restserver</id>
@@ -178,9 +173,9 @@
                                             <mainClass>${main.class}</mainClass>
                                         </manifest>
                                     </archive>
-                                    <descriptorRefs>
-                                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                                    </descriptorRefs>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/dist.xml</descriptor>
+                                    </descriptors>
                                 </configuration>
                             </execution>
                         </executions>

@@ -27,9 +27,11 @@ import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.r4.ErpFhirResource;
 import de.gematik.test.erezept.fhir.util.FhirEntryReplacer;
 import de.gematik.test.erezept.fhir.util.IdentifierUtil;
+import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,7 @@ import lombok.val;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Composition;
 import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.ResourceType;
 
 @Slf4j
@@ -118,6 +121,39 @@ public abstract class KbvBaseBundle extends Bundle implements ErpFhirResource {
                     KbvPractitioner.class, entry, KbvPractitioner::fromPractitioner))
         .findFirst()
         .orElseThrow(() -> new MissingFieldException(this.getClass(), ResourceType.Practitioner));
+  }
+
+  public List<KbvPractitioner> getAllPractitioners() {
+    return this.entry.stream()
+        .filter(entry -> entry.getResource().getResourceType().equals(ResourceType.Practitioner))
+        .filter(
+            practitionerEntry ->
+                ((Practitioner) practitionerEntry.getResource())
+                    .getIdentifier().stream()
+                        .map(identifier -> identifier.getType().getCodingFirstRep())
+                        .anyMatch(BaseANR::isPractitioner))
+        .map(
+            entry ->
+                FhirEntryReplacer.cast(
+                    KbvPractitioner.class, entry, KbvPractitioner::fromPractitioner))
+        .toList();
+  }
+
+  public Optional<KbvPractitionerRole> getPractitionerRole() {
+    return this.entry.stream()
+        .filter(
+            entry -> entry.getResource().getResourceType().equals(ResourceType.PractitionerRole))
+        .map(
+            entry ->
+                FhirEntryReplacer.cast(
+                    KbvPractitionerRole.class,
+                    entry,
+                    resource -> {
+                      val pr = new KbvPractitionerRole();
+                      resource.copyValues(pr);
+                      return pr;
+                    }))
+        .findFirst();
   }
 
   public KbvMedicalOrganization getMedicalOrganization() {

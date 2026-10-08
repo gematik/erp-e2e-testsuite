@@ -15,13 +15,16 @@
     </appender>
 
 
-    <logger name="com.github.tomakehurst.wiremock" level="WARN">
+    <logger name="com.github.tomakehurst.wiremock" level="INFO">
         <appender-ref ref="STDOUT"/>
     </logger>
     <logger name="wiremock.org" level="ERROR">
         <appender-ref ref="STDOUT"/>
     </logger>
-    <logger name="WireMock" level="WARN">
+    <logger name="WireMock" level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+    <logger name="de.gematik" level="INFO" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 

@@ -211,7 +211,7 @@ public class TaskVerifier {
   }
 
   public static VerificationStep<ErxTask> hasRedeemableByProperties(boolean expected) {
-    Predicate<ErxTask> predicate = task -> task.isRedeemableByProperties(expected);
+    Predicate<ErxTask> predicate = task -> task.isRedeemableByProperties() == expected;
 
     return new VerificationStep.StepBuilder<ErxTask>(
             ErpAfos.A_27063.getRequirement(),
@@ -221,7 +221,7 @@ public class TaskVerifier {
   }
 
   public static VerificationStep<ErxTask> hasRedeemableByPatientAuthorization(boolean expected) {
-    Predicate<ErxTask> predicate = task -> task.isRedeemableByAuthorization(expected);
+    Predicate<ErxTask> predicate = task -> task.isRedeemableByAuthorization() == expected;
 
     return new VerificationStep.StepBuilder<ErxTask>(
             ErpAfos.A_27063.getRequirement(),

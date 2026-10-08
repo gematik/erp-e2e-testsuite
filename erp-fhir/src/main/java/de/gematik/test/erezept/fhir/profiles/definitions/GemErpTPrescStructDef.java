@@ -30,6 +30,12 @@ import lombok.Getter;
 public enum GemErpTPrescStructDef implements WithStructureDefinition<TPrescrVersion> {
   CARBON_COPY(
       "https://gematik.de/fhir/erp-t-prescription/StructureDefinition/erp-tprescription-carbon-copy"),
+  MEDICATION_DISPENSE(
+      "https://gematik.de/fhir/erp-t-prescription/StructureDefinition/erp-tprescription-medication-dispense"),
+  DISPENSE_ORGANIZATION(
+      "https://gematik.de/fhir/erp-t-prescription/StructureDefinition/erp-tprescription-organization"),
+  MEDICATION_REQUEST(
+      "https://gematik.de/fhir/erp-t-prescription/StructureDefinition/erp-tprescription-medication-request"),
   ;
 
   private final String canonicalUrl;

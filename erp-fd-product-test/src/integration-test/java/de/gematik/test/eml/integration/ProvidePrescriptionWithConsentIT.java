@@ -21,6 +21,7 @@
 package de.gematik.test.eml.integration;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLogFor;
+import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlMedRequestDosageHasText;
 import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.*;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
@@ -274,5 +275,63 @@ public class ProvidePrescriptionWithConsentIT extends ErpTest {
           .fake();
       default -> throw new IllegalArgumentException("Unknown medication type: " + medicationType);
     };
+  }
+
+  @ParameterizedTest(name = "{0} → {1}")
+  @TestcaseId("EML_PROVIDE_PRESCRIPTION_DOSAGE_INSTRUCTION_04")
+  @DisplayName(
+      "Es soll geprüft werden, dass der FD die Zeichen der DosageInstruction beim Export korrekt"
+          + " transformiert")
+  @MethodSource("dosageInstructionTestData")
+  void shouldExportDosageInstructionWithCorrectEscaping(
+      String dosageInstructionText, String expectedDosageInstructionText) {
+
+    val epaFhirChecker = new GemaTestActor("epaFhirChecker");
+    this.config.equipWithEpaMockClient(epaFhirChecker);
+
+    patient.changePatientInsuranceType(InsuranceTypeDe.GKV);
+
+    val activation =
+        doc.performs(
+            IssuePrescription.forPatient(patient)
+                .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
+                .withKbvBundleFrom(
+                    KbvErpBundleFaker.builder()
+                        .withMedication(getMedication(MEDICATION_PZN))
+                        .withDosageInstruction(
+                            dosageInstructionText) // The parameter represents only the text value
+                        // of the DosageInstruction, not the entire
+                        // element.
+                        .toBuilder()));
+
+    val task = activation.getExpectedResponse();
+
+    val prescr =
+        patient.performs(
+            GetPrescriptionById.withTaskId(task.getTaskId()).withAccessCode(task.getAccessCode()));
+
+    val kbvBundle = prescr.getExpectedResponse().getKbvBundle().orElseThrow();
+
+    epaFhirChecker.attemptsTo(
+        CheckEpaOpProvidePrescriptionWithTask.forPrescription(
+            kbvBundle,
+            doc.getSmcbTelematikId(),
+            doc.getHbaTelematikId(),
+            emlMedRequestDosageHasText(expectedDosageInstructionText)));
+  }
+
+  private static Stream<Arguments> dosageInstructionTestData() {
+    return Stream.of(
+        Arguments.of(
+            "<",
+            "<"), // TODO: The "<" -> "<" case is expected to fail once the FD feature is deployed,
+        // as "<" will then be correctly escaped to "\\u003C"
+        Arguments.of("<", "\\u003C"),
+        Arguments.of("</", "\\u003C/"),
+        Arguments.of("<script>", "\\u003Cscript>"),
+        Arguments.of("]]>", "]]\\u003e"),
+        Arguments.of("-->", "--\\u003e"),
+        Arguments.of("\u2028", "\\u2028"),
+        Arguments.of("\u2029", "\\u2029"));
   }
 }

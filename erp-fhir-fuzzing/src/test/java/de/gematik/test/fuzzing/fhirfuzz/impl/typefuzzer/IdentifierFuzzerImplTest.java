@@ -21,10 +21,7 @@
 package de.gematik.test.fuzzing.fhirfuzz.impl.typefuzzer;
 
 import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.fuzzing.fhirfuzz.impl.typesfuzzer.CodeableConceptFuzzImpl;
 import de.gematik.test.fuzzing.fhirfuzz.impl.typesfuzzer.IdentifierFuzzerImpl;
@@ -51,6 +48,7 @@ class IdentifierFuzzerImplTest {
     fuzzConfig = new FuzzConfig();
     fuzzConfig.setPercentOfEach(100.0f);
     fuzzConfig.setPercentOfAll(100.0f);
+    fuzzConfig.setUsedPercentOfMutators(100.0f);
     fuzzerContext = new FuzzerContext(fuzzConfig);
     fhirIdentifierFuzzer = new IdentifierFuzzerImpl(fuzzerContext);
   }
@@ -107,7 +105,6 @@ class IdentifierFuzzerImplTest {
   @RepeatedTest(REPETITIONS)
   void shouldFuzzIdentifierUse() {
 
-    fuzzConfig.setUseAllMutators(true);
     fuzzConfig.setPercentOfAll(00.0f);
     val use =
         fuzzerContext.getRandomOneOfClass(
@@ -127,7 +124,6 @@ class IdentifierFuzzerImplTest {
 
   @RepeatedTest(REPETITIONS)
   void shouldFuzzIdentifierSystem() {
-    fuzzConfig.setUseAllMutators(true);
     fuzzConfig.setPercentOfAll(00.0f);
     val system = TESTSTRING;
     assertFalse(identifier.hasSystem());
@@ -144,7 +140,6 @@ class IdentifierFuzzerImplTest {
 
   @RepeatedTest(REPETITIONS)
   void shouldFuzzIdentifierValue() {
-    fuzzConfig.setUseAllMutators(true);
     fuzzConfig.setPercentOfAll(00.0f);
     val system = TESTSTRING;
     assertFalse(identifier.hasSystem());
@@ -160,7 +155,6 @@ class IdentifierFuzzerImplTest {
 
   @RepeatedTest(REPETITIONS)
   void shouldFuzzIdentifierPeriod() {
-    fuzzConfig.setUseAllMutators(true);
     fuzzConfig.setPercentOfAll(00.0f);
     val period = new Period();
     assertFalse(identifier.hasPeriod());

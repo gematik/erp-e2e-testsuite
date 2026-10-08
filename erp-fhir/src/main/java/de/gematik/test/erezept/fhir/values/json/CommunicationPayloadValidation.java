@@ -20,16 +20,16 @@
 
 package de.gematik.test.erezept.fhir.values.json;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.schema.JsonSchemaFactory;
-import com.networknt.schema.SpecVersion;
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.Error;
+import com.networknt.schema.SchemaRegistry;
+import com.networknt.schema.dialect.Dialects;
 import de.gematik.bbriccs.utils.ResourceLoader;
-import java.util.Set;
+import java.util.List;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @SuppressWarnings("java:S106")
 @Slf4j
@@ -45,14 +45,12 @@ public class CommunicationPayloadValidation {
     schemaNode = mapper.readTree(schemaJson);
   }
 
-  public Set<ValidationMessage> validate(Object toValidate) {
+  public List<Error> validate(Object toValidate) {
+    val objectNode = mapper.valueToTree(toValidate);
 
-    JsonNode objectNode = mapper.valueToTree(toValidate);
-
-    var factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V4);
-    var jsonSchema = factory.getSchema(schemaNode);
-
-    Set<ValidationMessage> errors = jsonSchema.validate(objectNode);
+    val registry = SchemaRegistry.withDefaultDialect(Dialects.getDraft202012());
+    val schema = registry.getSchema(schemaNode);
+    val errors = schema.validate(objectNode);
     errors.forEach(e -> log.info(e.getMessage()));
     return errors;
   }

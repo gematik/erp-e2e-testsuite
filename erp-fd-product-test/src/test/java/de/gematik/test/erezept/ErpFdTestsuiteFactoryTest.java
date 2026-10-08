@@ -21,13 +21,14 @@
 package de.gematik.test.erezept;
 
 import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_CONFIG;
-import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR_PROFILES_TOGGLE;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 import de.gematik.bbriccs.fhir.conf.ProfilesConfigurator;
+import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.abilities.*;
 import de.gematik.test.erezept.actors.*;
@@ -36,10 +37,15 @@ import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.actor.EuPharmacyConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
+import de.gematik.test.erezept.config.dto.erpclient.BackendRouteConfiguration;
+import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
+import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.config.exceptions.ConfigurationMappingException;
 import de.gematik.test.erezept.exceptions.MissingAbilityException;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import java.util.List;
 import lombok.SneakyThrows;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
@@ -49,7 +55,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ErpFdTestsuiteFactoryTest {
+class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
 
   @SneakyThrows
   @BeforeEach
@@ -389,5 +395,23 @@ class ErpFdTestsuiteFactoryTest {
               ErpClientFactory.createErpClientWithInvalidIdpToken(
                   any(), any(PatientConfiguration.class)));
     }
+  }
+
+  @Test
+  void shouldReturnOcspUrl() {
+    val ti = new BackendRouteConfiguration();
+    ti.setOcsp("http://ehca-testref.komp-ca.telematik-test/status/ecc-qocsp");
+
+    val environment = new EnvironmentConfiguration();
+    environment.setName("TU");
+    environment.setTi(ti);
+
+    val dto = new PrimsysConfigurationDto();
+    dto.setActiveEnvironment("TU");
+    dto.setEnvironments(List.of(environment));
+
+    val config = ErpFdTestsuiteFactory.fromDto(dto, mock(SmartcardArchive.class));
+
+    assertEquals("http://ehca-testref.komp-ca.telematik-test/status/ecc-qocsp", config.getOcsp());
   }
 }
