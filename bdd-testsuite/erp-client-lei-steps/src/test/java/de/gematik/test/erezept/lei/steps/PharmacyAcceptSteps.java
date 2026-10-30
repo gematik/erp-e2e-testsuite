@@ -23,9 +23,9 @@ package de.gematik.test.erezept.lei.steps;
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
+import de.gematik.test.erezept.common.screenplay.task.CheckTheReturnCode;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfAcceptOperation;
 import de.gematik.test.erezept.screenplay.task.AcceptPrescription;
-import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Wenn;
 import lombok.val;
@@ -62,5 +62,15 @@ public class PharmacyAcceptSteps {
     then(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(ResponseOfAcceptOperation.fromStack(order)).isEqualTo(409));
+  }
+
+  @Dann(
+      "^kann die Apotheke (.+) das (letzte|erste) zugewiesene E-Rezept nicht beim Fachdienst"
+          + " akzeptieren, weil es noch nicht gültig ist$")
+  public void thenForbiddenToAcceptPrescriptionWith403(String pharmName, String order) {
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    then(thePharmacy)
+        .attemptsTo(
+            CheckTheReturnCode.of(ResponseOfAcceptOperation.fromStack(order)).isEqualTo(403));
   }
 }

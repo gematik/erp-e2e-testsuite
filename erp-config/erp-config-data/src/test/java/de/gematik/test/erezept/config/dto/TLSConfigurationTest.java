@@ -20,16 +20,16 @@
 
 package de.gematik.test.erezept.config.dto;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.gematik.bbriccs.cfg.dto.TLSConfiguration;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class TLSConfigurationTest {
+class TLSConfigurationTest {
 
   @Test
-  public void testSetterGetter() {
+  void testSetterGetter() {
     val tls = new TLSConfiguration();
     tls.setKeyStore("my_keystore.p12");
     tls.setKeyStorePassword("00");

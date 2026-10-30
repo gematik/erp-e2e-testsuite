@@ -23,10 +23,12 @@ package de.gematik.test.erezept.screenplay.questions;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.rest.fd.FhirBResponse;
+import de.gematik.test.erezept.common.screenplay.questions.FhirResponseQuestion;
+import de.gematik.test.erezept.common.screenplay.questions.GetReceivedCommunication;
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.fhir.r4.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

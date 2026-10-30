@@ -49,7 +49,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.val;
 import org.hl7.fhir.r4.model.*;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -373,7 +373,7 @@ class KbvErpBundleFakerTest extends ErpFhirParsingTest {
    * Optional.ofNullable(when).ifPresent(timing::when); return
    * DosageDgMPBuilder.dosageBuilder(dosageValue, code).timing(timing.build()).build(); }
    */
-  @Ignore("this Unittest takes rd. about 10 seconds to run, so it is disabled for now")
+  @Disabled("this Unittest takes rd. about 10 seconds to run, so it is disabled for now")
   void shouldValidateExtrasBigDosageCorrect() {
 
     val dosageDGMP1 =

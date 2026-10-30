@@ -163,8 +163,7 @@ public class KbvPatient extends Patient implements ErpFhirResource {
   }
 
   public String getFullname() {
-    val hn = this.getNameFirstRep();
-    return format("{0}, {1}", hn.getFamily(), hn.getGivenAsSingleString());
+    return this.getNameFirstRep().getNameAsSingleString();
   }
 
   public String getFamilyName() {

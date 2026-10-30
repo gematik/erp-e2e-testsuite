@@ -26,12 +26,12 @@ import static org.mockito.Mockito.*;
 
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.client.usecases.TaskAcceptCommand;
+import de.gematik.test.erezept.common.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -26,6 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.erezept.remotefdv.api.model.Prescription;
+import de.gematik.test.erezept.common.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.fdv.abilities.UseTheRemoteFdVClient;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.values.AccessCode;
@@ -33,7 +34,6 @@ import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.remotefdv.client.FdVResponse;
 import de.gematik.test.erezept.remotefdv.client.requests.GetPrescriptionById;
-import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
 import java.util.Collections;
 import lombok.val;

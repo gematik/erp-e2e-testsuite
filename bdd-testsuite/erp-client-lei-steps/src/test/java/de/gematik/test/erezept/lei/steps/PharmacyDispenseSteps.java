@@ -24,13 +24,14 @@ import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
 import de.gematik.bbriccs.rest.fd.exceptions.UnexpectedResponseResourceError;
-import de.gematik.test.erezept.screenplay.questions.GetMedicationDispense;
+import de.gematik.test.erezept.common.screenplay.questions.GetMedicationDispense;
+import de.gematik.test.erezept.common.screenplay.task.CheckTheReturnCode;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfClosePrescriptionOperation;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfReDispenseMedication;
-import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
 import de.gematik.test.erezept.screenplay.task.ClosePrescription;
 import de.gematik.test.erezept.screenplay.task.Negate;
 import de.gematik.test.erezept.screenplay.task.ThatNotAllowedToAsk;
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
@@ -44,6 +45,24 @@ public class PharmacyDispenseSteps {
     val thePatient = OnStage.theActorCalled(patientName);
     when(thePharmacy)
         .attemptsTo(ClosePrescription.toPatient(order, thePatient).withPrescribedMedications());
+  }
+
+  @Wenn("^die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept korrekt dispensiert$")
+  public void whenDispenseMedication(String pharmName, String order) {
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    when(thePharmacy).attemptsTo(ClosePrescription.fromStack(order).withPrescribedMedications());
+  }
+
+  @Wenn(
+      "^die Apotheke das (letzte|erste) akzeptierte E-Rezept mit den folgenden Medikamenten korrekt"
+          + " an (.+) dispensiert:$")
+  public void whenDispenseAlternativeReplacementMedications(
+      String order, String patientName, DataTable medications) {
+    val thePharmacy = OnStage.theActorInTheSpotlight();
+    val thePatient = OnStage.theActorCalled(patientName);
+    when(thePharmacy)
+        .attemptsTo(
+            ClosePrescription.toPatient(order, thePatient).withAlternativeMedications(medications));
   }
 
   @Dann("^kann die Apotheke (.+) das (letzte|erste) akzeptierte E-Rezept korrekt dispensieren$")

@@ -29,14 +29,25 @@ import lombok.val;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RemoteFdVFactory {
 
-  public static UseTheRemoteFdVClient forUser(String userName, ErpRemoteFdVConfiguration config) {
-    val userConfig = config.getAppUserByName(userName);
-    val remoteFdvConfig = config.getRemoteFdVConfiguration(userConfig.getRemoteFdV());
-    val remoteFdv =
+  public static UseTheRemoteFdVClient forUser(String userName, RemoteFdVBaseConfigWrapper config) {
+    val userConfig = config.getFdVUserConfig(userName);
+    val remoteFdvConfig = config.getFdVConfig(userConfig.getRemoteFdV());
+    val deviceManagement = remoteFdvConfig.getDeviceManagement();
+
+    val remoteFdvBuilder =
         RemoteFdVClient.builder()
             .forRemote(remoteFdvConfig.getUrl())
-            .apiKey(remoteFdvConfig.getAccessKey())
-            .build();
-    return UseTheRemoteFdVClient.with(remoteFdv);
+            .withDeviceFarmManagement(deviceManagement.isActive());
+
+    if (remoteFdvConfig.getAccessKey() != null) {
+      remoteFdvBuilder.apiKey(remoteFdvConfig.getAccessKey());
+    }
+    if (remoteFdvConfig.getMTlsConfig() != null) {
+      val mtlsConfig = remoteFdvConfig.getMTlsConfig();
+      remoteFdvBuilder.withKeystore(mtlsConfig.getKeystorePath(), mtlsConfig.getKeystorePassword());
+      remoteFdvBuilder.withTruststore(
+          mtlsConfig.getTruststorePath(), mtlsConfig.getTruststorePassword());
+    }
+    return UseTheRemoteFdVClient.with(remoteFdvBuilder.build());
   }
 }

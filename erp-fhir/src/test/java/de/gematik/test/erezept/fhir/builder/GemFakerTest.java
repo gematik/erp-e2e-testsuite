@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.fhir.builder;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -250,5 +251,33 @@ class GemFakerTest {
     assertThrows(BuilderException.class, () -> GemFaker.cost(-0.1f, 10f));
     assertThrows(BuilderException.class, () -> GemFaker.cost(9.1f, -10f));
     assertThrows(BuilderException.class, () -> GemFaker.cost(90.1f, 80f));
+  }
+
+  @Test
+  void shouldGenerateRandomNamePrefixes() {
+    for (var i = 0; i < 100; i++) {
+      val prefix = assertDoesNotThrow(GemFaker::generateNamePrefix);
+      assertNotNull(prefix);
+      assertFalse(prefix.isEmpty());
+      assertTrue(prefix.length() <= 20, "Generated name prefix exceeds 20 characters: " + prefix);
+    }
+  }
+
+  @Test
+  void shouldRandomlyGenerateWithChanceOf() {
+    int hitCounter = 0;
+    for (var i = 0; i < 100; i++) {
+      val chance = 0.5f;
+      val result = GemFaker.chanceOf(chance, GemFaker::fakerName);
+      assertNotNull(result);
+      if (result.isPresent()) {
+        hitCounter++;
+      }
+    }
+    // Statistically we would expect ~50 hits, but with only 100 probes the actual count can
+    // deviate noticeably. Asserting an exact or narrow range would make this test flaky.
+    // The probability of zero hits in 100 tries at 50% is 0.5^100 (~8e-31), so "> 0" is a
+    // practically impossible-to-fail check that still proves chanceOf() can produce a value.
+    assertTrue(hitCounter > 0);
   }
 }

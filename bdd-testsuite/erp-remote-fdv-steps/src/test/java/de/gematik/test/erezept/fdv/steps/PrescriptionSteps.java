@@ -21,15 +21,13 @@
 package de.gematik.test.erezept.fdv.steps;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.gematik.test.erezept.fdv.questions.DeletingThePrescription;
-import de.gematik.test.erezept.fdv.questions.HasReceivedDispensedMedication;
-import de.gematik.test.erezept.fdv.questions.PrescriptionHasGone;
+import de.gematik.test.erezept.common.screenplay.questions.HasDispensedDrugs;
+import de.gematik.test.erezept.fdv.questions.*;
 import de.gematik.test.erezept.fdv.task.DeleteRedeemablePrescription;
 import de.gematik.test.erezept.fdv.task.EnsureThatThePrescription;
-import de.gematik.test.erezept.screenplay.questions.HasDispensedDrugs;
-import de.gematik.test.erezept.screenplay.task.HandoverDataMatrixCode;
+import io.cucumber.java.de.Aber;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
@@ -38,7 +36,7 @@ import net.serenitybdd.screenplay.actors.OnStage;
 import net.serenitybdd.screenplay.ensure.Ensure;
 
 public class PrescriptionSteps {
-  @Wenn("^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept in der App löscht$")
+  @Wenn("^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept löscht$")
   public void whenDeletePrescription(String userName, String order) {
     val theAppUser = OnStage.theActorCalled(userName);
     when(theAppUser).attemptsTo(DeleteRedeemablePrescription.fromStack(order));
@@ -51,17 +49,15 @@ public class PrescriptionSteps {
   }
 
   @Dann(
-      "^kann (?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept in der App nicht"
-          + " löschen")
+      "^kann (?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept nicht"
+          + " löschen, weil (?:sie|er) nicht das Recht dazu hat$")
+  @Aber(
+      "^(?:der|die) Versicherte (.+) kann (?:sein|ihr) (letztes|erstes) E-Rezept nicht"
+          + " löschen, weil (?:sie|er) nicht das Recht dazu hat$")
   public void thenCannotDeletePrescription(String userName, String order) {
     val theAppUser = OnStage.theActorCalled(userName);
     then(theAppUser)
         .attemptsTo(Ensure.that(DeletingThePrescription.wasSuccessful(order)).isFalse());
-  }
-
-  @Wenn("^(?:der|die) Versicherte (.+) (?:seine|ihre) E-Rezepte abruft")
-  public void whenRefreshPrescriptions(String userName) {
-    // val theAppUser = OnStage.theActorCalled(userName);
   }
 
   @Wenn("^(?:der|dem) Versicherten (.+) das (letzte|erste) E-Rezept in der App angezeigt wird$")
@@ -77,40 +73,75 @@ public class PrescriptionSteps {
     then(thePatient).attemptsTo(EnsureThatThePrescription.fromStack(order).isShownCorrectly());
   }
 
-  @Dann("^wird (?:der|dem) Versicherten (.+) das (letzte|erste) E-Rezept in der App angezeigt$")
-  @Und("^(?:der|dem) Versicherten (.+) wird das (letzte|erste) E-Rezept in der App angezeigt$")
+  @Dann("^wird (?:der|dem) Versicherten (.+) das (letzte|erste) E-Rezept angezeigt$")
+  @Und("^(?:der|dem) Versicherten (.+) wird das (letzte|erste) E-Rezept angezeigt$")
   public void thenCheckPrescription(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient).attemptsTo(EnsureThatThePrescription.fromStack(order).isShownCorrectly());
   }
 
-  @Dann("^hat (?:der|die) Versicherte (.+) das (letzte|erste) E-Rezept elektronisch erhalten")
+  @Dann(
+      "^hat (?:der|die) Versicherte (.+) (\\d+) Dispensierinformation(?:en)? für (?:sein|ihr)"
+          + " (erstes|letztes) E-Rezept abrufen$")
   public void thenReceivedPrescription(String userName, String order) {
     val theAppUser = OnStage.theActorCalled(userName);
     assertTrue(
-        "E-Rezept elektronisch nicht erhalten",
-        then(theAppUser).asksFor(HasReceivedDispensedMedication.fromStack(order)));
+        then(theAppUser).asksFor(HasReceivedDispensedMedication.fromStack(order)),
+        "E-Rezept elektronisch nicht erhalten");
+  }
+
+  @Dann(
+      "^kann (?:der|die) Versicherte (.+) (\\d+) Dispensierinformation(?:en)? für (?:sein|ihr)"
+          + " (erstes|letztes) E-Rezept abrufen$")
+  public void thenPatientGetsMedicationDispense(String patientName, long amount, String order) {
+    val thePatient = OnStage.theActorCalled(patientName);
+    then(thePatient)
+        .attemptsTo(
+            Ensure.that(
+                    MedicationDispenseContains.forPatient()
+                        .andPrescription(order)
+                        .numberOfMedicationDispenses(amount))
+                .isTrue());
   }
 
   @Und("^(?:der|die) Versicherte (.+) hat das (letzte|erste) E-Rezept elektronisch erhalten")
   public void andReceivedPrescription(String userName, String order) {
     val theAppUser = OnStage.theActorCalled(userName);
     assertTrue(
-        "E-Rezept elektronisch nicht erhalten",
-        and(theAppUser).asksFor(HasReceivedDispensedMedication.fromStack(order)));
+        and(theAppUser).asksFor(HasReceivedDispensedMedication.fromStack(order)),
+        "E-Rezept elektronisch nicht erhalten");
   }
 
   @Dann(
-      "^wird das (letzte|erste) (ausgestellte|gelöschte) E-Rezept (?:dem|der) Versicherten in der"
-          + " App nicht mehr angezeigt$")
-  public void thenPrescriptionNotDisplayed(String order, String stack) {
+      "^wird (?:der|dem) Versicherten (.+) (?:sein|ihr) letztes (ausgestellte|gelöschte) E-Rezept"
+          + " nicht mehr angezeigt$")
+  public void thenPrescriptionNotDisplayed(String patientName, String stack) {
+    val thePatient = OnStage.theActorCalled(patientName);
+    then(thePatient)
+        .attemptsTo(Ensure.that(TheLastPrescription.from(stack).existsInBackend()).isFalse());
+  }
+
+  /**
+   * Der angegebene Patient ruft das letzte verschriebene Rezept auf dem Patientenstapel beim FD ab
+   *
+   * @param patientName ist der Name des Versicherten
+   * @see <a href="https://service.gematik.de/browse/TMD-1605">TMD-1605</a>
+   */
+  @Dann("^wird (?:der|dem) Versicherten (.+) das neue E-Rezept angezeigt$")
+  @Dann("^wird (?:der|dem) Versicherten (.+) das neue E-Rezept ohne AccessCode angezeigt$")
+  public void thenFetchPrescriptionFromBackend(String patientName) {
+    val thePatient = OnStage.theActorCalled(patientName);
+    then(thePatient)
+        .attemptsTo(Ensure.that("", TheLastPrescription.prescribed().existsInBackend()).isTrue());
+  }
+
+  @Dann(
+      "^wird das letzte (ausgestellte|gelöschte) E-Rezept (?:dem|der) Versicherten nicht mehr"
+          + " angezeigt$")
+  public void thenPrescriptionNotDisplayed(String stack) {
     val thePatient = OnStage.theActorInTheSpotlight();
     then(thePatient)
-        .attemptsTo(
-            Ensure.that(
-                    "the deleted prescription is gone",
-                    PrescriptionHasGone.fromStack(stack).withDeque(order))
-                .isTrue());
+        .attemptsTo(Ensure.that(TheLastPrescription.from(stack).existsInBackend()).isFalse());
   }
 
   @Dann(
@@ -129,32 +160,13 @@ public class PrescriptionSteps {
     and(thePatient).attemptsTo(Ensure.that(HasDispensedDrugs.of(adverb, amount)).isTrue());
   }
 
-  /**
-   * Dieser Schritt bildet den Vorgang in einer realen Apotheke nach. Der Versicherte mit dem Namen
-   * aus {@code patientName} ruft zunächst alle seine E-Rezepte beim Fachdienst ab und wählt das
-   * gewünschte E-Rezept anhand von {@code order} aus. Im Anschluss erfolgt die Zuweisung über den
-   * Data Matrix Code an die Apotheke mit dem Namen {@code pharmacyName}.
-   *
-   * <p>Mit der Zuweisung über den DMC (Data * Matrix Code) findet keine weitere Interaktion durch
-   * den Versicherten mit dem Fachdienst statt. Stattdessen wird dem Apotheker der DMC vorgezeigt.
-   *
-   * @param patientName ist der Name des Versicherten, der ein E-Rezept bei einer Apotheke einlösen
-   *     möchte
-   * @param order ist die Reihenfolge, mit der das gewünschte E-Rezept ausgewählt wird
-   * @param pharmacyName ist die Apotheke, welche den DMC zugewiesen bekommt
-   */
-  @Wenn(
-      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) (ausgestelltes|gelöschtes)"
-          + " E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
-  @Wenn(
-      "^(?:der|die) GKV Versicherte (.+) (?:sein|ihr) (letztes|erstes) (ausgestelltes|gelöschtes)"
-          + " E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
-  public void whenAssignDataMatrixCodeFromStack(
-      String patientName, String order, String dmcStack, String pharmacyName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    val thePharmacy = OnStage.theActorCalled(pharmacyName);
-
-    when(thePatient)
-        .attemptsTo(HandoverDataMatrixCode.fromStack(dmcStack).with(order).to(thePharmacy));
+  @Und(
+      "^(?:der|die) Versicherte kann (?:sein|ihr) (letztes|erstes) E-Rezept nicht löschen, weil"
+          + " (?:sie|er) nicht das Recht dazu hat$")
+  public void andCannotDeletePrescription403(String order) {
+    val thePatient = OnStage.theActorInTheSpotlight();
+    and(thePatient)
+        .attemptsTo(
+            Ensure.that(ResponseOfAbortOperation.asPatient().fromStack(order)).isEqualTo("403"));
   }
 }

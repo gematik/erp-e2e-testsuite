@@ -837,4 +837,32 @@ public class EpaOpProvidePrescriptionVerifier {
         .predicate(predicate)
         .accept();
   }
+
+  public static VerificationStep<EpaOpProvidePrescription> emlMedRequestDosageHasExpectedText(
+      String text) {
+
+    Predicate<EpaOpProvidePrescription> predicate =
+        provPresc -> {
+          var dosageInstructions = provPresc.getEpaMedicationRequest().getDosageInstruction();
+
+          dosageInstructions.forEach(
+              instruction ->
+                  log.info(
+                      "DosageInstruction text: [{}], expected: [{}]", instruction.getText(), text));
+
+          return dosageInstructions.stream()
+              .anyMatch(
+                  instruction ->
+                      instruction.getText() != null && instruction.getText().equals(text));
+        };
+
+    return new VerificationStep.StepBuilder<EpaOpProvidePrescription>(
+            EmlBfd.B_FD_1701.getRequirement(),
+            format(
+                "Die EpaProvidePrescriptions enthält im MedicationRequest die DosageInstruction"
+                    + " {0}",
+                text))
+        .predicate(predicate)
+        .accept();
+  }
 }

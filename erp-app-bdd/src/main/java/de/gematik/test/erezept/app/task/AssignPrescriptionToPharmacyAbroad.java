@@ -28,12 +28,12 @@ import de.gematik.test.erezept.app.mobile.EUFlowElements;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.PrescriptionDetails;
 import de.gematik.test.erezept.app.questions.MovingToPrescription;
+import de.gematik.test.erezept.common.screenplay.abilities.ManageDataMatrixCodes;
+import de.gematik.test.erezept.common.screenplay.questions.ResponseOfGetTaskByIdAsPatient;
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
-import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfGetTaskById;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.DmcStack;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
@@ -80,7 +80,7 @@ public class AssignPrescriptionToPharmacyAbroad implements Task {
     // Verify that the prescription is marked as EU redeemable on FD
     val erxTask =
         actor
-            .asksFor(ResponseOfGetTaskById.asPatient(DequeStrategy.FIFO))
+            .asksFor(ResponseOfGetTaskByIdAsPatient.with(DequeStrategy.FIFO))
             .getExpectedResource()
             .getTask();
     assertTrue(

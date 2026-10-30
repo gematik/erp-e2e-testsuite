@@ -37,4 +37,13 @@ public class CommunicationSteps {
     then(thePatient)
         .attemptsTo(Ensure.that(PatientDoesHaveMessagesForTask.fromStack(order)).isFalse());
   }
+
+  @Dann(
+      "^kann (?:der|die) Versicherte (.+) weiterhin die Nachrichten zu (?:seinem|ihrem)"
+          + " (ersten|letzten) E-Rezept abrufen$")
+  public void thenPatientCanGetCommunicationsBasedOnTask(String patientName, String order) {
+    val thePatient = OnStage.theActorCalled(patientName);
+    then(thePatient)
+        .attemptsTo(Ensure.that(PatientDoesHaveMessagesForTask.fromStack(order)).isTrue());
+  }
 }

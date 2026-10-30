@@ -22,8 +22,8 @@ package de.gematik.test.erezept.lei.hooks;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.fhirdump.FhirDumpStepListener;
-import de.gematik.test.erezept.fhirdump.FhirDumper;
+import de.gematik.test.erezept.common.fhirdump.FhirDumpStepListener;
+import de.gematik.test.erezept.common.fhirdump.FhirDumper;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;

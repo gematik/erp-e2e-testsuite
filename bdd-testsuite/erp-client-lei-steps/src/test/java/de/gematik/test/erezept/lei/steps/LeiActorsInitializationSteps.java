@@ -23,10 +23,10 @@ package de.gematik.test.erezept.lei.steps;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.test.erezept.PrimSysBddFactory;
-import de.gematik.test.erezept.apimeasure.DumpingStopwatch;
+import de.gematik.test.erezept.common.PrimSysBddFactory;
+import de.gematik.test.erezept.common.apimeasure.DumpingStopwatch;
+import de.gematik.test.erezept.common.screenplay.task.ConnectSubscriptionService;
 import de.gematik.test.erezept.config.ConfigurationReader;
-import de.gematik.test.erezept.screenplay.task.ConnectSubscriptionService;
 import io.cucumber.java.After;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;

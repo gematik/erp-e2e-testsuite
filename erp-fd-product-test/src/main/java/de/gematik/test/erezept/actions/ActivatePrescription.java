@@ -24,10 +24,12 @@ import static java.text.MessageFormat.*;
 
 import de.gematik.test.erezept.*;
 import de.gematik.test.erezept.client.usecases.*;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheKonnektor;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.fhir.r4.erp.*;
 import de.gematik.test.erezept.fhir.r4.kbv.*;
 import de.gematik.test.erezept.fhir.values.*;
-import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.screenplay.util.*;
 import de.gematik.test.fuzzing.core.*;
 import java.io.ByteArrayOutputStream;

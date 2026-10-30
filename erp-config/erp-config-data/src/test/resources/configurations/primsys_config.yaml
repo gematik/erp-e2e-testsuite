@@ -2,10 +2,6 @@ activeEnvironment: TU
 
 preferManualSteps: false
 
-pspClientConfig:
-  url: "DUMMY VALUE"
-  auth: "DUMMY VALUE"
-
 actors:
   doctors:
     - name: Bernd Claudius

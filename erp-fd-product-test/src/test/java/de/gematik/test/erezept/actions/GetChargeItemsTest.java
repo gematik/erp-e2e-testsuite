@@ -32,9 +32,9 @@ import de.gematik.test.erezept.actions.chargeitem.GetChargeItems;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetCommand;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItemSet;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 

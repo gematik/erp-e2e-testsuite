@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.actions.rawhttpactions;
 
 import de.gematik.test.erezept.abilities.RawHttpAbility;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import kong.unirest.core.HttpResponse;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;

@@ -26,9 +26,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
 import de.gematik.test.erezept.abilities.ProvidePharmacyBaseData;
+import de.gematik.test.erezept.common.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.config.dto.actor.EuPharmacyConfiguration;
 import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
-import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 

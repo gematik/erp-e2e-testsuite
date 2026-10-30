@@ -22,16 +22,16 @@ package de.gematik.test.erezept.actors;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.erezept.actions.IssuePrescription;
+import de.gematik.test.erezept.common.screenplay.abilities.ProvideDoctorBaseData;
+import de.gematik.test.erezept.common.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvMedicalOrganization;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
-import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
-import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -60,6 +60,30 @@ public class DoctorActor extends ErpActor {
   public TelematikID getSmcbTelematikId() {
     val smcbAbility = SafeAbility.getAbility(this, UseSMCB.class);
     return TelematikID.from(smcbAbility.getTelematikID());
+  }
+
+  /**
+   * For Special UseCase Use only!!! this method cleanUp the value of the Telematik ID to reduce
+   * Whitespaces, Enter or Tab prompts
+   *
+   * @return cleaned TelematikId
+   */
+  public TelematikID getCleanedUpHbaTelematikId() {
+    val baseData = SafeAbility.getAbility(this, ProvideDoctorBaseData.class);
+    val spacelessId = baseData.getHbaTelematikId().replaceAll("(?U)\\s+", "");
+    return TelematikID.from(spacelessId);
+  }
+
+  /**
+   * For Special UseCase Use only!!! this method cleanUp the value of the Telematik ID to reduce
+   * Whitespaces, Enter or Tab prompts
+   *
+   * @return cleaned TelematikId
+   */
+  public TelematikID getCleanedUpSmcbTelematikId() {
+    val smcbAbility = SafeAbility.getAbility(this, UseSMCB.class);
+    val spacelessId = smcbAbility.getTelematikID().replaceAll("(?U)\\s+", "");
+    return TelematikID.from(spacelessId);
   }
 
   public void setVersion(KbvItaForVersion kbvItaForVersion) {

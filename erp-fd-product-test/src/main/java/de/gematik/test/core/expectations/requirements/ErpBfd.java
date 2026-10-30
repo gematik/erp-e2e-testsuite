@@ -44,7 +44,12 @@ public enum ErpBfd implements RequirementsSet {
       "B-FD_1698",
       "Fix für fehlende Version in Medication.code:atc"
           + "https://service.gematik.de/browse/B_FD-1698"),
-  B_FD_1729("B-FD_1729", "DosageDgMP -> 500 Internal Server Error");
+  B_FD_1729("B-FD_1729", "DosageDgMP -> 500 Internal Server Error"),
+  B_FD_1709(
+      "B-FD_1709",
+      "C_12901 E-Rezept-Fachdienst: Optimierung der Transformation der Telematik-ID im"
+          + " E-Rezept-Fachdienst");
+
   @Getter private final Requirement requirement;
 
   ErpBfd(String id, String description) {

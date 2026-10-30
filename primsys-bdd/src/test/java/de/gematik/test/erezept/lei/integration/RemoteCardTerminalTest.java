@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import de.gematik.bbriccs.cardterminal.CardTerminal;
 import de.gematik.bbriccs.konnektor.Konnektor;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.test.erezept.PrimSysBddFactory;
+import de.gematik.test.erezept.common.PrimSysBddFactory;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import java.util.List;
 import lombok.val;

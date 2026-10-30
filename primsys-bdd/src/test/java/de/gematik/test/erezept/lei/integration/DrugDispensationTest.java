@@ -32,18 +32,18 @@ import static org.mockito.Mockito.when;
 import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
+import de.gematik.test.erezept.common.screenplay.abilities.ManageChargeItems;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.common.screenplay.questions.HasChargeItemBundleAsPatient;
+import de.gematik.test.erezept.common.screenplay.questions.HasDispensedDrugs;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItemBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.screenplay.abilities.ManageChargeItems;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.questions.HasChargeItemBundle;
-import de.gematik.test.erezept.screenplay.questions.HasDispensedDrugs;
 import java.time.Instant;
 import java.util.Optional;
 import lombok.val;
@@ -103,7 +103,7 @@ class DrugDispensationTest extends ErpFhirBuildingTest {
 
     dispensedDrugs.append(prescriptionId, Instant.now());
     assertTrue(then(patient).asksFor(HasDispensedDrugs.of("genau", 1)));
-    assertTrue(then(patient).asksFor(HasChargeItemBundle.forLastDispensedDrug().asPatient()));
+    assertTrue(then(patient).asksFor(HasChargeItemBundleAsPatient.forLastDispensedDrug()));
   }
 
   @Test
@@ -116,6 +116,6 @@ class DrugDispensationTest extends ErpFhirBuildingTest {
 
     dispensedDrugs.append(prescriptionId, Instant.now());
     assertTrue(then(patient).asksFor(HasDispensedDrugs.of("genau", 1)));
-    assertFalse(then(patient).asksFor(HasChargeItemBundle.forLastDispensedDrug().asPatient()));
+    assertFalse(then(patient).asksFor(HasChargeItemBundleAsPatient.forLastDispensedDrug()));
   }
 }

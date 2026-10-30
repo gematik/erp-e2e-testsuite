@@ -24,7 +24,7 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import java.time.Duration;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;

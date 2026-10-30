@@ -22,6 +22,7 @@ package de.gematik.test.eml.integration;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLogFor;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
+import static de.gematik.test.erezept.actions.ErpInteractionPoller.getAuditEventStopPollingPredicate;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.core.annotations.Actor;
@@ -38,17 +39,15 @@ import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
-import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.time.LocalDate;
-import java.util.function.Predicate;
+import java.util.List;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -81,19 +80,6 @@ class CancelPrescriptionWithConsentIT extends ErpTest {
 
   static Stream<Arguments> prescriptionTypesProvider() {
     return WorkflowAndMedicationComposer.workflowAndMedicationComposer().create();
-  }
-
-  private static @NonNull Predicate<ErxAuditEventBundle> getErxAuditEventBreakOutPredicate() {
-    return aeb ->
-        aeb.getAuditEvents().stream()
-            .anyMatch(
-                ae ->
-                    ae.getFirstText()
-                            .contains(
-                                "Die Verordnung konnte nicht in die Patientenakte übertragen"
-                                    + " werden")
-                        || ae.getFirstText()
-                            .contains("Die Verordnung wurde in die Patientenakte übertragen"));
   }
 
   @TestcaseId("EML_CANCEL_PRESCRIPTION_WITH_CONSENT_DECISION_APPLY_AS_PATIENT_01")
@@ -154,7 +140,10 @@ class CancelPrescriptionWithConsentIT extends ErpTest {
     val auditEvents =
         pollerBuilder.poll(
             () -> patient.performs(DownloadAuditEvent.withQueryParams(searchParams)),
-            getErxAuditEventBreakOutPredicate());
+            getAuditEventStopPollingPredicate(
+                List.of(
+                    "Die Verordnung konnte nicht in die Patientenakte übertragen werden",
+                    "Die Verordnung wurde in die Patientenakte übertragen")));
     patient.attemptsTo(
         Verify.that(auditEvents)
             .withExpectedType()
@@ -219,7 +208,10 @@ class CancelPrescriptionWithConsentIT extends ErpTest {
     val auditEvents =
         pollerBuilder.poll(
             () -> patient.performs(DownloadAuditEvent.withQueryParams(searchParams)),
-            getErxAuditEventBreakOutPredicate());
+            getAuditEventStopPollingPredicate(
+                List.of(
+                    "Die Verordnung wurde in die Patientenakte übertragen",
+                    "Die Verordnung konnte nicht in die Patientenakte übertragen werden")));
 
     patient.attemptsTo(
         Verify.that(auditEvents)
@@ -290,7 +282,10 @@ class CancelPrescriptionWithConsentIT extends ErpTest {
     val auditEvents =
         pollerBuilder.poll(
             () -> patient.performs(DownloadAuditEvent.withQueryParams(searchParams)),
-            getErxAuditEventBreakOutPredicate());
+            getAuditEventStopPollingPredicate(
+                List.of(
+                    "Die Verordnung wurde in die Patientenakte übertragen",
+                    "Die Verordnung konnte nicht in die Patientenakte übertragen werden")));
 
     patient.attemptsTo(
         Verify.that(auditEvents)

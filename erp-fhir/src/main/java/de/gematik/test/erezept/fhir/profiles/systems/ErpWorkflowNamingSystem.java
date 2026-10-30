@@ -32,7 +32,9 @@ public enum ErpWorkflowNamingSystem implements WithNamingSystem {
   PRESCRIPTION_ID("https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"),
   ACCESS_CODE("https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_AccessCode"),
   SECRET("https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_Secret"),
-  ;
+
+  /** The orderId is a synthetic identifier which is used by the FdV to group messages together. */
+  ORDER_ID("https://gematik.de/fhir/NamingSystem/OrderID");
 
   private final String canonicalUrl;
 

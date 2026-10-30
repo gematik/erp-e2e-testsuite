@@ -27,7 +27,7 @@ import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.PharmacySearch;
 import de.gematik.test.erezept.app.questions.ThePharmacyProvidesDeliveryOptions;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import java.util.List;
 import java.util.Map;
 import lombok.AccessLevel;

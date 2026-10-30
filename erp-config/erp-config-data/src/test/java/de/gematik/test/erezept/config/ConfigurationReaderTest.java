@@ -26,7 +26,6 @@ import de.gematik.bbriccs.konnektor.cfg.KonnektorModuleConfigurationDto;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.app.ErpAppConfigurationBase;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
-import de.gematik.test.erezept.config.dto.psp.PSPClientConfig;
 import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -63,8 +62,6 @@ class ConfigurationReaderTest {
         () ->
             ConfigurationReader.forPrimSysConfiguration()
                 .configFile(templatePath)
-                // just for coverage, won't affect the configuration
-                .registerSubtype(PSPClientConfig.class, "PSP")
                 .wrappedBy(PrimSysTestWrapper::new, false));
   }
 

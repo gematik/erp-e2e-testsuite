@@ -32,24 +32,24 @@ import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class SafeAbilityTest extends ErpFhirBuildingTest {
+class SafeAbilityTest extends ErpFhirBuildingTest {
 
-  @Before
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     OnStage.setTheStage(Cast.ofStandardActors());
   }
 
-  @After
-  public void tearDown() {
+  @AfterEach
+  void tearDown() {
     OnStage.drawTheCurtain();
   }
 
   @Test
-  public void shouldGetExistingAbility() {
+  void shouldGetExistingAbility() {
     val actor = OnStage.theActor("Marty");
     val provideBaseData =
         ProvidePatientBaseData.forPatient(
@@ -66,7 +66,7 @@ public class SafeAbilityTest extends ErpFhirBuildingTest {
   }
 
   @Test
-  public void shouldThrowOnNonExistingAbility() {
+  void shouldThrowOnNonExistingAbility() {
     val actor = OnStage.theActor("Emmet");
     assertThrows(
         MissingAbilityException.class,

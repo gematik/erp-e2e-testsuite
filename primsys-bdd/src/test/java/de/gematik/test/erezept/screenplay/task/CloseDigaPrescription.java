@@ -22,12 +22,15 @@ package de.gematik.test.erezept.screenplay.task;
 
 import de.gematik.bbriccs.konnektor.SoftKonVerifier;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
+import de.gematik.test.erezept.common.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.common.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseDiGAFaker;
 import de.gematik.test.erezept.fhir.builder.erp.GemOperationInputParameterBuilder;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvEvdgaBundle;
 import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

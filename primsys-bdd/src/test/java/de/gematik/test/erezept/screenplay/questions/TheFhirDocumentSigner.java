@@ -21,8 +21,8 @@
 package de.gematik.test.erezept.screenplay.questions;
 
 import de.gematik.bbriccs.smartcards.SmartcardType;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheKonnektor;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 import lombok.AccessLevel;

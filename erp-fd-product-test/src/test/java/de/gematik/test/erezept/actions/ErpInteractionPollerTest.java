@@ -26,17 +26,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.ErpInteraction;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayDeque;
+import java.util.Date;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.val;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Narrative;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.Test;
@@ -200,6 +204,96 @@ class ErpInteractionPollerTest {
     }
   }
 
+  @Test
+  void auditEventShouldStopPollingPredicateShouldMatchWhenAnyAuditEventContainsBreakUpString() {
+    val bundle =
+        auditEventBundleWithTexts(
+            "Das AuditEvent ist nicht relevant.",
+            "Sie haben die Zugriffsberechtigung zum Einlösen von E-Rezepten gelöscht.");
+
+    val predicate =
+        ErpInteractionPoller.getAuditEventStopPollingPredicate(
+            List.of("Zugriffsberechtigung zum Einlösen von E-Rezepten"));
+
+    assertTrue(predicate.test(bundle));
+  }
+
+  @Test
+  void auditEventShouldStopPollingPredicateShouldMatchWhenAnyBreakUpStringIsContained() {
+    val bundle =
+        auditEventBundleWithTexts(
+            "Die Medikamentenabgabe konnte nicht in die Patientenakte übertragen werden.");
+
+    val predicate =
+        ErpInteractionPoller.getAuditEventStopPollingPredicate(
+            List.of(
+                "Die Medikamentenabgabe wurde in die Patientenakte übertragen",
+                "Die Medikamentenabgabe konnte nicht in die Patientenakte übertragen werden"));
+
+    assertTrue(predicate.test(bundle));
+  }
+
+  @Test
+  void auditEventShouldStopPollingPredicateShouldNotMatchWhenNoAuditEventContainsBreakUpString() {
+    val bundle =
+        auditEventBundleWithTexts(
+            "Die Verordnung wurde erstellt.", "Die Verordnung wurde erfolgreich abgerufen.");
+
+    val predicate =
+        ErpInteractionPoller.getAuditEventStopPollingPredicate(
+            List.of("hat Markierung zu Einlösung im EU Ausland gespeichert"));
+
+    assertFalse(predicate.test(bundle));
+  }
+
+  @Test
+  void auditEventShouldStopPollingPredicateShouldNotMatchEmptyAuditEventBundle() {
+    val predicate =
+        ErpInteractionPoller.getAuditEventStopPollingPredicate(
+            List.of("Die Verordnung wurde in die Patientenakte übertragen"));
+
+    assertFalse(predicate.test(new ErxAuditEventBundle()));
+  }
+
+  @Test
+  void minOneAENotOlderThenPredicateShouldMatchWhenAnyAuditEventWasRecordedAfterTimestamp() {
+    val timestamp = Instant.parse("2026-10-08T15:00:00Z");
+    val bundle =
+        auditEventBundleWithRecordedInstants(timestamp.minusSeconds(1), timestamp.plusSeconds(1));
+
+    val predicate = ErpInteractionPoller.getMinOneAENotOlderThen(timestamp);
+
+    assertTrue(predicate.test(bundle));
+  }
+
+  @Test
+  void minOneAENotOlderThenPredicateShouldNotMatchWhenAllAuditEventsWereRecordedBeforeTimestamp() {
+    val timestamp = Instant.parse("2026-10-08T15:00:00Z");
+    val bundle =
+        auditEventBundleWithRecordedInstants(timestamp.minusSeconds(2), timestamp.minusSeconds(1));
+
+    val predicate = ErpInteractionPoller.getMinOneAENotOlderThen(timestamp);
+
+    assertFalse(predicate.test(bundle));
+  }
+
+  @Test
+  void minOneAENotOlderThenPredicateShouldNotMatchWhenAuditEventWasRecordedAtTimestamp() {
+    val timestamp = Instant.parse("2026-10-08T15:00:00Z");
+    val bundle = auditEventBundleWithRecordedInstants(timestamp);
+
+    val predicate = ErpInteractionPoller.getMinOneAENotOlderThen(timestamp);
+
+    assertFalse(predicate.test(bundle));
+  }
+
+  @Test
+  void minOneAENotOlderThenPredicateShouldNotMatchEmptyAuditEventBundle() {
+    val predicate = ErpInteractionPoller.getMinOneAENotOlderThen(Instant.now());
+
+    assertFalse(predicate.test(new ErxAuditEventBundle()));
+  }
+
   private static ErpInteractionPoller getPollBuilder(int maxRetries, int waitTimeInMilliSeconds) {
     return ErpInteractionPoller.builder()
         .maxRetries(maxRetries)
@@ -219,6 +313,37 @@ class ErpInteractionPollerTest {
     task.setId(id);
     task.setStatus(Task.TaskStatus.DRAFT);
     return task;
+  }
+
+  private static ErxAuditEventBundle auditEventBundleWithTexts(String... texts) {
+    val bundle = new ErxAuditEventBundle();
+    for (val text : texts) {
+      bundle.addEntry(new Bundle.BundleEntryComponent().setResource(auditEventWithText(text)));
+    }
+    return bundle;
+  }
+
+  private static ErxAuditEventBundle auditEventBundleWithRecordedInstants(Instant... recordedAt) {
+    val bundle = new ErxAuditEventBundle();
+    for (val instant : recordedAt) {
+      bundle.addEntry(
+          new Bundle.BundleEntryComponent().setResource(auditEventWithRecordedInstant(instant)));
+    }
+    return bundle;
+  }
+
+  private static ErxAuditEvent auditEventWithText(String text) {
+    val auditEvent = new ErxAuditEvent();
+    val narrative = new Narrative();
+    narrative.setDivAsString("<div xmlns=\"http://www.w3.org/1999/xhtml\">" + text + "</div>");
+    auditEvent.setText(narrative);
+    return auditEvent;
+  }
+
+  private static ErxAuditEvent auditEventWithRecordedInstant(Instant instant) {
+    val auditEvent = new ErxAuditEvent();
+    auditEvent.setRecorded(Date.from(instant));
+    return auditEvent;
   }
 
   private static <R extends Resource> ErpInteraction<R> interaction(

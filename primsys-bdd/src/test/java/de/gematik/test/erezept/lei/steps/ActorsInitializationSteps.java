@@ -23,10 +23,10 @@ package de.gematik.test.erezept.lei.steps;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.test.erezept.PrimSysBddFactory;
-import de.gematik.test.erezept.apimeasure.DumpingStopwatch;
+import de.gematik.test.erezept.common.PrimSysBddFactory;
+import de.gematik.test.erezept.common.apimeasure.DumpingStopwatch;
+import de.gematik.test.erezept.common.screenplay.task.ConnectSubscriptionService;
 import de.gematik.test.erezept.config.ConfigurationReader;
-import de.gematik.test.erezept.screenplay.task.ConnectSubscriptionService;
 import io.cucumber.java.After;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
@@ -111,51 +111,11 @@ public class ActorsInitializationSteps {
     config.equipAsDoctor(theActor);
   }
 
-  /**
-   * Initialisiere einen Versicherten mit einer eGK und der Versicherungsart aus {@code
-   * insuranceType}
-   *
-   * <p>Gültige Versicherungsarten sind:
-   *
-   * <ul>
-   *   <li>GKV: gesetzliche Krankenversicherung
-   *   <li>PKV: private Krankenversicherung
-   *   <li>BG: Berufsgenossenschaft
-   *   <li>SEL: Selbstzahler
-   *   <li>SOZ: Sozialamt
-   *   <li>GPV: gesetzliche Pflegeversicherung
-   *   <li>PPV: private Pflegeversicherung
-   *   <li>BEI: Beihilfe
-   * </ul>
-   *
-   * @param insuranceType ist eine der gültigen Versicherungsarten, mit der dieser Versicherte im
-   *     Laufe des Szenarios agieren wird
-   * @param patientName der Name des Versicherten, der innerhalb des Szenarios verwendet wird, um
-   *     diesen zu identifizieren
-   */
-  @Angenommen(
-      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat Zugriff auf"
-          + " (?:seine|ihre) (?:digitale Identität|eGK)$")
-  public void initPatient(String insuranceType, String patientName) {
-    log.trace("Initialize Patient {} {}", insuranceType, patientName);
-    val theActor = OnStage.theActorCalled(patientName);
-    config.equipAsPatient(theActor, insuranceType);
-  }
-
   @Angenommen("^der Kostenträger (.+) hat Zugriff auf seine SMC-B KTR$")
   public void initKtr(String insuranceName) {
     log.trace("Initialize HealthInsurance {}", insuranceName);
     val theActor = OnStage.theActorCalled(insuranceName);
     config.equipAsKtr(theActor);
-  }
-
-  @Angenommen(
-      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat eine (?:digitale"
-          + " Identität|eGK) für die Abholung in der Apotheke$")
-  public void initPatientForVsdm(String insuranceType, String patientName) {
-    log.trace("Initialize Patient {} {} for VSDM", insuranceType, patientName);
-    val theActor = OnStage.theActorCalled(patientName);
-    config.equipAsPatientForVsdm(theActor, insuranceType);
   }
 
   @Wenn("^(?:die Apotheke|der Kostenträger) (.+) sich mit dem Subscription Service verbindet$")

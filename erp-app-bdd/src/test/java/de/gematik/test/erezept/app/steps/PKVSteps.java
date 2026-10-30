@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.app.steps;
 
-import static de.gematik.test.erezept.screenplay.task.BillingInformationConsent.ConsentAction.fromString;
+import static de.gematik.test.erezept.common.screenplay.task.BillingInformationConsent.ConsentAction.fromString;
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
 
 import de.gematik.test.erezept.app.task.DeleteChargeItem;

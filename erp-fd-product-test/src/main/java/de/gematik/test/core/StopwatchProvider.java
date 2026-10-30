@@ -21,8 +21,8 @@
 package de.gematik.test.core;
 
 import de.gematik.test.core.exceptions.NotInitializedException;
-import de.gematik.test.erezept.apimeasure.ApiCallStopwatch;
-import de.gematik.test.erezept.apimeasure.DumpingStopwatch;
+import de.gematik.test.erezept.common.apimeasure.ApiCallStopwatch;
+import de.gematik.test.erezept.common.apimeasure.DumpingStopwatch;
 import lombok.Getter;
 
 public class StopwatchProvider {

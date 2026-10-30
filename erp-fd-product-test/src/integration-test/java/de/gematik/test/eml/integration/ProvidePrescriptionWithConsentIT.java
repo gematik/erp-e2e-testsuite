@@ -21,7 +21,7 @@
 package de.gematik.test.eml.integration;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLogFor;
-import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlMedRequestDosageHasText;
+import static de.gematik.test.erezept.actions.ErpInteractionPoller.getAuditEventStopPollingPredicate;
 import static de.gematik.test.erezept.arguments.WorkflowAndMedicationComposer.*;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
@@ -49,6 +49,7 @@ import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -98,6 +99,7 @@ public class ProvidePrescriptionWithConsentIT extends ErpTest {
     this.config.equipWithEpaMockClient(epaFhirChecker);
 
     patient.changePatientInsuranceType(insuranceType);
+
     // todo activate if PUT is activated
     // patient.attemptsTo(EmlProvidePrescriptionApply.forKvnr(patient.getKvnr()));
 
@@ -158,16 +160,19 @@ public class ProvidePrescriptionWithConsentIT extends ErpTest {
         CheckEpaOpProvidePrescriptionWithTask.forPrescription(
             kbvBundle, doc.getSmcbTelematikId(), doc.getHbaTelematikId()));
 
-    // waiting for computing and store AuditEvent for Patient
-    Thread.sleep(2000); // NOSONAR
-
     // patient checks auditEvent content
     val searchParams =
         IQueryParameter.search()
             .withAuthoredOnAndFilter(LocalDate.now(), SearchPrefix.EQ)
             .sortedBy("date", SortOrder.DESCENDING)
             .createParameter();
-    val auditEvents = patient.performs(DownloadAuditEvent.withQueryParams(searchParams));
+    val auditEvents =
+        ErpInteractionPoller.builder()
+            .build()
+            .poll(
+                () -> patient.performs(DownloadAuditEvent.withQueryParams(searchParams)),
+                getAuditEventStopPollingPredicate(
+                    List.of("Die Verordnung wurde in die Patientenakte übertragen")));
 
     patient.attemptsTo(
         Verify.that(auditEvents)
@@ -223,28 +228,27 @@ public class ProvidePrescriptionWithConsentIT extends ErpTest {
     epaFhirChecker.attemptsTo(
         CheckEpaOpProvidePrescriptionsRenderedDosageInstructionValues.forPrescription(kbvBundle));
 
-    // waiting for computing and store AuditEvent for Patient
-    Thread.sleep(2000); // NOSONAR
-
     // patient checks auditEvent content
     val searchParams =
         IQueryParameter.search()
             .withAuthoredOnAndFilter(LocalDate.now(), SearchPrefix.EQ)
             .sortedBy("date", SortOrder.DESCENDING)
             .createParameter();
-    val auditEvents = patient.performs(DownloadAuditEvent.withQueryParams(searchParams));
+    val auditEvents =
+        ErpInteractionPoller.builder()
+            .build()
+            .poll(
+                () -> patient.performs(DownloadAuditEvent.withQueryParams(searchParams)),
+                getAuditEventStopPollingPredicate(
+                    List.of("Die Verordnung wurde in die Patientenakte übertragen")));
 
-    patient.attemptsTo(
-        Verify.that(auditEvents)
-            .withExpectedType()
-            .and(
-                bundleContainsLogFor(
-                    prescr.getExpectedResponse().getTask().getPrescriptionId(),
-                    "Die Verordnung wurde in die Patientenakte übertragen"))
-            .isCorrect());
-
-    // cleanUp
-    patient.performs(TaskAbort.asPatient(task));
+    Verify.that(auditEvents)
+        .withExpectedType()
+        .and(
+            bundleContainsLogFor(
+                prescr.getExpectedResponse().getTask().getPrescriptionId(),
+                "Die Verordnung wurde in die Patientenakte übertragen"))
+        .isCorrect();
   }
 
   private KbvErpMedication getMedication(String medicationType) {
@@ -277,61 +281,46 @@ public class ProvidePrescriptionWithConsentIT extends ErpTest {
     };
   }
 
-  @ParameterizedTest(name = "{0} → {1}")
-  @TestcaseId("EML_PROVIDE_PRESCRIPTION_DOSAGE_INSTRUCTION_04")
+  @TestcaseId("EML_PROVIDE_PRESCRIPTION_WITH_CONSENT_DECISION_APPLY_05")
+  @ParameterizedTest(
+      name =
+          "[{index}] -> Ein Arzt mit {0} der TelematikID im Krypto Material eine Verordnungen"
+              + " verschreibt und die Leerzeichen vom Erp-FD entfernt werden")
   @DisplayName(
-      "Es soll geprüft werden, dass der FD die Zeichen der DosageInstruction beim Export korrekt"
-          + " transformiert")
-  @MethodSource("dosageInstructionTestData")
-  void shouldExportDosageInstructionWithCorrectEscaping(
-      String dosageInstructionText, String expectedDosageInstructionText) {
+      "Es muss geprüft werden, dass die Telematik IDs vom Fachdienst bereinigt werden und ggf."
+          + " vorhandenen Leerzeichen entfernt werden: ErpBfd.B_FD_1709")
+  @MethodSource("doctorAndTelematikIdComposer")
+  void checkSubmittedTelematikIds(String docName) {
+
+    val doctor = this.getDoctorNamed(docName);
 
     val epaFhirChecker = new GemaTestActor("epaFhirChecker");
     this.config.equipWithEpaMockClient(epaFhirChecker);
 
     patient.changePatientInsuranceType(InsuranceTypeDe.GKV);
 
-    val activation =
-        doc.performs(
+    val resp =
+        doctor.performs(
             IssuePrescription.forPatient(patient)
                 .ofAssignmentKind(PrescriptionAssignmentKind.PHARMACY_ONLY)
-                .withKbvBundleFrom(
-                    KbvErpBundleFaker.builder()
-                        .withMedication(getMedication(MEDICATION_PZN))
-                        .withDosageInstruction(
-                            dosageInstructionText) // The parameter represents only the text value
-                        // of the DosageInstruction, not the entire
-                        // element.
-                        .toBuilder()));
-
-    val task = activation.getExpectedResponse();
+                .withRandomKbvBundle());
+    val task = resp.getExpectedResponse();
 
     val prescr =
         patient.performs(
             GetPrescriptionById.withTaskId(task.getTaskId()).withAccessCode(task.getAccessCode()));
 
+    // performs the resource-content validation
     val kbvBundle = prescr.getExpectedResponse().getKbvBundle().orElseThrow();
-
     epaFhirChecker.attemptsTo(
         CheckEpaOpProvidePrescriptionWithTask.forPrescription(
-            kbvBundle,
-            doc.getSmcbTelematikId(),
-            doc.getHbaTelematikId(),
-            emlMedRequestDosageHasText(expectedDosageInstructionText)));
+            kbvBundle, doctor.getCleanedUpSmcbTelematikId(), doctor.getCleanedUpHbaTelematikId()));
   }
 
-  private static Stream<Arguments> dosageInstructionTestData() {
+  private static Stream<Arguments> doctorAndTelematikIdComposer() {
     return Stream.of(
-        Arguments.of(
-            "<",
-            "<"), // TODO: The "<" -> "<" case is expected to fail once the FD feature is deployed,
-        // as "<" will then be correctly escaped to "\\u003C"
-        Arguments.of("<", "\\u003C"),
-        Arguments.of("</", "\\u003C/"),
-        Arguments.of("<script>", "\\u003Cscript>"),
-        Arguments.of("]]>", "]]\\u003e"),
-        Arguments.of("-->", "--\\u003e"),
-        Arguments.of("\u2028", "\\u2028"),
-        Arguments.of("\u2029", "\\u2029"));
+        Arguments.of("TelematikId Leerzeichen Anfang"),
+        Arguments.of("TelematikId Leerzeichen Mitte"),
+        Arguments.of("TelematikId Leerzeichen Ende"));
   }
 }

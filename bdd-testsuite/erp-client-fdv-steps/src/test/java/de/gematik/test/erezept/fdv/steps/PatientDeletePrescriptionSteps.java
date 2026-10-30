@@ -23,9 +23,9 @@ package de.gematik.test.erezept.fdv.steps;
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 
-import de.gematik.test.erezept.fdv.task.CheckTheReturnCode;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfAbortOperation;
-import de.gematik.test.erezept.screenplay.task.AbortPrescription;
+import de.gematik.test.erezept.common.screenplay.questions.ResponseOfAbortOperation;
+import de.gematik.test.erezept.common.screenplay.task.AbortPrescription;
+import de.gematik.test.erezept.common.screenplay.task.CheckTheReturnCode;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;

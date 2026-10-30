@@ -24,12 +24,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.ErpFdTestsuiteFactory;
+import de.gematik.test.erezept.common.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.values.json.CommunicationPayloadValidation;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage.PaymentMethod;
 import de.gematik.test.erezept.fhir.valuesets.DeliveryStatus;
 import de.gematik.test.erezept.fhir.valuesets.ReadyForCollecting;
-import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
 import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;

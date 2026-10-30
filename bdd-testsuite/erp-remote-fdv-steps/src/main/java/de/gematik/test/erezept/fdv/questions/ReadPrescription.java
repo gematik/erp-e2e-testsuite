@@ -21,11 +21,11 @@
 package de.gematik.test.erezept.fdv.questions;
 
 import de.gematik.erezept.remotefdv.api.model.Prescription;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.fdv.abilities.UseTheRemoteFdVClient;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.remotefdv.client.FdVResponse;
 import de.gematik.test.erezept.remotefdv.client.PatientRequests;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.annotations.Step;

@@ -36,21 +36,44 @@ import de.gematik.test.erezept.fhir.valuesets.Wop;
 import dev.codesoapbox.dummy4j.Dummy4j;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.val;
 
 public class GemFaker {
   private static final String DATE_FORMAT_SIMPLE = "dd.MM.yyyy";
 
-  private static final Faker faker = new Faker(new Locale("de"));
+  private static final Faker faker = new Faker(Locale.of("de"));
   private static final Dummy4j dummy = new Dummy4j();
   private static final List<String> HEALTH_INSURANCE_NAMES =
       List.of("KOA", "Farmer", "Künstler-Krankenkasse", "KVED Krankenversicherungs-AG");
+
+  // probabilities and templates for generating a random name prefix
+  private static final double PROFESSOR_PROBABILITY = 0.25;
+  private static final double HABILITATION_PROBABILITY = 0.10;
+  private static final double PRIVATDOZENT_PROBABILITY = 0.05;
+  private static final double DIPLOM_MEDIZINER_PROBABILITY = 0.05;
+  // weighted by repetition: medicine dominates in the prescription context
+  private static final List<String> DOCTORATE_SUBJECTS =
+      List.of(
+          "med.",
+          "med.",
+          "med.",
+          "med.",
+          "med.",
+          "med.",
+          "med. dent.",
+          "med. dent.",
+          "rer. nat.",
+          "rer. nat.",
+          "phil.");
 
   private GemFaker() {
     throw new AssertionError();
@@ -251,6 +274,55 @@ public class GemFaker {
     val checkNumString =
         (checkNumLong >= 10) ? String.valueOf(checkNumLong) : format("0{0}", checkNumLong);
     return format("{0}.{1}", rawIso7064, checkNumString);
+  }
+
+  /**
+   * Generates a realistic German academic name prefix such as {@code Dr. med.}, {@code Prof. Dr.
+   * med. dent.} or {@code Prof. Dr. habil. Dr. rer. nat.}.
+   *
+   * <p>Note: in the KBV profiles the name prefix is limited to 100 characters for practitioners but
+   * to 20 characters for patients. Because this generator is used for both, the generated prefix
+   * must stick to the 20-character limit.
+   *
+   * @return a non-blank, single-spaced prefix
+   */
+  public static String generateNamePrefix() {
+    val parts = new ArrayList<String>();
+
+    if (chance(PRIVATDOZENT_PROBABILITY)) {
+      // Privatdozent implies a habilitation, which in turn implies a doctorate
+      parts.add("PD");
+      parts.add("Dr.");
+      // Note: this usually does not fit into the 20-character limit of the name prefix defined by
+      // KBV
+      //      parts.add(GemFaker.randomElement(DOCTORATE_SUBJECTS));
+      parts.add("habil.");
+      return String.join(" ", parts);
+    }
+
+    if (chance(DIPLOM_MEDIZINER_PROBABILITY)) {
+      parts.add("Dipl.-Med.");
+      return String.join(" ", parts);
+    }
+
+    val isProfessor = chance(PROFESSOR_PROBABILITY);
+    if (isProfessor) {
+      parts.add("Prof.");
+
+      if (chance(HABILITATION_PROBABILITY)) {
+        parts.add("habil.");
+
+        // Note: here we usually have already reached the 20-character limit
+        return String.join(" ", parts);
+      }
+    }
+
+    // when we reach this point, we have either a professor or a regular doctor, but in both cases
+    // we need a doctorate
+    parts.add("Dr.");
+    parts.add(GemFaker.randomElement(DOCTORATE_SUBJECTS));
+
+    return String.join(" ", parts);
   }
 
   public static String fakerAccessCode() {
@@ -475,6 +547,18 @@ public class GemFaker {
     val base = faker.random().nextDouble();
     val diff = max - min;
     return (float) (min + diff * base);
+  }
+
+  public static boolean chance(double probability) {
+    return GemFaker.getFaker().random().nextDouble() < probability;
+  }
+
+  public static <R> Optional<R> chanceOf(double probability, Supplier<R> supplier) {
+    if (chance(probability)) {
+      return Optional.ofNullable(supplier.get());
+    } else {
+      return Optional.empty();
+    }
   }
 
   /**

@@ -20,7 +20,6 @@
 
 package de.gematik.test.erezept.trezept;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 

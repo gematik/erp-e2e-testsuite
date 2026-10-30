@@ -34,9 +34,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 class KbvPractitionerBuilderTest extends ErpFhirParsingTest {
 
   @ParameterizedTest(
-      name =
-          "[{index}] -> Build KBV Bundle for GKV with versions KbvItaForVersion {0} and"
-              + " KbvItaErpVersion {1}")
+      name = "[{index}] -> Build KBV Bundle for GKV with versions KbvItaForVersion {0}")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvItaForVersions")
   void shouldBuildSimplePractitioner(KbvItaForVersion kbvForVersion) {
     val practitioner =

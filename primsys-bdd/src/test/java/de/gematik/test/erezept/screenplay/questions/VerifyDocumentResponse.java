@@ -20,8 +20,8 @@
 
 package de.gematik.test.erezept.screenplay.questions;
 
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheKonnektor;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -35,9 +35,12 @@ public class VerifyDocumentResponse implements Question<Boolean> {
 
   private final byte[] toVerify;
 
-  public static VerifyDocumentResponse forGivenDocument(byte[] document) {
+  public static de.gematik.test.erezept.common.screenplay.questions.VerifyDocumentResponse
+      forGivenDocument(byte[] document) {
     Object[] properties = {document};
-    return Instrumented.instanceOf(VerifyDocumentResponse.class).withProperties(properties);
+    return Instrumented.instanceOf(
+            de.gematik.test.erezept.common.screenplay.questions.VerifyDocumentResponse.class)
+        .withProperties(properties);
   }
 
   @Override

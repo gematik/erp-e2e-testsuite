@@ -22,8 +22,8 @@ package de.gematik.test.erezept.screenplay.strategy;
 
 import static java.text.MessageFormat.format;
 
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.exceptions.StrategyInitializationException;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;

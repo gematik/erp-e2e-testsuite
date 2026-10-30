@@ -6,7 +6,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.8.0</version>
+        <version>1.9.0</version>
     </parent>
 
     <artifactId>erp-app-bdd</artifactId>
@@ -14,7 +14,6 @@
     <description>BDD testsuite for the Gematik E-Rezept application</description>
 
     <properties>
-        <tags/>
         <failsafeFailRerun>0</failsafeFailRerun>
         <bdd.testsuite>CompleteTestSuite</bdd.testsuite>
     </properties>
@@ -24,12 +23,12 @@
             <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
                 <artifactId>selenium-api</artifactId>
-                <version>4.50.0</version>
+                <version>4.51.0</version>
             </dependency>
             <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
                 <artifactId>selenium-remote-driver</artifactId>
-                <version>4.50.0</version>
+                <version>4.51.0</version>
             </dependency>
             <dependency>
                 <groupId>io.appium</groupId>
@@ -81,18 +80,46 @@
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>smartcard</artifactId>
         </dependency>
+
+        <!--erp-bdd-common is an old common dependency for BDD Testsuites!-->
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-bdd-common</artifactId>
         </dependency>
+
+        <!--erp-common is a new common dependency containing shared functionality for FdV and AVS/PVS!-->
+        <dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-common</artifactId>
+        </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>primsys-bdd</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>de.gematik.test.erezept</groupId>
+                    <artifactId>erp-remote-fdv-steps</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>de.gematik.test.erezept</groupId>
+                    <artifactId>erp-client-fdv-steps</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>primsys-bdd</artifactId>
             <type>test-jar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>de.gematik.test.erezept</groupId>
+                    <artifactId>erp-remote-fdv-steps</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>de.gematik.test.erezept</groupId>
+                    <artifactId>erp-client-fdv-steps</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
@@ -236,44 +263,10 @@
                     <rerunFailingTestsCount>${failsafeFailRerun}</rerunFailingTestsCount>
                     <skip>${skip.inttests}</skip>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>net.serenity-bdd.maven.plugins</groupId>
                 <artifactId>serenity-maven-plugin</artifactId>
-                <version>${version.serenity}</version>
-                <configuration>
-                    <tags>${tags}</tags>
-                    <reports>single-page-html,json-summary</reports>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>net.serenity-bdd</groupId>
-                        <artifactId>serenity-single-page-report</artifactId>
-                        <version>${version.serenity}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>net.serenity-bdd</groupId>
-                        <artifactId>serenity-json-summary-report</artifactId>
-                        <version>${version.serenity}</version>
-                    </dependency>
-                </dependencies>
-                <executions>
-                    <execution>
-                        <id>serenity-reports</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>aggregate</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

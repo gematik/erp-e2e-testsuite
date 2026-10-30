@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
+import static de.gematik.test.erezept.fhir.builder.GemFaker.chanceOf;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerBirthday;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerCity;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.fakerFirstName;
@@ -30,6 +31,7 @@ import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPatient;
 import java.util.Date;
@@ -44,9 +46,11 @@ public class KbvPatientFaker {
 
   private KbvPatientFaker(KbvItaForVersion version) {
     this.version = version;
+    // 20% chance to add a prefix to the name
+    val prefix = chanceOf(0.2, GemFaker::generateNamePrefix).orElse(null);
     this.withBirthDate(fakerBirthday())
         .withAddress(fakerCity(), fakerZipCode(), fakerStreetName())
-        .withName(fakerFirstName(), fakerLastName())
+        .withName(prefix, fakerFirstName(), fakerLastName())
         .withKvnrAndInsuranceType(
             KVNR.random(), randomElement(InsuranceTypeDe.GKV, InsuranceTypeDe.PKV));
   }
@@ -80,7 +84,11 @@ public class KbvPatientFaker {
   }
 
   public KbvPatientFaker withName(String givenName, String familyName) {
-    builderConsumers.put("name", b -> b.name(givenName, familyName));
+    return withName(null, givenName, familyName);
+  }
+
+  public KbvPatientFaker withName(String prefix, String givenName, String familyName) {
+    builderConsumers.put("name", b -> b.name(givenName, familyName, prefix));
     return this;
   }
 

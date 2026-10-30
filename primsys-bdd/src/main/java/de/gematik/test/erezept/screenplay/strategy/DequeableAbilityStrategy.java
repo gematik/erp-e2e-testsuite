@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.screenplay.strategy;
 
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
 import net.serenitybdd.screenplay.Ability;
 
 public abstract class DequeableAbilityStrategy<A extends Ability> extends AbilityStrategy<A> {

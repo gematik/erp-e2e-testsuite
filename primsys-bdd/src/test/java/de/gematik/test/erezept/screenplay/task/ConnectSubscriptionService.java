@@ -21,9 +21,9 @@
 package de.gematik.test.erezept.screenplay.task;
 
 import de.gematik.test.erezept.client.websocket.WebSocketClient;
-import de.gematik.test.erezept.exceptions.WebSocketException;
-import de.gematik.test.erezept.screenplay.abilities.UseSubscriptionService;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.exceptions.WebSocketException;
+import de.gematik.test.erezept.common.screenplay.abilities.UseSubscriptionService;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -57,7 +57,9 @@ public class ConnectSubscriptionService implements Task {
     }
   }
 
-  public static ConnectSubscriptionService connect(String subscriptionServiceUrl) {
-    return new ConnectSubscriptionService(subscriptionServiceUrl);
+  public static de.gematik.test.erezept.common.screenplay.task.ConnectSubscriptionService connect(
+      String subscriptionServiceUrl) {
+    return new de.gematik.test.erezept.common.screenplay.task.ConnectSubscriptionService(
+        subscriptionServiceUrl);
   }
 }

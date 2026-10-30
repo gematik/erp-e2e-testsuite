@@ -27,7 +27,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class RemoteFdVActorConfiguration extends PatientConfiguration {
-  private boolean useVirtualEgk = false;
   private String remoteFdV;
   private String kvnr;
 }

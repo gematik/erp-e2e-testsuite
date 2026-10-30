@@ -20,16 +20,16 @@
 
 package de.gematik.test.erezept.app.task;
 
-import static de.gematik.test.erezept.screenplay.task.BillingInformationConsent.ConsentAction.GRANT;
-import static de.gematik.test.erezept.screenplay.task.BillingInformationConsent.ConsentAction.REVOKE;
+import static de.gematik.test.erezept.common.screenplay.task.BillingInformationConsent.ConsentAction.GRANT;
+import static de.gematik.test.erezept.common.screenplay.task.BillingInformationConsent.ConsentAction.REVOKE;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.mobile.elements.*;
-import de.gematik.test.erezept.screenplay.task.BillingInformationConsent;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.task.BillingInformationConsent;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

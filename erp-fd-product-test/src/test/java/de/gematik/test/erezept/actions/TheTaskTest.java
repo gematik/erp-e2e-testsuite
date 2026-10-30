@@ -29,9 +29,9 @@ import static org.mockito.Mockito.when;
 import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 

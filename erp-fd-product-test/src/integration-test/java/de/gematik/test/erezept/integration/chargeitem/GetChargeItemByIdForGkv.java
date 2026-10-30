@@ -32,16 +32,13 @@ import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import lombok.val;
-import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 
-@Tag("CHARGE_ITEM")
-@RunWith(SerenityParameterizedRunner.class)
+@Tag("ChargeItem")
 @ExtendWith(SerenityJUnit5Extension.class)
 public class GetChargeItemByIdForGkv extends ErpTest {
   @Actor(name = "Adelheid Ulmenwald")

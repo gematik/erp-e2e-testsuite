@@ -236,6 +236,33 @@
     ]
   },
   {
+    "iccsn": "praxis_telematik_id_leerzeichen_beginn",
+    "type": "SMC_B",
+    "ownerName": " Dr. Michael Leerzeichen-Beginn TEST-ONLY",
+    "stores": [
+      "smcb/praxis_telematik_id_leerzeichen_beginn/Arztpraxis-Leerzeichen-Beginn-C_SMCB_AUT_E256_X509.p12",
+      "smcb/praxis_telematik_id_leerzeichen_beginn/Arztpraxis-Leerzeichen-Beginn-C_SMCB_OSIG_E256_X509.p12"
+    ]
+  },
+  {
+    "iccsn": "praxis_telematik_id_leerzeichen_mitte",
+    "type": "SMC_B",
+    "ownerName": " Dr. Michael Leerzeichen-Mitte TEST-ONLY",
+    "stores": [
+      "smcb/praxis_telematik_id_leer_zeichen_mitte/Arztpraxis-Leerzeichen-Mitte-C_SMCB_AUT_E256_X509.p12",
+      "smcb/praxis_telematik_id_leer_zeichen_mitte/Arztpraxis-Leerzeichen-Mitte-C_SMCB_OSIG_E256_X509.p12"
+    ]
+  },
+  {
+    "iccsn": "praxis_telematik_id_leerzeichen_ende",
+    "type": "SMC_B",
+    "ownerName": " Dr. Michael Leerzeichen-Ende TEST-ONLY",
+    "stores": [
+      "smcb/praxis_telematik_id_leerzeichen_ende/Arztpraxis-Leerzeichen-Ende-C_SMCB_AUT_E256_X509.p12",
+      "smcb/praxis_telematik_id_leerzeichen_ende/Arztpraxis-Leerzeichen-Ende-C_SMCB_OSIG_E256_X509.p12"
+    ]
+  },
+  {
     "iccsn": "80276001011699901102",
     "type": "SMC_B",
     "note": "valid until: Thu Nov 09 22:59:59 UTC 2028",
@@ -420,6 +447,33 @@
       "smcb/80276883110000159320/80276883110000159320-C_HCI_AUT_SMCB57_E256.p12",
       "smcb/80276883110000159320/80276883110000159320-C_HCI_ENC_SMCB57_E256.p12",
       "smcb/80276883110000159320/80276883110000159320-C_HCI_OSIG_SMCB57_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276001099699901397",
+    "type": "HBA",
+    "ownerName": "Arzt-Leerzeichen-Ende",
+    "stores": [
+      "hba/80276001099699901397/Arzt-Leerzeichen-Ende-C_HP_AUT_E256.p12",
+      "hba/80276001099699901397/Arzt-Leerzeichen-Ende-C_HP_QES_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276001099699901398",
+    "type": "HBA",
+    "ownerName": "Arzt-Leerzeichen-Mitte",
+    "stores": [
+      "hba/80276001099699901398/Arzt-Leerzeichen-Mitte-C_HP_AUT_E256.p12",
+      "hba/80276001099699901398/Arzt-Leerzeichen-Mitte-C_HP_QES_E256.p12"
+    ]
+  },
+  {
+    "iccsn": "80276001099699901399",
+    "type": "HBA",
+    "ownerName": "Arzt-_Leerzeichen-Beginn",
+    "stores": [
+      "hba/80276001099699901399/Arzt-_Leerzeichen-Beginn-C_HP_AUT_E256.p12",
+      "hba/80276001099699901399/Arzt-_Leerzeichen-Beginn-C_HP_QES_E256.p12"
     ]
   },
   {

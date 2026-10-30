@@ -18,6 +18,21 @@ apikey: {{apikey}}
   }
 }
 
+### FAKER-DOC-PHARMACEUTICAL-02
+# Fake a pharmaceutical prescription which has a patient with a very complex name
+POST {{host}}/faker/doc/kbvbundle
+Content-Type: application/json
+apikey: {{apikey}}
+
+{
+  "patient": {
+    "kvnr": "S040464113",
+    "namePrefix": "Prof. habil. Dr. med",
+    "firstName": "Friedrich-Wilhelm-Karl-Gustav-Justus-Gotfried",
+    "lastName": "Grossherzog von und zu der Schaumberg-von-und-zu-Schaumburg-und-Radeberg"
+  }
+}
+
 ### FAKER-DOC-DIGA-01
 POST {{host}}/faker/doc/evdgabundle
 Content-Type: application/json

@@ -50,6 +50,7 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.usecases.CommunicationGetByIdCommand;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
@@ -63,7 +64,6 @@ import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import de.gematik.test.erezept.toggle.FuzzingIterationsToggle;
 import java.util.LinkedList;
@@ -289,7 +289,10 @@ public class FuzzingIT extends ErpTest {
             });
 
     val replyCom =
-        ErxCommunicationBuilder.asReply(CommunicationReplyMessage.forV1().build())
+        ErxCommunicationBuilder.asReply(
+                CommunicationReplyMessage.forV1()
+                    .infoText(GemFaker.fakerCommunicationReplyMessage())
+                    .build())
             .basedOn(task.getTaskId())
             .receiver(patient.getKvnr().getValue())
             .sender(pharmacy.getTelematikId().getValue())

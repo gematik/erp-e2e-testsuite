@@ -21,12 +21,12 @@
 package de.gematik.test.erezept.screenplay.questions;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
-import de.gematik.test.erezept.screenplay.strategy.AmountAdverb;
-import de.gematik.test.erezept.screenplay.strategy.AmountStrategy;
+import de.gematik.test.erezept.common.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.common.screenplay.strategy.AmountAdverb;
+import de.gematik.test.erezept.common.screenplay.strategy.AmountStrategy;
+import de.gematik.test.erezept.common.screenplay.util.DispenseReceipt;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.screenplay.strategy.ContainsReceiptForStrategy;
-import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.List;
 import java.util.function.Predicate;
 import lombok.val;

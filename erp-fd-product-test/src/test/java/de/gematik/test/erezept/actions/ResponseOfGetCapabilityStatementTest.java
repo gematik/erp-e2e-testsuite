@@ -26,8 +26,8 @@ import static org.mockito.Mockito.*;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.usecases.GetCapabilityStatementCommand;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCapabilityStatement;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 

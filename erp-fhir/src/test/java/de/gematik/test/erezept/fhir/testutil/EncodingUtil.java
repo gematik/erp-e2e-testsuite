@@ -21,8 +21,8 @@
 package de.gematik.test.erezept.fhir.testutil;
 
 import static java.text.MessageFormat.format;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.codec.FhirCodec;
@@ -68,7 +68,7 @@ public class EncodingUtil {
     val originalEncoding = EncodingType.fromString(filepath);
     val originalObject = parser.decode(clazz, originalContent, originalEncoding);
     assertNotNull(
-        format("{0} must result in {1}", filepath, clazz.getSimpleName()), originalObject);
+        originalObject, format("{0} must result in {1}", filepath, clazz.getSimpleName()));
     log.info("File {} parsed to {}", filepath, originalObject);
 
     // re-encode the original object to its origin encoding and validate again

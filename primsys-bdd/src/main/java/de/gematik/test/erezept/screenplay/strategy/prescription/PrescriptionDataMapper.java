@@ -21,6 +21,7 @@
 package de.gematik.test.erezept.screenplay.strategy.prescription;
 
 import com.google.common.base.Strings;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.DosageDgMPBuilder;
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.dgmp.TimingBuilder;
 import de.gematik.test.erezept.eml.fhir.valuesets.BmpDosiereinheit;
@@ -35,7 +36,6 @@ import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.util.FlowTypeUtil;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.*;
 import java.util.stream.Stream;
 import lombok.AccessLevel;

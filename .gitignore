@@ -26,4 +26,8 @@ CI
 **/.env
 /primsys-bdd/src/main/resources/**
 
+# safety net
+/primsys-bdd/**/*.p12
+/primsys-bdd/**/*.jks
+
 /primsys-rest/primsys-rest-server/src/test/http/http-client.private.env.json

@@ -31,6 +31,9 @@ import de.gematik.test.erezept.ErpFdTestsuiteFactory;
 import de.gematik.test.erezept.actions.MockActorsUtils;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
+import de.gematik.test.erezept.common.screenplay.abilities.ProvideDoctorBaseData;
+import de.gematik.test.erezept.common.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
@@ -38,14 +41,12 @@ import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
-import de.gematik.test.erezept.screenplay.abilities.ProvideDoctorBaseData;
-import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.val;
 import org.hl7.fhir.r4.model.Task;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 
 class DoctorActorTest extends ErpFhirBuildingTest {
@@ -57,10 +58,14 @@ class DoctorActorTest extends ErpFhirBuildingTest {
   }
 
   private DoctorActor createDoc(String name) {
+    return createDoc(name, "UselessTestId");
+  }
+
+  private DoctorActor createDoc(String name, String hbaTelematikId) {
     val config = ErpFdTestsuiteFactory.create();
     val doctor = new DoctorActor(name);
     val docConfig = config.getDoctorConfig(doctor.getName());
-    val provideBaseData = ProvideDoctorBaseData.fromConfiguration(docConfig, "UselessTestId");
+    val provideBaseData = ProvideDoctorBaseData.fromConfiguration(docConfig, hbaTelematikId);
     doctor.can(provideBaseData);
 
     val smcbMock = mock(SmcB.class);
@@ -92,6 +97,35 @@ class DoctorActorTest extends ErpFhirBuildingTest {
     val doctor = createDoc("Adelheid Ulmenwald");
     assertNotNull(doctor.getHbaTelematikId());
     assertNotNull(doctor.getSmcbTelematikId());
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "'TelematikId Leerzeichen Anfang', ' telematikId', telematikId",
+    "'TelematikId Leerzeichen Mitte', 'telematik Id', telematikId",
+    "'TelematikId Leerzeichen Ende', 'telematikId ', telematikId"
+  })
+  void shouldHaveSpacelessSmcbTelematikIds(
+      String docName, String whitespaceTelematikID, String expectedTelematikId) {
+    val doctor = createDoc(docName);
+    val smcbMock = SafeAbility.getAbility(doctor, UseSMCB.class).getSmcB();
+    when(smcbMock.getTelematikId()).thenReturn(whitespaceTelematikID);
+
+    assertEquals(whitespaceTelematikID, doctor.getSmcbTelematikId().getValue());
+    assertEquals(expectedTelematikId, doctor.getCleanedUpSmcbTelematikId().getValue());
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "'TelematikId Leerzeichen Anfang', ' telematikId', telematikId",
+    "'TelematikId Leerzeichen Mitte', 'telematik Id', telematikId",
+    "'TelematikId Leerzeichen Ende', 'telematikId ', telematikId"
+  })
+  void shouldHaveWhitespacesInHbaTelematikIds(
+      String docName, String whitespaceTelematikID, String expectedTelematikId) {
+    val doctor = createDoc(docName, whitespaceTelematikID);
+    assertEquals(whitespaceTelematikID, doctor.getHbaTelematikId().getValue());
+    assertEquals(expectedTelematikId, doctor.getCleanedUpHbaTelematikId().getValue());
   }
 
   @Test

@@ -22,7 +22,7 @@ package de.gematik.test.erezept.actions;
 
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.test.erezept.abilities.UsePoppTokenGenerator;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
