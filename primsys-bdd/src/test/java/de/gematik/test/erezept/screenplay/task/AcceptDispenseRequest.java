@@ -23,21 +23,22 @@ package de.gematik.test.erezept.screenplay.task;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
+import de.gematik.test.erezept.common.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.common.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheKonnektor;
+import de.gematik.test.erezept.common.screenplay.questions.GetReceivedCommunication;
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
 import de.gematik.test.erezept.fhir.r4.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
-import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
-import de.gematik.test.erezept.screenplay.questions.GetReceivedCommunication;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfAcceptOperation;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,7 +82,10 @@ public class AcceptDispenseRequest implements Task {
     val smcb = SafeAbility.getAbility(actor, UseSMCB.class);
 
     val replyMessage =
-        CommunicationReplyMessage.forV1().supplyOptionsType(SupplyOptionsType.SHIPMENT).build();
+        CommunicationReplyMessage.forV1()
+            .supplyOptionsType(SupplyOptionsType.SHIPMENT)
+            .infoText(GemFaker.fakerCommunicationReplyMessage())
+            .build();
 
     val response =
         ErxCommunicationBuilder.asReply(replyMessage)

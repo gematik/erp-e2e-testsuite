@@ -24,6 +24,7 @@ import static de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe.GKV;
 import static de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe.PKV;
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLogFor;
 import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvidePrescriptionVerifier.emlPractitionerHasHbaTelematikId;
+import static de.gematik.test.erezept.actions.ErpInteractionPoller.getAuditEventStopPollingPredicate;
 import static de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType.*;
 import static de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind.DIRECT_ASSIGNMENT;
 import static de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind.PHARMACY_ONLY;
@@ -43,17 +44,14 @@ import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
-import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -142,7 +140,10 @@ public class ProvidePrescWithoutHbaTelematikIDIT extends ErpTest {
             .build()
             .poll(
                 () -> patient.performs(DownloadAuditEvent.withQueryParams(getQueryParameters())),
-                getErxAuditEventBreakOutPredicate());
+                getAuditEventStopPollingPredicate(
+                    List.of(
+                        "Die Verordnung konnte nicht in die Patientenakte übertragen werden",
+                        "Die Verordnung wurde in die Patientenakte übertragen")));
 
     val prescId = prescr.getExpectedResponse().getTask().getPrescriptionId();
     patient.attemptsTo(
@@ -205,7 +206,10 @@ public class ProvidePrescWithoutHbaTelematikIDIT extends ErpTest {
             .build()
             .poll(
                 () -> patient.performs(DownloadAuditEvent.withQueryParams(getQueryParameters())),
-                getErxAuditEventBreakOutPredicate());
+                getAuditEventStopPollingPredicate(
+                    List.of(
+                        "Die Verordnung konnte nicht in die Patientenakte übertragen werden",
+                        "Die Verordnung konnte nicht in die Patientenakte übertragen werden")));
 
     val prescriptionId = prescr.getExpectedResponse().getTask().getPrescriptionId();
     patient.attemptsTo(
@@ -216,18 +220,5 @@ public class ProvidePrescWithoutHbaTelematikIDIT extends ErpTest {
                     prescriptionId,
                     "Die Verordnung konnte nicht in die Patientenakte übertragen werden"))
             .isCorrect());
-  }
-
-  private static @NonNull Predicate<ErxAuditEventBundle> getErxAuditEventBreakOutPredicate() {
-    return aeb ->
-        aeb.getAuditEvents().stream()
-            .anyMatch(
-                ae ->
-                    ae.getFirstText()
-                            .contains(
-                                "Die Verordnung konnte nicht in die Patientenakte übertragen"
-                                    + " werden")
-                        || ae.getFirstText()
-                            .contains("Die Verordnung wurde in die Patientenakte übertragen"));
   }
 }

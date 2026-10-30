@@ -21,8 +21,8 @@
 package de.gematik.test.erezept.app.questions;
 
 import de.gematik.test.erezept.client.usecases.eu.EuConsentGetCommand;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;

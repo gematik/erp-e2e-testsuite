@@ -23,11 +23,8 @@ package de.gematik.test.erezept.lei.steps;
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
-import de.gematik.test.erezept.screenplay.questions.HasChargeItemBundle;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfGetChargeItemBundle;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfPostChargeItem;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfPutChargeItem;
-import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
+import de.gematik.test.erezept.common.screenplay.task.CheckTheReturnCode;
+import de.gematik.test.erezept.screenplay.questions.*;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
@@ -149,7 +146,7 @@ public class PharmacyPkvSteps {
   public void andWhenThenPharmacyGetsChargeItemBundle(String pharmName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy)
-        .attemptsTo(Ensure.that(HasChargeItemBundle.forPrescription(order).asPharmacy()).isTrue());
+        .attemptsTo(Ensure.that(HasChargeItemBundleAsPharmacy.forPrescription(order)).isTrue());
   }
 
   @Dann(
@@ -161,9 +158,9 @@ public class PharmacyPkvSteps {
     then(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfGetChargeItemBundle.forPrescription(order)
+                    ResponseOfGetChargeItemBundleAsPharmacy.forPrescription(order)
                         .withRandomAccessCode()
-                        .asPharmacy())
+                        .build())
                 .isEqualTo(403));
   }
 
@@ -177,9 +174,9 @@ public class PharmacyPkvSteps {
     then(thePharmacy)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfGetChargeItemBundle.forPrescription(order)
+                    ResponseOfGetChargeItemBundleAsPharmacy.forPrescription(order)
                         .withAccessCode(accessCode)
-                        .asPharmacy())
+                        .build())
                 .isEqualTo(403));
   }
 

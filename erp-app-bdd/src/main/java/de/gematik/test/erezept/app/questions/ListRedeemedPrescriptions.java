@@ -23,7 +23,7 @@ package de.gematik.test.erezept.app.questions;
 import static de.gematik.test.erezept.app.mobile.elements.Receipt.REDEEMED_PRESCRIPTION_STATUS_LABEL;
 
 import de.gematik.test.erezept.app.abilities.UseTheApp;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

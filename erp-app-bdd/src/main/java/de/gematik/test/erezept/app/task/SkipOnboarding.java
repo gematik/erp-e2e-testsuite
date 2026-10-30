@@ -24,7 +24,7 @@ import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.SwipeDirection;
 import de.gematik.test.erezept.app.task.android.SkipOnboardingOnAndroid;
 import de.gematik.test.erezept.app.task.ios.SkipOnboardingOnIOS;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;

@@ -27,5 +27,8 @@ import org.junit.platform.suite.api.*;
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("/features")
-@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "de.gematik.test.erezept.lei.steps")
+@ConfigurationParameter(
+    key = GLUE_PROPERTY_NAME,
+    value =
+        "de.gematik.test.erezept.lei.steps,de.gematik.test.erezept.fdv.steps,de.gematik.test.erezept.app.steps,de.gematik.test.erezept.common.steps")
 public class CompleteTestSuite {}

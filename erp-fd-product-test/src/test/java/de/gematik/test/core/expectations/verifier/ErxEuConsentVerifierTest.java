@@ -20,7 +20,6 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
@@ -106,8 +105,8 @@ class ErxEuConsentVerifierTest {
     val step = ErxEuConsentVerifier.hasValidTimestamp();
 
     assertTrue(
-        "Expected predicate to pass when consent dateTime is close to now",
-        step.getPredicate().test(consent));
+        step.getPredicate().test(consent),
+        "Expected predicate to pass when consent dateTime is close to now");
   }
 
   @Test
@@ -153,7 +152,7 @@ class ErxEuConsentVerifierTest {
     val step = ErxEuConsentVerifier.hasNoConsentEntry();
 
     assertTrue(
-        "Expected predicate to pass when bundle has no entry", step.getPredicate().test(bundle));
+        step.getPredicate().test(bundle), "Expected predicate to pass when bundle has no entry");
   }
 
   @Test
@@ -184,8 +183,8 @@ class ErxEuConsentVerifierTest {
     val step = ErxEuConsentVerifier.datetimeIsNot(forbiddenDate);
 
     assertTrue(
-        "Expected predicate to pass when consent dateTime is different from forbiddenDate",
-        step.getPredicate().test(consent));
+        step.getPredicate().test(consent),
+        "Expected predicate to pass when consent dateTime is different from forbiddenDate");
   }
 
   @Test
@@ -209,8 +208,8 @@ class ErxEuConsentVerifierTest {
     val step = ErxEuConsentVerifier.hasDateTime();
 
     assertTrue(
-        "Expected predicate to pass when consent dateTime is present (not null)",
-        step.getPredicate().test(consent));
+        step.getPredicate().test(consent),
+        "Expected predicate to pass when consent dateTime is present (not null)");
   }
 
   @Test

@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.config.dto.remotefdv;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.gematik.bbriccs.cfg.NamedConfigurationElement;
 import lombok.Data;
 
@@ -29,6 +30,12 @@ public class RemoteFdVConfiguration implements NamedConfigurationElement {
   private String url;
   private String accessKey;
   private String version;
-  private int maxWaitTimeout = 5000; // duration until timeout and finally NoSuchElementException
-  private int pollingInterval = 50; // polling interval in milli seconds
+
+  @JsonProperty("mTLS")
+  private MtlsConfig mTlsConfig;
+
+  @JsonProperty("deviceManagement")
+  private DeviceManagement deviceManagement = new DeviceManagement(false, null);
+
+  public record DeviceManagement(boolean isActive, String deviceId) {}
 }

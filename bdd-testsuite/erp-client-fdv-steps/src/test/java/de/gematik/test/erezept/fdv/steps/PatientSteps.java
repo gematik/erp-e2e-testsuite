@@ -22,10 +22,11 @@ package de.gematik.test.erezept.fdv.steps;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
 
+import de.gematik.test.erezept.common.screenplay.questions.HasDispensedDrugs;
+import de.gematik.test.erezept.common.screenplay.task.HandoverDataMatrixCode;
 import de.gematik.test.erezept.fdv.questions.*;
 import de.gematik.test.erezept.fdv.task.CheckDispenseStatusAsPatient;
-import de.gematik.test.erezept.screenplay.questions.HasDispensedDrugs;
-import de.gematik.test.erezept.screenplay.task.HandoverDataMatrixCode;
+import de.gematik.test.erezept.fdv.task.RetrievePrescriptionFromServer;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
@@ -57,35 +58,6 @@ public class PatientSteps {
     val thePatient = OnStage.theActorCalled(patientName);
     when(thePatient)
         .attemptsTo(Ensure.that(HisInsuranceType.equalsExpected(insuranceType)).isTrue());
-  }
-
-  /**
-   * Dieser Schritt bildet den Vorgang in einer realen Apotheke nach. Der Versicherte mit dem Namen
-   * aus {@code patientName} ruft zunächst alle seine E-Rezepte beim Fachdienst ab und wählt das
-   * gewünschte E-Rezept anhand von {@code order} aus. Im Anschluss erfolgt die Zuweisung über den
-   * Data Matrix Code an die Apotheke mit dem Namen {@code pharmacyName}.
-   *
-   * <p>Mit der Zuweisung über den DMC (Data * Matrix Code) findet keine weitere Interaktion durch
-   * den Versicherten mit dem Fachdienst statt. Stattdessen wird dem Apotheker der DMC vorgezeigt.
-   *
-   * @param patientName ist der Name des Versicherten, der ein E-Rezept bei einer Apotheke einlösen
-   *     möchte
-   * @param order ist die Reihenfolge, mit der das gewünschte E-Rezept ausgewählt wird
-   * @param pharmacyName ist die Apotheke, welche den DMC zugewiesen bekommt
-   */
-  @Wenn(
-      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) (ausgestellte|gelöschte)"
-          + " E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
-  @Wenn(
-      "^(?:der|die) GKV Versicherte (.+) (?:sein|ihr) (letztes|erstes) (ausgestellte|gelöschte)"
-          + " E-Rezept der Apotheke (.+) via Data Matrix Code zuweist$")
-  public void whenAssignDataMatrixCodeFromStack(
-      String patientName, String order, String dmcStack, String pharmacyName) {
-    val thePatient = OnStage.theActorCalled(patientName);
-    val thePharmacy = OnStage.theActorCalled(pharmacyName);
-
-    when(thePatient)
-        .attemptsTo(HandoverDataMatrixCode.fromStack(dmcStack).with(order).to(thePharmacy));
   }
 
   @Wenn(
@@ -122,20 +94,19 @@ public class PatientSteps {
     and(thePatient).attemptsTo(Ensure.that(HasDispensedDrugs.of(adverb, amount)).isTrue());
   }
 
-  /*@Wenn(
+  @Wenn(
       "^(?:der|die) Versicherte (.+) das (letztes|erstes) (?:ihm|ihr) zugewiesene E-Rezept"
           + " herunterlädt$")
   public void whenDownloadPrescription(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     when(thePatient).attemptsTo(RetrievePrescriptionFromServer.andChooseWith(order));
-  }*/
-  // TODO should be refactored!
+  }
 
   /**
    * Der angegebene Patient ruft das letzte verschriebene Rezept auf dem Patientenstapel beim FD ab
    *
-   * @see <a href="https://service.gematik.de/browse/TMD-1605">TMD-1605</a>
    * @param patientName ist der Name des Versicherten
+   * @see <a href="https://service.gematik.de/browse/TMD-1605">TMD-1605</a>
    */
   @Dann("^wird (?:der|dem) Versicherten (.+) das neue E-Rezept angezeigt$")
   @Dann("^wird (?:der|dem) Versicherten (.+) das neue E-Rezept ohne AccessCode angezeigt$")

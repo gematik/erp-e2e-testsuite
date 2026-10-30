@@ -21,6 +21,7 @@
 package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
+import static java.text.MessageFormat.format;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -30,10 +31,15 @@ import de.gematik.test.erezept.fhir.values.BaseANR;
 import de.gematik.test.erezept.fhir.values.LANR;
 import de.gematik.test.erezept.fhir.values.ZANR;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
+import javax.annotation.Nullable;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class KbvPractitionerFakerTest extends ErpFhirParsingTest {
+
   @Test
   void buildFakerPractitionerWithName() {
     val practitioner = KbvPractitionerFaker.builder().withName("Max Mustermann").fake();
@@ -44,6 +50,19 @@ class KbvPractitionerFakerTest extends ErpFhirParsingTest {
     assertEquals("Max Mustermann", practitioner2.getFullName());
     assertTrue(result.isSuccessful());
     assertTrue(result2.isSuccessful());
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"Dr.", "Prof.", "Prof. Dr."})
+  @NullSource
+  void buildFakerPractitionerWithNameAndPrefix(@Nullable String prefix) {
+    val practitioner = KbvPractitionerFaker.builder().withName(prefix, "Max", "Mustermann").fake();
+    val result = ValidatorUtil.encodeAndValidate(parser, practitioner);
+
+    val expectedName = prefix != null ? format("{0} Max Mustermann", prefix) : "Max Mustermann";
+    assertEquals(expectedName, practitioner.getFullName());
+
+    assertTrue(result.isSuccessful());
   }
 
   @Test

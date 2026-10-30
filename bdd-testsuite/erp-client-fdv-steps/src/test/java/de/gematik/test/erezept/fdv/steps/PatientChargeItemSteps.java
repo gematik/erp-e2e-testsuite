@@ -22,15 +22,15 @@ package de.gematik.test.erezept.fdv.steps;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
 
-import de.gematik.test.erezept.fdv.questions.ChargeItemBundleHasExpectedMarkingFlags;
-import de.gematik.test.erezept.fdv.questions.ChargeItemHasChanged;
-import de.gematik.test.erezept.fdv.task.BillingInformationConsent;
+import de.gematik.test.erezept.common.screenplay.questions.HasChargeItemBundleAsPatient;
+import de.gematik.test.erezept.common.screenplay.questions.ResponseOfGetChargeItemBundleAsPatient;
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.common.screenplay.task.BillingInformationConsent;
+import de.gematik.test.erezept.common.screenplay.task.CheckTheReturnCode;
+import de.gematik.test.erezept.common.screenplay.task.SendCommunication;
+import de.gematik.test.erezept.fdv.questions.*;
 import de.gematik.test.erezept.fdv.task.ChangeChargeItemMarkingFlags;
-import de.gematik.test.erezept.fdv.task.CheckTheReturnCode;
 import de.gematik.test.erezept.fdv.task.HandoverChargeItemAuthorization;
-import de.gematik.test.erezept.screenplay.questions.*;
-import de.gematik.test.erezept.screenplay.strategy.*;
-import de.gematik.test.erezept.screenplay.task.*;
 import io.cucumber.datatable.*;
 import io.cucumber.java.de.*;
 import lombok.*;
@@ -161,7 +161,7 @@ public class PatientChargeItemSteps {
   public void whenFdVGetsChargeItem(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
-        .attemptsTo(Ensure.that(HasChargeItemBundle.forPrescription(order).asPatient()).isTrue());
+        .attemptsTo(Ensure.that(HasChargeItemBundleAsPatient.forPrescription(order)).isTrue());
   }
 
   /**
@@ -181,7 +181,7 @@ public class PatientChargeItemSteps {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
         .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfGetChargeItemBundle.forPrescription(order).asPatient())
+            CheckTheReturnCode.of(ResponseOfGetChargeItemBundleAsPatient.forPrescription(order))
                 .isGreaterEqual(400));
   }
 
@@ -199,7 +199,7 @@ public class PatientChargeItemSteps {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
         .attemptsTo(
-            CheckTheReturnCode.of(ResponseOfGetChargeItemBundle.forPrescription(order).asPatient())
+            CheckTheReturnCode.of(ResponseOfGetChargeItemBundleAsPatient.forPrescription(order))
                 .isEqualTo(404));
   }
 
@@ -267,7 +267,7 @@ public class PatientChargeItemSteps {
     when(thePatient)
         .attemptsTo(
             SendCommunication.with(
-                ResponseOfPostCommunication.changeRequest()
+                ResponseOfPostChangeReqCommunication.build()
                     .forChargeItemFromBackend(DequeStrategy.LIFO)
                     .sentTo(thePharmacy)
                     .withRandomMessage()));
@@ -329,7 +329,7 @@ public class PatientChargeItemSteps {
   public void thenHasChargeItem(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
-        .attemptsTo(Ensure.that(HasChargeItemBundle.forPrescription(order).asPatient()).isTrue());
+        .attemptsTo(Ensure.that(HasChargeItemBundleAsPatient.forPrescription(order)).isTrue());
   }
 
   @Und(
@@ -338,7 +338,7 @@ public class PatientChargeItemSteps {
   public void andHasChargeItem(String patientName, String order) {
     val thePatient = OnStage.theActorCalled(patientName);
     and(thePatient)
-        .attemptsTo(Ensure.that(HasChargeItemBundle.forPrescription(order).asPatient()).isTrue());
+        .attemptsTo(Ensure.that(HasChargeItemBundleAsPatient.forPrescription(order)).isTrue());
   }
 
   @Dann(
@@ -347,7 +347,7 @@ public class PatientChargeItemSteps {
   public void thenHasChargeItem(String order) {
     val thePatient = OnStage.theActorInTheSpotlight();
     then(thePatient)
-        .attemptsTo(Ensure.that(HasChargeItemBundle.forPrescription(order).asPatient()).isTrue());
+        .attemptsTo(Ensure.that(HasChargeItemBundleAsPatient.forPrescription(order)).isTrue());
   }
 
   @Und(
@@ -356,6 +356,6 @@ public class PatientChargeItemSteps {
   public void andHasChargeItem(String order) {
     val thePatient = OnStage.theActorInTheSpotlight();
     and(thePatient)
-        .attemptsTo(Ensure.that(HasChargeItemBundle.forPrescription(order).asPatient()).isTrue());
+        .attemptsTo(Ensure.that(HasChargeItemBundleAsPatient.forPrescription(order)).isTrue());
   }
 }

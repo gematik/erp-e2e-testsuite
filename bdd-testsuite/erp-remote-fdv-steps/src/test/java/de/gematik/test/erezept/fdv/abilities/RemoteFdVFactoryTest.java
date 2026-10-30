@@ -23,9 +23,9 @@ package de.gematik.test.erezept.fdv.abilities;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.gematik.test.erezept.config.dto.remotefdv.RemoteFdVActorConfiguration;
+import de.gematik.test.erezept.config.dto.remotefdv.RemoteFdVBaseConfiguration;
 import de.gematik.test.erezept.config.dto.remotefdv.RemoteFdVConfiguration;
-import de.gematik.test.erezept.config.dto.remotefdv.RemoteFdVConfigurationBase;
-import de.gematik.test.erezept.fdv.cfg.ErpRemoteFdVConfiguration;
+import de.gematik.test.erezept.fdv.cfg.RemoteFdVBaseConfigWrapper;
 import de.gematik.test.erezept.fdv.cfg.RemoteFdVFactory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import java.util.List;
@@ -40,7 +40,7 @@ class RemoteFdVFactoryTest {
     val fdvName = "mockFdV";
     val actorConfig = new RemoteFdVActorConfiguration();
     val fdvConfig = new RemoteFdVConfiguration();
-    val configBase = new RemoteFdVConfigurationBase();
+    val configBase = new RemoteFdVBaseConfiguration();
 
     actorConfig.setName(userName);
     actorConfig.setRemoteFdV(fdvName);
@@ -50,7 +50,7 @@ class RemoteFdVFactoryTest {
     configBase.setUsers(List.of(actorConfig));
     configBase.setRemoteFdVs(List.of(fdvConfig));
 
-    val config = ErpRemoteFdVConfiguration.fromDto(configBase);
+    val config = RemoteFdVBaseConfigWrapper.fromDto(configBase);
     assertNotNull(RemoteFdVFactory.forUser(userName, config));
   }
 }

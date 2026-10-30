@@ -20,12 +20,13 @@
 
 package de.gematik.test.erezept.fdv.steps;
 
-import static net.serenitybdd.screenplay.GivenWhenThen.and;
-import static net.serenitybdd.screenplay.GivenWhenThen.when;
+import static net.serenitybdd.screenplay.GivenWhenThen.*;
 
+import de.gematik.test.erezept.common.screenplay.task.CheckTheReturnCode;
+import de.gematik.test.erezept.common.screenplay.task.SendCommunication;
 import de.gematik.test.erezept.fdv.questions.HasReceivedCommunication;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfPostCommunication;
-import de.gematik.test.erezept.screenplay.task.SendCommunication;
+import de.gematik.test.erezept.fdv.questions.ResponseOfPostDIGADispReqCommunication;
+import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;
 import lombok.val;
@@ -42,7 +43,7 @@ public class PatientCommunicationDiGASteps {
    * @param insuranceName
    */
   @Wenn(
-      "^(?:der|die) GKV Versicherte (.+) (?:sein|ihr) (letztes|erstes) ausgestelltes (?:EVGDA"
+      "^(?:der|die) GKV Versicherte (.+) (?:sein|ihr) (letztes|erstes) ausgestelltes (?:EVDGA"
           + " E-Rezept|E-Rezept) ihrem Kostenträger (.+) zuweist$")
   public void whenRequestDispenseViaCommunication(
       String patientName, String order, String insuranceName) {
@@ -51,18 +52,34 @@ public class PatientCommunicationDiGASteps {
     when(thePatient)
         .attemptsTo(
             SendCommunication.with(
-                ResponseOfPostCommunication.dispenseDiGARequest()
+                ResponseOfPostDIGADispReqCommunication.build()
                     .forPrescriptionFromBackend(order)
                     .sentTo(theInsurance)
                     .withoutMessage())); // without message for DiGA Usecase
   }
 
+  @Dann(
+      "^kann (?:der|die) GKV Versicherte (.+) (?:sein|ihr) (letztes|erstes) ausgestelltes (?:EVDGA"
+          + " E-Rezept|E-Rezept) ihrem Kostenträger (.+) nicht zuweisen$")
+  public void requestMedicalDispenseViaCommunication(
+      String patientName, String order, String insuranceName) {
+    val thePatient = OnStage.theActorCalled(patientName);
+    val theInsurance = OnStage.theActorCalled(insuranceName);
+    then(thePatient)
+        .attemptsTo(
+            CheckTheReturnCode.of(
+                    ResponseOfPostDIGADispReqCommunication.build()
+                        .forPrescriptionFromBackend(order)
+                        .sentTo(theInsurance)
+                        .withoutMessage())
+                .isEqualTo(403)); // without message for DiGA Usecase
+  }
+
   @Und(
-      "^(?:der|die) GKV Versicherte (.+) kann für die (letzte|erste) EVGDA Verordnung Informationen"
+      "^(?:der|die) GKV Versicherte (.+) kann für die (letzte|erste) EVDGA Verordnung Informationen"
           + " vom Kostenträger (.*) im FdV einsehen$")
-  public void
-      dieGKVVersicherteHannaBäckerKannFürDieLetzteEVGDAInformationenImFdVEineBegründungEinsehen(
-          String patientName, String order, String insuranceName) {
+  public void andCheckReceivedCommunications(
+      String patientName, String order, String insuranceName) {
     val thePatient = OnStage.theActorCalled(patientName);
     val theInsurance = OnStage.theActorCalled(insuranceName);
     and(thePatient)

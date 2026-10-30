@@ -24,14 +24,15 @@ import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheKonnektor;
+import de.gematik.test.erezept.common.screenplay.questions.FhirResponseQuestion;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.abilities.UseTheKonnektor;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class ResponseOfTaskActivate extends FhirResponseQuestion<ErxTask> {
   private final PrescriptionAssignmentKind prescriptionAssignmentKind;
   private final Actor recipient;
 
-  public static ResponseOfTaskActivate asAssingnementTo(
+  public static ResponseOfTaskActivate asAssignmentTo(
       PrescriptionAssignmentKind prescriptionAssignmentKind, Actor thePatient) {
     return new ResponseOfTaskActivate(prescriptionAssignmentKind, thePatient);
   }

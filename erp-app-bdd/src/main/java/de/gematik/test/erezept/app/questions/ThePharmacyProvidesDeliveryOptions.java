@@ -22,7 +22,7 @@ package de.gematik.test.erezept.app.questions;
 
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.elements.PharmacyDeliveryOptions;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

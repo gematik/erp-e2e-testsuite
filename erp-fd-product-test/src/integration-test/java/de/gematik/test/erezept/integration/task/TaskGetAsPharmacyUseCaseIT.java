@@ -23,6 +23,7 @@ package de.gematik.test.erezept.integration.task;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCodeIs;
 import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifier.operationOutcomeHasDetailsText;
+import static de.gematik.test.erezept.actions.ErpInteractionPoller.getMinOneAENotOlderThen;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
@@ -78,13 +79,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 @Execution(ExecutionMode.SAME_THREAD)
 class TaskGetAsPharmacyUseCaseIT extends ErpTest {
 
-  private static boolean tasksInitialized = false;
-
   private static final Boolean PN3_ACTIVATE =
       featureConf.getToggle(new EgkPharmacyAcceptPN3Toggle());
   private static final Boolean ENFORCE_HCV_CHECK =
       featureConf.getToggle(new EgkPharmacyEnforceHcvCheck());
-
+  private static boolean tasksInitialized = false;
   private final VsdmService vsdmService = config.getSoftKonnVsdmService();
 
   @Actor(name = "Tina Kleinschmidt")
@@ -160,7 +159,14 @@ class TaskGetAsPharmacyUseCaseIT extends ErpTest {
   private void verifyAuditEvent(ErxAuditEvent.Representation representation) {
     val auditEventVerifier = AuditEventVerifier.forPharmacy(pharmacy).build();
     val timestamp = Instant.now();
-    val response = patient.performs(DownloadAuditEvent.orderByDateDesc());
+
+    val response =
+        ErpInteractionPoller.builder()
+            .build()
+            .poll(
+                () -> patient.performs(DownloadAuditEvent.orderByDateDesc()),
+                getMinOneAENotOlderThen(timestamp.minusSeconds(5)));
+
     if (response.getResponse().isValidPayload()) {
       val auditEvents = response.getExpectedResponse().getAuditEvents();
       auditEvents.stream()

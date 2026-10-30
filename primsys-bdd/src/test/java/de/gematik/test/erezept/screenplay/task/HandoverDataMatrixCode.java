@@ -22,11 +22,11 @@ package de.gematik.test.erezept.screenplay.task;
 
 import static java.text.MessageFormat.format;
 
-import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.common.screenplay.abilities.ManageDataMatrixCodes;
+import de.gematik.test.erezept.common.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.screenplay.util.DmcStack;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;

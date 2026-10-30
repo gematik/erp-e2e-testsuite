@@ -22,6 +22,7 @@ package de.gematik.test.eml.integration;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bundleContainsLogFor;
 import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvideDispensationVerifier.emlMedicationHasCategory;
+import static de.gematik.test.erezept.actions.ErpInteractionPoller.getAuditEventStopPollingPredicate;
 
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
@@ -85,6 +86,8 @@ public class ProvideTDispensationWithConsentIT extends ErpTest {
           .sortedBy("date", SortOrder.DESCENDING)
           .createParameter();
 
+  private final ErpInteractionPoller pollerBuilder = ErpInteractionPoller.builder().build();
+
   @TestcaseId("EML_PROVIDE_T_DISPENSATION_WITH_CONSENT_DECISION_APPLY_01")
   @ParameterizedTest(
       name =
@@ -143,8 +146,14 @@ public class ProvideTDispensationWithConsentIT extends ErpTest {
             pharmacy.getTelematikId(),
             task.getPrescriptionId(),
             List.of(emlMedicationHasCategory(MedicationCategory.C_02))));
+    val auditEvents =
+        pollerBuilder.poll(
+            () -> patient.performs(DownloadAuditEvent.withQueryParams(searchParams)),
+            getAuditEventStopPollingPredicate(
+                List.of(
+                    "Die Medikamentenabgabe wurde in die Patientenakte übertragen",
+                    "Die Medikamentenabgabe konnte nicht in die Patientenakte übertragen werden")));
 
-    val auditEvents = patient.performs(DownloadAuditEvent.withQueryParams(searchParams));
     patient.attemptsTo(
         Verify.that(auditEvents)
             .withExpectedType()

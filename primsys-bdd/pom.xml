@@ -5,7 +5,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.8.0</version>
+        <version>1.9.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -110,6 +110,53 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>erp-client</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>de.gematik.test.erezept</groupId>
+                    <artifactId>erp-client-fdv-steps</artifactId>
+                    <version>1.9.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>de.gematik.test.erezept</groupId>
+                    <artifactId>erp-client-fdv-steps</artifactId>
+                    <version>1.9.0</version>
+                    <type>test-jar</type>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>remote-fdv</id>
+            <dependencies>
+                <dependency>
+                    <groupId>de.gematik.test.erezept</groupId>
+                    <artifactId>erp-remote-fdv-steps</artifactId>
+                    <version>1.9.0</version>
+                    <type>test-jar</type>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>jakarta.activation</groupId>
+                            <artifactId>jakarta.activation-api</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>de.gematik.test.erezept</groupId>
+                    <artifactId>erp-remote-fdv-steps</artifactId>
+                    <version>1.9.0</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>jakarta.activation</groupId>
+                            <artifactId>jakarta.activation-api</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
     </profiles>
 
     <dependencies>
@@ -133,9 +180,22 @@
             <scope>test</scope>
             <type>test-jar</type>
         </dependency>
+
+        <!--erp-bdd-common is an old common dependency for BDD Testsuites!-->
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-bdd-common</artifactId>
+        </dependency>
+
+        <!--erp-common is a new common dependency containing shared functionality for FdV and AVS/PVS!-->
+        <dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-common</artifactId>
+            <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
@@ -183,43 +243,10 @@
                     <argLine>-Xmx10G</argLine>
                     <skip>${skip.inttests}</skip>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>net.serenity-bdd.maven.plugins</groupId>
                 <artifactId>serenity-maven-plugin</artifactId>
-                <version>${version.serenity}</version>
-                <configuration>
-                    <reports>single-page-html,json-summary</reports>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>net.serenity-bdd</groupId>
-                        <artifactId>serenity-single-page-report</artifactId>
-                        <version>${version.serenity}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>net.serenity-bdd</groupId>
-                        <artifactId>serenity-json-summary-report</artifactId>
-                        <version>${version.serenity}</version>
-                    </dependency>
-                </dependencies>
-                <executions>
-                    <execution>
-                        <id>serenity-reports</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>aggregate</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -235,7 +262,7 @@
             <plugin>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>bdd-javadocs</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
             </plugin>
         </plugins>
     </build>

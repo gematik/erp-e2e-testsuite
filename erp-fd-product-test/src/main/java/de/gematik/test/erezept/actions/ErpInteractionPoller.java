@@ -23,11 +23,15 @@ package de.gematik.test.erezept.actions;
 import static java.text.MessageFormat.format;
 
 import de.gematik.test.erezept.ErpInteraction;
+import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
+import java.time.Instant;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.Resource;
+import org.jspecify.annotations.NonNull;
 
 @Slf4j
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
@@ -103,5 +107,18 @@ public class ErpInteractionPoller {
     public ErpInteractionPoller build() {
       return new ErpInteractionPoller(maxRetries, waitTimeInMilliSeconds);
     }
+  }
+
+  public static @NonNull Predicate<ErxAuditEventBundle> getAuditEventStopPollingPredicate(
+      List<String> breakUpStrg) {
+    return aeb ->
+        aeb.getAuditEvents().stream()
+            .anyMatch(ae -> breakUpStrg.stream().anyMatch(s -> ae.getFirstText().contains(s)));
+  }
+
+  public static @NonNull Predicate<ErxAuditEventBundle> getMinOneAENotOlderThen(Instant timestamp) {
+    return auditEventBundle ->
+        auditEventBundle.getAuditEvents().stream()
+            .anyMatch(ae -> ae.getRecorded().toInstant().isAfter(timestamp));
   }
 }

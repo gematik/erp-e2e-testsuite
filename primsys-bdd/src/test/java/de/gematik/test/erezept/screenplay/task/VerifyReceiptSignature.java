@@ -20,10 +20,10 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
-import de.gematik.test.erezept.screenplay.abilities.*;
-import de.gematik.test.erezept.screenplay.questions.VerifyDocumentResponse;
-import de.gematik.test.erezept.screenplay.strategy.*;
-import de.gematik.test.erezept.screenplay.util.*;
+import de.gematik.test.erezept.common.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.common.screenplay.questions.VerifyDocumentResponse;
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import lombok.*;
 import net.serenitybdd.annotations.Step;
 import net.serenitybdd.core.steps.*;

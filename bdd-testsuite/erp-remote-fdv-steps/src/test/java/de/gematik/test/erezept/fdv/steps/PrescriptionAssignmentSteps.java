@@ -29,7 +29,7 @@ import net.serenitybdd.screenplay.actors.OnStage;
 
 public class PrescriptionAssignmentSteps {
   @Wenn(
-      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept in der App der Apotheke"
+      "^(?:der|die) Versicherte (.+) (?:sein|ihr) (letztes|erstes) E-Rezept der Apotheke"
           + " (.+) per Nachricht zuweist")
   public void whenAssignPrescriptionViaDispReq(String userName, String order, String pharmacyName) {
     val theAppUser = OnStage.theActorCalled(userName);

@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.gematik.test.erezept</groupId>
         <artifactId>erezept-testsuite</artifactId>
-        <version>1.8.0</version>
+        <version>1.9.0</version>
     </parent>
 
     <name>Parent Cucumber-Steps</name>
@@ -17,7 +17,6 @@
 
     <modules>
         <module>erp-remote-fdv-steps</module>
-        <module>primsys-bdd2</module>
         <module>erp-client-fdv-steps</module>
         <module>erp-client-lei-steps</module>
         <module>erp-common</module>

@@ -1,0 +1,51 @@
+/*
+ * Copyright (Change Date see Readme), gematik GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
+ */
+
+package de.gematik.test.erezept.common.apimeasure;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+
+import ca.uhn.fhir.validation.ValidationResult;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
+import de.gematik.test.erezept.client.ClientType;
+import de.gematik.test.erezept.client.usecases.TaskGetCommand;
+import de.gematik.test.erezept.fhir.r4.erp.ErxTaskBundle;
+import java.time.Duration;
+import lombok.val;
+import org.junit.jupiter.api.Test;
+
+class LoggingStopwatchTest {
+
+  @Test
+  void shouldLogMeasurements() {
+    val sw = new LoggingStopwatch();
+    val clientType = ClientType.PS;
+    val cmd = new TaskGetCommand();
+    val vr = mock(ValidationResult.class);
+    val response =
+        FhirBResponse.forPayload(ErxTaskBundle.class, null)
+            .withDuration(Duration.ofMillis(200))
+            .withStatusCode(200)
+            .andValidationResult(vr);
+    assertDoesNotThrow(() -> sw.measurement(clientType, cmd, response));
+    assertDoesNotThrow(sw::close);
+  }
+}

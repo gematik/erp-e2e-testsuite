@@ -20,8 +20,10 @@
 
 package de.gematik.test.erezept.fhir.values.json;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.extensions.erp.CommunicationPayloadType;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
@@ -71,12 +73,19 @@ public record CommunicationReplyMessage(
     private String supplyOptionsType =
         GemFaker.randomElement(SupplyOptionsType.values()).getLabel();
 
-    private String infoText = GemFaker.fakerCommunicationReplyMessage();
+    private String infoText;
     private String url;
 
     private String pickUpCodeHR;
     private String pickUpCodeDMC;
 
+    /**
+     * Attention: use with caution, as the version is set to 1 by default. Only use this method if
+     * you really need to change the version e.g. for negative testing.
+     *
+     * @param version to be set instead of the default value 1
+     * @return this builder instance
+     */
     public CommunicationReplyMessageV1Builder version(int version) {
       this.version = version;
       return this;
@@ -272,7 +281,10 @@ public record CommunicationReplyMessage(
   }
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
-  public record InTransportPosition(Double lat, Double lon) {}
+  public record InTransportPosition(
+      Double lat,
+      // lon is wrong, but we need to support (via the alias) it as long the FD is not fixed
+      @JsonAlias("lon") @JsonProperty("long") Double lon) {}
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public record InTransportETA(Long from, Long to) {}

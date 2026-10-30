@@ -23,7 +23,7 @@ package de.gematik.test.erezept.app.task;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.task.ios.SetVirtualEgkOnIOS;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import java.util.function.Supplier;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

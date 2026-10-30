@@ -30,7 +30,8 @@ import org.junit.platform.suite.api.*;
 @SelectClasspathResource("/features")
 @ConfigurationParameter(
     key = GLUE_PROPERTY_NAME,
-    value = "de.gematik.test.erezept.lei.steps,de.gematik.test.erezept.lei.hooks")
+    value =
+        "de.gematik.test.erezept.lei.steps,de.gematik.test.erezept.lei.hooks,de.gematik.test.erezept.fdv.steps,de.gematik.test.erezept.app.steps,de.gematik.test.erezept.common.steps")
 @ConfigurationParameter(
     key = PLUGIN_PROPERTY_NAME,
     value = "net.serenitybdd.cucumber.core.plugin.SerenityReporter") // SerenityReporterParallel not

@@ -26,6 +26,7 @@ import static de.gematik.test.core.expectations.verifier.OperationOutcomeVerifie
 import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.hasRedeemableByPropertiesForBundlePrescription;
 import static de.gematik.test.core.expectations.verifier.PrescriptionBundleVerifier.prescriptionInStatus;
 import static de.gematik.test.core.expectations.verifier.TaskVerifier.*;
+import static de.gematik.test.erezept.actions.ErpInteractionPoller.getAuditEventStopPollingPredicate;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
@@ -46,6 +47,10 @@ import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
+import de.gematik.test.erezept.common.screenplay.abilities.ManageDataMatrixCodes;
+import de.gematik.test.erezept.common.screenplay.abilities.ManageDoctorsPrescriptions;
+import de.gematik.test.erezept.common.screenplay.abilities.ManagePatientPrescriptions;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
@@ -55,12 +60,8 @@ import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
-import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
-import de.gematik.test.erezept.screenplay.abilities.ManageDoctorsPrescriptions;
-import de.gematik.test.erezept.screenplay.abilities.ManagePatientPrescriptions;
 import de.gematik.test.erezept.screenplay.task.IssueDiGAPrescription;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import de.gematik.test.fuzzing.core.NamedEnvelope;
 import java.time.LocalDate;
 import java.util.List;
@@ -93,7 +94,7 @@ class EuPrescriptionRedemptionMarkerIT extends ErpTest {
   @Actor(name = "Leonie Hütter")
   private PatientActor leonie;
 
-  static Stream<Arguments> mvoPrescriptionTypesProvider() {
+  private static Stream<Arguments> mvoPrescriptionTypesProvider() {
     val composer =
         ArgumentComposer.composeWith()
             .arguments(
@@ -209,7 +210,13 @@ class EuPrescriptionRedemptionMarkerIT extends ErpTest {
             .sortedBy("date", SortOrder.DESCENDING)
             .createParameter();
 
-    val auditEvents = sina.performs(DownloadAuditEvent.withQueryParams(searchParams));
+    val auditEvents =
+        ErpInteractionPoller.builder()
+            .build()
+            .poll(
+                () -> sina.performs(DownloadAuditEvent.withQueryParams(searchParams)),
+                getAuditEventStopPollingPredicate(
+                    List.of("hat Markierung zu Einlösung im EU Ausland gespeichert")));
 
     leonie.attemptsTo(
         Verify.that(auditEvents)

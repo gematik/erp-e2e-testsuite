@@ -23,13 +23,13 @@ package de.gematik.test.erezept.actors;
 import static de.gematik.test.erezept.fhir.builder.GemFaker.randomElement;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
+import de.gematik.test.erezept.common.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.extensions.erp.CommunicationPayloadType;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.fhir.valuesets.DeliveryStatus;
 import de.gematik.test.erezept.fhir.valuesets.ReadyForCollecting;
-import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;

@@ -22,9 +22,9 @@ package de.gematik.test.eml.tasks;
 
 import de.gematik.test.core.expectations.verifier.VerificationStep;
 import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

@@ -47,7 +47,7 @@ class KbvBasePatientTest extends ErpFhirParsingTest {
     val expectedGkvKvnr = "K220635158";
     assertEquals(expectedGkvKvnr, patient.getGkvId().orElseThrow().getValue());
 
-    assertEquals("Königsstein, Ludger", patient.getFullname());
+    assertEquals("Ludger Königsstein", patient.getFullname());
     assertNotNull(patient.getDescription());
   }
 

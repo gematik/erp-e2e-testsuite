@@ -26,6 +26,10 @@ public enum EmlBfd implements RequirementsSet {
   B_FD_1571(
       "B_FD-1571",
       "Mapping MedicationRequest-DosageInstruction, https://service.gematik.de/browse/B_FD-1571"),
+  B_FD_1701(
+      "B_FD-1701",
+      "OWASP konforme Korrektur der Exportierten Daten an den ePA FD,"
+          + " https://service.gematik.de/browse/B_FD-1701"),
   ;
 
   @Getter private final Requirement requirement;

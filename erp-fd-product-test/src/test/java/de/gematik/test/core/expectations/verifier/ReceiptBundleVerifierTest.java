@@ -20,8 +20,6 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;

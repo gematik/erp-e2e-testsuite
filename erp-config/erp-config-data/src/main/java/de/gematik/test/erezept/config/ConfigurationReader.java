@@ -25,7 +25,7 @@ import de.gematik.bbriccs.konnektor.cfg.KonnektorModuleConfigurationDto;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.app.ErpAppConfigurationBase;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
-import de.gematik.test.erezept.config.dto.remotefdv.RemoteFdVConfigurationBase;
+import de.gematik.test.erezept.config.dto.remotefdv.RemoteFdVBaseConfiguration;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -77,9 +77,9 @@ public class ConfigurationReader<DTO extends BaseConfigurationDto> {
     return forConfiguration(ErpAppConfigurationBase.class, TestsuiteconfigurationScope.ERP_APP);
   }
 
-  public static Builder<RemoteFdVConfigurationBase> forRemoteFdVConfiguration() {
+  public static Builder<RemoteFdVBaseConfiguration> forRemoteFdVConfiguration() {
     return forConfiguration(
-        RemoteFdVConfigurationBase.class, TestsuiteconfigurationScope.ERP_REMOTEFDV);
+        RemoteFdVBaseConfiguration.class, TestsuiteconfigurationScope.ERP_REMOTEFDV);
   }
 
   /**

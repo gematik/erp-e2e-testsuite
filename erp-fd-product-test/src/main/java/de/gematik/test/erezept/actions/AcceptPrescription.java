@@ -22,12 +22,12 @@ package de.gematik.test.erezept.actions;
 
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.client.usecases.TaskAcceptCommand;
+import de.gematik.test.erezept.common.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.val;

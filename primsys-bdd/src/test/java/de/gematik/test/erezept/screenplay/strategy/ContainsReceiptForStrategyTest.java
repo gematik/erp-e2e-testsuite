@@ -26,7 +26,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
-import de.gematik.test.erezept.screenplay.util.DispenseReceipt;
+import de.gematik.test.erezept.common.screenplay.strategy.AmountAdverb;
+import de.gematik.test.erezept.common.screenplay.util.DispenseReceipt;
 import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.Test;

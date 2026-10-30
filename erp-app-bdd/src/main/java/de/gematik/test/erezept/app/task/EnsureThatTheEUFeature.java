@@ -26,7 +26,7 @@ import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.Debug;
 import de.gematik.test.erezept.app.mobile.elements.FeatureFlagScreen;
 import de.gematik.test.erezept.app.mobile.elements.Settings;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;

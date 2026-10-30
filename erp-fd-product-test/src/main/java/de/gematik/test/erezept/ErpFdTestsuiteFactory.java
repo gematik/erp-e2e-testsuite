@@ -38,8 +38,9 @@ import de.gematik.test.erezept.abilities.*;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.ErpActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.apimeasure.ApiCallStopwatch;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
+import de.gematik.test.erezept.common.apimeasure.ApiCallStopwatch;
+import de.gematik.test.erezept.common.screenplay.abilities.*;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.actor.*;
@@ -106,8 +107,6 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
   public <A extends Actor> void equipAsDoctor(A actor) {
     val name = actor.getName();
-    // TODO tbd
-    // val useResourceComparator = UseResourceComparator.with(new StructureMapsHapiComparator());
     log.info("Equip Doctor {}", name);
 
     val cfg = this.getDoctorConfig(name);
@@ -121,7 +120,6 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
         .describedAs(cfg.getDescription())
         .whoCan(UseSMCB.itHasAccessTo(smcb))
         .can(UsePoppTokenGenerator.with(getPoppTokenGenerator(), smcb))
-        // .can(useResourceComparator)
         .can(UseHBA.itHasAccessTo(hba))
         .can(useTheKonnektor)
         .can(useTheErpClientFrom(cfg).authenticatingWith(useTheKonnektor))

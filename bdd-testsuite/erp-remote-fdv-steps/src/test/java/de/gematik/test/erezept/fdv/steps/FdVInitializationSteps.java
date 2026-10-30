@@ -26,44 +26,40 @@ import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.smartcards.DummyEgk;
 import de.gematik.bbriccs.smartcards.cfg.SmartcardConfigDto;
+import de.gematik.test.erezept.common.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.config.ConfigurationReader;
-import de.gematik.test.erezept.fdv.cfg.ErpRemoteFdVConfiguration;
+import de.gematik.test.erezept.fdv.cfg.RemoteFdVBaseConfigWrapper;
 import de.gematik.test.erezept.fdv.cfg.RemoteFdVFactory;
 import de.gematik.test.erezept.fdv.task.SetUpRemoteFdV;
-import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
 import io.cucumber.java.Before;
 import io.cucumber.java.de.Angenommen;
-import io.cucumber.java.de.Wenn;
 import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
 
 public class FdVInitializationSteps {
-  private ErpRemoteFdVConfiguration config;
+  private RemoteFdVBaseConfigWrapper config;
 
   @Before
   public void setUp() {
     config =
         ConfigurationReader.forRemoteFdVConfiguration()
-            .wrappedBy(ErpRemoteFdVConfiguration::fromDto);
+            .wrappedBy(RemoteFdVBaseConfigWrapper::fromDto);
 
     OnStage.setTheStage(Cast.ofStandardActors());
   }
 
   @Angenommen(
-      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat die"
-          + " (?:Remote-FdV|E-Rezept App) auf (?:seinem|ihrem) Smartphone eingerichtet$")
-  @Wenn(
-      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) die (?:Remote-FdV|E-Rezept"
-          + " App) auf (?:seinem|ihrem) Smartphone eingerichtet hat$")
+      "^(?:der|die) (GKV|PKV|BG|SEL|SOZ|GPV|PPV|BEI) Versicherte (.+) hat Zugriff auf"
+          + " (?:seine|ihre) (?:digitale Identität|eGK)$")
   public void initPatient(String insuranceType, String userName) {
     val useTheRemoteFdV = RemoteFdVFactory.forUser(userName, config);
 
     val theAppUser = OnStage.theActorCalled(userName);
-    val kvnr = config.getAppUserByName(userName).getKvnr();
+    val kvnr = config.getFdVUserConfig(userName).getKvnr();
 
     theAppUser.describedAs(format("Eine {0} App-Nutzer des E-Rezept", insuranceType));
     givenThat(theAppUser).can(useTheRemoteFdV);
@@ -77,7 +73,7 @@ public class FdVInitializationSteps {
     givenThat(theAppUser).can(ManageDataMatrixCodes.sheGetsPrescribed());
     givenThat(theAppUser).can(ReceiveDispensedDrugs.forHimself());
 
-    // walk through onboarding
-    givenThat(theAppUser).attemptsTo(SetUpRemoteFdV.forUser(config.getAppUserByName(userName)));
+    // start and login with a kvnr on the remoteFdV
+    givenThat(theAppUser).attemptsTo(SetUpRemoteFdV.forUser(userName, config));
   }
 }

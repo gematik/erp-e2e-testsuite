@@ -20,11 +20,11 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfGetTaskById;
-import de.gematik.test.erezept.screenplay.questions.VerifyDocumentResponse;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.common.screenplay.questions.VerifyDocumentResponse;
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfGetTaskByIdAsPharmacy;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
@@ -46,7 +46,7 @@ public class GetPrescriptionById implements Task {
   public <T extends Actor> void performAs(T actor) {
     val prescriptionManager = SafeAbility.getAbility(actor, ManagePharmacyPrescriptions.class);
 
-    val response = actor.asksFor(ResponseOfGetTaskById.asPharmacy(deque));
+    val response = actor.asksFor(ResponseOfGetTaskByIdAsPharmacy.with(deque));
     val acceptBundle = response.getExpectedResource();
 
     // Note: A_24179 on "erneuter Abruf Verordnung" the FD does not send the AccessCode again

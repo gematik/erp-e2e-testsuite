@@ -23,11 +23,11 @@ package de.gematik.test.erezept.lei.steps;
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.questions.HasDownloadableOpenTask;
 import de.gematik.test.erezept.screenplay.questions.HasRetrieved;
 import de.gematik.test.erezept.screenplay.questions.RetrieveExamEvidence;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Wenn;
 import lombok.val;

@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.val;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -861,7 +861,7 @@ class KbvErpBundleBuilderTest extends ErpFhirParsingTest {
           "[{index}] -> Create a prescription bundle with a SupplyRequest (with versions"
               + " KbvItaForVersion {0} and KbvItaErpVersion {1})")
   @MethodSource("de.gematik.test.erezept.fhir.testutil.VersionArgumentProvider#kbvBundleVersions")*/
-  @Ignore(
+  @Disabled(
       "just reactivate after solving the spookey issue:[ERROR in Line 1 at Bundle]: Rule"
           + " -erp-angabeUnfallkennzeichenArbeitsunfallBerufskrankheitVerbot: 'In der Ressource vom"
           + " Typ MedicationRequest ist das Unfallkennzeichen für einen Arbeitsunfall oder"

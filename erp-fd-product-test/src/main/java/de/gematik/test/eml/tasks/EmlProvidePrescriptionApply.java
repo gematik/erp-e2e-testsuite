@@ -23,7 +23,7 @@ package de.gematik.test.eml.tasks;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.core.exceptions.EpaMockClientException;
 import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

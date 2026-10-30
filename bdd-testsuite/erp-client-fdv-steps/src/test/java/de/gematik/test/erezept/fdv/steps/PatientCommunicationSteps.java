@@ -23,15 +23,14 @@ package de.gematik.test.erezept.fdv.steps;
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
-import de.gematik.test.erezept.fdv.questions.HasReceivedCommunication;
-import de.gematik.test.erezept.fdv.questions.HistSentCommunications;
-import de.gematik.test.erezept.fdv.questions.PatientDoesHaveMessagesForTask;
-import de.gematik.test.erezept.fdv.task.CheckTheReturnCode;
+import de.gematik.test.erezept.common.screenplay.questions.ResponseOfGetCommunicationFrom;
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.common.screenplay.task.CheckTheReturnCode;
+import de.gematik.test.erezept.common.screenplay.task.DeleteSentCommunication;
+import de.gematik.test.erezept.common.screenplay.task.SendCommunication;
+import de.gematik.test.erezept.fdv.questions.*;
 import de.gematik.test.erezept.fdv.task.DeleteAllSentCommunications;
 import de.gematik.test.erezept.fdv.task.RedeemPrescription;
-import de.gematik.test.erezept.screenplay.questions.*;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
-import de.gematik.test.erezept.screenplay.task.*;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Wenn;
 import lombok.val;
@@ -57,7 +56,7 @@ public class PatientCommunicationSteps {
     when(thePatient)
         .attemptsTo(
             SendCommunication.with(
-                ResponseOfPostCommunication.dispenseRequest()
+                ResponseOfPostDispReqCommunication.build()
                     .forPrescriptionFromBackend(order)
                     .sentTo(thePharmacy)
                     .withRandomMessage()));
@@ -80,7 +79,7 @@ public class PatientCommunicationSteps {
     when(thePatient)
         .attemptsTo(
             SendCommunication.with(
-                ResponseOfPostCommunication.infoRequest()
+                ResponseOfPostInfoReqCommunication.build()
                     .forPrescriptionFromBackend(order) // letzte | erste
                     .sentTo(thePharmacy)
                     .withRandomMessage()));
@@ -95,7 +94,7 @@ public class PatientCommunicationSteps {
     when(thePatient)
         .attemptsTo(
             SendCommunication.with(
-                ResponseOfPostCommunication.infoRequest()
+                ResponseOfPostInfoReqCommunication.build()
                     .forPrescriptionFromBackend(order) // letzte | erste
                     .sentTo(thePharmacy)
                     .withRandomMessage()));
@@ -152,7 +151,7 @@ public class PatientCommunicationSteps {
     when(thePatient)
         .attemptsTo(
             SendCommunication.with(
-                ResponseOfPostCommunication.representative()
+                ResponseOfPostRepresentativeCommunication.build()
                     .forPrescriptionFromBackend(order) // letzte | erste
                     .sentTo(theRepresentative)
                     .withRandomMessage()));
@@ -168,7 +167,7 @@ public class PatientCommunicationSteps {
     then(thePatient)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfPostCommunication.representative()
+                    ResponseOfPostRepresentativeCommunication.build()
                         .forPrescriptionFromBackend(order) // letzte | erste
                         .sentTo(theRepresentative)
                         .withRandomMessage())
@@ -202,6 +201,15 @@ public class PatientCommunicationSteps {
         .attemptsTo(Ensure.that(PatientDoesHaveMessagesForTask.fromStack(order)).isFalse());
   }
 
+  @Dann(
+      "^kann (?:der|die) Versicherte (.+) weiterhin die Nachrichten zu (?:seinem|ihrem)"
+          + " (ersten|letzten) E-Rezept abrufen$")
+  public void thenPatientCanGetCommunicationsBasedOnTask(String patientName, String order) {
+    val thePatient = OnStage.theActorCalled(patientName);
+    then(thePatient)
+        .attemptsTo(Ensure.that(PatientDoesHaveMessagesForTask.fromStack(order)).isTrue());
+  }
+
   @Wenn("^(?:der|die) Versicherte (.+) alle (?:seinem|ihre) versendeten Nachrichten löscht$")
   public void whenPatientDeletesAllCommunications(String patientName) {
     val thePatient = OnStage.theActorCalled(patientName);
@@ -220,7 +228,7 @@ public class PatientCommunicationSteps {
   public void thenPatientCannotGetAnyCommunications(String patientName) {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
-        .attemptsTo(Ensure.that(HistSentCommunications.onBackend().noneExistAnymore()).isTrue());
+        .attemptsTo(Ensure.that(HisSentCommunications.onBackend().noneExistAnymore()).isTrue());
   }
 
   @Dann(
@@ -230,7 +238,7 @@ public class PatientCommunicationSteps {
     val thePatient = OnStage.theActorCalled(patientName);
     then(thePatient)
         .attemptsTo(
-            Ensure.that(HistSentCommunications.onBackend().fromQueueStillExists(order)).isFalse());
+            Ensure.that(HisSentCommunications.onBackend().fromQueueStillExists(order)).isFalse());
   }
 
   @Wenn(

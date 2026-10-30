@@ -35,6 +35,7 @@ public abstract class ErxComPrescriptionBuilder<B extends ErxCommunicationBuilde
   protected IKNR insuranceIknr;
   protected PrescriptionFlowType flowType;
   protected KbvErpMedication medication;
+  protected String orderId;
   protected String aboutReference;
   protected AvailabilityStatus availabilityStatus;
   protected SupplyOptionsType supplyOptionsType = SupplyOptionsType.createDefault();
@@ -95,6 +96,18 @@ public abstract class ErxComPrescriptionBuilder<B extends ErxCommunicationBuilde
     //    due to the AccessCode HAPI will cut Task/ (the leading resource)
     //    trick HAPI by providing '/' in front of the leading resource
     this.baseOnReference = "/" + this.baseOnReference;
+    return self();
+  }
+
+  /**
+   * The orderId is a synthetic identifier which is used by the FdV to group messages together. It
+   * is not part of the FHIR specification but also not forbidden.
+   *
+   * @param orderId to be used for grouping communication messages together
+   * @return the builder instance
+   */
+  public B orderId(String orderId) {
+    this.orderId = orderId;
     return self();
   }
 }

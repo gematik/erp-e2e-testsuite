@@ -23,10 +23,10 @@ package de.gematik.test.erezept.lei.steps;
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
-import de.gematik.test.erezept.screenplay.questions.ResponseOfAbortOperation;
+import de.gematik.test.erezept.common.screenplay.questions.ResponseOfAbortOperation;
+import de.gematik.test.erezept.common.screenplay.task.AbortPrescription;
+import de.gematik.test.erezept.common.screenplay.task.CheckTheReturnCode;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfAbortUnaccepted;
-import de.gematik.test.erezept.screenplay.task.AbortPrescription;
-import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
 import io.cucumber.java.de.Wenn;

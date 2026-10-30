@@ -833,4 +833,18 @@ class EpaOpProvidePrescriptionVerifierTest extends ErpFhirParsingTest {
     val step = emlMedRequestDosageHasText("Wrong Text");
     assertThrows(AssertionError.class, () -> step.apply(epaOpProvidePrescriptionWithPzn));
   }
+
+  @Test
+  void shouldValidateEpaMedicationRequestDosageInstructionWithExpectedText() {
+    val step = emlMedRequestDosageHasExpectedText("1-0-0-0");
+
+    assertDoesNotThrow(() -> step.apply(epaOpProvidePrescriptionWithPzn));
+  }
+
+  @Test
+  void shouldThrowWhileValidateEpaMedicationRequestDosageInstructionWithUnexpectedText() {
+    val step = emlMedRequestDosageHasExpectedText("Wrong Text");
+
+    assertThrows(AssertionError.class, () -> step.apply(epaOpProvidePrescriptionWithPzn));
+  }
 }

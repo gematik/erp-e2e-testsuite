@@ -2,10 +2,6 @@ activeEnvironment: TU
 
 preferManualSteps: false
 
-pspClientConfig:
-  url: DUMMY VALUE
-  auth: DUMMY VALUE
-
 actors:
   doctors:
     - name: Adelheid Ulmenwald
@@ -70,6 +66,8 @@ actors:
       qualificationType: Arzt
       konnektor: Soft-Konn
 
+      ## Achtung !! ab hier bitt mit bedacht und nur bewusster Einsatz
+
     - name: Kein Arzt
       description: "Akteur mit Apotheker-HBA und Arztpraxis SMC-B der sich als Arzt ausgibt"
       smcbIccsn: 80276001011699901102 # Praxis Bernd Rosenstrauch
@@ -85,6 +83,25 @@ actors:
       algorithm: E256
       qualificationType: Arzt
       konnektor: Soft-Konn
+
+    - name: TelematikId Leerzeichen Anfang
+      smcbIccsn: praxis_telematik_id_leerzeichen_beginn # bewusst manipulierte TelematikID
+      hbaIccsn: 80276001099699901399 # bewusst manipulierte TelematikID
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
+    - name: TelematikId Leerzeichen Mitte
+      smcbIccsn: praxis_telematik_id_leerzeichen_mitte # bewusst manipulierte TelematikID
+      hbaIccsn: 80276001099699901398 # bewusst manipulierte TelematikID
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
+    - name: TelematikId Leerzeichen Ende
+      smcbIccsn: praxis_telematik_id_leerzeichen_ende # bewusst manipulierte TelematikID
+      hbaIccsn: 80276001099699901397 # bewusst manipulierte TelematikID
+      qualificationType: Arzt
+      konnektor: Soft-Konn
+
 
   pharmacies:
     - name: Am Flughafen

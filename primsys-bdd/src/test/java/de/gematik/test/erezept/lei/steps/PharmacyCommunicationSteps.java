@@ -24,9 +24,11 @@ import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
 import de.gematik.bbriccs.rest.fd.exceptions.UnexpectedResponseResourceError;
-import de.gematik.test.erezept.screenplay.questions.HasNewSubscriptionPing;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfGetCommunicationFrom;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfPostCommunication;
+import de.gematik.test.erezept.common.screenplay.questions.ResponseOfGetCommunicationFrom;
+import de.gematik.test.erezept.common.screenplay.task.CheckTheReturnCode;
+import de.gematik.test.erezept.common.screenplay.task.DeleteSentCommunication;
+import de.gematik.test.erezept.common.screenplay.task.SendCommunication;
+import de.gematik.test.erezept.screenplay.questions.*;
 import de.gematik.test.erezept.screenplay.task.*;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;
@@ -70,7 +72,7 @@ public class PharmacyCommunicationSteps {
     when(thePharmacy)
         .attemptsTo(
             SendCommunication.with(
-                ResponseOfPostCommunication.reply()
+                ResponseOfPostReplyCommunication.build()
                     .forCommunicationRequestFromBackend(order) // letzte | erste
                     .receivedFrom(thePatient)
                     .withRandomMessage()));
@@ -83,7 +85,7 @@ public class PharmacyCommunicationSteps {
     when(thePharmacy)
         .attemptsTo(
             SendCommunication.with(
-                ResponseOfPostCommunication.reply()
+                ResponseOfPostReplyCommunication.build()
                     .forCommunicationRequestFromBackend(order) // letzte | erste
                     .receivedFrom(thePatient)
                     .withRandomMessage()));
@@ -100,7 +102,7 @@ public class PharmacyCommunicationSteps {
         .attemptsTo(
             Negate.the(
                     SendCommunication.with(
-                        ResponseOfPostCommunication.reply()
+                        ResponseOfPostReplyCommunication.build()
                             .forCommunicationRequestFromBackend(order)
                             .receivedFrom(thePatient)
                             .withRandomMessage()))
@@ -118,7 +120,7 @@ public class PharmacyCommunicationSteps {
     when(thePharmacy)
         .attemptsTo(
             SendCommunication.with(
-                ResponseOfPostCommunication.changeReply()
+                ResponseOfPostChangeReplyCommunication.build()
                     .forCommunicationRequestFromBackend(order)
                     .receivedFrom(thePatient)
                     .withRandomMessage()));

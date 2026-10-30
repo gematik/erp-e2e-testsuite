@@ -22,7 +22,7 @@ package de.gematik.test.erezept.app.steps;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.app.questions.DeletingThePrescription;
 import de.gematik.test.erezept.app.questions.HasReceivedDispensedMedication;
@@ -158,8 +158,8 @@ public class PrescriptionSteps {
   public void thenReceivedPrescription(String userName, String order) {
     val theAppUser = OnStage.theActorCalled(userName);
     assertTrue(
-        "E-Rezept elektronisch nicht erhalten",
-        then(theAppUser).asksFor(HasReceivedDispensedMedication.fromStack(order)));
+        then(theAppUser).asksFor(HasReceivedDispensedMedication.fromStack(order)),
+        "E-Rezept elektronisch nicht erhalten");
   }
 
   @Dann("^hat (?:der|die) Versicherte das (letzte|erste) E-Rezept elektronisch erhalten")
@@ -167,7 +167,7 @@ public class PrescriptionSteps {
   public void thenReceivedPrescription(String order) {
     val theAppUser = OnStage.theActorInTheSpotlight();
     assertTrue(
-        "E-Rezept elektronisch nicht erhalten",
-        then(theAppUser).asksFor(HasReceivedDispensedMedication.fromStack(order)));
+        then(theAppUser).asksFor(HasReceivedDispensedMedication.fromStack(order)),
+        "E-Rezept elektronisch nicht erhalten");
   }
 }

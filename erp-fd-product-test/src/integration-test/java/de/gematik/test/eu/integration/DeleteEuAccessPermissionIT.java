@@ -25,11 +25,13 @@ import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.bund
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
 import static de.gematik.test.core.expectations.verifier.ErxEuAccessPermissionVerifier.hasCorrectProfile;
 import static de.gematik.test.core.expectations.verifier.ErxEuAccessPermissionVerifier.validUntilWithinOneHour;
+import static de.gematik.test.erezept.actions.ErpInteractionPoller.getAuditEventStopPollingPredicate;
 
 import de.gematik.test.core.annotations.Actor;
 import de.gematik.test.core.annotations.TestcaseId;
 import de.gematik.test.erezept.ErpTest;
 import de.gematik.test.erezept.actions.DownloadAuditEvent;
+import de.gematik.test.erezept.actions.ErpInteractionPoller;
 import de.gematik.test.erezept.actions.Verify;
 import de.gematik.test.erezept.actions.eu.DeleteEuAccessPermission;
 import de.gematik.test.erezept.actions.eu.EuGrantConsent;
@@ -41,6 +43,7 @@ import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
@@ -94,7 +97,15 @@ class DeleteEuAccessPermissionIT extends ErpTest {
             .withAuthoredOnAndFilter(LocalDate.now(), SearchPrefix.EQ)
             .sortedBy("date", SortOrder.DESCENDING)
             .createParameter();
-    val audit = sina.performs(DownloadAuditEvent.withQueryParams(searchParams));
+    val audit =
+        ErpInteractionPoller.builder()
+            .build()
+            .poll(
+                () -> sina.performs(DownloadAuditEvent.withQueryParams(searchParams)),
+                getAuditEventStopPollingPredicate(
+                    List.of(
+                        "Sie haben die Zugriffsberechtigung zum Einlösen von E-Rezepten für das"
+                            + " Land MT gelöscht.")));
 
     sina.attemptsTo(
         Verify.that(audit)

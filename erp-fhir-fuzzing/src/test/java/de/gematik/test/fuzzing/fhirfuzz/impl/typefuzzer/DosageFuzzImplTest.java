@@ -21,10 +21,10 @@
 package de.gematik.test.fuzzing.fhirfuzz.impl.typefuzzer;
 
 import static de.gematik.test.fuzzing.fhirfuzz.CentralIterationSetupForTests.REPETITIONS;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.fuzzing.fhirfuzz.impl.typesfuzzer.CodeableConceptFuzzImpl;
 import de.gematik.test.fuzzing.fhirfuzz.impl.typesfuzzer.DosageFuzzImpl;
@@ -40,7 +40,6 @@ import org.hl7.fhir.r4.model.Dosage;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Ratio;
 import org.hl7.fhir.r4.model.Timing;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
@@ -75,7 +74,7 @@ class DosageFuzzImplTest {
   void shouldFuzzSequence() {
     assertFalse(dosage.hasSequence());
     dosageFuzzImpl.fuzz(dosage);
-    Assertions.assertTrue(dosage.hasSequence());
+    assertTrue(dosage.hasSequence());
     val testObject = fuzzerContext.getRandom().nextInt();
     dosage.setSequence(testObject);
     fuzzConfig.setPercentOfAll(0.00f);
@@ -87,7 +86,7 @@ class DosageFuzzImplTest {
   void shouldFuzzText() {
     assertFalse(dosage.hasText());
     dosageFuzzImpl.fuzz(dosage);
-    Assertions.assertTrue(dosage.hasText());
+    assertTrue(dosage.hasText());
     val testObject = fuzzerContext.getStringFuzz().generateRandom(100);
     dosage.setText(testObject);
     fuzzConfig.setPercentOfAll(0.00f);
@@ -99,7 +98,7 @@ class DosageFuzzImplTest {
   void shouldFuzTiming() {
     assertFalse(dosage.hasTiming());
     dosageFuzzImpl.fuzz(dosage);
-    Assertions.assertTrue(dosage.hasTiming());
+    assertTrue(dosage.hasTiming());
     val testObject =
         fuzzerContext
             .getTypeFuzzerFor(Timing.class, () -> new TimingFuzzImpl(fuzzerContext))
@@ -114,7 +113,7 @@ class DosageFuzzImplTest {
   void shouldFuzzAdditionalInstr() {
     assertFalse(dosage.hasAdditionalInstruction());
     dosageFuzzImpl.fuzz(dosage);
-    Assertions.assertTrue(dosage.hasAdditionalInstruction());
+    assertTrue(dosage.hasAdditionalInstruction());
     val testObject =
         fuzzerContext
             .getTypeFuzzerFor(
@@ -130,7 +129,7 @@ class DosageFuzzImplTest {
   void shouldFuzzPatientInstr() {
     assertFalse(dosage.hasPatientInstruction());
     dosageFuzzImpl.fuzz(dosage);
-    Assertions.assertTrue(dosage.hasPatientInstruction());
+    assertTrue(dosage.hasPatientInstruction());
     val testObject = fuzzerContext.getStringFuzz().generateRandom(100);
     dosage.setPatientInstruction(testObject);
     fuzzConfig.setPercentOfAll(0.00f);
@@ -142,7 +141,7 @@ class DosageFuzzImplTest {
   void shouldFuzzSite() {
     assertFalse(dosage.hasSite());
     dosageFuzzImpl.fuzz(dosage);
-    Assertions.assertTrue(dosage.hasSite());
+    assertTrue(dosage.hasSite());
     val testObject =
         fuzzerContext
             .getTypeFuzzerFor(
@@ -158,7 +157,7 @@ class DosageFuzzImplTest {
   void shouldFuzzRoute() {
     assertFalse(dosage.hasRoute());
     dosageFuzzImpl.fuzz(dosage);
-    Assertions.assertTrue(dosage.hasRoute());
+    assertTrue(dosage.hasRoute());
     val testObject =
         fuzzerContext
             .getTypeFuzzerFor(
@@ -174,7 +173,7 @@ class DosageFuzzImplTest {
   void shouldFuzzMethod() {
     assertFalse(dosage.hasMethod());
     dosageFuzzImpl.fuzz(dosage);
-    Assertions.assertTrue(dosage.hasMethod());
+    assertTrue(dosage.hasMethod());
     val testObject =
         fuzzerContext
             .getTypeFuzzerFor(
@@ -190,7 +189,7 @@ class DosageFuzzImplTest {
   void shouldFuzzMaxDosePeriod() {
     assertFalse(dosage.hasMaxDosePerPeriod());
     dosageFuzzImpl.fuzz(dosage);
-    Assertions.assertTrue(dosage.hasMaxDosePerPeriod());
+    assertTrue(dosage.hasMaxDosePerPeriod());
     val testObject =
         fuzzerContext
             .getTypeFuzzerFor(Ratio.class, () -> new RatioTypeFuzzerImpl(fuzzerContext))
@@ -205,7 +204,7 @@ class DosageFuzzImplTest {
   void shouldFuzzMaxDosePerAdmin() {
     assertFalse(dosage.hasMaxDosePerAdministration());
     dosageFuzzImpl.fuzz(dosage);
-    Assertions.assertTrue(dosage.hasMaxDosePerAdministration());
+    assertTrue(dosage.hasMaxDosePerAdministration());
     val testObject =
         fuzzerContext
             .getTypeFuzzerFor(Quantity.class, () -> new SimpleQuantityFuzzImpl(fuzzerContext))
@@ -220,7 +219,7 @@ class DosageFuzzImplTest {
   void shouldFuzzMaxDPerLifetime() {
     assertFalse(dosage.hasMaxDosePerLifetime());
     dosageFuzzImpl.fuzz(dosage);
-    Assertions.assertTrue(dosage.hasMaxDosePerLifetime());
+    assertTrue(dosage.hasMaxDosePerLifetime());
     val testObject =
         fuzzerContext
             .getTypeFuzzerFor(Quantity.class, () -> new SimpleQuantityFuzzImpl(fuzzerContext))

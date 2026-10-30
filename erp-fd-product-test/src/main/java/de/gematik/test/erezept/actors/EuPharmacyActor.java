@@ -22,9 +22,9 @@ package de.gematik.test.erezept.actors;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.test.erezept.abilities.ProvidePharmacyBaseData;
+import de.gematik.test.erezept.common.screenplay.abilities.UseSMCB;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
-import de.gematik.test.erezept.screenplay.abilities.UseSMCB;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

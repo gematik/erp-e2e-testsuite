@@ -32,5 +32,6 @@ import org.junit.platform.suite.api.Suite;
 @SelectClasspathResource("/features")
 @ConfigurationParameter(
     key = GLUE_PROPERTY_NAME,
-    value = "de.gematik.test.erezept.lei.steps,de.gematik.test.erezept.app.steps")
+    value =
+        "de.gematik.test.erezept.lei.steps,de.gematik.test.erezept.app.steps,de.gematik.test.erezept.common.steps")
 public class CompleteTestSuite {}

@@ -22,7 +22,7 @@ package de.gematik.test.erezept.actions.rawhttpactions;
 
 import de.gematik.test.erezept.abilities.RawHttpAbility;
 import de.gematik.test.erezept.actions.rawhttpactions.pki.PKICertificatesDTOEnvelop;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import java.util.Optional;
 import kong.unirest.core.HttpResponse;
 import lombok.AllArgsConstructor;

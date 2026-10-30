@@ -20,20 +20,20 @@
 
 package de.gematik.test.erezept.screenplay.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.InvalidValueSetException;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.util.List;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class FlowTypeUtilTest {
+class FlowTypeUtilTest {
 
   @Test
-  public void shouldTakeOverrideCode() {
+  void shouldTakeOverrideCode() {
     val codes = List.of("160", "169", "200");
     val expected =
         List.of(
@@ -54,7 +54,7 @@ public class FlowTypeUtilTest {
   }
 
   @Test
-  public void shouldThrowOnInvalidOverrideCode() {
+  void shouldThrowOnInvalidOverrideCode() {
     val codes = List.of("161", "170", "201", "");
     codes.forEach(
         code ->
@@ -66,7 +66,7 @@ public class FlowTypeUtilTest {
   }
 
   @Test
-  public void shouldReasonWorkflowType() {
+  void shouldReasonWorkflowType() {
     val insuranceKinds =
         List.of(InsuranceTypeDe.GKV, InsuranceTypeDe.GKV, InsuranceTypeDe.PKV, InsuranceTypeDe.PKV);
     val assignementKinds =
@@ -93,7 +93,7 @@ public class FlowTypeUtilTest {
   }
 
   @Test
-  public void should160OnUnsupportedInsuranceKind() {
+  void should160OnUnsupportedInsuranceKind() {
     val unsupported =
         List.of(
             InsuranceTypeDe.BG,

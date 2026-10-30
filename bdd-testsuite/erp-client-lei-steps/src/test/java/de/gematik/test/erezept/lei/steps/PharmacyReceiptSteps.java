@@ -22,6 +22,8 @@ package de.gematik.test.erezept.lei.steps;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.questions.HasReceipts;
 import de.gematik.test.erezept.screenplay.task.RetrieveReceiptAgain;
 import de.gematik.test.erezept.screenplay.task.VerifyReceiptSignature;
@@ -37,6 +39,21 @@ public class PharmacyReceiptSteps {
   public void hasReceipts(String pharmName, String adverb, long amount) {
     val thePharmacy = OnStage.theActorCalled(pharmName);
     then(thePharmacy).attemptsTo(Ensure.that(HasReceipts.of(adverb, amount)).isTrue());
+  }
+
+  @Dann(
+      "^hat die Apotheke (.+) (mindestens|maximal|genau) (\\d+) Quittung(?:en)? für (.+)"
+          + " vorliegen$")
+  @Und(
+      "^die Apotheke hat (.+) (mindestens|maximal|genau) (\\d+) Quittung(?:en)? für (.+)"
+          + " vorliegen$")
+  public void hasReceiptFor(String pharmName, String adverb, long amount, String patientName) {
+    val thePharmacy = OnStage.theActorCalled(pharmName);
+    val thePatient = OnStage.theActorCalled(patientName);
+    val kvnr = SafeAbility.getAbility(thePatient, ProvideEGK.class).getKvnr();
+
+    then(thePharmacy)
+        .attemptsTo(Ensure.that(HasReceipts.forPatient(adverb, amount, kvnr)).isTrue());
   }
 
   /**

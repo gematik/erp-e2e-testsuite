@@ -39,6 +39,7 @@ public class PatientDto {
   private String kvnr;
 
   private InsuranceTypeDto insuranceType;
+  private String namePrefix;
   private String firstName;
   private String lastName;
 
@@ -57,6 +58,7 @@ public class PatientDto {
   public static class Builder {
     private final String kvnr;
     private InsuranceTypeDto insuranceType = InsuranceTypeDto.GKV;
+    private String namePrefix;
     private String firstName;
     private String lastName;
     private Date birthDate;
@@ -109,7 +111,7 @@ public class PatientDto {
 
     public PatientDto build() {
       return new PatientDto(
-          kvnr, insuranceType, firstName, lastName, birthDate, city, postal, street);
+          kvnr, insuranceType, namePrefix, firstName, lastName, birthDate, city, postal, street);
     }
   }
 }

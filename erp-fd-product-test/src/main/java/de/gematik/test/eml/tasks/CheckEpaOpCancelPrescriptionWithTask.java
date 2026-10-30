@@ -24,8 +24,8 @@ import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpCancel
 
 import de.gematik.test.core.expectations.requirements.EmlAfos;
 import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

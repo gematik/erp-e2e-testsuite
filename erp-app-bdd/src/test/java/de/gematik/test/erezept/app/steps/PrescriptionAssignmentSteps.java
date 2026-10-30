@@ -22,8 +22,8 @@ package de.gematik.test.erezept.app.steps;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.app.questions.IsIssued;
 import de.gematik.test.erezept.app.questions.ListRedeemedPrescriptions;

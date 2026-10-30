@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 class CommunicationReplyMessageTest {
 
@@ -96,8 +97,7 @@ class CommunicationReplyMessageTest {
 
   @Test
   void shouldRespectNullableFields() {
-
-    val msg = CommunicationReplyMessage.forV1().build();
+    val msg = CommunicationReplyMessage.forV1().infoText("Hello World").build();
 
     assertNull(msg.transactionID());
     assertNull(msg.text());
@@ -128,6 +128,16 @@ class CommunicationReplyMessageTest {
     assertNotNull(msg.inTransportETA());
     assertEquals(1735736400L, msg.inTransportETA().from());
     assertEquals(1735741800L, msg.inTransportETA().to());
+
+    // Note: the validator does not detect the lon/long issue
+    // check by hand, that this value is renamed to long
+    val objectMapper = new ObjectMapper();
+    val rawMessage = objectMapper.writeValueAsString(msg);
+    val transportPosition = objectMapper.readTree(rawMessage).path("inTransportPosition");
+    assertFalse(transportPosition.has("lon"), "longitude must be serialized as long and not lon");
+    assertTrue(
+        transportPosition.has("long"), "long missing in:\n" + rawMessage); // with append g -> long
+    assertEquals("13.38", transportPosition.get("long").asString());
   }
 
   @Test

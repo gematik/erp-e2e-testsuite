@@ -21,8 +21,8 @@
 package de.gematik.test.erezept.fdv.steps;
 
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.test.erezept.PrimSysBddFactory;
-import de.gematik.test.erezept.apimeasure.DumpingStopwatch;
+import de.gematik.test.erezept.common.PrimSysBddFactory;
+import de.gematik.test.erezept.common.apimeasure.DumpingStopwatch;
 import de.gematik.test.erezept.config.ConfigurationReader;
 import io.cucumber.java.BeforeAll;
 import io.cucumber.java.de.Angenommen;

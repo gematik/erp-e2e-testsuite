@@ -25,6 +25,7 @@ import de.gematik.bbriccs.fhir.coding.SemanticValue;
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.coding.version.ProfileVersion;
 import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.util.IdentifierUtil;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
@@ -35,6 +36,7 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.hl7.fhir.r4.model.Communication;
+import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Resource;
 
 @Slf4j
@@ -158,5 +160,12 @@ public class ErxCommunication extends Communication {
         .orElseThrow(
             () ->
                 new MissingFieldException(ErxCommunication.class, "Profile of Communication Type"));
+  }
+
+  public Optional<String> getOrderId() {
+    return this.getIdentifier().stream()
+        .filter(ErpWorkflowNamingSystem.ORDER_ID::matches)
+        .map(Identifier::getValue)
+        .findFirst();
   }
 }

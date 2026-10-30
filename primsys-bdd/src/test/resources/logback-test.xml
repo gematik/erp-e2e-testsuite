@@ -36,6 +36,9 @@
     <logger name="de.gematik.test.erezept.client" level="WARN" additivity="false">
         <appender-ref ref="REST"/>
     </logger>
+    <logger name="de.gematik.test.erezept.remotefdv.client" level="INFO" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
     <logger name="de.gematik" level="WARN" additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>

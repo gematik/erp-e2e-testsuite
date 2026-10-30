@@ -42,7 +42,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import lombok.val;
 import org.hl7.fhir.r4.model.Timing;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -183,7 +183,7 @@ class GemOperationInputParameterBuilderTest extends ErpFhirParsingTest {
    * https://service.gematik.de/browse/ANFERP-4169 and tracked in B-FD_1699, Abweichende Generierung
    * / Validierung der Strukturierten Dosierinformationen
    */
-  @Ignore("this Unittest takes rd. about 10 seconds to run, so it is disabled for now")
+  @Disabled("this Unittest takes rd. about 10 seconds to run, so it is disabled for now")
   void shouldValidateExtrasBigDosageCorrect() {
 
     val dosageDGMP1 =

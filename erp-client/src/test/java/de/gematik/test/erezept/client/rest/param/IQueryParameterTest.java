@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.client.rest.param;
 
 import static de.gematik.test.erezept.client.rest.param.IQueryParameter.queryListFromUrl;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
@@ -29,7 +29,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import lombok.val;
 import org.hl7.fhir.r4.model.Identifier;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class IQueryParameterTest {
@@ -115,8 +114,8 @@ class IQueryParameterTest {
   @Test
   void shouldBuildBundlePagingQueryWithSort() {
     val iQP = IQueryParameter.search().sortedBy("date", SortOrder.DESCENDING).createParameter();
-    Assertions.assertEquals("_sort", iQP.get(0).parameter());
-    Assertions.assertEquals("-date", iQP.get(0).value());
+    assertEquals("_sort", iQP.get(0).parameter());
+    assertEquals("-date", iQP.get(0).value());
   }
 
   @Test
@@ -125,38 +124,38 @@ class IQueryParameterTest {
         IQueryParameter.search()
             .withAuthoredOnAndFilter(LocalDate.of(1, Month.JANUARY, 1), SearchPrefix.EQ)
             .createParameter();
-    Assertions.assertEquals("authored-on", iQP.get(0).parameter());
-    Assertions.assertEquals("eq0001-01-01", iQP.get(0).value());
+    assertEquals("authored-on", iQP.get(0).parameter());
+    assertEquals("eq0001-01-01", iQP.get(0).value());
   }
 
   @Test
   void shouldBuildBundlePagingQueryWithSortedBy() {
     val iQP = IQueryParameter.search().sortedBy("date", SortOrder.ASCENDING).createParameter();
-    Assertions.assertEquals("_sort", iQP.get(0).parameter());
-    Assertions.assertEquals("date", iQP.get(0).value());
+    assertEquals("_sort", iQP.get(0).parameter());
+    assertEquals("date", iQP.get(0).value());
   }
 
   @Test
   void shouldBuildBundlePagingQueryWithWasSent() {
     val testDate = LocalDate.of(2024, Month.JULY, 30);
     val iQP = IQueryParameter.search().wasSent(testDate, SearchPrefix.GT).createParameter();
-    Assertions.assertEquals("sent", iQP.get(0).parameter());
-    Assertions.assertEquals("gt2024-07-30", iQP.get(0).value());
+    assertEquals("sent", iQP.get(0).parameter());
+    assertEquals("gt2024-07-30", iQP.get(0).value());
   }
 
   @Test
   void shouldBuildBundlePagingQueryWithReceived() {
     val testDate = LocalDate.of(2024, Month.JULY, 30);
     val iQP = IQueryParameter.search().wasReceived(testDate, SearchPrefix.GT).createParameter();
-    Assertions.assertEquals("received", iQP.get(0).parameter());
-    Assertions.assertEquals("gt2024-07-30", iQP.get(0).value());
+    assertEquals("received", iQP.get(0).parameter());
+    assertEquals("gt2024-07-30", iQP.get(0).value());
   }
 
   @Test
   void shouldBuildBundlePagingQueryWithSender() {
     val iQP = IQueryParameter.search().hasSender("id").createParameter();
-    Assertions.assertEquals("sender", iQP.get(0).parameter());
-    Assertions.assertEquals("id", iQP.get(0).value());
+    assertEquals("sender", iQP.get(0).parameter());
+    assertEquals("id", iQP.get(0).value());
   }
 
   @Test
@@ -165,8 +164,8 @@ class IQueryParameterTest {
         IQueryParameter.search()
             .identifier(new Identifier().setSystem("123").setValue("456"))
             .createParameter();
-    Assertions.assertEquals("identifier", iQP.get(0).parameter());
-    Assertions.assertEquals("123|456", iQP.get(0).value());
+    assertEquals("identifier", iQP.get(0).parameter());
+    assertEquals("123|456", iQP.get(0).value());
   }
 
   @Test
@@ -175,15 +174,15 @@ class IQueryParameterTest {
         IQueryParameter.search()
             .identifierValue(new Identifier().setSystem("123").setValue("456"))
             .createParameter();
-    Assertions.assertEquals("identifier", iQP.get(0).parameter());
-    Assertions.assertEquals("456", iQP.get(0).value());
+    assertEquals("identifier", iQP.get(0).parameter());
+    assertEquals("456", iQP.get(0).value());
   }
 
   @Test
   void shouldBuildBundlePagingQueryWithRecipient() {
     val iQP = IQueryParameter.search().andRecipient("id").createParameter();
-    Assertions.assertEquals("recipient", iQP.get(0).parameter());
-    Assertions.assertEquals("id", iQP.get(0).value());
+    assertEquals("recipient", iQP.get(0).parameter());
+    assertEquals("id", iQP.get(0).value());
   }
 
   @Test
@@ -192,8 +191,8 @@ class IQueryParameterTest {
         IQueryParameter.search()
             .whenHandedOver(SearchPrefix.EQ, LocalDate.of(1, Month.JANUARY, 1))
             .createParameter();
-    Assertions.assertEquals("whenhandedover", iQP.get(0).parameter());
-    Assertions.assertEquals("eq0001-01-01", iQP.get(0).value());
+    assertEquals("whenhandedover", iQP.get(0).parameter());
+    assertEquals("eq0001-01-01", iQP.get(0).value());
   }
 
   @Test
@@ -202,14 +201,14 @@ class IQueryParameterTest {
         IQueryParameter.search()
             .whenPrepared(SearchPrefix.EQ, LocalDate.of(1, Month.JANUARY, 1))
             .createParameter();
-    Assertions.assertEquals("whenprepared", iQP.get(0).parameter());
-    Assertions.assertEquals("eq0001-01-01", iQP.get(0).value());
+    assertEquals("whenprepared", iQP.get(0).parameter());
+    assertEquals("eq0001-01-01", iQP.get(0).value());
   }
 
   @Test
   void shouldBuildSearchQueryWithPerformer() {
     val iQP = IQueryParameter.search().fromPerformer(TelematikID.from("1")).createParameter();
-    Assertions.assertEquals("performer", iQP.get(0).parameter());
-    Assertions.assertEquals("1", iQP.get(0).value());
+    assertEquals("performer", iQP.get(0).parameter());
+    assertEquals("1", iQP.get(0).value());
   }
 }

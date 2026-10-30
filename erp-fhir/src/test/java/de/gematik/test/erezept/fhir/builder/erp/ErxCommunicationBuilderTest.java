@@ -122,6 +122,7 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
             .receiver("606358757")
             .sender(KVNR.randomStringValue())
             .flowType(PrescriptionFlowType.FLOW_TYPE_160)
+            .orderId("123123123123")
             .build();
 
     val result = ValidatorUtil.encodeAndValidate(parser, dispReq);
@@ -130,6 +131,10 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
     // check basedOn-Reference
     assertEquals(taskId, dispReq.getBasedOnReferenceId());
     assertEquals(accessCode, dispReq.getBasedOnAccessCode().orElseThrow());
+
+    // check the orderId
+    assertTrue(dispReq.getOrderId().isPresent(), "OrderId should be present");
+    assertEquals("123123123123", dispReq.getOrderId().orElseThrow());
   }
 
   @Test
@@ -205,10 +210,15 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
             .sender("606358757")
             .availabilityStatus(AvailabilityStatus.AS_30)
             .supplyOptions(SupplyOptionsType.SHIPMENT)
+            .orderId("123123123123")
             .build();
 
     val result = ValidatorUtil.encodeAndValidate(parser, reply);
     assertTrue(result.isSuccessful());
+
+    // check the orderId
+    assertTrue(reply.getOrderId().isPresent(), "OrderId should be present");
+    assertEquals("123123123123", reply.getOrderId().orElseThrow());
   }
 
   @ParameterizedTest(name = "[{index}] -> Build CommunicationReply with E-Rezept FHIR Profiles {0}")

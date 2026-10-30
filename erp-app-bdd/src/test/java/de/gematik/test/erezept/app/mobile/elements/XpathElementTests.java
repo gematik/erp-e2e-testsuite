@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.app.mobile.elements;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import de.gematik.test.erezept.app.mobile.PlatformType;

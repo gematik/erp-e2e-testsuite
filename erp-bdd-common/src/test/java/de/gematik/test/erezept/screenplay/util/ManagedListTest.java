@@ -24,19 +24,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ManagedListTest {
+class ManagedListTest {
 
   @Test
-  public void shouldDetectEmptyManagedList() {
+  void shouldDetectEmptyManagedList() {
     val ml = new ManagedList<String>(() -> "nothing here yet");
     assertTrue(ml.isEmpty());
     assertEquals(0, ml.getRawList().size());
   }
 
   @Test
-  public void shouldDetectNonEmptyManagedList() {
+  void shouldDetectNonEmptyManagedList() {
     val ml = new ManagedList<String>(() -> "nothing here yet");
     ml.append("Hello World");
     assertFalse(ml.isEmpty());
@@ -44,7 +44,7 @@ public class ManagedListTest {
   }
 
   @Test
-  public void shouldGetLastFirstWithoutConsumeFromManagedList() {
+  void shouldGetLastFirstWithoutConsumeFromManagedList() {
     val ml = new ManagedList<String>(() -> "nothing here yet");
     ml.append("first");
     ml.append("last");
@@ -58,7 +58,7 @@ public class ManagedListTest {
   }
 
   @Test
-  public void shouldConsumeFirstLastFromManagedList() {
+  void shouldConsumeFirstLastFromManagedList() {
     val ml = new ManagedList<String>(() -> "nothing here yet");
     ml.append("first");
     ml.append("last");
@@ -71,7 +71,7 @@ public class ManagedListTest {
   }
 
   @Test
-  public void shouldConsumeLastFirstFromManagedList() {
+  void shouldConsumeLastFirstFromManagedList() {
     val ml = new ManagedList<String>(() -> "nothing here yet");
     ml.append("first");
     ml.append("last");
@@ -84,7 +84,7 @@ public class ManagedListTest {
   }
 
   @Test
-  public void shouldPrependOnManagedList() {
+  void shouldPrependOnManagedList() {
     val ml = new ManagedList<String>(() -> "nothing here yet");
     ml.append("last");
     ml.prepend("first");
@@ -94,7 +94,7 @@ public class ManagedListTest {
   }
 
   @Test
-  public void shouldThrowOnEmptyManagedList() {
+  void shouldThrowOnEmptyManagedList() {
     val ml = new ManagedList<String>(() -> "nothing here yet");
     assertTrue(ml.isEmpty());
     assertThrows(MissingPreconditionError.class, ml::getFirst);

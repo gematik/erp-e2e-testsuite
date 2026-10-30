@@ -23,8 +23,8 @@ package de.gematik.test.erezept.lei.steps;
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
+import de.gematik.test.erezept.common.screenplay.task.CheckTheReturnCode;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfTaskActivate;
-import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
 import de.gematik.test.erezept.screenplay.task.IssueDiGAPrescription;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import io.cucumber.java.de.Dann;
@@ -59,7 +59,7 @@ public class DoctorPrescribeDiGASteps {
     then(theDoctor)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfTaskActivate.asAssingnementTo(
+                    ResponseOfTaskActivate.asAssignmentTo(
                         PrescriptionAssignmentKind.PHARMACY_ONLY, thePatient))
                 .isEqualTo(400));
   }
@@ -77,7 +77,7 @@ public class DoctorPrescribeDiGASteps {
     then(theDoctor)
         .attemptsTo(
             CheckTheReturnCode.of(
-                    ResponseOfTaskActivate.asAssingnementTo(
+                    ResponseOfTaskActivate.asAssignmentTo(
                         PrescriptionAssignmentKind.DIRECT_ASSIGNMENT, thePatient))
                 .isEqualTo(400));
   }

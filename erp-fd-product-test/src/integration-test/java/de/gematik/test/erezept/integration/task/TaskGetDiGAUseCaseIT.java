@@ -34,12 +34,12 @@ import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.KtrActor;
 import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
-import de.gematik.test.erezept.screenplay.abilities.ManagePharmacyPrescriptions;
-import de.gematik.test.erezept.screenplay.questions.ResponseOfGetTaskById;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.common.screenplay.abilities.ManageDataMatrixCodes;
+import de.gematik.test.erezept.common.screenplay.abilities.ManagePharmacyPrescriptions;
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfGetTaskByIdAsKtr;
 import de.gematik.test.erezept.screenplay.task.IssueDiGAPrescription;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
@@ -86,7 +86,7 @@ class TaskGetDiGAUseCaseIT extends ErpTest {
     SafeAbility.getAbility(ktr, ManagePharmacyPrescriptions.class)
         .appendAcceptedPrescription(acceptedPrescription);
 
-    val response = ktr.asksFor(ResponseOfGetTaskById.asKtr(DequeStrategy.FIFO));
+    val response = ktr.asksFor(ResponseOfGetTaskByIdAsKtr.with(DequeStrategy.FIFO));
 
     ktr.attemptsTo(
         Verify.that(new ErpInteraction<>(response))

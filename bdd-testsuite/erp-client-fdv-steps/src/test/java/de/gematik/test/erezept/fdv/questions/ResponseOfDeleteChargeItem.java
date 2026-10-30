@@ -1,0 +1,59 @@
+/*
+ * Copyright (Change Date see Readme), gematik GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * *******
+ *
+ * For additional notes and disclaimer from gematik and in case of changes by gematik find details in the "Readme" file.
+ */
+
+package de.gematik.test.erezept.fdv.questions;
+
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
+import de.gematik.bbriccs.rest.fd.FhirBResponse;
+import de.gematik.test.erezept.client.usecases.ChargeItemDeleteCommand;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.common.screenplay.questions.FhirResponseQuestion;
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
+import de.gematik.test.erezept.screenplay.abilities.ReceiveDispensedDrugs;
+import lombok.val;
+import net.serenitybdd.screenplay.Actor;
+
+public class ResponseOfDeleteChargeItem extends FhirResponseQuestion<EmptyResource> {
+
+  private final DequeStrategy deque;
+
+  private ResponseOfDeleteChargeItem(DequeStrategy deque) {
+    this.deque = deque;
+  }
+
+  @Override
+  public FhirBResponse<EmptyResource> answeredBy(Actor actor) {
+    val dispensedDrugs = SafeAbility.getAbility(actor, ReceiveDispensedDrugs.class);
+    val erpClient = SafeAbility.getAbility(actor, UseTheErpClient.class);
+
+    val dispensationInformation = deque.chooseFrom(dispensedDrugs.getDispensedDrugsList());
+    val cmd = new ChargeItemDeleteCommand(dispensationInformation.prescriptionId());
+    return erpClient.request(cmd);
+  }
+
+  public static ResponseOfDeleteChargeItem fromStack(String order) {
+    return fromStack(DequeStrategy.fromString(order));
+  }
+
+  public static ResponseOfDeleteChargeItem fromStack(DequeStrategy deque) {
+    return new ResponseOfDeleteChargeItem(deque);
+  }
+}

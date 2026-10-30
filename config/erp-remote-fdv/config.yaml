@@ -1,25 +1,81 @@
 shouldLogCapabilityStatement: true
 
+
+
 users:
   - name: Sina Hüllmann
     kvnr: X110609524
-    useVirtualEgk: false
-    remoteFdV: DUMMY VALUE
-  - name: Alice
-    kvnr: X110645443
-    useVirtualEgk: false
-    remoteFdV: RU-mock-LTU_RU
+    remoteFdV: TK-remoteFdV-RU-DEV-Android
+    #following actors use the same KVNR as Sina Hüllmann for testing purposes
+    #this works because there are no test scenarios where more than one patient is present
+    #in the same test scenario that can be run with remoteFdV
+  - name: Hanna Bäcker
+    kvnr: X110609524
+    remoteFdV: TK-remoteFdV-RU-DEV-Android
+  - name: Günther Angermänn
+    kvnr: X110609524
+    remoteFdV: TK-remoteFdV-RU-DEV-Android
+  - name: Leonie Hütter
+    kvnr: X110609524
+    remoteFdV: TK-remoteFdV-RU-DEV-Android
+
 
 remote-fdv:
   - name: mock-local
-    url: https://localhost:443
-    version: 1.0.1
+    url: http://localhost:8080
+    version: 1.1.7
     accessKey: apiKey2024
-  - name: RU-mock-LTU_RU
+
+  - name: mock-remoteFdV-RU
     url: https://erp-remote-fdv.dev.gematik.solutions
-    version: 1.0.1
+    version: 1.1.7
     accessKey: apiKey2024
-  - name: RU-DEV-mock-LTU_RU
+
+  - name: mock-remoteFdV-RU-DEV
     url: https://erp-remote-fdv.ru-dev.gematik.solutions
-    version: 1.0.1
+    version: 1.1.7
     accessKey: apiKey2024
+
+  - name: TK-remoteFdV-RU-DEV-Android
+    url: https://remote-fdv-ref.api.tk.de/erp/erezept-1
+    version: 2.3.21
+    mTLS:
+      keystorePath: mTLS/gematik_eRezeptClientKeystore.p12
+      keystorePassword: DUMMY_VALUE
+      truststorePath: mTLS/gemTruststore.p12
+      truststorePassword: DUMMY_VALUE
+
+  - name: RISE-remoteFdV-RU-DEV-Android
+    url: https://gematik-testtreiber.rt.rise-tim.de/epa-erezept-farm-management
+    version: XX.X.X
+    mTLS:
+      keystorePath: mTLS/gematik_eRezeptClientKeystore.p12
+      keystorePassword: DUMMY_VALUE
+      truststorePath: mTLS/gemTruststore.p12
+      truststorePassword: DUMMY_VALUE
+    deviceManagement:
+       isActive: true
+       deviceId: 5
+
+  - name: RISE-remoteFdV-RU-DEV-iOS
+    url: https://gematik-testtreiber.rt.rise-tim.de/epa-erezept-farm-management
+    version: 26.3.1
+    mTLS:
+      keystorePath: mTLS/gematik_eRezeptClientKeystore.p12
+      keystorePassword: DUMMY_VALUE
+      truststorePath: mTLS/gemTruststore.p12
+      truststorePassword: DUMMY_VALUE
+    deviceManagement:
+      isActive: true
+      deviceId: 2
+
+  - name: EY-remoteFdV-RU-DEV
+    url: https://devicefarmmgmt.tu.epa.ccod4hcc.com/erp-fdv-test-farm
+    version: 1.2.1
+    mTLS:
+      keystorePath: mTLS/gematik_eRezeptClientKeystore.p12
+      keystorePassword: DUMMY_VALUE
+      truststorePath: mTLS/gemTruststore.p12
+      truststorePassword: DUMMY_VALUE
+    deviceManagement:
+       isActive: true

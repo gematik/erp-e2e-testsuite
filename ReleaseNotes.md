@@ -1,9 +1,16 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 1.9.0
+
+* erp-fd-product-test:
+    - implement a generic PollingWrapper to Poll e. g. auditevents to stabilize Testruns
+
+
 ## Release 1.8.0
 
 * primsys-bbd:
   - Moved the OCSP URL from ActivateTaskQesIT to the central configuration 
+  - Remove PSP client configuration and related code
 
 * erp-fhir:
     - add de.gematik.erezept-workflow.r4-1.6.4

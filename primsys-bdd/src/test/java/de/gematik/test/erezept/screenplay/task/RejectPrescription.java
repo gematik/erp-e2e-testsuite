@@ -20,8 +20,8 @@
 
 package de.gematik.test.erezept.screenplay.task;
 
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.questions.ResponseOfRejectOperation;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -20,16 +20,17 @@
 
 package de.gematik.test.erezept.app.task;
 
-import static de.gematik.test.erezept.screenplay.task.BillingInformationConsent.ConsentAction.*;
+import static de.gematik.test.erezept.common.screenplay.task.BillingInformationConsent.ConsentAction.GRANT;
+import static de.gematik.test.erezept.common.screenplay.task.BillingInformationConsent.ConsentAction.REVOKE;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.app.questions.IsEUConsentPresent;
 import de.gematik.test.erezept.client.usecases.eu.EuConsentDeleteCommand;
 import de.gematik.test.erezept.client.usecases.eu.EuConsentPostCommand;
+import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.common.screenplay.task.BillingInformationConsent;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
-import de.gematik.test.erezept.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.screenplay.task.BillingInformationConsent;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;

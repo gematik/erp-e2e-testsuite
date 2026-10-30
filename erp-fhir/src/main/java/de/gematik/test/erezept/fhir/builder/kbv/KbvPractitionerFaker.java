@@ -22,6 +22,7 @@ package de.gematik.test.erezept.fhir.builder.kbv;
 
 import static de.gematik.test.erezept.fhir.builder.GemFaker.*;
 
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvPractitioner;
 import de.gematik.test.erezept.fhir.values.AsvFachgruppennummer;
@@ -32,6 +33,7 @@ import de.gematik.test.erezept.fhir.valuesets.QualificationType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import lombok.val;
 
 public class KbvPractitionerFaker {
@@ -44,7 +46,9 @@ public class KbvPractitionerFaker {
   private KbvPractitionerFaker(KbvItaForVersion forVersion) {
     this.forVersion = forVersion;
     val qualificationType = randomElement(QualificationType.DOCTOR, QualificationType.DENTIST);
-    this.withName(fakerFirstName(), fakerLastName())
+    // 70% chance to add a prefix to the name
+    val prefix = chanceOf(0.7, GemFaker::generateNamePrefix).orElse(null);
+    this.withName(prefix, fakerFirstName(), fakerLastName())
         .withQualificationType(fakerProfession())
         .withAnr(BaseANR.randomFromQualification(qualificationType));
   }
@@ -58,7 +62,11 @@ public class KbvPractitionerFaker {
   }
 
   public KbvPractitionerFaker withName(String firstName, String lastName) {
-    builderConsumers.put("name", b -> b.name(firstName, lastName));
+    return withName(null, firstName, lastName);
+  }
+
+  public KbvPractitionerFaker withName(@Nullable String prefix, String firstName, String lastName) {
+    builderConsumers.put("name", b -> b.name(firstName, lastName, prefix));
     return this;
   }
 

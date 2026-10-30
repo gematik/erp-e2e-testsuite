@@ -22,12 +22,12 @@ package de.gematik.test.erezept.fdv.questions;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.gematik.test.erezept.common.screenplay.abilities.ManageDataMatrixCodes;
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.fdv.abilities.UseTheRemoteFdVClient;
 import de.gematik.test.erezept.remotefdv.client.PatientRequests;
-import de.gematik.test.erezept.screenplay.abilities.ManageDataMatrixCodes;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.util.DmcStack;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import net.serenitybdd.annotations.Step;

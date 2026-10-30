@@ -22,8 +22,8 @@ package de.gematik.test.erezept.lei.steps;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 
-import de.gematik.test.erezept.screenplay.questions.ResponseOfGetTaskById;
-import de.gematik.test.erezept.screenplay.task.CheckTheReturnCode;
+import de.gematik.test.erezept.common.screenplay.task.CheckTheReturnCode;
+import de.gematik.test.erezept.screenplay.questions.ResponseOfGetTaskByIdAsPharmacy;
 import de.gematik.test.erezept.screenplay.task.GetPrescriptionById;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Wenn;
@@ -53,6 +53,7 @@ public class PharmacyGetTaskSteps {
   public void thenCanNotGetTaskById(String pharmaName, String order) {
     val thePharmacy = OnStage.theActorCalled(pharmaName);
     when(thePharmacy)
-        .attemptsTo(CheckTheReturnCode.of(ResponseOfGetTaskById.asPharmacy(order)).isEqualTo(412));
+        .attemptsTo(
+            CheckTheReturnCode.of(ResponseOfGetTaskByIdAsPharmacy.with(order)).isEqualTo(412));
   }
 }

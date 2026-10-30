@@ -21,7 +21,7 @@
 package de.gematik.test.erezept.app.steps;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.app.mobile.elements.Mainscreen;
 import de.gematik.test.erezept.app.questions.IsElementAvailable;
@@ -35,8 +35,8 @@ public class OnboardingSteps {
   public void thenUserCanSeeTheMainscreen() {
     val theAppUser = OnStage.theActorInTheSpotlight();
     assertTrue(
+        then(theAppUser).asksFor(IsElementAvailable.withName(Mainscreen.LOGIN_BUTTON)),
         "Onboarding wurde erfolgreich durchlaufen und wir prüfen, ob wir uns auf dem Mainscreen der"
-            + " App befinden",
-        then(theAppUser).asksFor(IsElementAvailable.withName(Mainscreen.LOGIN_BUTTON)));
+            + " App befinden");
   }
 }

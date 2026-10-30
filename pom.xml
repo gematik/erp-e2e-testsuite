@@ -7,7 +7,7 @@
 
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erezept-testsuite</artifactId>
-    <version>1.8.0</version>
+    <version>1.9.0</version>
     <packaging>pom</packaging>
 
     <name>E-Rezept E2E Testsuite</name>
@@ -78,13 +78,13 @@
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 
-        <version.serenity>5.3.11</version.serenity>
+        <version.serenity>5.4.1</version.serenity>
         <version.idp-client>30.1.0</version.idp-client>
-        <version.jackson.core>3.2.3</version.jackson.core>
-        <version.jackson.dataformat>3.2.3</version.jackson.dataformat>
-        <version.jackson.jaxrs>3.2.3</version.jackson.jaxrs>
-        <version.jackson.jakarta>3.2.3</version.jackson.jakarta>
-        <version.junit>5.14.4</version.junit>
+        <version.jackson.core>3.2.4</version.jackson.core>
+        <version.jackson.dataformat>3.2.4</version.jackson.dataformat>
+        <version.jackson.jaxrs>3.2.4</version.jackson.jaxrs>
+        <version.jackson.jakarta>3.2.4</version.jackson.jakarta>
+        <version.junit>6.1.3</version.junit>
         <version.assertj>3.27.7</version.assertj>
         <version.junit-pioneer>2.3.0</version.junit-pioneer>
         <version.mockito>5.24.0</version.mockito>
@@ -145,87 +145,98 @@
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>smartcard</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-client</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir-fuzzing</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-mock-client</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-fhir</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-fhir</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-bdd-common</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.test.erezept</groupId>
+                <artifactId>erp-common</artifactId>
+                <version>1.9.0</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.test.erezept</groupId>
+                <artifactId>erp-common</artifactId>
+                <type>test-jar</type>
+                <version>1.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-cli-common</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-data</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-client</artifactId>
-                <version>1.8.0</version>
+                <version>1.9.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.idp</groupId>
@@ -284,7 +295,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.22.1</version>
+                <version>1.23.0</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
@@ -302,54 +313,16 @@
             <!-- Serenity-BDD -->
             <dependency>
                 <groupId>net.serenity-bdd</groupId>
-                <artifactId>serenity-core</artifactId>
+                <artifactId>serenity-bom</artifactId>
                 <version>${version.serenity}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.serenity-bdd</groupId>
-                <artifactId>serenity-model</artifactId>
-                <version>${version.serenity}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <dependency>
-                <groupId>net.serenity-bdd</groupId>
-                <artifactId>serenity-cucumber</artifactId>
-                <version>${version.serenity}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.serenity-bdd</groupId>
-                <artifactId>serenity-screenplay</artifactId>
-                <version>${version.serenity}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.serenity-bdd</groupId>
-                <artifactId>serenity-screenplay-rest</artifactId>
-                <version>${version.serenity}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.serenity-bdd</groupId>
-                <artifactId>serenity-rest-assured</artifactId>
-                <version>${version.serenity}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.serenity-bdd</groupId>
-                <artifactId>serenity-ensure</artifactId>
-                <version>${version.serenity}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.serenity-bdd</groupId>
-                <artifactId>serenity-junit5</artifactId>
-                <version>${version.serenity}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.serenity-bdd</groupId>
-                <artifactId>serenity-junit</artifactId>
-                <version>${version.serenity}</version>
-            </dependency>
-            <dependency>
                 <groupId>io.cucumber</groupId>
                 <artifactId>cucumber-junit-platform-engine</artifactId>
-                <version>7.34.9</version>
+                <version>8.0.4</version>
             </dependency>
 
             <dependency>
@@ -633,12 +606,12 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.18.14</version>
+                <version>1.18.15</version>
             </dependency>
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy-agent</artifactId>
-                <version>1.18.14</version>
+                <version>1.18.15</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -655,11 +628,6 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -710,6 +678,43 @@
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>3.5.6</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>net.serenity-bdd.maven.plugins</groupId>
+                    <artifactId>serenity-maven-plugin</artifactId>
+                    <version>${version.serenity}</version>
+                    <configuration>
+                        <reports>single-page-html,json-summary</reports>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>serenity-reports</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>aggregate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>net.serenity-bdd</groupId>
+                            <artifactId>serenity-single-page-report</artifactId>
+                            <version>${version.serenity}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>net.serenity-bdd</groupId>
+                            <artifactId>serenity-json-summary-report</artifactId>
+                            <version>${version.serenity}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -801,7 +806,7 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>3.10.3</version>
+                <version>3.10.4</version>
                 <configuration>
                     <!--generischer ansatz-->
                     <formats>
@@ -1002,7 +1007,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.11.0</version>
+                        <version>0.12.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>

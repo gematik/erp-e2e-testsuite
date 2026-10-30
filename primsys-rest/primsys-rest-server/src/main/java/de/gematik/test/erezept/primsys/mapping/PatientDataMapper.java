@@ -59,7 +59,7 @@ public class PatientDataMapper extends DataMapper<PatientDto, KbvPatient> {
     // anyway, if no check was performed on the KVNR, we will still use a random one
     return KbvPatientBuilder.builder()
         .kvnr(getKvnr())
-        .name(dto.getFirstName(), dto.getLastName())
+        .name(dto.getFirstName(), dto.getLastName(), dto.getNamePrefix())
         .birthDate(dto.getBirthDate())
         .address(Country.D, dto.getCity(), dto.getPostal(), dto.getStreet())
         .build();
@@ -84,6 +84,7 @@ public class PatientDataMapper extends DataMapper<PatientDto, KbvPatient> {
     dto.setInsuranceType(InsuranceTypeDto.valueOf(patient.getInsuranceType().getCode()));
 
     val humanName = patient.getNameFirstRep();
+    dto.setNamePrefix(humanName.getPrefixAsSingleString());
     dto.setFirstName(humanName.getGivenAsSingleString());
     dto.setLastName(humanName.getFamily());
     dto.setBirthDate(patient.getBirthDate());

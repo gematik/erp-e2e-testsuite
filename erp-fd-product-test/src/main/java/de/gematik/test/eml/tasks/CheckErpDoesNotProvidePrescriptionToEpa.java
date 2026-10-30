@@ -24,11 +24,11 @@ import static de.gematik.test.core.expectations.verifier.emlverifier.EpaOpProvid
 
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
+import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
 import de.gematik.test.erezept.eml.PollingTimeoutException;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
-import de.gematik.test.erezept.screenplay.util.SafeAbility;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

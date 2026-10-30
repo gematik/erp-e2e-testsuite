@@ -23,9 +23,10 @@ package de.gematik.test.erezept.lei.steps;
 import static net.serenitybdd.screenplay.GivenWhenThen.*;
 
 import de.gematik.bbriccs.rest.fd.exceptions.UnexpectedResponseResourceError;
+import de.gematik.test.erezept.common.screenplay.strategy.DequeStrategy;
+import de.gematik.test.erezept.common.screenplay.task.CheckTheReturnCode;
 import de.gematik.test.erezept.exceptions.MissingPreconditionError;
 import de.gematik.test.erezept.screenplay.questions.*;
-import de.gematik.test.erezept.screenplay.strategy.DequeStrategy;
 import de.gematik.test.erezept.screenplay.task.*;
 import io.cucumber.java.de.Dann;
 import io.cucumber.java.de.Und;

@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.fuzzing.fhirfuzz.FuzzMain;
 import lombok.val;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 class MainFuzzTest {
 
@@ -49,7 +49,7 @@ class MainFuzzTest {
    * that Test-Call is only an Example how to use the Main.exe and how to format and handed over
    * possible Json - Configs
    */
-  @Ignore
+  @Disabled("Only for Playground and Example how to use the Fuzzer")
   void main() {
     val pathToBundle = "fhir/valid/kbv/1.0.2/bundle/5a3458b0-8364-4682-96e2-b262b2ab16eb.xml";
     // val pathToBundle2 = "fhir/valid/kbv/1.1.0/bundle/5a3458b0-8364-4682-96e2-b262b2ab16eb.xml";

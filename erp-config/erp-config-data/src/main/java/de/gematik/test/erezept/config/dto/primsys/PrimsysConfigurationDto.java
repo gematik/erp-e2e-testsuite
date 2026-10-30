@@ -25,7 +25,6 @@ import de.gematik.bbriccs.konnektor.cfg.KonnektorConfiguration;
 import de.gematik.bbriccs.popp.PoppTokenGeneratorConfiguration;
 import de.gematik.test.erezept.config.dto.actor.ActorsListConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
-import de.gematik.test.erezept.config.dto.psp.PSPClientConfig;
 import java.util.List;
 import lombok.Data;
 
@@ -33,7 +32,6 @@ import lombok.Data;
 public class PrimsysConfigurationDto implements BaseConfigurationDto {
   private String activeEnvironment;
   private boolean preferManualSteps = false;
-  private PSPClientConfig pspClientConfig;
   private ActorsListConfiguration actors;
   private List<EnvironmentConfiguration> environments;
   private List<KonnektorConfiguration> konnektors;
