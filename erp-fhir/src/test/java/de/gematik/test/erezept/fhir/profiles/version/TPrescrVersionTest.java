@@ -30,18 +30,18 @@ class TPrescrVersionTest {
 
   @Test
   void shouldReturnCorrectVersionString() {
-    assertEquals("1.1.0", TPrescrVersion.V1_1.getVersion());
+    assertEquals("1.2.0", TPrescrVersion.V1_2.getVersion());
   }
 
   @Test
   void fromStringShouldReturnCorrectEnum() {
-    assertEquals(TPrescrVersion.V1_1, TPrescrVersion.fromString("1.1.0"));
+    assertEquals(TPrescrVersion.V1_2, TPrescrVersion.fromString("1.2.0"));
   }
 
   @Test
   void shouldGetFromString() {
-    val result = TPrescrVersion.fromString("1.1.0");
+    val result = TPrescrVersion.fromString("1.2.0");
     assertNotNull(result);
-    assertEquals(TPrescrVersion.V1_1, result);
+    assertEquals(TPrescrVersion.V1_2, result);
   }
 }

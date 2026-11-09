@@ -55,8 +55,7 @@ class CheckErpDoesNotProvidePrescriptionToEpaTest extends ErpFhirParsingTest {
     kbvErpBundle =
         parser.decode(
             KbvErpBundle.class,
-            ResourceLoader.readFileFromResource(
-                "fhir/valid/kbv/1.1.0/bundle/manipulated/ManipulatedForUnitTestfe9200db-d503-4a1b-bd13-96ab375f9bab.xml"));
+            ResourceLoader.readFileFromResource("fhir/valid/kbv/1.4.0/Beispiel_45.xml"));
   }
 
   @AfterEach

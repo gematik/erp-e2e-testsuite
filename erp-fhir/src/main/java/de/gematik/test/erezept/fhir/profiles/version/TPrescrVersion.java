@@ -28,10 +28,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum TPrescrVersion implements ProfileVersion {
-  V1_1("1.1.0"),
+  V1_2("1.2.0"),
   ;
 
-  public static final String PROFILE_NAME = "de.gematik.erp.t-prescription";
+  public static final String PROFILE_NAME = "de.gematik.erp-t-prescription";
   private final String version;
   private final String name = PROFILE_NAME;
 

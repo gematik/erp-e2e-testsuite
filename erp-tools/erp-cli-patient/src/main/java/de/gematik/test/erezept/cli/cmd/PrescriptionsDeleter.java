@@ -25,7 +25,6 @@ import static java.text.MessageFormat.format;
 import de.gematik.bbriccs.fhir.codec.OperationOutcomeExtractor;
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.test.erezept.cli.cfg.ConfigurationFactory;
 import de.gematik.test.erezept.cli.param.EgkParameter;
 import de.gematik.test.erezept.cli.param.EnvironmentParameter;
 import de.gematik.test.erezept.cli.param.TaskStatusWrapper;
@@ -35,7 +34,6 @@ import de.gematik.test.erezept.client.rest.param.SortOrder;
 import de.gematik.test.erezept.client.usecases.BundlePagingCommand;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.client.usecases.search.TaskSearch;
-import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTaskBundle;
 import java.util.Optional;
@@ -84,26 +82,28 @@ public class PrescriptionsDeleter implements Callable<Integer> {
     }
 
     val sca = SmartcardArchive.fromResources();
-    val egks = egkParameter.getEgks(sca);
+    val kvnrs = egkParameter.getKvnrs(sca);
     val env = environmentParameter.getEnvironment();
+    val factory = ErpClientFactory.forEnvironment(env).withSmartcardArchive(sca).build();
 
-    egks.forEach(
-        egk -> {
+    kvnrs.forEach(
+        kvnr -> {
+          val p =
+              factory.prepareStagedClientFor(BaseRemoteCommand.createPatientConfigurationFor(kvnr));
+
+          val erpClient = p.getLeft();
+          val egk = p.getRight();
           Optional<BundlePagingCommand<ErxTaskBundle>> next;
+
+          log.info("Delete prescriptions for {} from {}", egk.getKvnr(), env.getName());
           do {
-            next = performFor(env, egk);
+            next = performFor(erpClient, egk);
           } while (next.isPresent());
         });
     return 0;
   }
 
-  private Optional<BundlePagingCommand<ErxTaskBundle>> performFor(
-      EnvironmentConfiguration env, Egk egk) {
-    val patientConfig = ConfigurationFactory.createPatientConfigurationFor(egk);
-    val erpClient = ErpClientFactory.createErpClient(env, patientConfig);
-    erpClient.authenticateWith(egk);
-    log.info("Delete prescriptions for {} from {}", egk.getKvnr(), env.getName());
-
+  private Optional<BundlePagingCommand<ErxTaskBundle>> performFor(ErpClient erpClient, Egk egk) {
     val cmd =
         TaskSearch.builder()
             .sortedByAuthoredOn(sortOrder)
@@ -117,9 +117,7 @@ public class PrescriptionsDeleter implements Callable<Integer> {
     val ownerName = egk.getOwnerData().getOwnerName();
 
     System.out.println(
-        format(
-            "Found {0} deletable Prescriptions(s) for {1} ({2}) in {3}\n",
-            size, ownerName, egk.getKvnr(), env.getName()));
+        format("Found {0} deletable Prescriptions(s) for {1}\n", size, egk.getKvnr()));
     tasks.forEach(task -> this.deletePrescription(erpClient, task));
 
     if (bundle.hasNextRelation() && !tasks.isEmpty()) {

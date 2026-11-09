@@ -50,11 +50,11 @@ class GenericBundleVerifierTest extends ErpFhirParsingTest {
     firstErxAuditEventBundle =
         getDecodedFromPath(
             ErxAuditEventBundle.class,
-            "fhir/valid/erp/1.4.0/auditeventbundle/f9c1d812-1ccb-4e4e-b62c-4d51a67ea4b7.json");
+            "fhir/valid/erp/1.6.0/json/auditEventBundle/AEBByFD58c1f701-c3b4-416b-b32d-381ec396d194.json");
     secondErxAuditEventBundle =
         getDecodedFromPath(
             ErxAuditEventBundle.class,
-            "fhir/valid/erp/1.4.0/auditeventbundle/f9c1d812-1ccb-4e4e-b62c-4d51a67ea4b7_manipulated.json");
+            "fhir/valid/erp/1.6.0/xml/auditEvent/auditEventBundleByFD.xml");
   }
 
   @Test
@@ -64,7 +64,7 @@ class GenericBundleVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldDetect50EventsCorrect() {
-    val step = containsEntriesOfCount(50);
+    val step = containsEntriesOfCount(5);
     assertDoesNotThrow(() -> step.apply(firstErxAuditEventBundle));
   }
 
@@ -89,14 +89,14 @@ class GenericBundleVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldThrowWileDetectingMinimalCountOfContainedElements() {
-    val step = containsEntriesOfCount(30);
+    val step = containsEntriesOfCount(6);
     assertThrows(AssertionError.class, () -> step.apply(firstErxAuditEventBundle));
   }
 
   @Test
   void shouldDetectAll5LinkRelations() {
     val step = containsAll5Links();
-    assertDoesNotThrow(() -> step.apply(firstErxAuditEventBundle));
+    assertDoesNotThrow(() -> step.apply(secondErxAuditEventBundle));
   }
 
   @Test
@@ -149,7 +149,7 @@ class GenericBundleVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldDetectQueryParamsCorrect() {
-    val step = expectedParamsIn("next", "_count", "50");
+    val step = expectedParamsIn("next", "_count", "5");
     assertDoesNotThrow(() -> step.apply(firstErxAuditEventBundle));
   }
 
@@ -161,7 +161,7 @@ class GenericBundleVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldDetectQueryParamsCorrect2() {
-    val step = expectedParamsIn("prev", "__offset", "20");
+    val step = expectedParamsIn("prev", "_sort", "date");
     assertDoesNotThrow(() -> step.apply(firstErxAuditEventBundle));
   }
 
@@ -173,8 +173,8 @@ class GenericBundleVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldDetectQueryParamsCorrect3() {
-    val step = expectedParamsIn("last", "_id", "gt01eb9373-789e-7db8-0000-000000000000");
-    assertDoesNotThrow(() -> step.apply(firstErxAuditEventBundle));
+    val step = expectedParamsIn("last", "_id", "ge01ebd19c-bd1e-5c58-0000-000000000000");
+    assertDoesNotThrow(() -> step.apply(secondErxAuditEventBundle));
   }
 
   @Test

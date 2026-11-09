@@ -27,8 +27,7 @@ import static org.mockito.Mockito.*;
 import de.gematik.bbriccs.smartcards.SmcB;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
-import de.gematik.test.erezept.ErpFdTestsuiteFactory;
-import de.gematik.test.erezept.actions.MockActorsUtils;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.common.screenplay.abilities.ProvideDoctorBaseData;
@@ -41,8 +40,9 @@ import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.fhir.valuesets.QualificationType;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
-import org.hl7.fhir.r4.model.Task;
+import org.hl7.fhir.r4.model.Task.TaskStatus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -62,9 +62,13 @@ class DoctorActorTest extends ErpFhirBuildingTest {
   }
 
   private DoctorActor createDoc(String name, String hbaTelematikId) {
-    val config = ErpFdTestsuiteFactory.create();
+    val docConfig =
+        ActorMockUtil.CONFIG.getActors().getDoctors().stream()
+            .filter(cfg -> cfg.getName().equalsIgnoreCase(name))
+            .findFirst()
+            .orElseThrow();
+
     val doctor = new DoctorActor(name);
-    val docConfig = config.getDoctorConfig(doctor.getName());
     val provideBaseData = ProvideDoctorBaseData.fromConfiguration(docConfig, hbaTelematikId);
     doctor.can(provideBaseData);
 
@@ -130,21 +134,26 @@ class DoctorActorTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldPrescribe() {
-    val mockUtil = new MockActorsUtils();
+    val doctorMock = ActorMockUtil.createRandomDoctor();
+    val doctorActor = doctorMock.getLeft();
+    val doctorClient = doctorMock.getRight();
+
+    val patientActor = ActorMockUtil.createRandomPatient().getLeft();
+
     val prescId = PrescriptionId.random();
     val taskId = TaskId.from(prescId);
-    val draftTask = spy(new ErxTask());
-    doReturn(taskId).when(draftTask).getTaskId();
-    doReturn(prescId).when(draftTask).getPrescriptionId();
-    doReturn(AccessCode.random()).when(draftTask).getAccessCode();
-    doReturn(Task.TaskStatus.DRAFT).when(draftTask).getStatus();
-    val createResponse = mockUtil.createErpResponse(draftTask, ErxTask.class, 201);
 
-    val doc = mockUtil.actorStage.getDoctorNamed("Adelheid Ulmenwald");
-    val patient = mockUtil.actorStage.getPatientNamed("Sina Hüllmann");
-    when(mockUtil.erpClientMock.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
-    when(mockUtil.erpClientMock.request(any(TaskActivateCommand.class))).thenReturn(createResponse);
-    val resp = doc.prescribeFor(patient);
+    val draftTask = new ErxTask();
+    draftTask.setId("Task/" + taskId.getValue());
+    draftTask.addIdentifier(prescId.asIdentifier());
+    draftTask.addIdentifier(AccessCode.random().asIdentifier());
+    draftTask.setStatus(TaskStatus.DRAFT);
+
+    val createResponse = ErpResponseUtil.createErpResponse(draftTask, ErxTask.class, 201);
+
+    when(doctorClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
+    when(doctorClient.request(any(TaskActivateCommand.class))).thenReturn(createResponse);
+    val resp = doctorActor.prescribeFor(patientActor);
 
     assertEquals(prescId, resp.getPrescriptionId());
   }

@@ -37,11 +37,11 @@ import org.junit.jupiter.api.Test;
 
 class KbvPatientTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH_1_1_0 = "fhir/valid/kbv/1.1.0/bundle/";
+  private static final String BASE_PATH_1_1_0 = "fhir/valid/kbv/1.4.4/";
 
   @Test
   void shouldDecodeWithoutExpectedType() {
-    val expectedID = "3a1c45f8-d959-43f0-8ac4-9959be746188";
+    val expectedID = "Beispiel_23_Rezeptur_Flag_true_Dos_existant_Positiv";
     val fileName = expectedID + ".xml";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_0 + fileName);
@@ -59,18 +59,18 @@ class KbvPatientTest extends ErpFhirParsingTest {
 
   @Test
   void shouldGetKvnr() {
-    val expectedID = "1f339db0-9e55-4946-9dfa-f1b30953be9b";
+    val expectedID = "Beispiel_23_Rezeptur_Flag_true_Dos_existant_Positiv";
     val fileName = expectedID + ".xml";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_0 + fileName);
     val bundle = parser.decode(KbvErpBundle.class, content);
     val patient = bundle.getPatient();
-    assertEquals("K220635158", patient.getKvnr().getValue());
+    assertEquals("K220645122", patient.getKvnr().getValue());
   }
 
   @Test
   void shouldThrowOnMissingIdentifiers() {
-    val expectedID = "baac1cdd-1313-468f-9c9e-bde74acb308e";
+    val expectedID = "Beispiel_23_Rezeptur_Flag_true_Dos_existant_Positiv";
     val fileName = expectedID + ".xml";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1_0 + fileName);

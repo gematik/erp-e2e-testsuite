@@ -20,7 +20,8 @@
 
 package de.gematik.test.erezept.client.usecases;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.utils.ResourceLoader;
@@ -40,7 +41,7 @@ class BundlePagingCommandTest extends ErpFhirParsingTest {
         parser.decode(
             ErxAuditEventBundle.class,
             ResourceLoader.readFileFromResource(
-                "fhir/valid/erp/1.4.0/auditeventbundle/f9c1d812-1ccb-4e4e-b62c-4d51a67ea4b7.json"));
+                "fhir/valid/erp/1.6.0/xml/auditEvent/auditEventBundleByFD.xml"));
   }
 
   @Test

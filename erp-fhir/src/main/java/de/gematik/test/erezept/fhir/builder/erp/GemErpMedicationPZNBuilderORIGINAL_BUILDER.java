@@ -27,7 +27,6 @@ import static java.text.MessageFormat.format;
 import de.gematik.bbriccs.fhir.builder.ResourceBuilder;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilCodeSystem;
-import de.gematik.bbriccs.fhir.de.HL7StructDef;
 import de.gematik.bbriccs.fhir.de.value.PZN;
 import de.gematik.test.erezept.eml.fhir.builder.EpaMedPznIngredientBuilder;
 import de.gematik.test.erezept.eml.fhir.profile.EpaMedicationStructDef;
@@ -39,7 +38,6 @@ import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpMedication;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.StandardSize;
-import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import lombok.AccessLevel;
@@ -303,29 +301,9 @@ extends ResourceBuilder<GemErpMedication, GemErpMedicationPZNBuilderORIGINAL_BUI
   private void fillMissingInIngredientStrength(
       Ratio ingredientStrength, GemErpMedication medication) {
 
-    if (version.compareTo(ErpWorkflowVersion.V1_4) <= 0) {
-      val absentExt = HL7StructDef.DATA_ABSENT_REASON.asCodeExtension("unknown");
-      List.of(ingredientStrength.getNumerator(), ingredientStrength.getDenominator())
-          .forEach(
-              quantity -> {
-                if (!quantity.hasSystem()) {
-                  quantity.getSystemElement().addExtension(absentExt);
-                }
-                if (!quantity.hasCode()) {
-                  quantity.getCodeElement().addExtension(absentExt);
-                }
-                if (!quantity.hasValue()) {
-                  quantity.getValueElement().addExtension(absentExt);
-                }
-              });
-
-    } else {
-      // Note: ingredient strength if coming from KbvMedication needs from 1.5.0 a mapping of the
-      // extension
-      ingredientStrength.getExtension().stream()
-          .filter(KbvItaErpStructDef.MEDICATION_INGREDIENT_AMOUNT::matches)
-          .forEach(it -> it.getUrlElement().setValue(INGREDIENT_AMOUNT_EXT.getCanonicalUrl()));
-    }
+    ingredientStrength.getExtension().stream()
+        .filter(KbvItaErpStructDef.MEDICATION_INGREDIENT_AMOUNT::matches)
+        .forEach(it -> it.getUrlElement().setValue(INGREDIENT_AMOUNT_EXT.getCanonicalUrl()));
 
     medication
         .getIngredientFirstRep()

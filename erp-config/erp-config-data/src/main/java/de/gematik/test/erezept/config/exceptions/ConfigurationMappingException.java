@@ -29,10 +29,14 @@ public class ConfigurationMappingException extends RuntimeException {
 
   public <T extends NamedConfigurationElement> ConfigurationMappingException(
       String elementName, List<T> configs) {
-    super(
+    this(
         format(
             "Element named {0} is not configured within the list of valid Elements {1}",
             elementName,
             String.join(", ", configs.stream().map(NamedConfigurationElement::getName).toList())));
+  }
+
+  public <T extends NamedConfigurationElement> ConfigurationMappingException(String message) {
+    super(message);
   }
 }

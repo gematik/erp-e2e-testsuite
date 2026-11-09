@@ -20,12 +20,7 @@
 
 package de.gematik.test.erezept.fhir.r4.kbv;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.utils.ResourceLoader;
@@ -40,7 +35,7 @@ import org.junit.jupiter.api.Test;
 
 class KbvEvdgaBundleTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH_1_1 = "fhir/valid/kbv_evdga/1.1/";
+  private static final String BASE_PATH_1_1 = "fhir/valid/kbv_evdga/1.2/";
 
   @Test
   void shouldGetHealthAppRequestFromBundle() {
@@ -96,7 +91,7 @@ class KbvEvdgaBundleTest extends ErpFhirParsingTest {
 
   @Test
   void shouldReadRole() {
-    val expectedID = "EVDGA_Bundle_Krankenhaus";
+    val expectedID = "EVDGA_Bundle_Krankenhaus_Standortnummer";
     val fileName = expectedID + ".xml";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1 + fileName);

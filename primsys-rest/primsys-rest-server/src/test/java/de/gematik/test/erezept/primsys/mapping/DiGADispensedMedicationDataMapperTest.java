@@ -31,7 +31,7 @@ import org.junitpioneer.jupiter.SetSystemProperty;
 class DiGADispensedMedicationDataMapperTest extends ErpFhirParsingTest {
 
   @RepeatedTest(value = 1)
-  @SetSystemProperty(key = "erp.fhir.profile", value = "1.4.0")
+  @SetSystemProperty(key = "erp.fhir.profile", value = "1.6.0")
   void shouldGenerateRandomly() {
     val mapper = DiGADispensedMedicationDataMapper.random();
     val medicationDispense = mapper.convert();

@@ -20,7 +20,8 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.bbriccs.utils.ResourceLoader;
@@ -36,10 +37,10 @@ import org.junit.jupiter.api.Test;
 @Slf4j
 class CommunicationVerifierTest extends ErpFhirParsingTest {
   private static final String COM_PATH =
-      "fhir/valid/erp/1.4.0/communication/8ca3c379-ac86-470f-bc12-178c9008f5c9.json";
+      "fhir/valid/erp/1.6.0/xml/Communication-a218a36e-f2fd-4603-ba67-c827acfef01b.json.xml";
 
   private static final String COM_PATH_WITHOUT_RECEIVED =
-      "fhir/invalid/erp/1.4.0/communication/withReceivedElem.xml";
+      "fhir/invalid/erp/1.6/communication/withReceivedElem.xml";
 
   private static ErxCommunication getDecodedCommunication(String path) {
     return parser.decode(ErxCommunication.class, ResourceLoader.readFileFromResource(path));
@@ -59,7 +60,7 @@ class CommunicationVerifierTest extends ErpFhirParsingTest {
   void shouldFindId() {
     val validComBundle = getDecodedCommunication(COM_PATH);
     val step =
-        CommunicationVerifier.matchId("8ca3c379-ac86-470f-bc12-178c9008f5c9", ErpAfos.A_19520);
+        CommunicationVerifier.matchId("a218a36e-f2fd-4603-ba67-c827acfef01b", ErpAfos.A_19520);
     step.apply(validComBundle);
   }
 
@@ -85,7 +86,7 @@ class CommunicationVerifierTest extends ErpFhirParsingTest {
     val validComBundle = getDecodedCommunication(COM_PATH);
     val step =
         CommunicationVerifier.doesNotMatchThatId(
-            "8ca3c379-ac86-470f-bc12-178c9008f5c9", ErpAfos.A_19520);
+            "a218a36e-f2fd-4603-ba67-c827acfef01b", ErpAfos.A_19520);
     assertThrows(AssertionError.class, () -> step.apply(validComBundle));
   }
 

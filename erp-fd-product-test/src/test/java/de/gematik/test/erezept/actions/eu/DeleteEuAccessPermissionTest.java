@@ -26,35 +26,30 @@ import static org.mockito.Mockito.*;
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.actions.ErpAction;
-import de.gematik.test.erezept.actions.MockActorsUtils;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.ErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.eu.EuGrantAccessDeleteCommand;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class DeleteEuAccessPermissionTest {
 
-  private ErpClient erpClientMock;
-  private MockActorsUtils mockUtil;
-  private PatientActor patient;
-
   @BeforeEach
   void setup() {
     StopwatchProvider.init();
-    mockUtil = new MockActorsUtils();
-    val actorStage = mockUtil.actorStage;
-    this.erpClientMock = mockUtil.erpClientMock;
-    this.patient = actorStage.getPatientNamed("Leonie Hütter");
   }
 
   @Test
   void shouldDeleteEuAccessPermissionSuccessfully() {
-    val mockResponse = mockUtil.createErpResponse(null, EmptyResource.class, 204);
-    when(erpClientMock.request(any(EuGrantAccessDeleteCommand.class))).thenReturn(mockResponse);
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
 
-    assertDoesNotThrow(() -> patient.performs(DeleteEuAccessPermission.forOneSelf()));
+    val mockResponse = ErpResponseUtil.createErpResponse(null, EmptyResource.class, 204);
+    when(patientClient.request(any(EuGrantAccessDeleteCommand.class))).thenReturn(mockResponse);
+
+    assertDoesNotThrow(() -> patientActor.performs(DeleteEuAccessPermission.forOneSelf()));
   }
 
   @Test

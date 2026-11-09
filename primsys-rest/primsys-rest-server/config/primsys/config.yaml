@@ -71,44 +71,50 @@ environments:
   - name: TU
     ti:
       tslBaseUrl: http://download-test.tsl.telematik-test/ECC
-      discoveryDocumentUrl: https://idp-test.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-test.zentral.erp.splitdns.ti-dienste.de
       subscriptionServiceUrl: wss://subscription-test.zentral.erp.splitdns.ti-dienste.de/subscription
       userAgent: DUMMY VALUE
+      idp:
+        discoveryDocumentUrl: https://idp-test.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
     internet:
       tslBaseUrl: https://download-test.tsl.ti-dienste.de/ECC
-      discoveryDocumentUrl: https://idp-test.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-test.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
+      idp:
+        discoveryDocumentUrl: https://idp-test.app.ti-dienste.de/.well-known/openid-configuration
 
   - name: RU
     ti:
       tslBaseUrl: http://download-ref.tsl.telematik-test/ECC
-      discoveryDocumentUrl: https://idp-ref.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-ref.zentral.erp.splitdns.ti-dienste.de
       subscriptionServiceUrl: wss://subscription-ref.zentral.erp.splitdns.ti-dienste.de/subscription
       userAgent: DUMMY VALUE
+      idp:
+        discoveryDocumentUrl: https://idp-ref.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
     internet:
       tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC
-      discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-ref.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
+      idp:
+        discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
 
   - name: RU-DEV
     ti:
       tslBaseUrl: http://download-ref.tsl.telematik-test/ECC
-      discoveryDocumentUrl: https://idp-ref.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-dev.zentral.erp.splitdns.ti-dienste.de
       subscriptionServiceUrl: wss://subscription-dev.zentral.erp.splitdns.ti-dienste.de/subscription
       userAgent: DUMMY VALUE
+      idp:
+        discoveryDocumentUrl: https://idp-ref.zentral.idp.splitdns.ti-dienste.de/.well-known/openid-configuration
     internet:
       tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC
-      discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-dev.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
+      idp:
+        discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
 
 konnektors:
   - name: "Soft-Konn"

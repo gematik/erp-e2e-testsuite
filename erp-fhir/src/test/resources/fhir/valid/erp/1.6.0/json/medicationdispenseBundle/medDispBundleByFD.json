@@ -1,0 +1,1599 @@
+{
+  "resourceType": "Bundle",
+  "id": "40acb0b1-fe5d-4504-8fe1-85a71e969e1f",
+  "type": "searchset",
+  "timestamp": "2026-10-29T16:12:59.915+00:00",
+  "total": 0,
+  "entry": [
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.082.48",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.082.48",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.nathalie-berner.de?code=B000BJ8TZI"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000A3LC18"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.082.48"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "18537025"
+          },
+          "display": "Hatity"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-24",
+        "note": [
+          {
+            "text": "Marty, I'm sorry, but the only power source capable of generating 1.21 gigawatts of electricity is a bolt of lightning."
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.074.72",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.074.72",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.irem-bader.com?code=B000B7CC94"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000NMKCKI"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.074.72"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "77968143"
+          },
+          "display": "Bitwolf"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-24",
+        "note": [
+          {
+            "text": "No! It requires something with a little more kick...plutonium!"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.073.75",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.073.75",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.catharina-jambor.name?code=B000BJ0KBO"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000AXVVY6"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.073.75"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "56324602"
+          },
+          "display": "Quo Lux"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-24",
+        "note": [
+          {
+            "text": "No! Marty! We've already agreed that having information about the future can be extremely dangerous. Even if your intentions are good, it can backfire drastically!"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.139.71",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.139.71",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.lili-denner.org?code=B000A3PI3G"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000I4W7S6"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.139.71"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "97946540"
+          },
+          "display": "Transcof"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-25",
+        "note": [
+          {
+            "text": "I've never seen purple underwear before!"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.148.44",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.148.44",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.fabian-green.de?code=B00066OELO"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000K0WZ2G"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.148.44"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "29569933"
+          },
+          "display": "Kanlam"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-25",
+        "note": [
+          {
+            "text": "This is all wrong. I don't know what it is. But when I kiss you, it's like I'm kissing... my brother. I guess that doesn't make any sense, does it?"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.140.68",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.140.68",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.edgar-helm.name?code=B000A6ULLW"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000FQ9CTY"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.140.68"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "36828401"
+          },
+          "display": "Sonair"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-25",
+        "note": [
+          {
+            "text": "Dear Dr. Brown. On the night that I go back in time, you will be shot by terrorists. Please take whatever precautions are necessary to prevent this terrible disaster. Your friend, Marty."
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.246.41",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.246.41",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.samira-berends.de?code=B000GWH2DU"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000CEPH52"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.246.41"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "32135546"
+          },
+          "display": "Keylex"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-26",
+        "note": [
+          {
+            "text": "I had a horrible nightmare. I dreamed that I went... back in time. It was terrible."
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.245.44",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.245.44",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.rike-sander.net?code=B0000DE0T8"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000BJ0LSQ"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.245.44"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "86894053"
+          },
+          "display": "Sonair"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-26",
+        "note": [
+          {
+            "text": "The way I see it, if you're gonna build a time machine into a car, why not do it with some style?"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.254.17",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.254.17",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.falk-wimmer.ch?code=B000JSBHCS"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000A6Y9HY"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.254.17"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "53036624"
+          },
+          "display": "Konklab"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-26",
+        "note": [
+          {
+            "text": "He's an absolute dream!"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.362.81",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.362.81",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.tim-xn--khnert-3ya.org?code=B00000AQ4N"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000K0WZ2G"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.362.81"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "84167136"
+          },
+          "display": "Stringtough"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-27",
+        "note": [
+          {
+            "text": "If you put your mind to it, you can accomplish anything."
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.371.54",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.371.54",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.merlin-pitschugin.com?code=B000FNP6CY"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000JTR9CE"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.371.54"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "12162191"
+          },
+          "display": "Voyatouch"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-27",
+        "note": [
+          {
+            "text": "Let me show you my plan for sending you home. Please excuse the crudity of this model. I didn't have time to build it to scale or paint it."
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.363.78",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.363.78",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.milo-roecker.ch?code=B000A2SP0K"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000I6VQX6"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.363.78"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "21562506"
+          },
+          "display": "Y-Solowarm"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-27",
+        "note": [
+          {
+            "text": "No wonder your president has to be an actor. He's gotta look good on television."
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.469.51",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.469.51",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.sinja-wehrsen.ch?code=B000G1CIH6"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000HW20EA"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.469.51"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "59212275"
+          },
+          "display": "Namfix"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-28",
+        "note": [
+          {
+            "text": "Whoa. Wait a minute, Doc. Are you trying to tell me that my mother has got the hots for me?"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.461.75",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.461.75",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.tayler-hooss.ch?code=B000O332KS"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000000Z1F"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.461.75"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "00338963"
+          },
+          "display": "Stim"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-28",
+        "note": [
+          {
+            "text": "See you in about 30 years."
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.460.78",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.460.78",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.rick-de.de?code=B000J1E1RS"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000FQ9CTY"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.460.78"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "51699289"
+          },
+          "display": "Fixflex"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-28",
+        "note": [
+          {
+            "text": "Stella! Another one of these damn kids jumped in front of my car! Come on out here! Help me take him in the house!"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.546.14",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.546.14",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.diego-mallmann.ch?code=B000AR99QO"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000BSH87O"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.546.14"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "43300994"
+          },
+          "display": "Stim"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-29",
+        "note": [
+          {
+            "text": "If my calculations are correct, when this baby hits 88 miles per hour... you're gonna see some serious shit."
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.545.17",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.545.17",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.janin-schmitz.org?code=B000A1AVNK"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B0002X4OIY"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.545.17"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "84282802"
+          },
+          "display": "Kanlam"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-29",
+        "note": [
+          {
+            "text": "The appropriate question is, 'when the hell are they?' You see, Einstein has just become the world's first time traveler! I sent him into the future. One minute into the future to be exact. And at precisely 1:21 a.m. and zero seconds, we shall catch up with him and the time machine."
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/160.000.125.863.684.32",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "160.000.125.863.684.32",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://ig.fhir.de/igs/medication/StructureDefinition/GeneratedDosageInstructionsMeta",
+            "extension": [
+              {
+                "url": "algorithmVersion",
+                "valueString": "1.0.1"
+              },
+              {
+                "url": "language",
+                "valueCode": "de-DE"
+              }
+            ]
+          },
+          {
+            "url": "http://hl7.org/fhir/5.0/StructureDefinition/extension-MedicationDispense.renderedDosageInstruction",
+            "valueMarkdown": "3-3-1-2-2"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "160.000.125.863.684.32"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "reference": "urn:uuid:901bb9dc-1dc6-4d99-8e7f-328a65dc7da8"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "5-2-KH-APO-Waldesrand-01"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-29",
+        "dosageInstruction": [
+          {
+            "text": "3-3-1-2-2"
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.555.84",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.555.84",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.emma-bock.de?code=B00066OELO"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B00067PATS"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.555.84"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "13577356"
+          },
+          "display": "Y-Solowarm"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-29",
+        "note": [
+          {
+            "text": "Last night, Darth Vader came down from Planet Vulcan and told me that if I didn't take Lorraine out, that he'd melt my brain."
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.576.21",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.576.21",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.summer-menne.ch?code=B000HCTRK0"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000BHP43U"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.576.21"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "85165079"
+          },
+          "display": "Subin"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-29",
+        "note": [
+          {
+            "text": "We're the, uh... We're the Pinheads."
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.577.18",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.577.18",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.rocco-heuck.ch?code=B00065F3KG"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B0002IQM52"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.577.18"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "49817497"
+          },
+          "display": "Kanlam"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-29",
+        "note": [
+          {
+            "text": "Marty, don't be such a square. Everybody who's anybody drinks."
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "https://erp-dev.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.049.585.91",
+      "resource": {
+        "resourceType": "MedicationDispense",
+        "id": "162.000.000.049.585.91",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink",
+            "valueUrl": "www.arno-klinger.name?code=B0000DIIQA"
+          },
+          {
+            "url": "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode",
+            "valueString": "B000HC0P2E"
+          }
+        ],
+        "identifier": [
+          {
+            "system": "https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId",
+            "value": "162.000.000.049.585.91"
+          }
+        ],
+        "status": "completed",
+        "medicationReference": {
+          "identifier": {
+            "system": "http://fhir.de/CodeSystem/ifa/pzn",
+            "value": "92402404"
+          },
+          "display": "Regrant"
+        },
+        "subject": {
+          "identifier": {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://fhir.de/CodeSystem/identifier-type-de-basis",
+                  "code": "KVZ10"
+                }
+              ]
+            },
+            "system": "http://fhir.de/sid/gkv/kvid-10",
+            "value": "X110670787"
+          }
+        },
+        "performer": [
+          {
+            "actor": {
+              "identifier": {
+                "system": "https://gematik.de/fhir/sid/telematik-id",
+                "value": "8-SMC-B-Testkarte--883110000163954"
+              }
+            }
+          }
+        ],
+        "whenHandedOver": "2026-10-29",
+        "note": [
+          {
+            "text": "Yeah, well, history is gonna change."
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:901bb9dc-1dc6-4d99-8e7f-328a65dc7da8",
+      "resource": {
+        "resourceType": "Medication",
+        "id": "901bb9dc-1dc6-4d99-8e7f-328a65dc7da8",
+        "meta": {
+          "profile": [
+            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Medication|1.6"
+          ]
+        },
+        "extension": [
+          {
+            "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/drug-category-extension",
+            "valueCoding": {
+              "system": "https://gematik.de/fhir/epa-medication/CodeSystem/epa-drug-category-cs",
+              "code": "00"
+            }
+          },
+          {
+            "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-id-vaccine-extension",
+            "valueBoolean": true
+          },
+          {
+            "url": "http://fhir.de/StructureDefinition/normgroesse",
+            "valueCode": "N3"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://fhir.de/CodeSystem/ifa/pzn",
+              "code": "64910722"
+            }
+          ],
+          "text": "DEXERYL Suspension"
+        },
+        "form": {
+          "coding": [
+            {
+              "system": "https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM",
+              "code": "NAG"
+            }
+          ]
+        },
+        "amount": {
+          "numerator": {
+            "extension": [
+              {
+                "url": "https://gematik.de/fhir/epa-medication/StructureDefinition/medication-total-quantity-formulation-extension",
+                "valueString": "19"
+              }
+            ],
+            "value": 19,
+            "unit": "Stk"
+          },
+          "denominator": {
+            "value": 1
+          }
+        },
+        "batch": {
+          "lotNumber": "6416302444"
+        }
+      },
+      "search": {
+        "mode": "include"
+      }
+    }
+  ]
+}

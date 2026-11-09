@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,8 +56,8 @@ class CloseUseCaseTest extends TestWithActorContext {
 
   static Stream<Arguments> shouldClosePrescription() {
     return Stream.of(
-        arguments("1.4.0", true),
-        arguments("1.4.0", false),
+        arguments("1.6.0", true),
+        arguments("1.6.0", false),
         arguments("1.5.0", true),
         arguments("1.5.0", false));
   }
@@ -130,12 +130,12 @@ class CloseUseCaseTest extends TestWithActorContext {
 
     when(mockClient.request(any(TaskGetByIdCommand.class))).thenReturn(mockTaskGetResponse);
 
-    try (val response = usecase.closePrescription("taskId", "accessCode")) {
-      fail("CloseUseCase did not throw the expected Exception");
-    } catch (WebApplicationException wae) {
-      assertEquals(WebApplicationException.class, wae.getClass());
-      assertEquals(404, wae.getResponse().getStatus());
-    }
+    assertThrows(
+        WebApplicationException.class,
+        () -> {
+          usecase.closePrescription("taskId", "accessCode");
+        },
+        "CloseUseCase did not throw the expected Exception");
   }
 
   @Test

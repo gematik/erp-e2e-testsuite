@@ -21,7 +21,6 @@
 package de.gematik.test.erezept.fhir.builder.erp;
 
 import static de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem.KVID_GKV_SID;
-import static de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem.KVID_PKV_SID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
@@ -41,7 +40,7 @@ class ErxConsentBuilderTest extends ErpFhirParsingTest {
     val kvnr = KVNR.randomPkv();
     val erxConsent =
         ErxConsentBuilder.forKvnr(kvnr)
-            .version(PatientenrechnungVersion.V1_0_0)
+            .version(PatientenrechnungVersion.V1_1_0)
             .policyRule(ActCode.OPTIN)
             .status(Consent.ConsentState.ACTIVE)
             .scope(ConsentScope.PATIENT_PRIVACY)
@@ -50,12 +49,12 @@ class ErxConsentBuilderTest extends ErpFhirParsingTest {
     val result = ValidatorUtil.encodeAndValidate(parser, erxConsent);
     assertTrue(result.isSuccessful());
     assertTrue(
-        erxConsent.getPatient().getIdentifier().getSystem().equals(KVID_PKV_SID.getCanonicalUrl()));
+        erxConsent.getPatient().getIdentifier().getSystem().equals(KVID_GKV_SID.getCanonicalUrl()));
   }
 
   @Test
   void buildConsentWithFixedValuesInVersion_1_1() {
-    val kvnr = KVNR.randomPkv();
+    val kvnr = KVNR.randomGkv();
     val erxConsent =
         ErxConsentBuilder.forKvnr(kvnr)
             .version(PatientenrechnungVersion.V1_1_0)

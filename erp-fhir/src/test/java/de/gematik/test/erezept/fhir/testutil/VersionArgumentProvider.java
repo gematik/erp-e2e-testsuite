@@ -37,9 +37,7 @@ public class VersionArgumentProvider {
   }
 
   public static Stream<Arguments> erpWorkflowVersions() {
-    return Arrays.stream(ErpWorkflowVersion.values())
-        .filter(version -> version.compareTo(ErpWorkflowVersion.V1_4) >= 0)
-        .map(Arguments::of);
+    return Arrays.stream(ErpWorkflowVersion.values()).map(Arguments::of);
   }
 
   public static Stream<Arguments> erpPatienterechnungVersions() {
@@ -73,8 +71,6 @@ public class VersionArgumentProvider {
   }
 
   public static Stream<Arguments> abdaErpPkvVersions() {
-    return Arrays.stream(AbdaErpPkvVersion.values())
-        .filter(it -> it.isBiggerThan(AbdaErpPkvVersion.V1_2_0))
-        .map(Arguments::of);
+    return Arrays.stream(AbdaErpPkvVersion.values()).map(Arguments::of);
   }
 }

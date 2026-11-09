@@ -24,35 +24,27 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import de.gematik.test.erezept.actions.ErpAction;
-import de.gematik.test.erezept.actions.MockActorsUtils;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.ErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.eu.EuGrantAccessGetCommand;
 import de.gematik.test.erezept.fhir.r4.eu.EuAccessPermission;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 
 class GetEuAccessPermissionTest {
 
-  private ErpClient erpClientMock;
-  private MockActorsUtils mockUtil;
-  private PatientActor patientActor;
-
-  @BeforeEach
-  void setup() {
-    mockUtil = new MockActorsUtils();
-    this.erpClientMock = mockUtil.erpClientMock;
-    this.patientActor = mockUtil.actorStage.getPatientNamed("Leonie Hütter");
-  }
-
   @Test
   void shouldGetEuAccessPermissionSuccessfully() {
-    val euAccessPermission = new EuAccessPermission();
-    val response = mockUtil.createErpResponse(euAccessPermission, EuAccessPermission.class, 200);
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
 
-    when(erpClientMock.request(ArgumentMatchers.any(EuGrantAccessGetCommand.class)))
+    val euAccessPermission = new EuAccessPermission();
+    val response =
+        ErpResponseUtil.createErpResponse(euAccessPermission, EuAccessPermission.class, 200);
+
+    when(patientClient.request(ArgumentMatchers.any(EuGrantAccessGetCommand.class)))
         .thenReturn(response);
 
     assertDoesNotThrow(() -> patientActor.performs(GetEuAccessPermission.forOneSelf()));

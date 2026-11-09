@@ -62,9 +62,6 @@ public enum ChargeItemCommunicationType implements ICommunicationType<Patientenr
   }
 
   private WithNamingSystem kvidFor(PatientenrechnungVersion version) {
-    if (version.isSmallerThanOrEqualTo(PatientenrechnungVersion.V1_0_0)) {
-      return DeBasisProfilNamingSystem.KVID_PKV_SID;
-    }
     return DeBasisProfilNamingSystem.KVID_GKV_SID;
   }
 

@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.primsys.rest.response;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,11 +38,9 @@ class InfoResponseBuilderTest extends TestWithActorContext {
   }
 
   @Test
-  /* @SetSystemProperty(key = ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE, value = "1.4.0")*/
-  void shouldChangeProfileViaSystemProperty() {
+  void shouldGenerateFhirInformation() {
     val ctx = ActorContext.getInstance();
-    val info = InfoResponseBuilder.getInfo(ctx);
-    assertNotNull(info.getFhir());
+    val info = assertDoesNotThrow(() -> InfoResponseBuilder.getInfo(ctx));
     assertNotNull(info.getFhir());
   }
 }

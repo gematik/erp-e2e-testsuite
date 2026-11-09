@@ -27,41 +27,36 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.test.core.StopwatchProvider;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.ErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.TaskGetByIdAsAcceptBundleCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import de.gematik.test.erezept.screenplay.util.DmcPrescription;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ReadDiGATaskAsAcceptBundleTest {
 
-  private ErpClient erpClientMock;
-  private MockActorsUtils mockUtil;
-  private PatientActor patientActor;
-
   @BeforeEach
   void init() {
     StopwatchProvider.init();
-
-    this.mockUtil = new MockActorsUtils();
-    this.erpClientMock = mockUtil.erpClientMock;
-
-    this.patientActor = mockUtil.actorStage.getPatientNamed("Leonie Hütter");
   }
 
   @Test
   void shouldPerformReadDiGATaskSuccessfully() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
     val taskId = TaskId.from("162");
     val accessCode = AccessCode.from("0123456789");
 
-    val mockResponse = mockUtil.createErpResponse(null, ErxAcceptBundle.class, 200);
+    val mockResponse = ErpResponseUtil.createErpResponse(null, ErxAcceptBundle.class, 200);
 
-    when(erpClientMock.request(any(TaskGetByIdAsAcceptBundleCommand.class)))
+    when(patientClient.request(any(TaskGetByIdAsAcceptBundleCommand.class)))
         .thenReturn(mockResponse);
 
     val action = new ReadDiGATaskAsAcceptBundle(taskId, accessCode);

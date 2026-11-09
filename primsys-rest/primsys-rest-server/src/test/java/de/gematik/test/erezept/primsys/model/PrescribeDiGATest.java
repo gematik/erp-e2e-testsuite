@@ -20,7 +20,7 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,12 +31,9 @@ import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvCoverageFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvEvdgaBundleBuilder;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvHealthAppRequestFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvMedicalOrganizationFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
-import de.gematik.test.erezept.fhir.builder.kbv.KbvPractitionerFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItvEvdgaVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -86,12 +83,13 @@ class PrescribeDiGATest extends TestWithActorContext {
     when(mockClient.request(any(TaskCreateCommand.class))).thenReturn(createResponse);
     when(mockClient.request(any(TaskActivateCommand.class))).thenReturn(activateResponse);
 
-    val patient = KbvPatientFaker.builder().fake();
+    val patient = KbvPatientFaker.builder(KbvItaForVersion.V1_3_0).fake();
     val kvnr = patient.getKvnr().getValue();
-    val practitioner = KbvPractitionerFaker.builder().fake();
-    val coverage = KbvCoverageFaker.builder().fake();
+    val practitioner = KbvPractitionerFaker.builder(KbvItaForVersion.V1_3_0).fake();
+    val coverage = KbvCoverageFaker.builder(KbvItaForVersion.V1_3_0).fake();
     val evdgaBundle =
         KbvEvdgaBundleBuilder.forPrescription(prescriptionId)
+            .version(KbvItvEvdgaVersion.V1_2)
             .patient(patient)
             .insurance(coverage)
             .practitioner(practitioner)

@@ -74,14 +74,14 @@ class ResourcePrinterTest extends ErpFhirParsingTest {
 
   static Stream<Arguments> shouldPrintWithoutThrowingExceptions() {
     return ResourceLoader.getResourceDirectoryStructure(
-            "fhir/valid/erp/1.4.0/medicationdispensebundle/")
+            "fhir/valid/erp/1.6.0/json/medicationdispenseBundle")
         .stream()
         .map(Arguments::of);
   }
 
   @Test
   void shouldPrintHealthAppRequestWithoutThrowingExceptions() {
-    val content = ResourceLoader.readFileFromResource("fhir/valid/kbv_evdga/1.1/EVDGA_Bundle.xml");
+    val content = ResourceLoader.readFileFromResource("fhir/valid/kbv_evdga/1.2/EVDGA_Bundle.xml");
     val bundle = parser.decode(KbvEvdgaBundle.class, content);
 
     val har = bundle.getHealthAppRequest();
@@ -93,7 +93,7 @@ class ResourcePrinterTest extends ErpFhirParsingTest {
   void shouldPrintKbvMedicationWithoutThrowingExceptions() {
     val content =
         ResourceLoader.readFileFromResource(
-            "fhir/valid/kbv/1.1.0/bundle/1f339db0-9e55-4946-9dfa-f1b30953be9b.xml");
+            "fhir/valid/kbv/1.4.4/Beispiel_4_Flag_true_Dos_existant_Positiv.xml");
     val bundle = parser.decode(KbvErpBundle.class, content);
 
     val medication = bundle.getMedication();

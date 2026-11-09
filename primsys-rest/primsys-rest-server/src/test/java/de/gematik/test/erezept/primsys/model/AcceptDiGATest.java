@@ -34,6 +34,7 @@ import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.client.usecases.TaskAcceptCommand;
 import de.gematik.test.erezept.fhir.builder.kbv.*;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.values.AccessCode;
@@ -57,7 +58,7 @@ class AcceptDiGATest extends TestWithActorContext {
     val taskId = TaskId.from(prescriptionId);
     val accessCode = AccessCode.random();
 
-    val patient = KbvPatientFaker.builder().fake();
+    val patient = KbvPatientFaker.builder(KbvItaForVersion.V1_3_0).fake();
     val app = KbvHealthAppRequestFaker.forPatient(patient).fake();
     val evdga =
         KbvEvdgaBundleBuilder.forPrescription(prescriptionId)

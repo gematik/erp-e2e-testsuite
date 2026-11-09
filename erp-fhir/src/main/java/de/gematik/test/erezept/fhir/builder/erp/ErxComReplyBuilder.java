@@ -23,7 +23,6 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import static de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem.ORDER_ID;
 
 import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
@@ -41,11 +40,10 @@ public class ErxComReplyBuilder extends ErxComPrescriptionBuilder<ErxComReplyBui
 
   @Override
   public ErxCommunication build() {
-    val flowTypeDiGA =
+    val useDiGAProfile =
         Optional.ofNullable(this.flowType)
             .map(ft -> ft.equals(PrescriptionFlowType.FLOW_TYPE_162))
             .orElse(false);
-    val useDiGAProfile = flowTypeDiGA && erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4) > 0;
     val com =
         buildCommon(
             () ->

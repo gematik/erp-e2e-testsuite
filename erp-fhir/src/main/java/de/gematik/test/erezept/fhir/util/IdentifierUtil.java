@@ -20,8 +20,10 @@
 
 package de.gematik.test.erezept.fhir.util;
 
+import java.util.List;
 import lombok.val;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.UriType;
 
 public class IdentifierUtil {
 
@@ -38,7 +40,11 @@ public class IdentifierUtil {
    */
   public static String getUnqualifiedId(String qualifiedId) {
     val idTokens = qualifiedId.split("[/:]");
-    return idTokens[idTokens.length - 1];
+    val praefix = List.of("http", "uuid", "urn");
+    if (praefix.stream().anyMatch(qualifiedId::startsWith)) {
+      return idTokens[idTokens.length - 1];
+    }
+    return idTokens[idTokens.length > 1 ? 1 : 0];
   }
 
   public static String getUnqualifiedId(IdType idType) {

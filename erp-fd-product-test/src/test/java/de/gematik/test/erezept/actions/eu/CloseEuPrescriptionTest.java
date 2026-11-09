@@ -21,45 +21,43 @@
 package de.gematik.test.erezept.actions.eu;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
+import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.abilities.ProvidePharmacyBaseData;
-import de.gematik.test.erezept.actors.EuPharmacyActor;
-import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
+import de.gematik.test.erezept.client.usecases.eu.EuCloseInputPostCommand;
 import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
-import de.gematik.test.erezept.config.dto.actor.EuPharmacyConfiguration;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
 import de.gematik.test.fuzzing.eu.EuCloseOperationManipulatorFactory;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class CloseEuPrescriptionTest extends ErpFhirBuildingTest {
 
-  private static EuPharmacyActor pharmacy;
-  private static UseTheErpClient useErpClient;
-
   @BeforeAll
   static void setup() {
     CoverageReporter.getInstance().startTestcase("don't care");
-    // init pharmacy
-    pharmacy = new EuPharmacyActor("Hannes Vogt");
-    useErpClient = mock(UseTheErpClient.class);
-    pharmacy.can(useErpClient);
-
-    EuPharmacyConfiguration cfg = new EuPharmacyConfiguration();
-    cfg.setCountryCode("LI");
-    pharmacy.can(ProvidePharmacyBaseData.fromConfiguration(cfg));
   }
 
   @Test
   void shouldBuildActionCorrect() {
-    SafeAbility.getAbility(pharmacy, ProvidePharmacyBaseData.class);
-    pharmacy.abilityTo(ProvidePharmacyBaseData.class);
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+    val pharmacyClient = pharmacyMock.getRight();
+
+    val response = ErpResponseUtil.createErpResponse(null, EmptyResource.class, 200);
+    when(pharmacyClient.request(any(EuCloseInputPostCommand.class))).thenReturn(response);
+
+    SafeAbility.getAbility(pharmacyActor, ProvidePharmacyBaseData.class);
+    pharmacyActor.abilityTo(ProvidePharmacyBaseData.class);
     val action =
         CloseEuPrescription.with(EuAccessCode.random(), KVNR.random())
             .withResourceManipulator(
@@ -67,6 +65,6 @@ class CloseEuPrescriptionTest extends ErpFhirBuildingTest {
                     .findFirst()
                     .orElseThrow())
             .withAccepted(KbvErpBundleFaker.builder().fake());
-    assertDoesNotThrow(() -> pharmacy.performs(action));
+    assertDoesNotThrow(() -> pharmacyActor.performs(action));
   }
 }

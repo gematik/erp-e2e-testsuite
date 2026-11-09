@@ -52,7 +52,8 @@ class GemErpMedicationTest extends ErpFhirParsingTest {
   @Test
   void shouldReadNameFromContainedMedication() {
     val content =
-        ResourceLoader.readFileFromResource("fhir/valid/erp/1.4.0/medication/Rezeptur.json");
+        ResourceLoader.readFileFromResource(
+            "fhir/valid/erp/1.6.0/json/Medication-Medication-Rezeptur.json");
     val medication = parser.decode(GemErpMedication.class, content);
     assertTrue(medication.getNameFromCodeOreContainedRessource().isPresent());
     assertFalse(medication.getNameFromCodingDisplay().isPresent());

@@ -20,43 +20,42 @@
 
 package de.gematik.test.erezept.actions;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.actions.chargeitem.GetChargeItems;
-import de.gematik.test.erezept.actors.PatientActor;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.ChargeItemGetCommand;
-import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItemSet;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class GetChargeItemsTest extends ErpFhirBuildingTest {
 
+  @BeforeAll
+  static void setup() {
+    CoverageReporter.getInstance().startTestcase("don't care");
+  }
+
   @Test
   void shouldPerformCorrectCommand() {
-    PatientActor patient;
-    CoverageReporter.getInstance().startTestcase("don't care");
-    // init pharmacy
-    patient = new PatientActor("Sina Hüllmann");
-    UseTheErpClient useErpClient = mock(UseTheErpClient.class);
-    patient.can(useErpClient);
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
     val resource = new ErxChargeItemSet();
-    val response =
-        FhirBResponse.forPayload(ErxChargeItemSet.class, resource)
-            .withStatusCode(200)
-            .andValidationResult(createEmptyValidationResult());
-    when(useErpClient.request(any(ChargeItemGetCommand.class))).thenReturn(response);
+    val response = ErpResponseUtil.createErpResponse(resource, ErxChargeItemSet.class, 200);
+
+    when(patientClient.request(any(ChargeItemGetCommand.class))).thenReturn(response);
     val action =
         GetChargeItems.fromServerWith(
             new ChargeItemGetCommand(IQueryParameter.search().withCount(3).createParameter()));
-    assertDoesNotThrow(() -> action.answeredBy(patient));
+    assertDoesNotThrow(() -> action.answeredBy(patientActor));
   }
 }

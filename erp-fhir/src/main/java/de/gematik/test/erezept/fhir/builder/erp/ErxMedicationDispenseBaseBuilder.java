@@ -29,7 +29,6 @@ import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.fhir.de.valueset.IdentifierTypeDe;
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBase;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpMedication;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -144,19 +143,10 @@ public abstract class ErxMedicationDispenseBaseBuilder<
     Optional.ofNullable(this.practitionerRoleReference)
         .ifPresent(pRR -> medDisp.addPerformer().setActor(pRR));
 
-    // this kind of comparison is happened, caused by different .compare() implementations in ENUM
-    // and ProfilVersion
-    if (ErpWorkflowVersion.V1_4.compareTo(erpWorkflowVersion) >= 0) {
-      // older Versions
-      val subjectIdentifier = DeBasisProfilNamingSystem.KVID_GKV_SID.asIdentifier(kvnr.getValue());
-      medDisp.getSubject().setIdentifier(subjectIdentifier);
-    } else {
-      // since WorkflowProfile 1.5.2 KVNR-TYPE ist mandatory
-      kvnr = kvnr.as(InsuranceTypeDe.GKV);
-      val subjectIdentifier =
-          kvnr.asIdentifier().setType(IdentifierTypeDe.KVZ10.asCodeableConcept());
-      medDisp.getSubject().setIdentifier(subjectIdentifier);
-    }
+    // since WorkflowProfile 1.5.2 KVNR-TYPE ist mandatory
+    kvnr = kvnr.as(InsuranceTypeDe.GKV);
+    val subjectIdentifier = kvnr.asIdentifier().setType(IdentifierTypeDe.KVZ10.asCodeableConcept());
+    medDisp.getSubject().setIdentifier(subjectIdentifier);
   }
 
   private void checkRequiredBase() {

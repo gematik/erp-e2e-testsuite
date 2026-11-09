@@ -27,6 +27,7 @@ import de.gematik.bbriccs.fhir.de.value.IKNR;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
+import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.profiles.version.PatientenrechnungVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -38,9 +39,7 @@ import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.fhir.valuesets.AvailabilityStatus;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
-import java.util.List;
 import lombok.val;
-import org.hl7.fhir.r4.model.CanonicalType;
 import org.hl7.fhir.r4.model.StringType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -139,7 +138,7 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldBuildDispReqFixedValuesForDiGA() {
-    val version = ErpWorkflowVersion.V1_4;
+    val version = ErpWorkflowVersion.V1_6;
     val taskId = TaskId.from(PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_162));
     val accessCode = AccessCode.random();
 
@@ -335,11 +334,12 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldSetCorrectProfileForDiGAReply() {
+
     val taskId = TaskId.from(PrescriptionId.random(PrescriptionFlowType.FLOW_TYPE_162));
     val accessCode = AccessCode.random();
     val reply =
         ErxCommunicationBuilder.asReply("DiGA Text")
-            .version(ErpWorkflowVersion.V1_5)
+            .version(ErpWorkflowVersion.V1_6)
             .flowType(PrescriptionFlowType.FLOW_TYPE_162)
             .basedOn(taskId, accessCode)
             .receiver("X234567890")
@@ -348,15 +348,7 @@ class ErxCommunicationBuilderTest extends ErpFhirParsingTest {
             .supplyOptions(SupplyOptionsType.SHIPMENT)
             .build();
 
-    List<CanonicalType> profiles = reply.getMeta().getProfile();
-    assertTrue(
-        profiles.stream()
-            .anyMatch(
-                p ->
-                    p.getValue()
-                        .equals(
-                            "https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Communication_DiGA|1.5")),
-        "Expected profile for DiGA communication reply not found");
+    assertTrue(ErpWorkflowStructDef.COM_DIGA.matches(reply));
 
     assertInstanceOf(StringType.class, reply.getPayloadFirstRep().getContent());
   }

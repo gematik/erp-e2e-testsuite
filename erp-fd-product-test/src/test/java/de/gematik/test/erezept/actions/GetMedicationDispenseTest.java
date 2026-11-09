@@ -20,82 +20,80 @@
 
 package de.gematik.test.erezept.actions;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
-import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.rest.param.IQueryParameter;
 import de.gematik.test.erezept.client.rest.param.SearchPrefix;
 import de.gematik.test.erezept.client.rest.param.SortOrder;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.MedicationDispenseGetCommand;
-import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
+import de.gematik.test.utils.ActorMockUtil;
 import java.time.LocalDate;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class GetMedicationDispenseTest extends ErpFhirBuildingTest {
-  private static PharmacyActor pharmacist;
-  private static PatientActor sina;
+
+  private static PatientActor patientActor;
 
   @BeforeAll
   static void setup() {
-    val useErpClient = mock(UseTheErpClient.class);
-    pharmacist = new PharmacyActor("PhaMoc");
-    pharmacist.can(useErpClient);
+    val patientMock = ActorMockUtil.createRandomPatient();
+    patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
 
-    sina = new PatientActor("sina");
-    sina.can(useErpClient);
     val mockResponse =
-        FhirBResponse.forPayload(
-                ErxMedicationDispenseBundle.class, new ErxMedicationDispenseBundle())
-            .withStatusCode(200)
-            .andValidationResult(createEmptyValidationResult());
-    when(useErpClient.request(any(MedicationDispenseGetCommand.class))).thenReturn(mockResponse);
+        ErpResponseUtil.createErpResponse(
+            new ErxMedicationDispenseBundle(), ErxMedicationDispenseBundle.class, 200);
+    when(patientClient.request(any(MedicationDispenseGetCommand.class))).thenReturn(mockResponse);
   }
 
   @Test
   void shouldGetMedicationDispenseWhenHandedOver() {
     assertDoesNotThrow(
         () ->
-            sina.performs(GetMedicationDispense.whenHandedOver(SearchPrefix.EQ, LocalDate.now())));
+            patientActor.performs(
+                GetMedicationDispense.whenHandedOver(SearchPrefix.EQ, LocalDate.now())));
   }
 
   @Test
   void shouldGetMedicationDispenseWhenHandedOverDefault() {
-    assertDoesNotThrow(() -> sina.performs(GetMedicationDispense.whenHandedOverDefault()));
+    assertDoesNotThrow(() -> patientActor.performs(GetMedicationDispense.whenHandedOverDefault()));
   }
 
   @Test
   void shouldGetMedicationDispenseWhenPrepared() {
     assertDoesNotThrow(
-        () -> sina.performs(GetMedicationDispense.whenPrepared(SearchPrefix.EQ, LocalDate.now())));
+        () ->
+            patientActor.performs(
+                GetMedicationDispense.whenPrepared(SearchPrefix.EQ, LocalDate.now())));
   }
 
   @Test
   void shouldGetMedicationDispenseFromPerformer() {
     assertDoesNotThrow(
-        () -> sina.performs(GetMedicationDispense.fromPerformer(TelematikID.from("performerId"))));
+        () ->
+            patientActor.performs(
+                GetMedicationDispense.fromPerformer(TelematikID.from("performerId"))));
   }
 
   @Test
   void shouldGetMedicationDispenseWithCount() {
-    assertDoesNotThrow(() -> sina.performs(GetMedicationDispense.withCount(5)));
+    assertDoesNotThrow(() -> patientActor.performs(GetMedicationDispense.withCount(5)));
   }
 
   @Test
   void shouldGetMedicationDispenseQueryParams() {
     assertDoesNotThrow(
         () ->
-            sina.performs(
+            patientActor.performs(
                 GetMedicationDispense.withQueryParams(
                     IQueryParameter.search()
                         .withCount(5)

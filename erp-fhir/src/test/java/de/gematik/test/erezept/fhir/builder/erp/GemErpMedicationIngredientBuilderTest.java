@@ -61,7 +61,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldSetSpecificVersionCorrect() {
-    val value = ErpWorkflowVersion.V1_4;
+    val value = ErpWorkflowVersion.V1_6;
     val medIngredient =
         GemErpMedicationIngredientBuilder.forIngredient()
             .ingredientComponent(ingredient)
@@ -69,7 +69,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
             .build();
 
     assertNotNull(medIngredient);
-    assertTrue(medIngredient.getMeta().getProfile().get(0).getValue().contains("1.4"));
+    assertTrue(medIngredient.getMeta().getProfile().get(0).getValue().contains("1.6"));
     assertTrue(ValidatorUtil.encodeAndValidate(parser, medIngredient).isSuccessful());
   }
 
@@ -129,7 +129,7 @@ class GemErpMedicationIngredientBuilderTest extends ErpFhirParsingTest {
     val value = "Karton";
     val medIngredient =
         GemErpMedicationIngredientBuilder.forIngredient()
-            .version(ErpWorkflowVersion.V1_4)
+            .version(ErpWorkflowVersion.V1_6)
             .packaging(value)
             .amount(5)
             .ingredientComponent(ingredient)

@@ -21,7 +21,6 @@
 package de.gematik.test.erezept.app.task;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
@@ -29,7 +28,6 @@ import de.gematik.test.erezept.app.questions.UsedSessionKVNR;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
-import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
 import de.gematik.test.erezept.screenplay.abilities.ProvidePatientBaseData;
 import lombok.RequiredArgsConstructor;
@@ -41,13 +39,12 @@ import net.serenitybdd.screenplay.Task;
 @Slf4j
 @RequiredArgsConstructor
 public class EquipWithProvidePatientBaseDataAndErpClient implements Task {
-  private final EnvironmentConfiguration environment;
   private final InsuranceTypeDe insuranceKind;
-  private final SmartcardArchive sca;
+  private final ErpClientFactory erpClientFactory;
 
   public static EquipWithProvidePatientBaseDataAndErpClient forInput(
-      EnvironmentConfiguration environment, InsuranceTypeDe insuranceKind, SmartcardArchive sca) {
-    return new EquipWithProvidePatientBaseDataAndErpClient(environment, insuranceKind, sca);
+      InsuranceTypeDe insuranceKind, ErpClientFactory erpClientFactory) {
+    return new EquipWithProvidePatientBaseDataAndErpClient(insuranceKind, erpClientFactory);
   }
 
   @Override
@@ -55,20 +52,23 @@ public class EquipWithProvidePatientBaseDataAndErpClient implements Task {
     val app = SafeAbility.getAbilityThatExtends(actor, UseTheApp.class);
     val userConfig = SafeAbility.getAbility(actor, UseConfigurationData.class);
 
-    val kvnr = actor.asksFor(UsedSessionKVNR.fromUserProfile());
-    val egk = sca.getEgkByKvnr(kvnr);
+    val r = erpClientFactory.prepareStagedClientFor(userConfig.getUserConfig());
+    val egk = r.getRight();
+    val erpClient = r.getLeft();
+
+    // technically, no longer required, but we keep it for now to ensure that the KVNR is actually
+    // set in the app
+    val kvnr = actor.asksFor(UsedSessionKVNR.fromUserProfile()); // NOSONAR
+
+    val useErpClient = UseTheErpClient.with(erpClient);
+
     val provideEgk = ProvideEGK.sheOwns(egk);
 
+    actor.can(useErpClient);
     actor.can(provideEgk);
     actor.can(
         ProvidePatientBaseData.forPatient(
             provideEgk.getKvnr(), egk.getOwnerData().getCommonName(), insuranceKind));
-
-    // now get the concrete eGK wich was chosen from the card wall
-    val erpClient = ErpClientFactory.createErpClient(environment, userConfig.getUserConfig());
-    val useErpClient = UseTheErpClient.with(erpClient);
-    useErpClient.authenticateWith(egk);
-    actor.can(useErpClient);
 
     app.tap(BottomNav.PRESCRIPTION_BUTTON);
   }

@@ -35,11 +35,7 @@ class GemErpIngredientComponentBuilderTest extends ErpFhirParsingTest {
 
   @ClearSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE)
   @Test
-  void shouldSetIngredientNumSystemAndSoElseAutomaticForOldVersions() {
-    // only to find testcase while restructure versions:
-    val onlyToFindVersionByCompiler = ErpWorkflowVersion.V1_4; // NOSONAR
-    System.setProperty(ERP_FHIR_PROFILES_TOGGLE, "1.4.0");
-
+  void shouldBuildMinimalIngredientComp() {
     val ingrdComponent =
         new GemErpIngredientComponentBuilder()
             .ask(ASK.from("123456"))
@@ -47,11 +43,7 @@ class GemErpIngredientComponentBuilderTest extends ErpFhirParsingTest {
             .darreichungsform("halt irgendwie rein damit")
             .build();
     assertNotNull(ingrdComponent);
-    assertNotNull(ingrdComponent.getStrength().getNumerator().getCode());
-    assertNotNull(ingrdComponent.getStrength().getNumerator().getSystem());
     assertNotNull(ingrdComponent.getStrength().getNumerator().getValue());
-    assertNotNull(ingrdComponent.getStrength().getDenominator().getCode());
-    assertNotNull(ingrdComponent.getStrength().getDenominator().getSystem());
     assertNotNull(ingrdComponent.getStrength().getDenominator().getValue());
   }
 

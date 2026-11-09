@@ -99,7 +99,6 @@ public class ProvidePrescriptionWithConsentIT extends ErpTest {
     this.config.equipWithEpaMockClient(epaFhirChecker);
 
     patient.changePatientInsuranceType(insuranceType);
-
     // todo activate if PUT is activated
     // patient.attemptsTo(EmlProvidePrescriptionApply.forKvnr(patient.getKvnr()));
 
@@ -159,6 +158,9 @@ public class ProvidePrescriptionWithConsentIT extends ErpTest {
     epaFhirChecker.attemptsTo(
         CheckEpaOpProvidePrescriptionWithTask.forPrescription(
             kbvBundle, doc.getSmcbTelematikId(), doc.getHbaTelematikId()));
+
+    // waiting for computing and store AuditEvent for Patient
+    Thread.sleep(2000); // NOSONAR
 
     // patient checks auditEvent content
     val searchParams =

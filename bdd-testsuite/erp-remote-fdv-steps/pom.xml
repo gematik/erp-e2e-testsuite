@@ -6,7 +6,7 @@
     <parent>
         <artifactId>bdd-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.9.0</version>
+        <version>1.10.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

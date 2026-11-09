@@ -22,13 +22,7 @@ package de.gematik.test.erezept.primsys;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 
-import de.gematik.test.erezept.client.ErpClient;
-import de.gematik.test.erezept.client.cfg.ErpClientFactory;
-import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -36,28 +30,19 @@ class PrimSysRestFactoryTest extends TestWithActorContext {
 
   @Test
   void shouldReadDefaultEnvironment() {
-    val factory = PrimSysRestFactory.fromDto(configDto, sca);
-    val activeEnv = assertDoesNotThrow(factory::getActiveEnvironment);
-    assertEquals(configDto.getActiveEnvironment(), activeEnv.getName());
+    val activeEnv = assertDoesNotThrow(primsysFactory::getActiveEnvironment);
+    assertEquals(primsysConfig.getActiveEnvironment(), activeEnv.getName());
   }
 
   @Test
   void shouldCreateDoctors() {
-    val factory = PrimSysRestFactory.fromDto(configDto, sca);
+    val docs = assertDoesNotThrow(primsysFactory::createDoctorActors);
+    assertEquals(primsysConfig.getActors().getDoctors().size(), docs.size());
 
-    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
-      erpClientFactoryMockedStatic
-          .when(() -> ErpClientFactory.createErpClient(any(), any(PsActorConfiguration.class)))
-          .thenReturn(mock(ErpClient.class));
+    val pharmacies = assertDoesNotThrow(primsysFactory::createPharmacyActors);
+    assertEquals(primsysConfig.getActors().getPharmacies().size(), pharmacies.size());
 
-      val docs = assertDoesNotThrow(factory::createDoctorActors);
-      assertEquals(configDto.getActors().getDoctors().size(), docs.size());
-
-      val pharmacies = assertDoesNotThrow(factory::createPharmacyActors);
-      assertEquals(configDto.getActors().getPharmacies().size(), pharmacies.size());
-
-      val ktrs = assertDoesNotThrow(factory::createHealthInsuranceActors);
-      assertEquals(configDto.getActors().getHealthInsurances().size(), ktrs.size());
-    }
+    val ktrs = assertDoesNotThrow(primsysFactory::createHealthInsuranceActors);
+    assertEquals(primsysConfig.getActors().getHealthInsurances().size(), ktrs.size());
   }
 }

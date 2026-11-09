@@ -20,91 +20,78 @@
 
 package de.gematik.test.erezept;
 
-import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_CONFIG;
+import static de.gematik.test.utils.ActorStageUtil.createMockedErpFdTestsuiteFactory;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
 
-import de.gematik.bbriccs.fhir.conf.ProfilesConfigurator;
+import de.gematik.bbriccs.fhir.codec.FhirCodec;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.abilities.*;
 import de.gematik.test.erezept.actors.*;
-import de.gematik.test.erezept.client.ErpClient;
-import de.gematik.test.erezept.client.cfg.ErpClientFactory;
+import de.gematik.test.erezept.client.testutils.VauCertificateGenerator;
 import de.gematik.test.erezept.common.exceptions.MissingAbilityException;
 import de.gematik.test.erezept.common.screenplay.abilities.*;
 import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
-import de.gematik.test.erezept.config.dto.actor.EuPharmacyConfiguration;
-import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
-import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.BackendRouteConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.config.exceptions.ConfigurationMappingException;
+import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
+import de.gematik.test.erezept.fhir.parser.FhirParser;
+import de.gematik.test.erezept.fhir.parser.ValidatorType;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import java.util.List;
-import lombok.SneakyThrows;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
-import net.serenitybdd.screenplay.actors.Cast;
-import net.serenitybdd.screenplay.actors.OnStage;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
 
-  @SneakyThrows
-  @BeforeEach
-  void init() {
-    OnStage.setTheStage(new Cast() {});
-    StopwatchProvider.init();
-  }
+  private static ErpFdTestsuiteFactory config;
 
-  @AfterEach
-  void tearDown() {
-    OnStage.drawTheCurtain();
+  @BeforeAll
+  static void init() {
+    StopwatchProvider.init();
+    config = createMockedErpFdTestsuiteFactory(mock(FhirCodec.class));
   }
 
   @Test
   void shouldEquipDoctorActor() {
     val doctorName = "Adelheid Ulmenwald";
-    val config = ErpFdTestsuiteFactory.create();
     val doctor = new DoctorActor(doctorName);
 
-    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
-      val erpClient = mock(ErpClient.class);
-      erpClientFactoryMockedStatic
-          .when(() -> ErpClientFactory.createErpClient(any(), any(PsActorConfiguration.class)))
-          .thenReturn(erpClient);
-
-      assertDoesNotThrow(() -> config.equipAsDoctor(doctor));
-      assertNotNull(doctor.abilityTo(UseTheErpClient.class));
-      assertNotNull(doctor.abilityTo(UseSMCB.class));
-      assertNotNull(doctor.abilityTo(UseTheKonnektor.class));
-      assertNotNull(doctor.abilityTo(ProvideDoctorBaseData.class));
-      assertNotNull(doctor.getDescription());
-    }
+    assertDoesNotThrow(() -> config.equipAsDoctor(doctor));
+    assertNotNull(doctor.abilityTo(UseTheErpClient.class));
+    assertNotNull(doctor.abilityTo(UseSMCB.class));
+    assertNotNull(doctor.abilityTo(UseTheKonnektor.class));
+    assertNotNull(doctor.abilityTo(ProvideDoctorBaseData.class));
+    assertNotNull(doctor.getDescription());
   }
 
   @Test
   void shouldEquipActorWithEpaMockClient() {
     val actorName = "Fridolin Straßer";
     val actor = new PatientActor(actorName);
-    val config = ErpFdTestsuiteFactory.create();
 
-    assertDoesNotThrow(() -> config.equipWithEpaMockClient(actor));
+    // creating the real EpaFhir codec is expensive: mock the static factory for this test
+    try (val epaFhirFactory = mockStatic(EpaFhirFactory.class)) {
+      epaFhirFactory.when(EpaFhirFactory::create).thenReturn(mock(FhirCodec.class));
+
+      assertDoesNotThrow(() -> config.equipWithEpaMockClient(actor));
+      epaFhirFactory.verify(EpaFhirFactory::create);
+    }
     assertNotNull(actor.abilityTo(UseTheEpaMockClient.class));
   }
 
   @Test
   void shouldEquipActorWithTRegisterMockClient() {
     val actor = new GemaTestActor("Holly Goodhead");
-    val config = ErpFdTestsuiteFactory.create();
 
     assertDoesNotThrow(() -> config.equipWithTPrescriptionMockClient(actor));
     assertNotNull(actor.abilityTo(UseTheTRegisterMockClient.class));
@@ -113,7 +100,6 @@ class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
   @Test
   void shouldEquipActorWithTRegisterMockClientWhenProxyIsSet() {
     val actor = new GemaTestActor("Holly Goodhead");
-    val config = ErpFdTestsuiteFactory.create();
 
     System.setProperty("https.gematikProxy", "localhost");
 
@@ -126,83 +112,66 @@ class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
   }
 
   @Test
-  void shouldEquipActorWithFhirValidator() {
+  void shouldEquipActorWithBricksFhirValidator() {
     val actor = new GemaTestActor("Holly Goodhead");
-    val config = ErpFdTestsuiteFactory.create();
 
-    assertDoesNotThrow(() -> config.equipWithTPrescriptionMockClient(actor));
+    // mock the expensive FhirParser construction and capture the constructor arguments
+    try (val fhirParserConstruction =
+        mockConstruction(
+            FhirParser.class,
+            (mock, context) ->
+                assertEquals(ValidatorType.BRICKS, context.arguments().getFirst()))) {
+
+      assertDoesNotThrow(() -> config.equipWithTPrescriptionMockClient(actor));
+
+      assertEquals(1, fhirParserConstruction.constructed().size());
+    }
   }
 
   @Test
   void shouldEquipPharmacyActor() {
     val pharmacyName = "Am Flughafen";
-    val config = ErpFdTestsuiteFactory.create();
     val pharmacy = new PharmacyActor(pharmacyName);
 
-    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
-      val erpClient = mock(ErpClient.class);
-      erpClientFactoryMockedStatic
-          .when(() -> ErpClientFactory.createErpClient(any(), any(PsActorConfiguration.class)))
-          .thenReturn(erpClient);
-
-      assertDoesNotThrow(() -> config.equipAsPharmacy(pharmacy));
-      assertNotNull(pharmacy.abilityTo(UseTheErpClient.class));
-      assertNotNull(pharmacy.abilityTo(UseSMCB.class));
-      assertNotNull(pharmacy.abilityTo(UseTheKonnektor.class));
-      assertNotNull(pharmacy.abilityTo(ManagePharmacyPrescriptions.class));
-      assertNotNull(pharmacy.getDescription());
-    }
+    assertDoesNotThrow(() -> config.equipAsPharmacy(pharmacy));
+    assertNotNull(pharmacy.abilityTo(UseTheErpClient.class));
+    assertNotNull(pharmacy.abilityTo(UseSMCB.class));
+    assertNotNull(pharmacy.abilityTo(UseTheKonnektor.class));
+    assertNotNull(pharmacy.abilityTo(ManagePharmacyPrescriptions.class));
+    assertNotNull(pharmacy.getDescription());
   }
 
   @Test
   void shouldEquipEuPharmacyActor() {
     val pharmacyName = "Hannes Vogt";
-    val config = ErpFdTestsuiteFactory.create();
     val pharmacy = new EuPharmacyActor(pharmacyName);
 
-    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
-      val erpClient = mock(ErpClient.class);
-      erpClientFactoryMockedStatic
-          .when(() -> ErpClientFactory.createErpClient(any(), any(EuPharmacyConfiguration.class)))
-          .thenReturn(erpClient);
-
-      assertDoesNotThrow(() -> config.equipAsEuPharmacy(pharmacy));
-      assertNotNull(pharmacy.abilityTo(UseTheErpClient.class));
-      assertNotNull(pharmacy.abilityTo(UseSMCB.class));
-      assertNotNull(pharmacy.getDescription());
-    }
+    assertDoesNotThrow(() -> config.equipAsEuPharmacy(pharmacy));
+    assertNotNull(pharmacy.abilityTo(UseTheErpClient.class));
+    assertNotNull(pharmacy.abilityTo(UseSMCB.class));
+    assertNotNull(pharmacy.getDescription());
   }
 
   @Test
   void shouldEquipPatientActor() {
     val patientName = "Fridolin Straßer";
-    val config = ErpFdTestsuiteFactory.create();
     val patient = new PatientActor(patientName);
 
-    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
-
-      val erpClient = mock(ErpClient.class);
-      erpClientFactoryMockedStatic
-          .when(() -> ErpClientFactory.createErpClient(any(), any(PatientConfiguration.class)))
-          .thenReturn(erpClient);
-
-      assertDoesNotThrow(() -> config.equipAsPatient(patient));
-      assertDoesNotThrow(patient::getEgk);
-      assertNotNull(patient.abilityTo(UseTheErpClient.class));
-      assertNotNull(patient.abilityTo(ProvidePatientBaseData.class));
-      assertNotNull(patient.abilityTo(ProvideEGK.class));
-      assertNotNull(patient.abilityTo(ManageDataMatrixCodes.class));
-      assertNotNull(patient.abilityTo(ManageCommunications.class));
-      assertNotNull(patient.getDescription());
-      assertDoesNotThrow(patient::toString);
-    }
+    assertDoesNotThrow(() -> config.equipAsPatient(patient));
+    assertDoesNotThrow(patient::getEgk);
+    assertNotNull(patient.abilityTo(UseTheErpClient.class));
+    assertNotNull(patient.abilityTo(ProvidePatientBaseData.class));
+    assertNotNull(patient.abilityTo(ProvideEGK.class));
+    assertNotNull(patient.abilityTo(ManageDataMatrixCodes.class));
+    assertNotNull(patient.abilityTo(ManageCommunications.class));
+    assertNotNull(patient.getDescription());
+    assertDoesNotThrow(patient::toString);
   }
 
   @Test
   void shouldEquipPatientActorWithRawHttp() {
     val actorName = "Fridolin Straßer";
     val patient = new PatientActor(actorName);
-    val config = ErpFdTestsuiteFactory.create();
 
     assertThrows(
         MissingAbilityException.class, () -> SafeAbility.getAbility(patient, RawHttpAbility.class));
@@ -216,7 +185,6 @@ class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
   void shouldEquipPharmaActorWithRawHttp() {
     val actorName = "Am Flughafen";
     val pharmacy = new PharmacyActor(actorName);
-    val config = ErpFdTestsuiteFactory.create();
 
     assertThrows(
         MissingAbilityException.class,
@@ -231,7 +199,6 @@ class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
   void shouldEquipDoctorActorWithRawHttp() {
     val actorName = "Adelheid Ulmenwald";
     val doc = new DoctorActor(actorName);
-    val config = ErpFdTestsuiteFactory.create();
 
     assertThrows(
         MissingAbilityException.class, () -> SafeAbility.getAbility(doc, RawHttpAbility.class));
@@ -245,7 +212,6 @@ class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
   void shouldEquipPatientActorForTslDownload() {
     val actorName = "Fridolin Straßer";
     val patient = new PatientActor(actorName);
-    val config = ErpFdTestsuiteFactory.create();
 
     assertThrows(
         MissingAbilityException.class, () -> SafeAbility.getAbility(patient, RawHttpAbility.class));
@@ -259,7 +225,6 @@ class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
   void shouldEquipPharmaActorForTslDownload() {
     val actorName = "Am Flughafen";
     val pharmacy = new PharmacyActor(actorName);
-    val config = ErpFdTestsuiteFactory.create();
 
     assertThrows(
         MissingAbilityException.class,
@@ -274,7 +239,6 @@ class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
   void shouldEquipDoctorActorForTslDownload() {
     val actorName = "Adelheid Ulmenwald";
     val doc = new DoctorActor(actorName);
-    val config = ErpFdTestsuiteFactory.create();
 
     assertThrows(
         MissingAbilityException.class, () -> SafeAbility.getAbility(doc, RawHttpAbility.class));
@@ -287,7 +251,6 @@ class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
   @Test
   void shouldEquipAsApothecary() {
     val apothecaryName = "Finn-Louis Nullmayr";
-    val config = ErpFdTestsuiteFactory.create();
     val apothecary = new Actor(apothecaryName); // currently no specific class for apothecary
 
     config.equipAsApothecary(apothecary);
@@ -297,14 +260,12 @@ class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldCreateVsdmService() {
-    val config = ErpFdTestsuiteFactory.create();
     val vsdmService = assertDoesNotThrow(config::getSoftKonnVsdmService);
     assertNotNull(vsdmService);
   }
 
   @Test
   void shouldCreatePoPPServiceMock() {
-    val config = ErpFdTestsuiteFactory.create();
     val vsdmService = assertDoesNotThrow(config::getPoppTokenGenerator);
     assertNotNull(vsdmService);
   }
@@ -313,7 +274,6 @@ class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
   void shouldEquipDoctorActorForOCSP() {
     val actorName = "Adelheid Ulmenwald";
     val actor = new DoctorActor(actorName);
-    val config = ErpFdTestsuiteFactory.create();
 
     assertThrows(
         MissingAbilityException.class, () -> SafeAbility.getAbility(actor, OCSPAbility.class));
@@ -326,7 +286,6 @@ class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
   @Test
   void shouldEquipPatientActorForOCSP() {
     val actor = new PatientActor("");
-    val config = ErpFdTestsuiteFactory.create();
 
     assertThrows(
         MissingAbilityException.class, () -> SafeAbility.getAbility(actor, OCSPAbility.class));
@@ -340,7 +299,6 @@ class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
   void shouldEquipPharmaActorForOCSP() {
     val actorName = "Am Flughafen";
     val actor = new PharmacyActor(actorName);
-    val config = ErpFdTestsuiteFactory.create();
 
     assertThrows(
         MissingAbilityException.class, () -> SafeAbility.getAbility(actor, OCSPAbility.class));
@@ -352,7 +310,6 @@ class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldFailWhenEquippingPatientActorWithUnknownActor() {
-    val config = ErpFdTestsuiteFactory.create();
     val patient = new PatientActor("Fridolin");
 
     assertThrows(
@@ -363,45 +320,24 @@ class ErpFdTestsuiteFactoryTest extends ErpFhirBuildingTest {
   @Test
   void shouldEquipPatientActorWithInvalidIdpToken() {
     val patientName = "Fridolin Straßer";
-    val config = ErpFdTestsuiteFactory.create();
     val patient = new PatientActor(patientName);
 
-    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
-      val erpClient = mock(ErpClient.class);
-      val erpClientInvalidToken = mock(ErpClient.class);
+    assertDoesNotThrow(() -> config.equipAsPatientWithInvalidIdpToken(patient));
 
-      // fhir profile manuell konfigurieren / setzen für createErpClient()
-      ProfilesConfigurator.getConfiguration(ERP_FHIR_PROFILES_CONFIG, ERP_FHIR_PROFILES_TOGGLE);
-      erpClientFactoryMockedStatic
-          .when(() -> ErpClientFactory.createErpClient(any(), any(PatientConfiguration.class)))
-          .thenReturn(erpClient);
-
-      erpClientFactoryMockedStatic
-          .when(
-              () ->
-                  ErpClientFactory.createErpClientWithInvalidIdpToken(
-                      any(), any(PatientConfiguration.class)))
-          .thenReturn(erpClientInvalidToken);
-
-      assertDoesNotThrow(() -> config.equipAsPatientWithInvalidIdpToken(patient));
-
-      assertNotNull(patient.abilityTo(UseTheErpClient.class));
-      assertNotNull(patient.abilityTo(ProvideEGK.class));
-      assertNotNull(patient.abilityTo(ProvidePatientBaseData.class));
-      assertNotNull(patient.abilityTo(ManageDataMatrixCodes.class));
-      assertNotNull(patient.abilityTo(ManageCommunications.class));
-
-      erpClientFactoryMockedStatic.verify(
-          () ->
-              ErpClientFactory.createErpClientWithInvalidIdpToken(
-                  any(), any(PatientConfiguration.class)));
-    }
+    assertNotNull(patient.abilityTo(UseTheErpClient.class));
+    assertNotNull(patient.abilityTo(ProvideEGK.class));
+    assertNotNull(patient.abilityTo(ProvidePatientBaseData.class));
+    assertNotNull(patient.abilityTo(ManageDataMatrixCodes.class));
+    assertNotNull(patient.abilityTo(ManageCommunications.class));
   }
 
   @Test
   void shouldReturnOcspUrl() {
     val ti = new BackendRouteConfiguration();
     ti.setOcsp("http://ehca-testref.komp-ca.telematik-test/status/ecc-qocsp");
+
+    val dummyVauCertificate = VauCertificateGenerator.generateRandomVauCertificateAsBase64();
+    ti.setVauCertificate(dummyVauCertificate);
 
     val environment = new EnvironmentConfiguration();
     environment.setName("TU");

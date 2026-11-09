@@ -2,23 +2,53 @@ environments:
   - name: TU
     internet:
       tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
-      discoveryDocumentUrl: https://idp-test.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-test.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
+      idp:
+        discoveryDocument: https://idp-test.app.ti-dienste.de/.well-known/openid-configuration
+      secIdp:
+        fedAuthEndpoint: https://idp-test.app.ti-dienste.de/fedauth
+        tokenEndpoint: https://idp-test.app.ti-dienste.de/token
+        sekIdpIss: https://gsi.dev.gematik.solutions
+        clientId: DUMMY VALUE
+        redirectUri: DUMMY VALUE
+        codeChallenge: DUMMY VALUE
+        codeVerifier: DUMMY VALUE
+        tokenKey: DUMMY VALUE
 
   - name: RU
     internet:
       tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
-      discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-ref.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
+      idp:
+        discoveryDocument: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
+      secIdp:
+        fedAuthEndpoint: https://idp-ref.app.ti-dienste.de/fedauth
+        tokenEndpoint: https://idp-ref.app.ti-dienste.de/token
+        sekIdpIss: https://gsi-ref.dev.gematik.solutions
+        clientId: DUMMY VALUE
+        redirectUri: DUMMY VALUE
+        codeChallenge: DUMMY VALUE
+        codeVerifier: DUMMY VALUE
+        tokenKey: DUMMY VALUE
 
   - name: RU-DEV
     internet:
       tslBaseUrl: https://download-ref.tsl.ti-dienste.de/ECC/
-      discoveryDocumentUrl: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
       fdBaseUrl: https://erp-dev.app.ti-dienste.de
       xapiKey: DUMMY VALUE
       userAgent: DUMMY VALUE
+      idp:
+        discoveryDocument: https://idp-ref.app.ti-dienste.de/.well-known/openid-configuration
+      secIdp:
+        fedAuthEndpoint: https://idp-ref.app.ti-dienste.de/fedauth
+        tokenEndpoint: https://idp-ref.app.ti-dienste.de/token
+        sekIdpIss: https://gsi-ref.dev.gematik.solutions
+        clientId: DUMMY VALUE
+        redirectUri: DUMMY VALUE
+        codeChallenge: DUMMY VALUE
+        codeVerifier: DUMMY VALUE
+        tokenKey: DUMMY VALUE

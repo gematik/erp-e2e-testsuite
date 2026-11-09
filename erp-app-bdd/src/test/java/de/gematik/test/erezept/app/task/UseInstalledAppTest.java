@@ -27,15 +27,13 @@ import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.Egk;
-import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
 import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.Profile;
-import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
-import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
+import de.gematik.test.erezept.client.cfg.ErpClientFactoryUtil;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -49,7 +47,7 @@ import org.junit.jupiter.api.Test;
 
 class UseInstalledAppTest extends ErpFhirParsingTest {
 
-  private final SmartcardArchive smartcards = SmartcardArchive.fromResources();
+  private final ErpClientFactory factory = ErpClientFactoryUtil.createMockedErpClientFactory();
   private Egk deviceOwnerEgk;
 
   private String userName;
@@ -57,6 +55,7 @@ class UseInstalledAppTest extends ErpFhirParsingTest {
   @BeforeEach
   void init() {
     OnStage.setTheStage(new Cast() {});
+    val smartcards = factory.getSmartcards();
     this.deviceOwnerEgk = smartcards.getEgk(0);
     val environment = new EnvironmentConfiguration();
     environment.setName("TU");
@@ -92,17 +91,10 @@ class UseInstalledAppTest extends ErpFhirParsingTest {
 
     when(app.getText(Profile.USER_KVNR)).thenReturn(deviceOwnerEgk.getKvnr());
 
-    try (val erpClientFactory = mockStatic(ErpClientFactory.class)) {
-      val erpClient = mock(ErpClient.class);
-      erpClientFactory
-          .when(() -> ErpClientFactory.createErpClient(any(), any(PatientConfiguration.class)))
-          .thenReturn(erpClient);
-      actor.attemptsTo(
-          UseInstalledApp.ownedBy(deviceOwner)
-              .forEnvironment(null)
-              .withInsuranceType(InsuranceTypeDe.GKV)
-              .byMappingVirtualEgkFrom(smartcards));
-    }
+    actor.attemptsTo(
+        UseInstalledApp.ownedBy(deviceOwner)
+            .withInsuranceType(InsuranceTypeDe.GKV)
+            .byMappingVirtualEgkFrom(factory));
 
     assertEquals(app, actor.abilityTo(UseIOSApp.class));
     verify(app, times(1)).setCurrentUserProfile(actor.getName());

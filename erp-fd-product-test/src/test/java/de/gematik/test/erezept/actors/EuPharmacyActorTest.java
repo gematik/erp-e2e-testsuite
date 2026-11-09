@@ -24,11 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.gematik.test.core.StopwatchProvider;
-import de.gematik.test.erezept.ErpFdTestsuiteFactory;
-import de.gematik.test.erezept.abilities.ProvidePharmacyBaseData;
-import de.gematik.test.erezept.common.screenplay.abilities.UseSMCB;
-import de.gematik.test.erezept.config.dto.actor.EuPharmacyConfiguration;
-import de.gematik.test.erezept.fhir.valuesets.IsoCountryCodeNCPeH;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -37,17 +33,9 @@ class EuPharmacyActorTest {
   @Test
   void shouldProvideCorrectData() {
     StopwatchProvider.init();
-    val config = ErpFdTestsuiteFactory.create();
-    val pharmacy = new EuPharmacyActor("Hannes Vogt");
-    val pharmacyConfig = config.getEuPharmacyConfig(pharmacy.getName());
-    val smcb = config.getSmcbByICCSN(pharmacyConfig.getSmcbIccsn());
 
-    val useSmcb = UseSMCB.itHasAccessTo(smcb);
-    pharmacy.can(useSmcb);
-
-    val cfg = new EuPharmacyConfiguration();
-    cfg.setCountryCode(IsoCountryCodeNCPeH.NL.getCode());
-    pharmacy.can(ProvidePharmacyBaseData.fromConfiguration(cfg));
+    val pharmacyMock = ActorMockUtil.createRandomEuPharmacy("NL");
+    val pharmacy = pharmacyMock.getLeft();
 
     assertNotNull(pharmacy.getCommonName());
     assertNotNull(pharmacy.getTelematikId());

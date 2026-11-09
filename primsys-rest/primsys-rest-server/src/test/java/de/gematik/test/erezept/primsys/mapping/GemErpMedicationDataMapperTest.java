@@ -20,9 +20,7 @@
 
 package de.gematik.test.erezept.primsys.mapping;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -37,7 +35,7 @@ import org.junitpioneer.jupiter.SetSystemProperty;
 class GemErpMedicationDataMapperTest extends ErpFhirParsingTest {
 
   @RepeatedTest(value = 10)
-  @SetSystemProperty(key = "erp.fhir.profile", value = "1.4.0")
+  @SetSystemProperty(key = "erp.fhir.profile", value = "1.6.0")
   void shouldGenerateRandomly() {
     val mapper = GemErpMedicationDataMapper.random();
     val erpMedication = mapper.convert();

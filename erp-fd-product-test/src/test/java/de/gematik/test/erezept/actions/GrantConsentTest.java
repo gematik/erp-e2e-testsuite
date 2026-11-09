@@ -27,8 +27,7 @@ import static org.mockito.Mockito.when;
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.core.StopwatchProvider;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.ErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.ConsentDeleteCommand;
 import de.gematik.test.erezept.client.usecases.ConsentGetCommand;
 import de.gematik.test.erezept.client.usecases.ConsentPostCommand;
@@ -36,37 +35,38 @@ import de.gematik.test.erezept.fhir.builder.erp.ErxConsentBuilder;
 import de.gematik.test.erezept.fhir.r4.erp.ErxConsent;
 import de.gematik.test.erezept.fhir.r4.erp.ErxConsentBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class GrantConsentTest extends ErpFhirBuildingTest {
-  private ErpClient erpClientMock;
-  private MockActorsUtils mockUtil;
-
-  private PatientActor patientActor;
 
   @BeforeEach
   void init() {
     StopwatchProvider.init();
-    this.mockUtil = new MockActorsUtils();
-    val actorStage = mockUtil.actorStage;
-    this.erpClientMock = mockUtil.erpClientMock;
-    patientActor = actorStage.getPatientNamed("Leonie Hütter");
   }
 
   @Test
   void shouldBuildConsentDepositCorrect() {
-    val mockResponse = mockUtil.createErpResponse(null, Resource.class, 400);
-    when(erpClientMock.request(any())).thenReturn(mockResponse);
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
+    val mockResponse = ErpResponseUtil.createErpResponse(null, Resource.class, 400);
+    when(patientClient.request(any())).thenReturn(mockResponse);
     assertDoesNotThrow(() -> patientActor.performs(GrantConsent.forOneSelf().withDefaultConsent()));
   }
 
   @Test
   void shouldBuildConsentDepositCorrectWithCustomConsent() {
-    val mockResponse = mockUtil.createErpResponse(null, Resource.class, 400);
-    when(erpClientMock.request(any())).thenReturn(mockResponse);
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
+    val mockResponse = ErpResponseUtil.createErpResponse(null, Resource.class, 400);
+    when(patientClient.request(any())).thenReturn(mockResponse);
     val consent = ErxConsentBuilder.forKvnr(KVNR.random()).build();
     assertDoesNotThrow(
         () ->
@@ -79,8 +79,12 @@ class GrantConsentTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldBuildConsentDepositCorrectWithDeposeConsentConstructor() {
-    val mockResponse = mockUtil.createErpResponse(null, Resource.class, 400);
-    when(erpClientMock.request(any())).thenReturn(mockResponse);
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
+    val mockResponse = ErpResponseUtil.createErpResponse(null, Resource.class, 400);
+    when(patientClient.request(any())).thenReturn(mockResponse);
     val consent = ErxConsentBuilder.forKvnr(KVNR.random()).build();
     assertDoesNotThrow(
         () ->
@@ -90,17 +94,22 @@ class GrantConsentTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldBuildConsentDepositCorrectWithEnsureAndConsent() {
-    val mockConsentResponse = mockUtil.createErpResponse(null, ErxConsent.class, 200);
-    val mockResourceResponse = mockUtil.createErpResponse(null, EmptyResource.class, 200);
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
+    val mockConsentResponse = ErpResponseUtil.createErpResponse(null, ErxConsent.class, 200);
+    val mockResourceResponse = ErpResponseUtil.createErpResponse(null, EmptyResource.class, 200);
     val mockConsBundle = new ErxConsentBundle();
     mockConsBundle.addEntry().setResource(ErxConsentBuilder.forKvnr(KVNR.random()).build());
     val mockErxBundleResponse =
-        mockUtil.createErpResponse(mockConsBundle, ErxConsentBundle.class, 200);
-    when(erpClientMock.request(any(ConsentPostCommand.class))).thenReturn(mockConsentResponse);
-    when(erpClientMock.request(any(ConsentDeleteCommand.class))).thenReturn(mockResourceResponse);
-    when(erpClientMock.request(any(ConsentGetCommand.class))).thenReturn(mockErxBundleResponse);
-    val mockErpResponseRessource = mockUtil.createErpResponse(null, EmptyResource.class, 201);
-    when(erpClientMock.request(any(ConsentDeleteCommand.class)))
+        ErpResponseUtil.createErpResponse(mockConsBundle, ErxConsentBundle.class, 200);
+    when(patientClient.request(any(ConsentPostCommand.class))).thenReturn(mockConsentResponse);
+    when(patientClient.request(any(ConsentDeleteCommand.class))).thenReturn(mockResourceResponse);
+    when(patientClient.request(any(ConsentGetCommand.class))).thenReturn(mockErxBundleResponse);
+    val mockErpResponseRessource =
+        ErpResponseUtil.createErpResponse(null, EmptyResource.class, 201);
+    when(patientClient.request(any(ConsentDeleteCommand.class)))
         .thenReturn(mockErpResponseRessource);
     val consent = ErxConsentBuilder.forKvnr(KVNR.random()).build();
     assertDoesNotThrow(

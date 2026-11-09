@@ -27,7 +27,6 @@ import de.gematik.bbriccs.rest.RawHttpCodec;
 import de.gematik.bbriccs.rest.headers.AuthHttpHeaderKey;
 import de.gematik.bbriccs.rest.headers.HttpHeader;
 import de.gematik.bbriccs.rest.headers.StandardHttpHeaderKey;
-import de.gematik.test.erezept.client.ClientType;
 import de.gematik.test.erezept.client.UnirestRetryWrapper;
 import de.gematik.test.erezept.client.vau.protocol.VauProtocol;
 import de.gematik.test.erezept.client.vau.protocol.VauVersion;
@@ -57,7 +56,6 @@ public class VauClient implements HttpBClient {
   private final String fdBaseUrl;
   private final String xApiKey;
   private final String userAgent;
-  private final ClientType clientType;
   private final UnirestInstance unirest;
   private final UnirestRetryWrapper retryWrapper = new UnirestRetryWrapper();
 
@@ -69,7 +67,6 @@ public class VauClient implements HttpBClient {
 
   public VauClient(
       String fdBaseUrl,
-      ClientType clientType,
       X509Certificate vauCertificate,
       @Nullable String xApiKey,
       @Nullable String userAgent) {
@@ -77,7 +74,6 @@ public class VauClient implements HttpBClient {
     this.vauProtocol = new VauProtocol(VauVersion.V1, (ECPublicKey) vauCertificate.getPublicKey());
     this.xApiKey = xApiKey;
     this.userAgent = userAgent;
-    this.clientType = clientType;
     this.unirest = Unirest.spawnInstance();
   }
 
@@ -104,6 +100,9 @@ public class VauClient implements HttpBClient {
     Objects.requireNonNull(
         this.unirest, "VauClient is not initialized: missing call to initialize()?");
 
+    // at least one of the header providers must have added an Authorization header, otherwise the
+    // VAU request will fail
+    // we need this header to be able to encode the inner request for the outer VAU request
     val bearerToken =
         innerHttpRequest
             .getBearerToken()
@@ -111,13 +110,14 @@ public class VauClient implements HttpBClient {
                 () ->
                     new VauException(
                         "Authorization header is missing which is required for VAU requests"));
+
     val encodedRequest = httpCodec.encode(innerHttpRequest);
     val reqBody =
         vauProtocol.encryptRawVauRequest(
             bearerToken, encodedRequest.getBytes(StandardCharsets.UTF_8));
+    // TODO: use observer plugin here!
     log.info(
-        "Sending VAU-Request as {} to: {} with Request ID {}",
-        clientType.toString(),
+        "Sending VAU-Request to: {} with Request ID {}",
         getVauRequestUrl(),
         Base64.getEncoder().encodeToString(vauProtocol.getRequestId()));
     log.trace("\n------- inner VAU-Request -------\n{}\n-------", encodedRequest);

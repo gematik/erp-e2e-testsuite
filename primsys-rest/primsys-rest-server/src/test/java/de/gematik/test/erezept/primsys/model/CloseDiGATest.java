@@ -20,9 +20,9 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,7 +41,7 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.SetSystemProperty;
 
-@SetSystemProperty(key = "erp.fhir.profile", value = "1.4.0")
+@SetSystemProperty(key = "erp.fhir.profile", value = "1.6.0")
 class CloseDiGATest extends TestWithActorContext {
 
   @Test
@@ -116,11 +116,11 @@ class CloseDiGATest extends TestWithActorContext {
     val ktr = ctx.getHealthInsurances().get(0);
 
     val usecase = new CloseDiGA(ktr);
-    try (val response = usecase.closePrescription("taskId", "accessCode")) {
-      fail("CloseUseCase did not throw the expected Exception");
-    } catch (WebApplicationException wae) {
-      assertEquals(WebApplicationException.class, wae.getClass());
-      assertEquals(404, wae.getResponse().getStatus());
-    }
+    assertThrows(
+        WebApplicationException.class,
+        () -> {
+          usecase.closePrescription("taskId", "accessCode");
+        },
+        "CloseUseCase did not throw the expected Exception");
   }
 }

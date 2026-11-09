@@ -71,7 +71,7 @@ public class AuditEventGetPagingIT extends ErpTest {
 
     val auditEventQueryParam =
         IQueryParameter.search()
-            .withOffset(10)
+            .withOffset(7)
             .withCount(5)
             .sortedBy("date", SortOrder.ASCENDING)
             .createParameter();

@@ -51,7 +51,7 @@ public class ErxChargeItemManipulatorFactory {
    */
   public static List<NamedEnvelope<FuzzingMutator<ErxChargeItem>>> binaryVersionManipulator() {
     val retList = new ArrayList<NamedEnvelope<FuzzingMutator<ErxChargeItem>>>();
-    retList.addAll(forContainedProfile(ErpWorkflowVersion.V1_4));
+    retList.addAll(forContainedProfile(ErpWorkflowVersion.V1_6));
     retList.addAll(forContainedProfile(ErpWorkflowVersion.V1_5));
     return retList;
   }

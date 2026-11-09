@@ -20,7 +20,8 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
 import de.gematik.bbriccs.utils.ResourceLoader;
@@ -35,17 +36,17 @@ import org.junit.jupiter.api.Test;
 
 class ChargeItemBundleVerifierTest extends ErpFhirParsingTest {
 
-  private static final String CHARGE_ITEM_BUNDLE_PATH_FROM_JSON =
-      "fhir/valid/erp/1.4.0/chargeitembundle/bundle_01.json";
+  private static final String CHARGE_ITEM_BUNDLE_PATH_FROM_XML =
+      "fhir/valid/erp/1.6.0/xml/charhgeitembundle/ChargeItemByFDWithAddedIds.xml";
 
   private final String invalidID = "123.TEST";
 
-  private static final String VALID_ID = "200.000.003.355.048.35";
+  private static final String VALID_ID = "200.000.003.746.556.84";
 
   private static ErxChargeItemBundle getDecodedChargeItemBundle() {
     return parser.decode(
         ErxChargeItemBundle.class,
-        ResourceLoader.readFileFromResource(CHARGE_ITEM_BUNDLE_PATH_FROM_JSON));
+        ResourceLoader.readFileFromResource(CHARGE_ITEM_BUNDLE_PATH_FROM_XML));
   }
 
   @BeforeEach
@@ -80,7 +81,7 @@ class ChargeItemBundleVerifierTest extends ErpFhirParsingTest {
   }
 
   @Test
-  void shouldThrowChargeItemIdNotEquals() {
+  void shouldThrowCauseChargeItemIdNotEquals() {
     val validChargeItemBundle = getDecodedChargeItemBundle();
     val step = ChargeItemBundleVerifier.chargeItemIdIsNotEqualTo(PrescriptionId.from(VALID_ID));
     assertThrows(AssertionError.class, () -> step.apply(validChargeItemBundle));
@@ -89,8 +90,8 @@ class ChargeItemBundleVerifierTest extends ErpFhirParsingTest {
   @Test
   void shouldValidatePrescriptionIdNotEquals() {
     val validChargeItemBundle = getDecodedChargeItemBundle();
-    val step = ChargeItemBundleVerifier.prescriptionIdIsEqualTo(TaskId.from(VALID_ID));
-    step.apply(validChargeItemBundle);
+    val step = ChargeItemBundleVerifier.prescriptionIdIsEqualTo(TaskId.from(invalidID));
+    assertThrows(AssertionError.class, () -> step.apply(validChargeItemBundle));
   }
 
   @Test

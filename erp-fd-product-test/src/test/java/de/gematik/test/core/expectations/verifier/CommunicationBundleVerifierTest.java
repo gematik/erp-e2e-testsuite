@@ -20,30 +20,35 @@
 
 package de.gematik.test.core.expectations.verifier;
 
-import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.containsOnlyIdentifierWith;
-import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.receivedDateIsEqualTo;
-import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.sentDateIsEqual;
-import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.verifyReceivedDateWithPredicate;
-import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.verifySentDateIsAfter;
-import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.verifySentDateIsBefore;
-import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.verifySentDateIsSortedAscend;
-import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.verifySentDateWithPredicate;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.utils.PrivateConstructorsUtil;
-import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.core.expectations.requirements.ErpAfos;
+import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
+import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunicationBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import de.gematik.test.erezept.fhir.values.AccessCode;
+import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.values.TaskId;
+import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
+import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
+import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Identifier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -52,25 +57,81 @@ import org.junit.jupiter.params.provider.ValueSource;
 @Slf4j
 class CommunicationBundleVerifierTest extends ErpFhirParsingTest {
 
-  private final ErxCommunicationBundle dispRequest =
-      parser.decode(
-          ErxCommunicationBundle.class,
-          ResourceLoader.readFileFromResource(
-              "fhir/valid/erp/1.4.0/communicationbundle/dispRequest_1_4.json"));
-
-  private final ErxCommunicationBundle replyBundle =
-      parser.decode(
-          ErxCommunicationBundle.class,
-          ResourceLoader.readFileFromResource(
-              "fhir/valid/erp/1.4.0/communicationbundle/reply_1_4.xml"));
-
-  private final ErxCommunicationBundle shortValidComBundle =
-      parser.decode(
-          ErxCommunicationBundle.class,
-          ResourceLoader.readFileFromResource(
-              "fhir/valid/erp/1.4.0/communicationbundle/shortDispRequestBundle.json"));
+  private static final String PHARMACY_TID = "3-SMC-B-Testkarte--883110000163973";
+  private static final String PATIENT_KVNR = "X110670787";
+  private static final String KNOWN_COM_ID = "01ebda7b-83e2-9fc0-471f-12c70443747c";
 
   private final LocalDate marchThe18thIn25 = LocalDate.of(2025, Month.MARCH, 18);
+
+  /** 5 DispReqs from KVNR X110670787 to the pharmacy, one with the known id, sent in 2025 */
+  private final ErxCommunicationBundle dispRequest =
+      bundleOf(
+          dispReq(KNOWN_COM_ID, marchThe18thIn25, marchThe18thIn25),
+          dispReq("01ebda7b-8415-2558-2f78-8862845071b3", marchThe18thIn25, marchThe18thIn25),
+          dispReq("01ebda7b-8416-bf80-9b91-8a1e4d1010d0", marchThe18thIn25, marchThe18thIn25),
+          dispReq("01ebda7b-8418-4df0-1e16-f620b8931dab", marchThe18thIn25, marchThe18thIn25),
+          dispReq("01ebda5c-34c7-8b18-7f4b-dde485a9210c", marchThe18thIn25, null));
+
+  /** replies from the pharmacy (TelematikID as sender), sorted ascending by sent date */
+  private final ErxCommunicationBundle replyBundle =
+      bundleOf(
+          reply("01ebda56-7e42-54b8-f5d6-56a331c535a3", LocalDate.of(2025, Month.MARCH, 16)),
+          reply("01ebda5c-34c7-8b18-7f4b-dde485a9210c", LocalDate.of(2025, Month.MARCH, 17)),
+          reply("01ebda7b-8415-2558-2f78-8862845071b3", marchThe18thIn25),
+          reply("01ebda7b-8416-bf80-9b91-8a1e4d1010d0", marchThe18thIn25));
+
+  /** single DispReq sent and received on 2025-03-18 */
+  private final ErxCommunicationBundle shortValidComBundle =
+      bundleOf(dispReq(KNOWN_COM_ID, marchThe18thIn25, marchThe18thIn25));
+
+  private static ErxCommunicationBundle bundleOf(ErxCommunication... communications) {
+    val bundle = new ErxCommunicationBundle();
+    bundle.setType(Bundle.BundleType.SEARCHSET);
+    bundle.setTotal(communications.length);
+    Arrays.stream(communications)
+        .forEach(
+            com ->
+                bundle
+                    .addEntry()
+                    .setFullUrl("Communication/" + com.getIdPart())
+                    .setResource(com)
+                    .getSearch()
+                    .setMode(Bundle.SearchEntryMode.MATCH));
+    return bundle;
+  }
+
+  private static ErxCommunication dispReq(String id, LocalDate sent, @Nullable LocalDate received) {
+    val com =
+        ErxCommunicationBuilder.forDispenseRequest(CommunicationDisReqMessage.forV1().build())
+            .basedOn(TaskId.from(PrescriptionId.random()), AccessCode.random())
+            .receiver(PHARMACY_TID)
+            .sender(PATIENT_KVNR)
+            .flowType(PrescriptionFlowType.FLOW_TYPE_160)
+            .build();
+    com.setId(id);
+    com.setSent(toDate(sent));
+    Optional.ofNullable(received)
+        .map(CommunicationBundleVerifierTest::toDate)
+        .ifPresent(com::setReceived);
+    return com;
+  }
+
+  private static ErxCommunication reply(String id, LocalDate sent) {
+    val com =
+        ErxCommunicationBuilder.asReply(CommunicationReplyMessage.forV1().build())
+            .basedOn(TaskId.from(PrescriptionId.random()))
+            .receiver(PATIENT_KVNR)
+            .sender(PHARMACY_TID)
+            .build();
+    com.setId(id);
+    com.setSent(toDate(sent));
+    com.setReceived(toDate(sent));
+    return com;
+  }
+
+  private static Date toDate(LocalDate date) {
+    return Date.from(date.atTime(12, 0).atZone(ZoneId.systemDefault()).toInstant());
+  }
 
   @BeforeEach
   void init() {
@@ -85,9 +146,8 @@ class CommunicationBundleVerifierTest extends ErpFhirParsingTest {
   @Test
   void shouldFindId() {
     val step =
-        CommunicationBundleVerifier.containsCommunicationWithId(
-            "01ebda7b-83e2-9fc0-471f-12c70443747c", ErpAfos.A_19520);
-    step.apply(dispRequest);
+        CommunicationBundleVerifier.containsCommunicationWithId(KNOWN_COM_ID, ErpAfos.A_19520);
+    assertDoesNotThrow(() -> step.apply(shortValidComBundle));
   }
 
   @Test
@@ -353,13 +413,15 @@ class CommunicationBundleVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldVerifySendDateAscendSortedBundle2() {
-    val ascendSortedBundle =
-        parser.decode(
-            ErxCommunicationBundle.class,
-            ResourceLoader.readFileFromResource(
-                "fhir/valid/erp/1.4.0/communicationbundle/dispReqWithIdentifier.xml"));
-    val step = containsOnlyIdentifierWith("160.000.006.993.636.55");
-    assertDoesNotThrow(() -> step.apply(ascendSortedBundle));
+    val prescriptionId = "160.000.006.993.636.55";
+    val com = dispReq("01ebe222-4405-2b58-6834-434ee850fca6", marchThe18thIn25, null);
+    com.addIdentifier(
+        new Identifier()
+            .setSystem("https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId")
+            .setValue(prescriptionId));
+    val bundleWithIdentifier = bundleOf(com);
+    val step = containsOnlyIdentifierWith(prescriptionId);
+    assertDoesNotThrow(() -> step.apply(bundleWithIdentifier));
   }
 
   @Test

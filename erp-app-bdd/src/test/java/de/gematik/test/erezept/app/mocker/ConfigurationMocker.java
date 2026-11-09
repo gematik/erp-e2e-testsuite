@@ -21,6 +21,7 @@
 package de.gematik.test.erezept.app.mocker;
 
 import de.gematik.test.erezept.app.cfg.ErpAppConfiguration;
+import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.app.DeviceConfiguration;
 import de.gematik.test.erezept.config.dto.app.ErpActorConfiguration;
 import de.gematik.test.erezept.config.dto.app.ErpAppConfigurationBase;
@@ -28,6 +29,12 @@ import java.util.LinkedList;
 import lombok.val;
 
 public class ConfigurationMocker {
+
+  public static PatientConfiguration createDefaultPatientConfiguration(String name) {
+    val cfg = new PatientConfiguration();
+    cfg.setName(name);
+    return cfg;
+  }
 
   public static ErpAppConfiguration createDefaultTestConfiguration(
       String userName, String iccsn, boolean shouldUseVirtualEgk) {

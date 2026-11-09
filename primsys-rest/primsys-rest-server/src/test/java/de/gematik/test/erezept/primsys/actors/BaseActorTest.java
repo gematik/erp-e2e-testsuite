@@ -31,7 +31,6 @@ import static org.mockito.Mockito.when;
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
-import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
 import de.gematik.test.erezept.primsys.model.ActorContext;
@@ -78,9 +77,7 @@ class BaseActorTest extends TestWithActorContext {
     try (val mdMock = mockStatic(MessageDigest.class)) {
       mdMock.when(() -> MessageDigest.getInstance("MD5")).thenThrow(new RuntimeException("test"));
 
-      val cfg = new PharmacyConfiguration();
-      cfg.setName("Pharmacy");
-      assertThrows(RuntimeException.class, () -> new Pharmacy(cfg, null, null, null));
+      assertThrows(RuntimeException.class, () -> new Pharmacy("Pharmacy", null, null, null, null));
     }
   }
 

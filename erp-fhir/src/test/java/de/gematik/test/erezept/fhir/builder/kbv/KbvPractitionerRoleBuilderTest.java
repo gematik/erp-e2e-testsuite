@@ -20,7 +20,8 @@
 
 package de.gematik.test.erezept.fhir.builder.kbv;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -38,13 +39,13 @@ class KbvPractitionerRoleBuilderTest extends ErpFhirParsingTest {
         KbvPractitionerRoleBuilder.builder()
             .practitioner(practitioner)
             .teamNumber(asvTeamNumber)
-            .version(KbvItaForVersion.V1_2_0)
+            .version(KbvItaForVersion.V1_3_0)
             .build();
     assertTrue(parser.isValid(practitionerRole));
     assertTrue(practitionerRole.getPractitioner().getReference().endsWith(practitioner.getId()));
     assertEquals(
         asvTeamNumber.getValue(), practitionerRole.getOrganization().getIdentifier().getValue());
-    assertTrue(practitionerRole.getMeta().getProfile().get(0).getValue().endsWith("1.2"));
+    assertTrue(practitionerRole.getMeta().getProfile().get(0).getValue().endsWith("1.3"));
   }
 
   @Test
@@ -53,9 +54,9 @@ class KbvPractitionerRoleBuilderTest extends ErpFhirParsingTest {
         KbvPractitionerRoleBuilder.builder()
             .practitioner(KbvPractitionerFaker.builder().fake())
             .teamNumber(AsvTeamNumber.random())
-            .version(KbvItaForVersion.V1_1_0)
+            .version(KbvItaForVersion.V1_3_0)
             .build();
     assertTrue(parser.isValid(practitionerRole));
-    assertTrue(practitionerRole.getMeta().getProfile().get(0).getValue().endsWith("1.1.0"));
+    assertTrue(practitionerRole.getMeta().getProfile().get(0).getValue().endsWith("1.3"));
   }
 }

@@ -20,18 +20,16 @@
 
 package de.gematik.test.erezept.primsys.actors;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.konnektor.Konnektor;
-import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.test.erezept.config.dto.actor.HealthInsuranceConfiguration;
-import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
+import de.gematik.bbriccs.smartcards.SmcB;
+import de.gematik.test.erezept.client.ErpClient;
+import de.gematik.test.erezept.primsys.data.actors.ActorType;
 
 public class HealthInsurance extends BaseActor {
 
   public HealthInsurance(
-      HealthInsuranceConfiguration cfg,
-      EnvironmentConfiguration env,
-      Konnektor konnektor,
-      SmartcardArchive sca) {
-    super(cfg, env, konnektor, sca);
+      String name, SmcB smcb, ErpClient client, CryptoSystem algorithm, Konnektor konnektor) {
+    super(ActorType.HEALTH_INSURANCE, name, smcb, client, algorithm, konnektor);
   }
 }

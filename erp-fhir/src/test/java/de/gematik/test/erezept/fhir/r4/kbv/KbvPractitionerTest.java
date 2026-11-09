@@ -20,12 +20,7 @@
 
 package de.gematik.test.erezept.fhir.r4.kbv;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.utils.ResourceLoader;
@@ -41,18 +36,18 @@ import org.junit.jupiter.api.Test;
 
 class KbvPractitionerTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH = "fhir/valid/kbv/1.1.0/bundle/";
+  private static final String BASE_PATH = "fhir/valid/kbv/1.4.4/";
 
   @Test
   void shouldEncodePractitionerWithoutANRFromKbvBundle() {
-    val kbvId = "5a3458b0-8364-4682-96e2-b262b2ab16eb";
-    val fileName = kbvId + ".xml";
 
-    val expName = "Ben Schulz";
+    val expName = "Emilia Becker";
     val expQualification = QualificationType.DOCTOR;
-    val expAdditionalQualification = "Facharzt für Allgemeinmedizin";
+    val expAdditionalQualification = "Fachärztin für Psychiatrie und Psychotherapie";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val content =
+        ResourceLoader.readFileFromResource(
+            BASE_PATH + "Beispiel_70_TRp_Flag_true_Dos_existant_Positiv.xml");
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
     val practitioner = kbvBundle.getPractitioner();
 
@@ -65,12 +60,12 @@ class KbvPractitionerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldEncodePractitionerWitLANRFromKbvBundle() {
-    val kbvId = "5f66314e-459a-41e9-a3d7-65c935a8be2c";
-    val fileName = kbvId + ".xml";
 
-    val expLanr = new LANR("754236701");
+    val expLanr = new LANR("582369858");
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val content =
+        ResourceLoader.readFileFromResource(
+            BASE_PATH + "Beispiel_70_TRp_Flag_true_Dos_existant_Positiv.xml");
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
     val practitioner = kbvBundle.getPractitioner();
 
@@ -86,11 +81,11 @@ class KbvPractitionerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldThrowOnMissingFields() {
-    val kbvId = "5a3458b0-8364-4682-96e2-b262b2ab16eb";
-    val fileName = kbvId + ".xml";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val content =
+        ResourceLoader.readFileFromResource(
+            BASE_PATH + "Beispiel_70_TRp_Flag_true_Dos_existant_Positiv.xml");
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
+
     val practitioner = kbvBundle.getPractitioner();
 
     practitioner.setQualification(List.of());
@@ -102,10 +97,9 @@ class KbvPractitionerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldGetSamePractitioner() {
-    val kbvId = "5a3458b0-8364-4682-96e2-b262b2ab16eb";
-    val fileName = kbvId + ".xml";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val content =
+        ResourceLoader.readFileFromResource(
+            BASE_PATH + "Beispiel_70_TRp_Flag_true_Dos_existant_Positiv.xml");
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
     val practitioner = kbvBundle.getPractitioner();
 
@@ -115,17 +109,14 @@ class KbvPractitionerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldReadAsvFachgruppennummer() {
-    val kbvId = "5a3458b0-8364-4682-96e2-b262b2ab16eb";
-    val fileName = kbvId + ".xml";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource("fhir/valid/kbv/1.4.0/Beispiel_60.xml");
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
     val practitioner = kbvBundle.getPractitioner();
 
     val qtOptional = practitioner.getAsvFachgruppennummer();
     assertNotNull(qtOptional);
     assertTrue(qtOptional.isPresent());
-    assertEquals("555555801", qtOptional.orElseThrow().getValue());
+    assertEquals("555555472", qtOptional.orElseThrow().getValue());
   }
 
   @Test

@@ -20,11 +20,17 @@
 
 package de.gematik.test.erezept.cli.param;
 
-import de.gematik.bbriccs.smartcards.Egk;
+import static java.text.MessageFormat.format;
+
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.bbriccs.smartcards.SmartcardType;
+import de.gematik.bbriccs.smartcards.cfg.SmartcardConfigDto;
 import de.gematik.test.erezept.cli.converter.StringListConverter;
+import de.gematik.test.erezept.cli.exceptions.CliException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.val;
 import picocli.CommandLine;
 
@@ -47,22 +53,47 @@ public class ExclusiveEgkIdentifierGroup {
   private List<String> iccsns;
 
   public boolean hasKvnrs() {
-    return kvnrs != null && !kvnrs.isEmpty();
+    return Optional.ofNullable(kvnrs).filter(it -> !it.isEmpty()).isPresent();
   }
 
   public boolean hasIccsns() {
-    return iccsns != null && !iccsns.isEmpty();
+    return Optional.ofNullable(iccsns).filter(it -> !it.isEmpty()).isPresent();
   }
 
-  public List<Egk> getEgks(SmartcardArchive sca) {
-    val ret = new LinkedList<Egk>();
+  /**
+   * This group is exclusive, so only one of the two lists can be set. If you choose to select KVNRs
+   * by their ICCSNs, the KVNRs will be resolved from the SmartcardArchive. If you choose to select
+   * KVNRs directly, the KVNRs will be used as is. In case the SmartcardArchive does not contain
+   * kryptographic material for the KVNRs, authentication via GID will be chosen.
+   *
+   * @param sca the SmartcardArchive to resolve KVNRs from ICCSNs
+   * @return a list of KVNRs, either directly from the KVNRs list or resolved from the ICCSNs list
+   */
+  public List<String> getKvnrs(SmartcardArchive sca) {
+    val ret = new LinkedList<String>();
 
     if (hasKvnrs()) {
-      ret.addAll(this.kvnrs.stream().map(sca::getEgkByKvnr).toList());
+      ret.addAll(this.kvnrs);
     }
 
     if (hasIccsns()) {
-      ret.addAll(this.iccsns.stream().map(sca::getEgkByICCSN).toList());
+      val iccsnToKvnr =
+          sca.getConfigsFor(SmartcardType.EGK).stream()
+              .collect(
+                  Collectors.toMap(
+                      SmartcardConfigDto::getIccsn,
+                      SmartcardConfigDto::getIdentifier,
+                      (first, second) -> first));
+
+      this.iccsns.forEach(
+          iccsn ->
+              ret.add(
+                  Optional.ofNullable(iccsnToKvnr.get(iccsn))
+                      .orElseThrow(
+                          () ->
+                              new CliException(
+                                  format(
+                                      "No eGK with ICCSN {0} found in SmartcardArchive", iccsn)))));
     }
 
     return ret;

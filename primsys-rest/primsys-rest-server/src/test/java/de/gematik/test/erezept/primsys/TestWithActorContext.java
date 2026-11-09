@@ -24,30 +24,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.EncodingType;
-import de.gematik.bbriccs.konnektor.Konnektor;
-import de.gematik.bbriccs.konnektor.KonnektorImpl;
-import de.gematik.bbriccs.konnektor.SofKonServicePort;
-import de.gematik.bbriccs.konnektor.cfg.KonnektorContextConfiguration;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.bbriccs.vsdm.VsdmService;
-import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
+import de.gematik.test.erezept.client.cfg.ErpClientFactoryUtil;
 import de.gematik.test.erezept.config.ConfigurationReader;
-import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
-import de.gematik.test.erezept.config.dto.actor.HealthInsuranceConfiguration;
-import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
-import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
-import de.gematik.test.erezept.config.dto.erpclient.BackendRouteConfiguration;
-import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
-import de.gematik.test.erezept.primsys.actors.Doctor;
-import de.gematik.test.erezept.primsys.actors.HealthInsurance;
-import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import de.gematik.test.erezept.primsys.model.ActorContext;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 import lombok.val;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Resource;
@@ -56,93 +39,18 @@ import org.mockito.stubbing.Answer;
 
 public abstract class TestWithActorContext extends ErpFhirParsingTest {
 
-  protected static final PrimsysConfigurationDto configDto;
-  protected static final EnvironmentConfiguration env;
-  protected static final SmartcardArchive sca;
-  protected static final Konnektor konnektor;
+  protected static final PrimsysConfigurationDto primsysConfig;
+  protected static final PrimSysRestFactory primsysFactory;
+  protected static final ErpClientFactory erpClientFactory;
 
   static {
-    configDto = ConfigurationReader.forPrimSysConfiguration().create();
-    env = createActiveEnvironment();
-    sca = SmartcardArchive.fromResources();
+    primsysConfig = ConfigurationReader.forPrimSysConfiguration().create();
+    val sca = SmartcardArchive.fromResources();
 
-    val serviceProvider = new SofKonServicePort(sca, VsdmService.instantiateWithTestKey());
-    konnektor =
-        new KonnektorImpl(
-            KonnektorContextConfiguration.getDefaultContextType(), serviceProvider, List.of());
+    erpClientFactory = ErpClientFactoryUtil.createMockedErpClientFactory(sca, parser);
+    primsysFactory = PrimSysRestFactory.from(primsysConfig, erpClientFactory);
 
-    val mockFactory = mock(PrimSysRestFactory.class);
-
-    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
-      erpClientFactoryMockedStatic
-          .when(() -> ErpClientFactory.createErpClient(any(), any(PsActorConfiguration.class)))
-          .thenReturn(mock(ErpClient.class));
-
-      val mockedDoctors = TestWithActorContext.createDoctorActors();
-      val mockedPharmacies = TestWithActorContext.createPharmacyActors();
-      val mockKtrs = TestWithActorContext.createKtrActors();
-
-      when(mockFactory.getActiveEnvironment()).thenReturn(env);
-      when(mockFactory.createDoctorActors()).thenReturn(mockedDoctors);
-      when(mockFactory.createPharmacyActors()).thenReturn(mockedPharmacies);
-      when(mockFactory.createHealthInsuranceActors()).thenReturn(mockKtrs);
-
-      ActorContext.init(mockFactory);
-    }
-  }
-
-  private static List<Doctor> createDoctorActors() {
-    return TestWithActorContext.configDto.getActors().getDoctors().stream()
-        .map(TestWithActorContext::createMockDoctor)
-        .toList();
-  }
-
-  private static List<Pharmacy> createPharmacyActors() {
-    return TestWithActorContext.configDto.getActors().getPharmacies().stream()
-        .map(TestWithActorContext::createMockedPharmacy)
-        .toList();
-  }
-
-  private static List<HealthInsurance> createKtrActors() {
-    return TestWithActorContext.configDto.getActors().getHealthInsurances().stream()
-        .map(TestWithActorContext::createMockedHealthInsurance)
-        .toList();
-  }
-
-  private static Doctor createMockDoctor(DoctorConfiguration cfg) {
-    return new Doctor(cfg, env, konnektor, sca);
-  }
-
-  private static Pharmacy createMockedPharmacy(PharmacyConfiguration cfg) {
-    return new Pharmacy(cfg, env, konnektor, sca);
-  }
-
-  private static HealthInsurance createMockedHealthInsurance(HealthInsuranceConfiguration cfg) {
-    return new HealthInsurance(cfg, env, konnektor, sca);
-  }
-
-  private static EnvironmentConfiguration createActiveEnvironment() {
-    val activeEnvironment = new EnvironmentConfiguration();
-    activeEnvironment.setName("Unit-Test Mock");
-
-    val ti = new BackendRouteConfiguration();
-    ti.setDiscoveryDocumentUrl(
-        "http://127.0.0.1:8590/auth/realms/idp/.well-known/openid-configuration");
-    ti.setFdBaseUrl("http://127.0.0.1:3000");
-    ti.setSubscriptionServiceUrl("wss://127.0.0.1:3000/subscription");
-    ti.setUserAgent("eRp-Testsuite");
-    activeEnvironment.setTi(ti);
-
-    val internet = new BackendRouteConfiguration();
-    internet.setDiscoveryDocumentUrl(
-        "http://127.0.0.1:8590/auth/realms/idp/.well-known/openid-configuration");
-    internet.setFdBaseUrl("http://127.0.0.1:3000");
-    internet.setSubscriptionServiceUrl("wss://127.0.0.1:3000/subscription");
-    internet.setUserAgent("eRp-Testsuite");
-    internet.setXapiKey("xapikey");
-    activeEnvironment.setTi(internet);
-
-    return activeEnvironment;
+    ActorContext.init(primsysFactory);
   }
 
   @BeforeEach
@@ -156,8 +64,6 @@ public abstract class TestWithActorContext extends ErpFhirParsingTest {
 
               // now mock the fhir parser back in
               when(erpClient.getFhir()).thenReturn(parser);
-              when(erpClient.getIdpTokenValidUntil())
-                  .thenReturn(Instant.now().plus(30, ChronoUnit.MINUTES));
               when(erpClient.decode(any(), any()))
                   .thenAnswer(
                       (Answer<IBaseResource>)

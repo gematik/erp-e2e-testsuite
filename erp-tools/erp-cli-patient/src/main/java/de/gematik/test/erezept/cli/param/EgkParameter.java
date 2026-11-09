@@ -20,7 +20,6 @@
 
 package de.gematik.test.erezept.cli.param;
 
-import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import java.util.List;
 import picocli.CommandLine;
@@ -30,7 +29,7 @@ public class EgkParameter {
   @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
   private ExclusiveEgkIdentifierGroup egkIdentifier;
 
-  public List<Egk> getEgks(SmartcardArchive sca) {
-    return egkIdentifier.getEgks(sca);
+  public List<String> getKvnrs(SmartcardArchive sca) {
+    return egkIdentifier.getKvnrs(sca);
   }
 }

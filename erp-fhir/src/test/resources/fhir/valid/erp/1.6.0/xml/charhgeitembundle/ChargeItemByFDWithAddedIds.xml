@@ -1,0 +1,938 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="d1504c90-11a5-49b0-9d1c-813e23c235d4"/>
+    <type value="collection"/>
+    <timestamp value="2026-10-13T10:42:21.803+00:00"/>
+    <entry>
+        <fullUrl value="https://erp-dev.zentral.erp.splitdns.ti-dienste.de/ChargeItem/200.000.003.746.556.84"/>
+        <resource>
+            <ChargeItem xmlns="http://hl7.org/fhir">
+                <id value="200.000.003.746.556.84"/>
+                <meta>
+                    <profile value="https://gematik.de/fhir/erpchrg/StructureDefinition/GEM_ERPCHRG_PR_ChargeItem|1.1"/>
+                </meta>
+                <identifier>
+                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_AccessCode"/>
+                    <value value="5702e3a8e80944b196bcd371c370cdba94c2b32f35bfce54dd6f86bd05f83c8e"/>
+                </identifier>
+                <identifier>
+                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                    <value value="200.000.003.746.556.84"/>
+                </identifier>
+                <status value="billable"/>
+                <code>
+                    <coding>
+                        <system value="http://terminology.hl7.org/CodeSystem/data-absent-reason"/>
+                        <code value="not-applicable"/>
+                    </coding>
+                </code>
+                <subject>
+                    <identifier>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110614233"/>
+                    </identifier>
+                </subject>
+                <enterer>
+                    <identifier>
+                        <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                        <value value="3-SMC-B-Testkarte--883110000163973"/>
+                    </identifier>
+                </enterer>
+                <enteredDate value="2026-10-13T10:42:21.597+00:00"/>
+                <supportingInformation>
+                    <reference value="urn:uuid:c8fc2a39-0000-0000-0001-000000000000"/>
+                    <display value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Bundle"/>
+                </supportingInformation>
+                <supportingInformation>
+                    <reference value="urn:uuid:c8fc2a39-0000-0000-0004-000000000000"/>
+                    <display
+                            value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenBundle"/>
+                </supportingInformation>
+                <supportingInformation>
+                    <reference value="urn:uuid:c8fc2a39-0000-0000-0003-000000000000"/>
+                    <display value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Bundle"/>
+                </supportingInformation>
+            </ChargeItem>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:c8fc2a39-0000-0000-0004-000000000000"/>
+        <resource>
+            <Bundle xmlns="http://hl7.org/fhir">
+                <id value="7d0e6b2f-680f-43d6-be55-0ee666d2b7f6"/>
+                <meta>
+                    <lastUpdated value="2026-10-13T12:42:21.263+02:00"/>
+                    <profile
+                            value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenBundle|1.4"/>
+                </meta>
+                <identifier>
+                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                    <value value="200.000.003.746.556.84"/>
+                </identifier>
+                <type value="document"/>
+                <timestamp value="2026-10-13T12:42:21.263+02:00"/>
+                <entry>
+                    <fullUrl value="urn:uuid:2404f356-653a-47e8-82e1-ce7a444651e7"/>
+                    <resource>
+                        <Composition xmlns="http://hl7.org/fhir">
+                            <id value="d01b6b56-4106-443a-9bff-bb5fab2d2cff"/>
+                            <meta>
+                                <profile
+                                        value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-AbgabedatenComposition|1.4"/>
+                            </meta>
+                            <status value="final"/>
+                            <type>
+                                <coding>
+                                    <system value="http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-CompositionTypes"/>
+                                    <code value="ERezeptAbgabedaten"/>
+                                </coding>
+                            </type>
+                            <date value="2026-10-13T12:42:21+02:00"/>
+                            <author>
+                                <reference value="urn:uuid:1e347dce-f4f7-4e43-bf1e-c3fcb2ae4091"/>
+                            </author>
+                            <title value="ERezeptAbgabedaten"/>
+                            <section>
+                                <title value="Apotheke"/>
+                                <entry>
+                                    <reference value="urn:uuid:1e347dce-f4f7-4e43-bf1e-c3fcb2ae4091"/>
+                                </entry>
+                            </section>
+                            <section>
+                                <title value="Abgabeinformationen"/>
+                                <entry>
+                                    <reference value="urn:uuid:05afcbff-81dd-4e04-8ff3-ae7e23ddbd0a"/>
+                                </entry>
+                            </section>
+                        </Composition>
+                    </resource>
+                </entry>
+                <entry>
+                    <fullUrl value="urn:uuid:1e347dce-f4f7-4e43-bf1e-c3fcb2ae4091"/>
+                    <resource>
+                        <Organization xmlns="http://hl7.org/fhir">
+                            <id value="d01b6b56-4106-443a-9bff-bb5fab2d2caa"/>
+                            <meta>
+                                <profile
+                                        value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Apotheke|1.4"/>
+                            </meta>
+                            <identifier>
+                                <system value="http://fhir.de/sid/arge-ik/iknr"/>
+                                <value value="117518625"/>
+                            </identifier>
+                            <name value="Apotheke Will Power"/>
+                            <address>
+                                <type value="physical"/>
+                                <line value="Am Alten Schafstall 62b">
+                                    <extension url="http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-streetName">
+                                        <valueString value="Am Alten Schafstall"/>
+                                    </extension>
+                                    <extension url="http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-houseNumber">
+                                        <valueString value="62b"/>
+                                    </extension>
+                                </line>
+                                <city value="Sebastianbrunn"/>
+                                <postalCode value="18391"/>
+                                <country value="NKA"/>
+                            </address>
+                        </Organization>
+                    </resource>
+                </entry>
+                <entry>
+                    <fullUrl value="urn:uuid:826bdec0-3c7a-47b2-87b3-f04b1eed9419"/>
+                    <resource>
+                        <Invoice xmlns="http://hl7.org/fhir">
+                            <meta>
+                                <profile
+                                        value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abrechnungszeilen|1.4"/>
+                            </meta>
+                            <status value="issued"/>
+                            <type>
+                                <coding>
+                                    <system value="http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-InvoiceTyp"/>
+                                    <code value="Abrechnungszeilen"/>
+                                </coding>
+                            </type>
+                            <lineItem>
+                                <sequence value="1"/>
+                                <chargeItemCodeableConcept>
+                                    <coding>
+                                        <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                                        <code value="91171138"/>
+                                    </coding>
+                                    <text value="Vertigoheel® Liquidum"/>
+                                </chargeItemCodeableConcept>
+                                <priceComponent>
+                                    <extension
+                                            url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-KostenVersicherter">
+                                        <extension url="Kategorie">
+                                            <valueCodeableConcept>
+                                                <coding>
+                                                    <system value="http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-PKV-CS-ERP-KostenVersicherterKategorie"/>
+                                                    <code value="0"/>
+                                                </coding>
+                                            </valueCodeableConcept>
+                                        </extension>
+                                        <extension url="Kostenbetrag">
+                                            <valueMoney>
+                                                <value value="33.92"/>
+                                                <currency value="EUR"/>
+                                            </valueMoney>
+                                        </extension>
+                                    </extension>
+                                    <extension
+                                            url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-MwStSatz">
+                                        <valueDecimal value="12.84"/>
+                                    </extension>
+                                    <type value="informational"/>
+                                    <factor value="1"/>
+                                    <amount>
+                                        <value value="34.75"/>
+                                        <currency value="EUR"/>
+                                    </amount>
+                                </priceComponent>
+                            </lineItem>
+                            <lineItem>
+                                <sequence value="2"/>
+                                <chargeItemCodeableConcept>
+                                    <coding>
+                                        <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                                        <code value="87819504"/>
+                                    </coding>
+                                    <text value="Curcumin Extrakt 45 Brausetabletten"/>
+                                </chargeItemCodeableConcept>
+                                <priceComponent>
+                                    <extension
+                                            url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-KostenVersicherter">
+                                        <extension url="Kategorie">
+                                            <valueCodeableConcept>
+                                                <coding>
+                                                    <system value="http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-PKV-CS-ERP-KostenVersicherterKategorie"/>
+                                                    <code value="0"/>
+                                                </coding>
+                                            </valueCodeableConcept>
+                                        </extension>
+                                        <extension url="Kostenbetrag">
+                                            <valueMoney>
+                                                <value value="96.56"/>
+                                                <currency value="EUR"/>
+                                            </valueMoney>
+                                        </extension>
+                                    </extension>
+                                    <extension
+                                            url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-MwStSatz">
+                                        <valueDecimal value="12.84"/>
+                                    </extension>
+                                    <type value="informational"/>
+                                    <factor value="1"/>
+                                    <amount>
+                                        <value value="290.54"/>
+                                        <currency value="EUR"/>
+                                    </amount>
+                                </priceComponent>
+                            </lineItem>
+                            <lineItem>
+                                <sequence value="3"/>
+                                <chargeItemCodeableConcept>
+                                    <coding>
+                                        <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                                        <code value="34227399"/>
+                                    </coding>
+                                    <text value="Lactulose AL Ampullen 850 mg"/>
+                                </chargeItemCodeableConcept>
+                                <priceComponent>
+                                    <extension
+                                            url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-KostenVersicherter">
+                                        <extension url="Kategorie">
+                                            <valueCodeableConcept>
+                                                <coding>
+                                                    <system value="http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-PKV-CS-ERP-KostenVersicherterKategorie"/>
+                                                    <code value="0"/>
+                                                </coding>
+                                            </valueCodeableConcept>
+                                        </extension>
+                                        <extension url="Kostenbetrag">
+                                            <valueMoney>
+                                                <value value="71.80"/>
+                                                <currency value="EUR"/>
+                                            </valueMoney>
+                                        </extension>
+                                    </extension>
+                                    <extension
+                                            url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-MwStSatz">
+                                        <valueDecimal value="12.84"/>
+                                    </extension>
+                                    <type value="informational"/>
+                                    <factor value="1"/>
+                                    <amount>
+                                        <value value="257.98"/>
+                                        <currency value="EUR"/>
+                                    </amount>
+                                </priceComponent>
+                            </lineItem>
+                            <lineItem>
+                                <sequence value="4"/>
+                                <chargeItemCodeableConcept>
+                                    <coding>
+                                        <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                                        <code value="87956230"/>
+                                    </coding>
+                                    <text value="PANTOPRAZOL beta Salbe 1500 mg"/>
+                                </chargeItemCodeableConcept>
+                                <priceComponent>
+                                    <extension
+                                            url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-KostenVersicherter">
+                                        <extension url="Kategorie">
+                                            <valueCodeableConcept>
+                                                <coding>
+                                                    <system value="http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-PKV-CS-ERP-KostenVersicherterKategorie"/>
+                                                    <code value="0"/>
+                                                </coding>
+                                            </valueCodeableConcept>
+                                        </extension>
+                                        <extension url="Kostenbetrag">
+                                            <valueMoney>
+                                                <value value="10.06"/>
+                                                <currency value="EUR"/>
+                                            </valueMoney>
+                                        </extension>
+                                    </extension>
+                                    <extension
+                                            url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-MwStSatz">
+                                        <valueDecimal value="12.84"/>
+                                    </extension>
+                                    <type value="informational"/>
+                                    <factor value="1"/>
+                                    <amount>
+                                        <value value="23.36"/>
+                                        <currency value="EUR"/>
+                                    </amount>
+                                </priceComponent>
+                            </lineItem>
+                            <totalGross>
+                                <extension
+                                        url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-Gesamtzuzahlung">
+                                    <valueMoney>
+                                        <value value="212.34"/>
+                                        <currency value="EUR"/>
+                                    </valueMoney>
+                                </extension>
+                                <value value="606.63"/>
+                                <currency value="EUR"/>
+                            </totalGross>
+                        </Invoice>
+                    </resource>
+                </entry>
+                <entry>
+                    <fullUrl value="urn:uuid:05afcbff-81dd-4e04-8ff3-ae7e23ddbd0a"/>
+                    <resource>
+                        <MedicationDispense xmlns="http://hl7.org/fhir">
+                            <meta>
+                                <profile
+                                        value="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-PR-ERP-Abgabeinformationen|1.4"/>
+                            </meta>
+                            <extension
+                                    url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-PKV-EX-ERP-AbrechnungsTyp">
+                                <valueCodeableConcept>
+                                    <coding>
+                                        <system value="http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-PKV-CS-ERP-AbrechnungsTyp"/>
+                                        <code value="1"/>
+                                    </coding>
+                                </valueCodeableConcept>
+                            </extension>
+                            <extension
+                                    url="http://fhir.abda.de/eRezeptAbgabedaten/StructureDefinition/DAV-EX-ERP-Abrechnungszeilen">
+                                <valueReference>
+                                    <reference value="urn:uuid:826bdec0-3c7a-47b2-87b3-f04b1eed9419"/>
+                                </valueReference>
+                            </extension>
+                            <status value="completed"/>
+                            <medicationCodeableConcept>
+                                <coding>
+                                    <system value="http://terminology.hl7.org/CodeSystem/data-absent-reason"/>
+                                    <code value="not-applicable"/>
+                                </coding>
+                            </medicationCodeableConcept>
+                            <performer>
+                                <actor>
+                                    <reference value="urn:uuid:1e347dce-f4f7-4e43-bf1e-c3fcb2ae4091"/>
+                                </actor>
+                            </performer>
+                            <authorizingPrescription>
+                                <identifier>
+                                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                                    <value value="200.000.003.746.556.84"/>
+                                </identifier>
+                            </authorizingPrescription>
+                            <type>
+                                <coding>
+                                    <system value="http://fhir.abda.de/eRezeptAbgabedaten/CodeSystem/DAV-CS-ERP-MedicationDispenseTyp"/>
+                                    <code value="Abgabeinformationen"/>
+                                </coding>
+                            </type>
+                            <whenHandedOver value="2026-10-13"/>
+                        </MedicationDispense>
+                    </resource>
+                </entry>
+                <signature>
+                    <type>
+                        <system value="urn:iso-astm:E1762-95:2013"/>
+                        <code value="1.2.840.10065.1.12.1.1"/>
+                    </type>
+                    <when value="2026-10-13T10:42:21.847+00:00"/>
+                    <who>
+                        <reference value="https://erp-dev.zentral.erp.splitdns.ti-dienste.de/Device/1"/>
+                    </who>
+                    <sigFormat value="application/pkcs7-mime"/>
+                    <data value="MIIyMwYJKoZIhvcNAQcCoIIyJDCCMiACAQExDTALBglghkgBZQMEAgEwgiFlBgkqhkiG9w0BBwGggiFWBIIhUjxCdW5kbGUgeG1sbnM9Imh0dHA6Ly9obDcub3JnL2ZoaXIiPjxpZCB2YWx1ZT0iN2QwZTZiMmYtNjgwZi00M2Q2LWJlNTUtMGVlNjY2ZDJiN2Y2Ii8+PG1ldGE+PGxhc3RVcGRhdGVkIHZhbHVlPSIyMDI2LTEwLTEzVDEyOjQyOjIxLjI2MyswMjowMCIvPjxwcm9maWxlIHZhbHVlPSJodHRwOi8vZmhpci5hYmRhLmRlL2VSZXplcHRBYmdhYmVkYXRlbi9TdHJ1Y3R1cmVEZWZpbml0aW9uL0RBVi1QS1YtUFItRVJQLUFiZ2FiZWRhdGVuQnVuZGxlfDEuNCIvPjwvbWV0YT48aWRlbnRpZmllcj48c3lzdGVtIHZhbHVlPSJodHRwczovL2dlbWF0aWsuZGUvZmhpci9lcnAvTmFtaW5nU3lzdGVtL0dFTV9FUlBfTlNfUHJlc2NyaXB0aW9uSWQiLz48dmFsdWUgdmFsdWU9IjIwMC4wMDAuMDAzLjc0Ni41NTYuODQiLz48L2lkZW50aWZpZXI+PHR5cGUgdmFsdWU9ImRvY3VtZW50Ii8+PHRpbWVzdGFtcCB2YWx1ZT0iMjAyNi0xMC0xM1QxMjo0MjoyMS4yNjMrMDI6MDAiLz48ZW50cnk+PGZ1bGxVcmwgdmFsdWU9InVybjp1dWlkOjI0MDRmMzU2LTY1M2EtNDdlOC04MmUxLWNlN2E0NDQ2NTFlNyIvPjxyZXNvdXJjZT48Q29tcG9zaXRpb24geG1sbnM9Imh0dHA6Ly9obDcub3JnL2ZoaXIiPjxpZCB2YWx1ZT0iMjQwNGYzNTYtNjUzYS00N2U4LTgyZTEtY2U3YTQ0NDY1MWU3Ii8+PG1ldGE+PHByb2ZpbGUgdmFsdWU9Imh0dHA6Ly9maGlyLmFiZGEuZGUvZVJlemVwdEFiZ2FiZWRhdGVuL1N0cnVjdHVyZURlZmluaXRpb24vREFWLVBLVi1QUi1FUlAtQWJnYWJlZGF0ZW5Db21wb3NpdGlvbnwxLjQiLz48L21ldGE+PHN0YXR1cyB2YWx1ZT0iZmluYWwiLz48dHlwZT48Y29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHA6Ly9maGlyLmFiZGEuZGUvZVJlemVwdEFiZ2FiZWRhdGVuL0NvZGVTeXN0ZW0vREFWLUNTLUVSUC1Db21wb3NpdGlvblR5cGVzIi8+PGNvZGUgdmFsdWU9IkVSZXplcHRBYmdhYmVkYXRlbiIvPjwvY29kaW5nPjwvdHlwZT48ZGF0ZSB2YWx1ZT0iMjAyNi0xMC0xM1QxMjo0MjoyMSswMjowMCIvPjxhdXRob3I+PHJlZmVyZW5jZSB2YWx1ZT0idXJuOnV1aWQ6MWUzNDdkY2UtZjRmNy00ZTQzLWJmMWUtYzNmY2IyYWU0MDkxIi8+PC9hdXRob3I+PHRpdGxlIHZhbHVlPSJFUmV6ZXB0QWJnYWJlZGF0ZW4iLz48c2VjdGlvbj48dGl0bGUgdmFsdWU9IkFwb3RoZWtlIi8+PGVudHJ5PjxyZWZlcmVuY2UgdmFsdWU9InVybjp1dWlkOjFlMzQ3ZGNlLWY0ZjctNGU0My1iZjFlLWMzZmNiMmFlNDA5MSIvPjwvZW50cnk+PC9zZWN0aW9uPjxzZWN0aW9uPjx0aXRsZSB2YWx1ZT0iQWJnYWJlaW5mb3JtYXRpb25lbiIvPjxlbnRyeT48cmVmZXJlbmNlIHZhbHVlPSJ1cm46dXVpZDowNWFmY2JmZi04MWRkLTRlMDQtOGZmMy1hZTdlMjNkZGJkMGEiLz48L2VudHJ5Pjwvc2VjdGlvbj48L0NvbXBvc2l0aW9uPjwvcmVzb3VyY2U+PC9lbnRyeT48ZW50cnk+PGZ1bGxVcmwgdmFsdWU9InVybjp1dWlkOjFlMzQ3ZGNlLWY0ZjctNGU0My1iZjFlLWMzZmNiMmFlNDA5MSIvPjxyZXNvdXJjZT48T3JnYW5pemF0aW9uIHhtbG5zPSJodHRwOi8vaGw3Lm9yZy9maGlyIj48aWQgdmFsdWU9IjFlMzQ3ZGNlLWY0ZjctNGU0My1iZjFlLWMzZmNiMmFlNDA5MSIvPjxtZXRhPjxwcm9maWxlIHZhbHVlPSJodHRwOi8vZmhpci5hYmRhLmRlL2VSZXplcHRBYmdhYmVkYXRlbi9TdHJ1Y3R1cmVEZWZpbml0aW9uL0RBVi1QS1YtUFItRVJQLUFwb3RoZWtlfDEuNCIvPjwvbWV0YT48aWRlbnRpZmllcj48c3lzdGVtIHZhbHVlPSJodHRwOi8vZmhpci5kZS9zaWQvYXJnZS1pay9pa25yIi8+PHZhbHVlIHZhbHVlPSIxMTc1MTg2MjUiLz48L2lkZW50aWZpZXI+PG5hbWUgdmFsdWU9IkFwb3RoZWtlIFdpbGwgUG93ZXIiLz48YWRkcmVzcz48dHlwZSB2YWx1ZT0icGh5c2ljYWwiLz48bGluZSB2YWx1ZT0iQW0gQWx0ZW4gU2NoYWZzdGFsbCA2MmIiPjxleHRlbnNpb24gdXJsPSJodHRwOi8vaGw3Lm9yZy9maGlyL1N0cnVjdHVyZURlZmluaXRpb24vaXNvMjEwOTAtQURYUC1zdHJlZXROYW1lIj48dmFsdWVTdHJpbmcgdmFsdWU9IkFtIEFsdGVuIFNjaGFmc3RhbGwiLz48L2V4dGVuc2lvbj48ZXh0ZW5zaW9uIHVybD0iaHR0cDovL2hsNy5vcmcvZmhpci9TdHJ1Y3R1cmVEZWZpbml0aW9uL2lzbzIxMDkwLUFEWFAtaG91c2VOdW1iZXIiPjx2YWx1ZVN0cmluZyB2YWx1ZT0iNjJiIi8+PC9leHRlbnNpb24+PC9saW5lPjxjaXR5IHZhbHVlPSJTZWJhc3RpYW5icnVubiIvPjxwb3N0YWxDb2RlIHZhbHVlPSIxODM5MSIvPjxjb3VudHJ5IHZhbHVlPSJOS0EiLz48L2FkZHJlc3M+PC9Pcmdhbml6YXRpb24+PC9yZXNvdXJjZT48L2VudHJ5PjxlbnRyeT48ZnVsbFVybCB2YWx1ZT0idXJuOnV1aWQ6ODI2YmRlYzAtM2M3YS00N2IyLTg3YjMtZjA0YjFlZWQ5NDE5Ii8+PHJlc291cmNlPjxJbnZvaWNlIHhtbG5zPSJodHRwOi8vaGw3Lm9yZy9maGlyIj48aWQgdmFsdWU9IjgyNmJkZWMwLTNjN2EtNDdiMi04N2IzLWYwNGIxZWVkOTQxOSIvPjxtZXRhPjxwcm9maWxlIHZhbHVlPSJodHRwOi8vZmhpci5hYmRhLmRlL2VSZXplcHRBYmdhYmVkYXRlbi9TdHJ1Y3R1cmVEZWZpbml0aW9uL0RBVi1QS1YtUFItRVJQLUFicmVjaG51bmdzemVpbGVufDEuNCIvPjwvbWV0YT48c3RhdHVzIHZhbHVlPSJpc3N1ZWQiLz48dHlwZT48Y29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHA6Ly9maGlyLmFiZGEuZGUvZVJlemVwdEFiZ2FiZWRhdGVuL0NvZGVTeXN0ZW0vREFWLUNTLUVSUC1JbnZvaWNlVHlwIi8+PGNvZGUgdmFsdWU9IkFicmVjaG51bmdzemVpbGVuIi8+PC9jb2Rpbmc+PC90eXBlPjxsaW5lSXRlbT48c2VxdWVuY2UgdmFsdWU9IjEiLz48Y2hhcmdlSXRlbUNvZGVhYmxlQ29uY2VwdD48Y29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHA6Ly9maGlyLmRlL0NvZGVTeXN0ZW0vaWZhL3B6biIvPjxjb2RlIHZhbHVlPSI5MTE3MTEzOCIvPjwvY29kaW5nPjx0ZXh0IHZhbHVlPSJWZXJ0aWdvaGVlbMKuIExpcXVpZHVtIi8+PC9jaGFyZ2VJdGVtQ29kZWFibGVDb25jZXB0PjxwcmljZUNvbXBvbmVudD48ZXh0ZW5zaW9uIHVybD0iaHR0cDovL2ZoaXIuYWJkYS5kZS9lUmV6ZXB0QWJnYWJlZGF0ZW4vU3RydWN0dXJlRGVmaW5pdGlvbi9EQVYtRVgtRVJQLUtvc3RlblZlcnNpY2hlcnRlciI+PGV4dGVuc2lvbiB1cmw9IkthdGVnb3JpZSI+PHZhbHVlQ29kZWFibGVDb25jZXB0Pjxjb2Rpbmc+PHN5c3RlbSB2YWx1ZT0iaHR0cDovL2ZoaXIuYWJkYS5kZS9lUmV6ZXB0QWJnYWJlZGF0ZW4vQ29kZVN5c3RlbS9EQVYtUEtWLUNTLUVSUC1Lb3N0ZW5WZXJzaWNoZXJ0ZXJLYXRlZ29yaWUiLz48Y29kZSB2YWx1ZT0iMCIvPjwvY29kaW5nPjwvdmFsdWVDb2RlYWJsZUNvbmNlcHQ+PC9leHRlbnNpb24+PGV4dGVuc2lvbiB1cmw9Iktvc3RlbmJldHJhZyI+PHZhbHVlTW9uZXk+PHZhbHVlIHZhbHVlPSIzMy45MiIvPjxjdXJyZW5jeSB2YWx1ZT0iRVVSIi8+PC92YWx1ZU1vbmV5PjwvZXh0ZW5zaW9uPjwvZXh0ZW5zaW9uPjxleHRlbnNpb24gdXJsPSJodHRwOi8vZmhpci5hYmRhLmRlL2VSZXplcHRBYmdhYmVkYXRlbi9TdHJ1Y3R1cmVEZWZpbml0aW9uL0RBVi1FWC1FUlAtTXdTdFNhdHoiPjx2YWx1ZURlY2ltYWwgdmFsdWU9IjEyLjg0Ii8+PC9leHRlbnNpb24+PHR5cGUgdmFsdWU9ImluZm9ybWF0aW9uYWwiLz48ZmFjdG9yIHZhbHVlPSIxIi8+PGFtb3VudD48dmFsdWUgdmFsdWU9IjM0Ljc1Ii8+PGN1cnJlbmN5IHZhbHVlPSJFVVIiLz48L2Ftb3VudD48L3ByaWNlQ29tcG9uZW50PjwvbGluZUl0ZW0+PGxpbmVJdGVtPjxzZXF1ZW5jZSB2YWx1ZT0iMiIvPjxjaGFyZ2VJdGVtQ29kZWFibGVDb25jZXB0Pjxjb2Rpbmc+PHN5c3RlbSB2YWx1ZT0iaHR0cDovL2ZoaXIuZGUvQ29kZVN5c3RlbS9pZmEvcHpuIi8+PGNvZGUgdmFsdWU9Ijg3ODE5NTA0Ii8+PC9jb2Rpbmc+PHRleHQgdmFsdWU9IkN1cmN1bWluIEV4dHJha3QgNDUgQnJhdXNldGFibGV0dGVuIi8+PC9jaGFyZ2VJdGVtQ29kZWFibGVDb25jZXB0PjxwcmljZUNvbXBvbmVudD48ZXh0ZW5zaW9uIHVybD0iaHR0cDovL2ZoaXIuYWJkYS5kZS9lUmV6ZXB0QWJnYWJlZGF0ZW4vU3RydWN0dXJlRGVmaW5pdGlvbi9EQVYtRVgtRVJQLUtvc3RlblZlcnNpY2hlcnRlciI+PGV4dGVuc2lvbiB1cmw9IkthdGVnb3JpZSI+PHZhbHVlQ29kZWFibGVDb25jZXB0Pjxjb2Rpbmc+PHN5c3RlbSB2YWx1ZT0iaHR0cDovL2ZoaXIuYWJkYS5kZS9lUmV6ZXB0QWJnYWJlZGF0ZW4vQ29kZVN5c3RlbS9EQVYtUEtWLUNTLUVSUC1Lb3N0ZW5WZXJzaWNoZXJ0ZXJLYXRlZ29yaWUiLz48Y29kZSB2YWx1ZT0iMCIvPjwvY29kaW5nPjwvdmFsdWVDb2RlYWJsZUNvbmNlcHQ+PC9leHRlbnNpb24+PGV4dGVuc2lvbiB1cmw9Iktvc3RlbmJldHJhZyI+PHZhbHVlTW9uZXk+PHZhbHVlIHZhbHVlPSI5Ni41NiIvPjxjdXJyZW5jeSB2YWx1ZT0iRVVSIi8+PC92YWx1ZU1vbmV5PjwvZXh0ZW5zaW9uPjwvZXh0ZW5zaW9uPjxleHRlbnNpb24gdXJsPSJodHRwOi8vZmhpci5hYmRhLmRlL2VSZXplcHRBYmdhYmVkYXRlbi9TdHJ1Y3R1cmVEZWZpbml0aW9uL0RBVi1FWC1FUlAtTXdTdFNhdHoiPjx2YWx1ZURlY2ltYWwgdmFsdWU9IjEyLjg0Ii8+PC9leHRlbnNpb24+PHR5cGUgdmFsdWU9ImluZm9ybWF0aW9uYWwiLz48ZmFjdG9yIHZhbHVlPSIxIi8+PGFtb3VudD48dmFsdWUgdmFsdWU9IjI5MC41NCIvPjxjdXJyZW5jeSB2YWx1ZT0iRVVSIi8+PC9hbW91bnQ+PC9wcmljZUNvbXBvbmVudD48L2xpbmVJdGVtPjxsaW5lSXRlbT48c2VxdWVuY2UgdmFsdWU9IjMiLz48Y2hhcmdlSXRlbUNvZGVhYmxlQ29uY2VwdD48Y29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHA6Ly9maGlyLmRlL0NvZGVTeXN0ZW0vaWZhL3B6biIvPjxjb2RlIHZhbHVlPSIzNDIyNzM5OSIvPjwvY29kaW5nPjx0ZXh0IHZhbHVlPSJMYWN0dWxvc2UgQUwgQW1wdWxsZW4gODUwIG1nIi8+PC9jaGFyZ2VJdGVtQ29kZWFibGVDb25jZXB0PjxwcmljZUNvbXBvbmVudD48ZXh0ZW5zaW9uIHVybD0iaHR0cDovL2ZoaXIuYWJkYS5kZS9lUmV6ZXB0QWJnYWJlZGF0ZW4vU3RydWN0dXJlRGVmaW5pdGlvbi9EQVYtRVgtRVJQLUtvc3RlblZlcnNpY2hlcnRlciI+PGV4dGVuc2lvbiB1cmw9IkthdGVnb3JpZSI+PHZhbHVlQ29kZWFibGVDb25jZXB0Pjxjb2Rpbmc+PHN5c3RlbSB2YWx1ZT0iaHR0cDovL2ZoaXIuYWJkYS5kZS9lUmV6ZXB0QWJnYWJlZGF0ZW4vQ29kZVN5c3RlbS9EQVYtUEtWLUNTLUVSUC1Lb3N0ZW5WZXJzaWNoZXJ0ZXJLYXRlZ29yaWUiLz48Y29kZSB2YWx1ZT0iMCIvPjwvY29kaW5nPjwvdmFsdWVDb2RlYWJsZUNvbmNlcHQ+PC9leHRlbnNpb24+PGV4dGVuc2lvbiB1cmw9Iktvc3RlbmJldHJhZyI+PHZhbHVlTW9uZXk+PHZhbHVlIHZhbHVlPSI3MS44MCIvPjxjdXJyZW5jeSB2YWx1ZT0iRVVSIi8+PC92YWx1ZU1vbmV5PjwvZXh0ZW5zaW9uPjwvZXh0ZW5zaW9uPjxleHRlbnNpb24gdXJsPSJodHRwOi8vZmhpci5hYmRhLmRlL2VSZXplcHRBYmdhYmVkYXRlbi9TdHJ1Y3R1cmVEZWZpbml0aW9uL0RBVi1FWC1FUlAtTXdTdFNhdHoiPjx2YWx1ZURlY2ltYWwgdmFsdWU9IjEyLjg0Ii8+PC9leHRlbnNpb24+PHR5cGUgdmFsdWU9ImluZm9ybWF0aW9uYWwiLz48ZmFjdG9yIHZhbHVlPSIxIi8+PGFtb3VudD48dmFsdWUgdmFsdWU9IjI1Ny45OCIvPjxjdXJyZW5jeSB2YWx1ZT0iRVVSIi8+PC9hbW91bnQ+PC9wcmljZUNvbXBvbmVudD48L2xpbmVJdGVtPjxsaW5lSXRlbT48c2VxdWVuY2UgdmFsdWU9IjQiLz48Y2hhcmdlSXRlbUNvZGVhYmxlQ29uY2VwdD48Y29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHA6Ly9maGlyLmRlL0NvZGVTeXN0ZW0vaWZhL3B6biIvPjxjb2RlIHZhbHVlPSI4Nzk1NjIzMCIvPjwvY29kaW5nPjx0ZXh0IHZhbHVlPSJQQU5UT1BSQVpPTCBiZXRhIFNhbGJlIDE1MDAgbWciLz48L2NoYXJnZUl0ZW1Db2RlYWJsZUNvbmNlcHQ+PHByaWNlQ29tcG9uZW50PjxleHRlbnNpb24gdXJsPSJodHRwOi8vZmhpci5hYmRhLmRlL2VSZXplcHRBYmdhYmVkYXRlbi9TdHJ1Y3R1cmVEZWZpbml0aW9uL0RBVi1FWC1FUlAtS29zdGVuVmVyc2ljaGVydGVyIj48ZXh0ZW5zaW9uIHVybD0iS2F0ZWdvcmllIj48dmFsdWVDb2RlYWJsZUNvbmNlcHQ+PGNvZGluZz48c3lzdGVtIHZhbHVlPSJodHRwOi8vZmhpci5hYmRhLmRlL2VSZXplcHRBYmdhYmVkYXRlbi9Db2RlU3lzdGVtL0RBVi1QS1YtQ1MtRVJQLUtvc3RlblZlcnNpY2hlcnRlckthdGVnb3JpZSIvPjxjb2RlIHZhbHVlPSIwIi8+PC9jb2Rpbmc+PC92YWx1ZUNvZGVhYmxlQ29uY2VwdD48L2V4dGVuc2lvbj48ZXh0ZW5zaW9uIHVybD0iS29zdGVuYmV0cmFnIj48dmFsdWVNb25leT48dmFsdWUgdmFsdWU9IjEwLjA2Ii8+PGN1cnJlbmN5IHZhbHVlPSJFVVIiLz48L3ZhbHVlTW9uZXk+PC9leHRlbnNpb24+PC9leHRlbnNpb24+PGV4dGVuc2lvbiB1cmw9Imh0dHA6Ly9maGlyLmFiZGEuZGUvZVJlemVwdEFiZ2FiZWRhdGVuL1N0cnVjdHVyZURlZmluaXRpb24vREFWLUVYLUVSUC1Nd1N0U2F0eiI+PHZhbHVlRGVjaW1hbCB2YWx1ZT0iMTIuODQiLz48L2V4dGVuc2lvbj48dHlwZSB2YWx1ZT0iaW5mb3JtYXRpb25hbCIvPjxmYWN0b3IgdmFsdWU9IjEiLz48YW1vdW50Pjx2YWx1ZSB2YWx1ZT0iMjMuMzYiLz48Y3VycmVuY3kgdmFsdWU9IkVVUiIvPjwvYW1vdW50PjwvcHJpY2VDb21wb25lbnQ+PC9saW5lSXRlbT48dG90YWxHcm9zcz48ZXh0ZW5zaW9uIHVybD0iaHR0cDovL2ZoaXIuYWJkYS5kZS9lUmV6ZXB0QWJnYWJlZGF0ZW4vU3RydWN0dXJlRGVmaW5pdGlvbi9EQVYtRVgtRVJQLUdlc2FtdHp1emFobHVuZyI+PHZhbHVlTW9uZXk+PHZhbHVlIHZhbHVlPSIyMTIuMzQiLz48Y3VycmVuY3kgdmFsdWU9IkVVUiIvPjwvdmFsdWVNb25leT48L2V4dGVuc2lvbj48dmFsdWUgdmFsdWU9IjYwNi42MyIvPjxjdXJyZW5jeSB2YWx1ZT0iRVVSIi8+PC90b3RhbEdyb3NzPjwvSW52b2ljZT48L3Jlc291cmNlPjwvZW50cnk+PGVudHJ5PjxmdWxsVXJsIHZhbHVlPSJ1cm46dXVpZDowNWFmY2JmZi04MWRkLTRlMDQtOGZmMy1hZTdlMjNkZGJkMGEiLz48cmVzb3VyY2U+PE1lZGljYXRpb25EaXNwZW5zZSB4bWxucz0iaHR0cDovL2hsNy5vcmcvZmhpciI+PGlkIHZhbHVlPSIwNWFmY2JmZi04MWRkLTRlMDQtOGZmMy1hZTdlMjNkZGJkMGEiLz48bWV0YT48cHJvZmlsZSB2YWx1ZT0iaHR0cDovL2ZoaXIuYWJkYS5kZS9lUmV6ZXB0QWJnYWJlZGF0ZW4vU3RydWN0dXJlRGVmaW5pdGlvbi9EQVYtUEtWLVBSLUVSUC1BYmdhYmVpbmZvcm1hdGlvbmVufDEuNCIvPjwvbWV0YT48ZXh0ZW5zaW9uIHVybD0iaHR0cDovL2ZoaXIuYWJkYS5kZS9lUmV6ZXB0QWJnYWJlZGF0ZW4vU3RydWN0dXJlRGVmaW5pdGlvbi9EQVYtUEtWLUVYLUVSUC1BYnJlY2hudW5nc1R5cCI+PHZhbHVlQ29kZWFibGVDb25jZXB0Pjxjb2Rpbmc+PHN5c3RlbSB2YWx1ZT0iaHR0cDovL2ZoaXIuYWJkYS5kZS9lUmV6ZXB0QWJnYWJlZGF0ZW4vQ29kZVN5c3RlbS9EQVYtUEtWLUNTLUVSUC1BYnJlY2hudW5nc1R5cCIvPjxjb2RlIHZhbHVlPSIxIi8+PC9jb2Rpbmc+PC92YWx1ZUNvZGVhYmxlQ29uY2VwdD48L2V4dGVuc2lvbj48ZXh0ZW5zaW9uIHVybD0iaHR0cDovL2ZoaXIuYWJkYS5kZS9lUmV6ZXB0QWJnYWJlZGF0ZW4vU3RydWN0dXJlRGVmaW5pdGlvbi9EQVYtRVgtRVJQLUFicmVjaG51bmdzemVpbGVuIj48dmFsdWVSZWZlcmVuY2U+PHJlZmVyZW5jZSB2YWx1ZT0idXJuOnV1aWQ6ODI2YmRlYzAtM2M3YS00N2IyLTg3YjMtZjA0YjFlZWQ5NDE5Ii8+PC92YWx1ZVJlZmVyZW5jZT48L2V4dGVuc2lvbj48c3RhdHVzIHZhbHVlPSJjb21wbGV0ZWQiLz48bWVkaWNhdGlvbkNvZGVhYmxlQ29uY2VwdD48Y29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHA6Ly90ZXJtaW5vbG9neS5obDcub3JnL0NvZGVTeXN0ZW0vZGF0YS1hYnNlbnQtcmVhc29uIi8+PGNvZGUgdmFsdWU9Im5vdC1hcHBsaWNhYmxlIi8+PC9jb2Rpbmc+PC9tZWRpY2F0aW9uQ29kZWFibGVDb25jZXB0PjxwZXJmb3JtZXI+PGFjdG9yPjxyZWZlcmVuY2UgdmFsdWU9InVybjp1dWlkOjFlMzQ3ZGNlLWY0ZjctNGU0My1iZjFlLWMzZmNiMmFlNDA5MSIvPjwvYWN0b3I+PC9wZXJmb3JtZXI+PGF1dGhvcml6aW5nUHJlc2NyaXB0aW9uPjxpZGVudGlmaWVyPjxzeXN0ZW0gdmFsdWU9Imh0dHBzOi8vZ2VtYXRpay5kZS9maGlyL2VycC9OYW1pbmdTeXN0ZW0vR0VNX0VSUF9OU19QcmVzY3JpcHRpb25JZCIvPjx2YWx1ZSB2YWx1ZT0iMjAwLjAwMC4wMDMuNzQ2LjU1Ni44NCIvPjwvaWRlbnRpZmllcj48L2F1dGhvcml6aW5nUHJlc2NyaXB0aW9uPjx0eXBlPjxjb2Rpbmc+PHN5c3RlbSB2YWx1ZT0iaHR0cDovL2ZoaXIuYWJkYS5kZS9lUmV6ZXB0QWJnYWJlZGF0ZW4vQ29kZVN5c3RlbS9EQVYtQ1MtRVJQLU1lZGljYXRpb25EaXNwZW5zZVR5cCIvPjxjb2RlIHZhbHVlPSJBYmdhYmVpbmZvcm1hdGlvbmVuIi8+PC9jb2Rpbmc+PC90eXBlPjx3aGVuSGFuZGVkT3ZlciB2YWx1ZT0iMjAyNi0xMC0xMyIvPjwvTWVkaWNhdGlvbkRpc3BlbnNlPjwvcmVzb3VyY2U+PC9lbnRyeT48L0J1bmRsZT6ggga1MIIC1zCCAn6gAwIBAgIDALXjMAoGCCqGSM49BAMCMIGEMQswCQYDVQQGEwJERTEfMB0GA1UECgwWZ2VtYXRpayBHbWJIIE5PVC1WQUxJRDEyMDAGA1UECwwpS29tcG9uZW50ZW4tQ0EgZGVyIFRlbGVtYXRpa2luZnJhc3RydWt0dXIxIDAeBgNVBAMMF0dFTS5LT01QLUNBNTYgVEVTVC1PTkxZMB4XDTI2MDExNTEyMTU1MloXDTMxMDExNDEyMTU1MVowXzELMAkGA1UEBhMCREUxIjAgBgNVBAoMGUlCTSBURVNULU9OTFkgLSBOT1QtVkFMSUQxGjAYBgNVBAUTETA4NzQ3LVJVREVWU0lHMDA2MRAwDgYDVQQDDAdlcmV6ZXB0MFowFAYHKoZIzj0CAQYJKyQDAwIIAQEHA0IABH+BhaeQHQGieKJfdSlyrifoVVzTp85/8pecCN0AMmm3YYN4WbjsWxNWiZtTVfpu60iYYM0n8bAPx2LztBbadq6jggEAMIH9MB0GA1UdDgQW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"/>
+                </signature>
+            </Bundle>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:c8fc2a39-0000-0000-0001-000000000000"/>
+        <resource>
+            <Bundle xmlns="http://hl7.org/fhir">
+                <id value="d01b6b56-4106-443a-9bff-bb5fab2d2cbb"/>
+                <meta>
+                    <versionId value="1"/>
+                    <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Bundle|1.4"/>
+                </meta>
+                <identifier>
+                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                    <value value="200.000.003.746.556.84"/>
+                </identifier>
+                <type value="document"/>
+                <timestamp value="2026-10-13T12:42:18.331+02:00"/>
+                <entry>
+                    <fullUrl value="urn:uuid:99b3d69e-c4a7-4f23-8675-7a9cb0fec76f"/>
+                    <resource>
+                        <Composition xmlns="http://hl7.org/fhir">
+                            <id value="dffbfd6a-5712-4798-bdc8-07201eb77ab8"/>
+                            <meta>
+                                <versionId value="1"/>
+                                <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Composition|1.4"/>
+                            </meta>
+                            <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_Legal_basis">
+                                <valueCoding>
+                                    <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_STATUSKENNZEICHEN"/>
+                                    <code value="00"/>
+                                </valueCoding>
+                            </extension>
+                            <status value="final"/>
+                            <type>
+                                <coding>
+                                    <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_FORMULAR_ART"/>
+                                    <code value="e16A"/>
+                                </coding>
+                            </type>
+                            <subject>
+                                <reference value="urn:uuid:debb5ac5-af98-4804-a584-4c6e471047d9"/>
+                            </subject>
+                            <date value="2026-10-13T12:42:18+02:00"/>
+                            <author>
+                                <type value="Device"/>
+                                <identifier>
+                                    <system value="https://fhir.kbv.de/NamingSystem/KBV_NS_FOR_Pruefnummer"/>
+                                    <value value="GEMATIK/410/2109/36/123"/>
+                                </identifier>
+                            </author>
+                            <author>
+                                <reference value="urn:uuid:016d0875-d8c1-47e4-b43c-383e985d7575"/>
+                                <type value="Practitioner"/>
+                            </author>
+                            <title value="elektronische Arzneimittelverordnung"/>
+                            <custodian>
+                                <reference value="urn:uuid:54cd5d48-58e2-491b-b1b8-c20b3de3aa8b"/>
+                            </custodian>
+                            <section>
+                                <code>
+                                    <coding>
+                                        <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_Section_Type"/>
+                                        <code value="Coverage"/>
+                                    </coding>
+                                </code>
+                                <entry>
+                                    <reference value="urn:uuid:1862918f-9f4f-432f-a404-65954784ea3d"/>
+                                </entry>
+                            </section>
+                            <section>
+                                <code>
+                                    <coding>
+                                        <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_Section_Type"/>
+                                        <code value="Prescription"/>
+                                    </coding>
+                                </code>
+                                <entry>
+                                    <reference value="urn:uuid:bceb0e27-e5c8-46ed-b123-e537fdf443f2"/>
+                                </entry>
+                            </section>
+                        </Composition>
+                    </resource>
+                </entry>
+                <entry>
+                    <fullUrl value="urn:uuid:1862918f-9f4f-432f-a404-65954784ea3d"/>
+                    <resource>
+                        <Coverage xmlns="http://hl7.org/fhir">
+                            <id value="d01b6b56-4106-443a-9bff-bb5fab2d2cee"/>
+                            <meta>
+                                <versionId value="1"/>
+                                <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Coverage|1.3"/>
+                            </meta>
+                            <extension url="http://fhir.de/StructureDefinition/gkv/besondere-personengruppe">
+                                <valueCoding>
+                                    <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_PERSONENGRUPPE"/>
+                                    <code value="00"/>
+                                </valueCoding>
+                            </extension>
+                            <extension url="http://fhir.de/StructureDefinition/gkv/dmp-kennzeichen">
+                                <valueCoding>
+                                    <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_DMP"/>
+                                    <code value="00"/>
+                                </valueCoding>
+                            </extension>
+                            <extension url="http://fhir.de/StructureDefinition/gkv/wop">
+                                <valueCoding>
+                                    <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_ITA_WOP"/>
+                                    <code value="78"/>
+                                </valueCoding>
+                            </extension>
+                            <extension url="http://fhir.de/StructureDefinition/gkv/versichertenart">
+                                <valueCoding>
+                                    <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_VERSICHERTENSTATUS"/>
+                                    <code value="1"/>
+                                </valueCoding>
+                            </extension>
+                            <status value="active"/>
+                            <type>
+                                <coding>
+                                    <system value="http://fhir.de/CodeSystem/versicherungsart-de-basis"/>
+                                    <code value="PKV"/>
+                                </coding>
+                            </type>
+                            <beneficiary>
+                                <reference value="urn:uuid:debb5ac5-af98-4804-a584-4c6e471047d9"/>
+                            </beneficiary>
+                            <payor>
+                                <identifier>
+                                    <system value="http://fhir.de/sid/arge-ik/iknr"/>
+                                    <value value="168141347"/>
+                                </identifier>
+                                <display value="Bayerische Beamtenkrankenkasse"/>
+                            </payor>
+                        </Coverage>
+                    </resource>
+                </entry>
+                <entry>
+                    <fullUrl value="urn:uuid:debb5ac5-af98-4804-a584-4c6e471047d9"/>
+                    <resource>
+                        <Patient xmlns="http://hl7.org/fhir">
+                            <id value="d01b6b56-4106-443a-9bff-bb5fab2d2cdd"/>
+                            <meta>
+                                <versionId value="1"/>
+                                <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Patient|1.3"/>
+                            </meta>
+                            <identifier>
+                                <type>
+                                    <coding>
+                                        <system value="http://fhir.de/CodeSystem/identifier-type-de-basis"/>
+                                        <code value="KVZ10"/>
+                                    </coding>
+                                </type>
+                                <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                                <value value="X110614233"/>
+                            </identifier>
+                            <name>
+                                <use value="official"/>
+                                <family value="Hüllmann">
+                                    <extension url="http://hl7.org/fhir/StructureDefinition/humanname-own-name">
+                                        <valueString value="Hüllmann"/>
+                                    </extension>
+                                </family>
+                                <given value="Sina"/>
+                            </name>
+                            <birthDate value="2005-05-09"/>
+                            <address>
+                                <type value="both"/>
+                                <line value="Helenenstr. 54b">
+                                    <extension url="http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-streetName">
+                                        <valueString value="Helenenstr."/>
+                                    </extension>
+                                    <extension url="http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-houseNumber">
+                                        <valueString value="54b"/>
+                                    </extension>
+                                </line>
+                                <city value="Bad Janineland"/>
+                                <postalCode value="67201"/>
+                                <country value="D"/>
+                            </address>
+                        </Patient>
+                    </resource>
+                </entry>
+                <entry>
+                    <fullUrl value="urn:uuid:016d0875-d8c1-47e4-b43c-383e985d7575"/>
+                    <resource>
+                        <Practitioner xmlns="http://hl7.org/fhir">
+                            <id value="d01b6b56-4106-443a-9bff-bb5fab2d2cbb"/>
+                            <meta>
+                                <versionId value="1"/>
+                                <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Practitioner|1.3"/>
+                            </meta>
+                            <identifier>
+                                <type>
+                                    <coding>
+                                        <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+                                        <code value="LANR"/>
+                                    </coding>
+                                </type>
+                                <system value="https://fhir.kbv.de/NamingSystem/KBV_NS_Base_ANR"/>
+                                <value value="782198556"/>
+                            </identifier>
+                            <name>
+                                <use value="official"/>
+                                <family value="Ulmenwald">
+                                    <extension url="http://hl7.org/fhir/StructureDefinition/humanname-own-name">
+                                        <valueString value="Ulmenwald"/>
+                                    </extension>
+                                </family>
+                                <given value="Adelheid"/>
+                                <prefix value="Dr.">
+                                    <extension url="http://hl7.org/fhir/StructureDefinition/iso21090-EN-qualifier">
+                                        <valueCode value="AC"/>
+                                    </extension>
+                                </prefix>
+                            </name>
+                            <qualification>
+                                <code>
+                                    <coding>
+                                        <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_FOR_Qualification_Type"/>
+                                        <code value="00"/>
+                                    </coding>
+                                </code>
+                            </qualification>
+                            <qualification>
+                                <code>
+                                    <coding>
+                                        <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_FOR_Berufsbezeichnung"/>
+                                        <code value="Berufsbezeichnung"/>
+                                    </coding>
+                                    <text value="Super-Facharzt für alles Mögliche"/>
+                                </code>
+                            </qualification>
+                        </Practitioner>
+                    </resource>
+                </entry>
+                <entry>
+                    <fullUrl value="urn:uuid:54cd5d48-58e2-491b-b1b8-c20b3de3aa8b"/>
+                    <resource>
+                        <Organization xmlns="http://hl7.org/fhir">
+                            <id value="dffbfd6a-5712-4798-bdc8-07201eb77ab8"/>
+                            <meta>
+                                <versionId value="1"/>
+                                <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_FOR_Organization|1.3"/>
+                            </meta>
+                            <identifier>
+                                <type>
+                                    <coding>
+                                        <system value="http://terminology.hl7.org/CodeSystem/v2-0203"/>
+                                        <code value="BSNR"/>
+                                    </coding>
+                                </type>
+                                <system value="https://fhir.kbv.de/NamingSystem/KBV_NS_Base_BSNR"/>
+                                <value value="502724686"/>
+                            </identifier>
+                            <name value="Arztpraxis Ulmenwald"/>
+                            <telecom>
+                                <system value="phone"/>
+                                <value value="+49-7695-00856945"/>
+                            </telecom>
+                            <telecom>
+                                <system value="email"/>
+                                <value value="tamino.schedler@uliczka.de"/>
+                            </telecom>
+                            <address>
+                                <type value="both"/>
+                                <line value="Overfeldweg 80a">
+                                    <extension url="http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-streetName">
+                                        <valueString value="Overfeldweg"/>
+                                    </extension>
+                                    <extension url="http://hl7.org/fhir/StructureDefinition/iso21090-ADXP-houseNumber">
+                                        <valueString value="80a"/>
+                                    </extension>
+                                </line>
+                                <city value="Klein Joyceheim"/>
+                                <postalCode value="46389"/>
+                                <country value="D"/>
+                            </address>
+                        </Organization>
+                    </resource>
+                </entry>
+                <entry>
+                    <fullUrl value="urn:uuid:0a280b6f-88ab-4e7e-9f3f-90e7993c8273"/>
+                    <resource>
+                        <Medication xmlns="http://hl7.org/fhir">
+                            <id value="dffbfd6a-5712-4798-bdc8-07201eb77ab8"/>
+                            <meta>
+                                <versionId value="1"/>
+                                <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Medication_PZN|1.4"/>
+                            </meta>
+                            <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_Base_Medication_Type">
+                                <valueCodeableConcept>
+                                    <coding>
+                                        <system value="http://snomed.info/sct"/>
+                                        <version value="http://snomed.info/sct/11000274103/version/20240515"/>
+                                        <code value="763158003"/>
+                                        <display value="Medicinal product (product)"/>
+                                    </coding>
+                                </valueCodeableConcept>
+                            </extension>
+                            <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_Category">
+                                <valueCoding>
+                                    <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_ERP_Medication_Category"/>
+                                    <code value="00"/>
+                                </valueCoding>
+                            </extension>
+                            <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_Vaccine">
+                                <valueBoolean value="false"/>
+                            </extension>
+                            <extension url="http://fhir.de/StructureDefinition/normgroesse">
+                                <valueCode value="N2"/>
+                            </extension>
+                            <code>
+                                <coding>
+                                    <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                                    <code value="46998699"/>
+                                </coding>
+                                <text value="Reactine® Duo Lösung 850 mg"/>
+                            </code>
+                            <form>
+                                <coding>
+                                    <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM"/>
+                                    <code value="SAL"/>
+                                </coding>
+                            </form>
+                            <amount>
+                                <numerator>
+                                    <extension
+                                            url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Medication_PackagingSize">
+                                        <valueString value="15"/>
+                                    </extension>
+                                    <unit value="Stk"/>
+                                </numerator>
+                                <denominator>
+                                    <value value="1"/>
+                                </denominator>
+                            </amount>
+                            <ingredient>
+                                <itemCodeableConcept>
+                                    <text value="Ibu-LysinHEXAL® Filmtabletten 100 mg"/>
+                                </itemCodeableConcept>
+                                <strength>
+                                    <extension url="http://hl7.org/fhir/StructureDefinition/data-absent-reason">
+                                        <valueCode value="unknown"/>
+                                    </extension>
+                                </strength>
+                            </ingredient>
+                        </Medication>
+                    </resource>
+                </entry>
+                <entry>
+                    <fullUrl value="urn:uuid:bceb0e27-e5c8-46ed-b123-e537fdf443f2"/>
+                    <resource>
+                        <MedicationRequest xmlns="http://hl7.org/fhir">
+                            <id value="d01b6b56-4106-443a-9bff-bb5fab2d2ccc"/>
+                            <meta>
+                                <versionId value="1"/>
+                                <profile value="https://fhir.kbv.de/StructureDefinition/KBV_PR_ERP_Prescription|1.4"/>
+                            </meta>
+                            <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_SER">
+                                <valueBoolean value="true"/>
+                            </extension>
+                            <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_EmergencyServicesFee">
+                                <valueBoolean value="false"/>
+                            </extension>
+                            <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_Multiple_Prescription">
+                                <extension url="Kennzeichen">
+                                    <valueBoolean value="false"/>
+                                </extension>
+                            </extension>
+                            <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_FOR_StatusCoPayment">
+                                <valueCoding>
+                                    <system value="https://fhir.kbv.de/CodeSystem/KBV_CS_FOR_StatusCoPayment"/>
+                                    <code value="1"/>
+                                </valueCoding>
+                            </extension>
+                            <extension
+                                    url="http://ig.fhir.de/igs/medication/StructureDefinition/GeneratedDosageInstructionsMeta">
+                                <extension url="algorithmVersion">
+                                    <valueString value="1.0.1"/>
+                                </extension>
+                                <extension url="language">
+                                    <valueCode value="de-DE"/>
+                                </extension>
+                            </extension>
+                            <extension
+                                    url="http://hl7.org/fhir/5.0/StructureDefinition/extension-MedicationRequest.renderedDosageInstruction">
+                                <valueMarkdown value="3-2-1-2-3"/>
+                            </extension>
+                            <extension url="https://fhir.kbv.de/StructureDefinition/KBV_EX_ERP_DosageFlag">
+                                <valueBoolean value="true"/>
+                            </extension>
+                            <status value="active"/>
+                            <intent value="order"/>
+                            <medicationReference>
+                                <reference value="urn:uuid:0a280b6f-88ab-4e7e-9f3f-90e7993c8273"/>
+                            </medicationReference>
+                            <subject>
+                                <reference value="urn:uuid:debb5ac5-af98-4804-a584-4c6e471047d9"/>
+                            </subject>
+                            <authoredOn value="2026-10-13"/>
+                            <requester>
+                                <reference value="urn:uuid:016d0875-d8c1-47e4-b43c-383e985d7575"/>
+                            </requester>
+                            <insurance>
+                                <reference value="urn:uuid:1862918f-9f4f-432f-a404-65954784ea3d"/>
+                            </insurance>
+                            <dosageInstruction>
+                                <text value="3-2-1-2-3"/>
+                            </dosageInstruction>
+                            <dispenseRequest>
+                                <quantity>
+                                    <value value="19"/>
+                                    <unit value="Packung"/>
+                                </quantity>
+                            </dispenseRequest>
+                            <substitution>
+                                <allowedBoolean value="false"/>
+                            </substitution>
+                        </MedicationRequest>
+                    </resource>
+                </entry>
+                <signature>
+                    <type>
+                        <system value="urn:iso-astm:E1762-95:2013"/>
+                        <code value="1.2.840.10065.1.12.1.1"/>
+                    </type>
+                    <when value="2026-10-13T10:42:21.845+00:00"/>
+                    <who>
+                        <reference value="https://erp-dev.zentral.erp.splitdns.ti-dienste.de/Device/1"/>
+                    </who>
+                    <sigFormat value="application/pkcs7-mime"/>
+                    <data value="MII2BAYJKoZIhvcNAQcCoII19TCCNfECAQUxDTALBglghkgBZQMEAgEwgivaBgkqhkiG9w0BBwGggivLBIIrxzw/eG1sIHZlcnNpb249IjEuMCIgZW5jb2Rpbmc9InV0Zi04Ij8+CjxCdW5kbGUgeG1sbnM9Imh0dHA6Ly9obDcub3JnL2ZoaXIiPjxpZCB2YWx1ZT0iZDAxYjZiNTYtNDEwNi00NDNhLTliZmYtYmI1ZmFiMmQyY2JiIi8+PG1ldGE+PHZlcnNpb25JZCB2YWx1ZT0iMSIvPjxwcm9maWxlIHZhbHVlPSJodHRwczovL2ZoaXIua2J2LmRlL1N0cnVjdHVyZURlZmluaXRpb24vS0JWX1BSX0VSUF9CdW5kbGV8MS40Ii8+PC9tZXRhPjxpZGVudGlmaWVyPjxzeXN0ZW0gdmFsdWU9Imh0dHBzOi8vZ2VtYXRpay5kZS9maGlyL2VycC9OYW1pbmdTeXN0ZW0vR0VNX0VSUF9OU19QcmVzY3JpcHRpb25JZCIvPjx2YWx1ZSB2YWx1ZT0iMjAwLjAwMC4wMDMuNzQ2LjU1Ni44NCIvPjwvaWRlbnRpZmllcj48dHlwZSB2YWx1ZT0iZG9jdW1lbnQiLz48dGltZXN0YW1wIHZhbHVlPSIyMDI2LTEwLTEzVDEyOjQyOjE4LjMzMSswMjowMCIvPjxlbnRyeT48ZnVsbFVybCB2YWx1ZT0idXJuOnV1aWQ6OTliM2Q2OWUtYzRhNy00ZjIzLTg2NzUtN2E5Y2IwZmVjNzZmIi8+PHJlc291cmNlPjxDb21wb3NpdGlvbj48aWQgdmFsdWU9Ijk5YjNkNjllLWM0YTctNGYyMy04Njc1LTdhOWNiMGZlYzc2ZiIvPjxtZXRhPjx2ZXJzaW9uSWQgdmFsdWU9IjEiLz48cHJvZmlsZSB2YWx1ZT0iaHR0cHM6Ly9maGlyLmtidi5kZS9TdHJ1Y3R1cmVEZWZpbml0aW9uL0tCVl9QUl9FUlBfQ29tcG9zaXRpb258MS40Ii8+PC9tZXRhPjxleHRlbnNpb24gdXJsPSJodHRwczovL2ZoaXIua2J2LmRlL1N0cnVjdHVyZURlZmluaXRpb24vS0JWX0VYX0ZPUl9MZWdhbF9iYXNpcyI+PHZhbHVlQ29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHBzOi8vZmhpci5rYnYuZGUvQ29kZVN5c3RlbS9LQlZfQ1NfU0ZISVJfS0JWX1NUQVRVU0tFTk5aRUlDSEVOIi8+PGNvZGUgdmFsdWU9IjAwIi8+PC92YWx1ZUNvZGluZz48L2V4dGVuc2lvbj48c3RhdHVzIHZhbHVlPSJmaW5hbCIvPjx0eXBlPjxjb2Rpbmc+PHN5c3RlbSB2YWx1ZT0iaHR0cHM6Ly9maGlyLmtidi5kZS9Db2RlU3lzdGVtL0tCVl9DU19TRkhJUl9LQlZfRk9STVVMQVJfQVJUIi8+PGNvZGUgdmFsdWU9ImUxNkEiLz48L2NvZGluZz48L3R5cGU+PHN1YmplY3Q+PHJlZmVyZW5jZSB2YWx1ZT0idXJuOnV1aWQ6ZGViYjVhYzUtYWY5OC00ODA0LWE1ODQtNGM2ZTQ3MTA0N2Q5Ii8+PC9zdWJqZWN0PjxkYXRlIHZhbHVlPSIyMDI2LTEwLTEzVDEyOjQyOjE4KzAyOjAwIi8+PGF1dGhvcj48dHlwZSB2YWx1ZT0iRGV2aWNlIi8+PGlkZW50aWZpZXI+PHN5c3RlbSB2YWx1ZT0iaHR0cHM6Ly9maGlyLmtidi5kZS9OYW1pbmdTeXN0ZW0vS0JWX05TX0ZPUl9QcnVlZm51bW1lciIvPjx2YWx1ZSB2YWx1ZT0iR0VNQVRJSy80MTAvMjEwOS8zNi8xMjMiLz48L2lkZW50aWZpZXI+PC9hdXRob3I+PGF1dGhvcj48cmVmZXJlbmNlIHZhbHVlPSJ1cm46dXVpZDowMTZkMDg3NS1kOGMxLTQ3ZTQtYjQzYy0zODNlOTg1ZDc1NzUiLz48dHlwZSB2YWx1ZT0iUHJhY3RpdGlvbmVyIi8+PC9hdXRob3I+PHRpdGxlIHZhbHVlPSJlbGVrdHJvbmlzY2hlIEFyem5laW1pdHRlbHZlcm9yZG51bmciLz48Y3VzdG9kaWFuPjxyZWZlcmVuY2UgdmFsdWU9InVybjp1dWlkOjU0Y2Q1ZDQ4LTU4ZTItNDkxYi1iMWI4LWMyMGIzZGUzYWE4YiIvPjwvY3VzdG9kaWFuPjxzZWN0aW9uPjxjb2RlPjxjb2Rpbmc+PHN5c3RlbSB2YWx1ZT0iaHR0cHM6Ly9maGlyLmtidi5kZS9Db2RlU3lzdGVtL0tCVl9DU19FUlBfU2VjdGlvbl9UeXBlIi8+PGNvZGUgdmFsdWU9IkNvdmVyYWdlIi8+PC9jb2Rpbmc+PC9jb2RlPjxlbnRyeT48cmVmZXJlbmNlIHZhbHVlPSJ1cm46dXVpZDoxODYyOTE4Zi05ZjRmLTQzMmYtYTQwNC02NTk1NDc4NGVhM2QiLz48L2VudHJ5Pjwvc2VjdGlvbj48c2VjdGlvbj48Y29kZT48Y29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHBzOi8vZmhpci5rYnYuZGUvQ29kZVN5c3RlbS9LQlZfQ1NfRVJQX1NlY3Rpb25fVHlwZSIvPjxjb2RlIHZhbHVlPSJQcmVzY3JpcHRpb24iLz48L2NvZGluZz48L2NvZGU+PGVudHJ5PjxyZWZlcmVuY2UgdmFsdWU9InVybjp1dWlkOmJjZWIwZTI3LWU1YzgtNDZlZC1iMTIzLWU1MzdmZGY0NDNmMiIvPjwvZW50cnk+PC9zZWN0aW9uPjwvQ29tcG9zaXRpb24+PC9yZXNvdXJjZT48L2VudHJ5PjxlbnRyeT48ZnVsbFVybCB2YWx1ZT0idXJuOnV1aWQ6MTg2MjkxOGYtOWY0Zi00MzJmLWE0MDQtNjU5NTQ3ODRlYTNkIi8+PHJlc291cmNlPjxDb3ZlcmFnZT48aWQgdmFsdWU9IjE4NjI5MThmLTlmNGYtNDMyZi1hNDA0LTY1OTU0Nzg0ZWEzZCIvPjxtZXRhPjx2ZXJzaW9uSWQgdmFsdWU9IjEiLz48cHJvZmlsZSB2YWx1ZT0iaHR0cHM6Ly9maGlyLmtidi5kZS9TdHJ1Y3R1cmVEZWZpbml0aW9uL0tCVl9QUl9GT1JfQ292ZXJhZ2V8MS4zIi8+PC9tZXRhPjxleHRlbnNpb24gdXJsPSJodHRwOi8vZmhpci5kZS9TdHJ1Y3R1cmVEZWZpbml0aW9uL2drdi9iZXNvbmRlcmUtcGVyc29uZW5ncnVwcGUiPjx2YWx1ZUNvZGluZz48c3lzdGVtIHZhbHVlPSJodHRwczovL2ZoaXIua2J2LmRlL0NvZGVTeXN0ZW0vS0JWX0NTX1NGSElSX0tCVl9QRVJTT05FTkdSVVBQRSIvPjxjb2RlIHZhbHVlPSIwMCIvPjwvdmFsdWVDb2Rpbmc+PC9leHRlbnNpb24+PGV4dGVuc2lvbiB1cmw9Imh0dHA6Ly9maGlyLmRlL1N0cnVjdHVyZURlZmluaXRpb24vZ2t2L2RtcC1rZW5uemVpY2hlbiI+PHZhbHVlQ29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHBzOi8vZmhpci5rYnYuZGUvQ29kZVN5c3RlbS9LQlZfQ1NfU0ZISVJfS0JWX0RNUCIvPjxjb2RlIHZhbHVlPSIwMCIvPjwvdmFsdWVDb2Rpbmc+PC9leHRlbnNpb24+PGV4dGVuc2lvbiB1cmw9Imh0dHA6Ly9maGlyLmRlL1N0cnVjdHVyZURlZmluaXRpb24vZ2t2L3dvcCI+PHZhbHVlQ29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHBzOi8vZmhpci5rYnYuZGUvQ29kZVN5c3RlbS9LQlZfQ1NfU0ZISVJfSVRBX1dPUCIvPjxjb2RlIHZhbHVlPSI3OCIvPjwvdmFsdWVDb2Rpbmc+PC9leHRlbnNpb24+PGV4dGVuc2lvbiB1cmw9Imh0dHA6Ly9maGlyLmRlL1N0cnVjdHVyZURlZmluaXRpb24vZ2t2L3ZlcnNpY2hlcnRlbmFydCI+PHZhbHVlQ29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHBzOi8vZmhpci5rYnYuZGUvQ29kZVN5c3RlbS9LQlZfQ1NfU0ZISVJfS0JWX1ZFUlNJQ0hFUlRFTlNUQVRVUyIvPjxjb2RlIHZhbHVlPSIxIi8+PC92YWx1ZUNvZGluZz48L2V4dGVuc2lvbj48c3RhdHVzIHZhbHVlPSJhY3RpdmUiLz48dHlwZT48Y29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHA6Ly9maGlyLmRlL0NvZGVTeXN0ZW0vdmVyc2ljaGVydW5nc2FydC1kZS1iYXNpcyIvPjxjb2RlIHZhbHVlPSJQS1YiLz48L2NvZGluZz48L3R5cGU+PGJlbmVmaWNpYXJ5PjxyZWZlcmVuY2UgdmFsdWU9InVybjp1dWlkOmRlYmI1YWM1LWFmOTgtNDgwNC1hNTg0LTRjNmU0NzEwNDdkOSIvPjwvYmVuZWZpY2lhcnk+PHBheW9yPjxpZGVudGlmaWVyPjxzeXN0ZW0gdmFsdWU9Imh0dHA6Ly9maGlyLmRlL3NpZC9hcmdlLWlrL2lrbnIiLz48dmFsdWUgdmFsdWU9IjE2ODE0MTM0NyIvPjwvaWRlbnRpZmllcj48ZGlzcGxheSB2YWx1ZT0iQmF5ZXJpc2NoZSBCZWFtdGVua3Jhbmtlbmthc3NlIi8+PC9wYXlvcj48L0NvdmVyYWdlPjwvcmVzb3VyY2U+PC9lbnRyeT48ZW50cnk+PGZ1bGxVcmwgdmFsdWU9InVybjp1dWlkOmRlYmI1YWM1LWFmOTgtNDgwNC1hNTg0LTRjNmU0NzEwNDdkOSIvPjxyZXNvdXJjZT48UGF0aWVudD48aWQgdmFsdWU9ImRlYmI1YWM1LWFmOTgtNDgwNC1hNTg0LTRjNmU0NzEwNDdkOSIvPjxtZXRhPjx2ZXJzaW9uSWQgdmFsdWU9IjEiLz48cHJvZmlsZSB2YWx1ZT0iaHR0cHM6Ly9maGlyLmtidi5kZS9TdHJ1Y3R1cmVEZWZpbml0aW9uL0tCVl9QUl9GT1JfUGF0aWVudHwxLjMiLz48L21ldGE+PGlkZW50aWZpZXI+PHR5cGU+PGNvZGluZz48c3lzdGVtIHZhbHVlPSJodHRwOi8vZmhpci5kZS9Db2RlU3lzdGVtL2lkZW50aWZpZXItdHlwZS1kZS1iYXNpcyIvPjxjb2RlIHZhbHVlPSJLVloxMCIvPjwvY29kaW5nPjwvdHlwZT48c3lzdGVtIHZhbHVlPSJodHRwOi8vZmhpci5kZS9zaWQvZ2t2L2t2aWQtMTAiLz48dmFsdWUgdmFsdWU9IlgxMTA2MTQyMzMiLz48L2lkZW50aWZpZXI+PG5hbWU+PHVzZSB2YWx1ZT0ib2ZmaWNpYWwiLz48ZmFtaWx5IHZhbHVlPSJIw7xsbG1hbm4iPjxleHRlbnNpb24gdXJsPSJodHRwOi8vaGw3Lm9yZy9maGlyL1N0cnVjdHVyZURlZmluaXRpb24vaHVtYW5uYW1lLW93bi1uYW1lIj48dmFsdWVTdHJpbmcgdmFsdWU9IkjDvGxsbWFubiIvPjwvZXh0ZW5zaW9uPjwvZmFtaWx5PjxnaXZlbiB2YWx1ZT0iU2luYSIvPjwvbmFtZT48YmlydGhEYXRlIHZhbHVlPSIyMDA1LTA1LTA5Ii8+PGFkZHJlc3M+PHR5cGUgdmFsdWU9ImJvdGgiLz48bGluZSB2YWx1ZT0iSGVsZW5lbnN0ci4gNTRiIj48ZXh0ZW5zaW9uIHVybD0iaHR0cDovL2hsNy5vcmcvZmhpci9TdHJ1Y3R1cmVEZWZpbml0aW9uL2lzbzIxMDkwLUFEWFAtc3RyZWV0TmFtZSI+PHZhbHVlU3RyaW5nIHZhbHVlPSJIZWxlbmVuc3RyLiIvPjwvZXh0ZW5zaW9uPjxleHRlbnNpb24gdXJsPSJodHRwOi8vaGw3Lm9yZy9maGlyL1N0cnVjdHVyZURlZmluaXRpb24vaXNvMjEwOTAtQURYUC1ob3VzZU51bWJlciI+PHZhbHVlU3RyaW5nIHZhbHVlPSI1NGIiLz48L2V4dGVuc2lvbj48L2xpbmU+PGNpdHkgdmFsdWU9IkJhZCBKYW5pbmVsYW5kIi8+PHBvc3RhbENvZGUgdmFsdWU9IjY3MjAxIi8+PGNvdW50cnkgdmFsdWU9IkQiLz48L2FkZHJlc3M+PC9QYXRpZW50PjwvcmVzb3VyY2U+PC9lbnRyeT48ZW50cnk+PGZ1bGxVcmwgdmFsdWU9InVybjp1dWlkOjAxNmQwODc1LWQ4YzEtNDdlNC1iNDNjLTM4M2U5ODVkNzU3NSIvPjxyZXNvdXJjZT48UHJhY3RpdGlvbmVyPjxpZCB2YWx1ZT0iMDE2ZDA4NzUtZDhjMS00N2U0LWI0M2MtMzgzZTk4NWQ3NTc1Ii8+PG1ldGE+PHZlcnNpb25JZCB2YWx1ZT0iMSIvPjxwcm9maWxlIHZhbHVlPSJodHRwczovL2ZoaXIua2J2LmRlL1N0cnVjdHVyZURlZmluaXRpb24vS0JWX1BSX0ZPUl9QcmFjdGl0aW9uZXJ8MS4zIi8+PC9tZXRhPjxpZGVudGlmaWVyPjx0eXBlPjxjb2Rpbmc+PHN5c3RlbSB2YWx1ZT0iaHR0cDovL3Rlcm1pbm9sb2d5LmhsNy5vcmcvQ29kZVN5c3RlbS92Mi0wMjAzIi8+PGNvZGUgdmFsdWU9IkxBTlIiLz48L2NvZGluZz48L3R5cGU+PHN5c3RlbSB2YWx1ZT0iaHR0cHM6Ly9maGlyLmtidi5kZS9OYW1pbmdTeXN0ZW0vS0JWX05TX0Jhc2VfQU5SIi8+PHZhbHVlIHZhbHVlPSI3ODIxOTg1NTYiLz48L2lkZW50aWZpZXI+PG5hbWU+PHVzZSB2YWx1ZT0ib2ZmaWNpYWwiLz48ZmFtaWx5IHZhbHVlPSJVbG1lbndhbGQiPjxleHRlbnNpb24gdXJsPSJodHRwOi8vaGw3Lm9yZy9maGlyL1N0cnVjdHVyZURlZmluaXRpb24vaHVtYW5uYW1lLW93bi1uYW1lIj48dmFsdWVTdHJpbmcgdmFsdWU9IlVsbWVud2FsZCIvPjwvZXh0ZW5zaW9uPjwvZmFtaWx5PjxnaXZlbiB2YWx1ZT0iQWRlbGhlaWQiLz48cHJlZml4IHZhbHVlPSJEci4iPjxleHRlbnNpb24gdXJsPSJodHRwOi8vaGw3Lm9yZy9maGlyL1N0cnVjdHVyZURlZmluaXRpb24vaXNvMjEwOTAtRU4tcXVhbGlmaWVyIj48dmFsdWVDb2RlIHZhbHVlPSJBQyIvPjwvZXh0ZW5zaW9uPjwvcHJlZml4PjwvbmFtZT48cXVhbGlmaWNhdGlvbj48Y29kZT48Y29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHBzOi8vZmhpci5rYnYuZGUvQ29kZVN5c3RlbS9LQlZfQ1NfRk9SX1F1YWxpZmljYXRpb25fVHlwZSIvPjxjb2RlIHZhbHVlPSIwMCIvPjwvY29kaW5nPjwvY29kZT48L3F1YWxpZmljYXRpb24+PHF1YWxpZmljYXRpb24+PGNvZGU+PGNvZGluZz48c3lzdGVtIHZhbHVlPSJodHRwczovL2ZoaXIua2J2LmRlL0NvZGVTeXN0ZW0vS0JWX0NTX0ZPUl9CZXJ1ZnNiZXplaWNobnVuZyIvPjxjb2RlIHZhbHVlPSJCZXJ1ZnNiZXplaWNobnVuZyIvPjwvY29kaW5nPjx0ZXh0IHZhbHVlPSJTdXBlci1GYWNoYXJ6dCBmw7xyIGFsbGVzIE3DtmdsaWNoZSIvPjwvY29kZT48L3F1YWxpZmljYXRpb24+PC9QcmFjdGl0aW9uZXI+PC9yZXNvdXJjZT48L2VudHJ5PjxlbnRyeT48ZnVsbFVybCB2YWx1ZT0idXJuOnV1aWQ6NTRjZDVkNDgtNThlMi00OTFiLWIxYjgtYzIwYjNkZTNhYThiIi8+PHJlc291cmNlPjxPcmdhbml6YXRpb24+PGlkIHZhbHVlPSI1NGNkNWQ0OC01OGUyLTQ5MWItYjFiOC1jMjBiM2RlM2FhOGIiLz48bWV0YT48dmVyc2lvbklkIHZhbHVlPSIxIi8+PHByb2ZpbGUgdmFsdWU9Imh0dHBzOi8vZmhpci5rYnYuZGUvU3RydWN0dXJlRGVmaW5pdGlvbi9LQlZfUFJfRk9SX09yZ2FuaXphdGlvbnwxLjMiLz48L21ldGE+PGlkZW50aWZpZXI+PHR5cGU+PGNvZGluZz48c3lzdGVtIHZhbHVlPSJodHRwOi8vdGVybWlub2xvZ3kuaGw3Lm9yZy9Db2RlU3lzdGVtL3YyLTAyMDMiLz48Y29kZSB2YWx1ZT0iQlNOUiIvPjwvY29kaW5nPjwvdHlwZT48c3lzdGVtIHZhbHVlPSJodHRwczovL2ZoaXIua2J2LmRlL05hbWluZ1N5c3RlbS9LQlZfTlNfQmFzZV9CU05SIi8+PHZhbHVlIHZhbHVlPSI1MDI3MjQ2ODYiLz48L2lkZW50aWZpZXI+PG5hbWUgdmFsdWU9IkFyenRwcmF4aXMgVWxtZW53YWxkIi8+PHRlbGVjb20+PHN5c3RlbSB2YWx1ZT0icGhvbmUiLz48dmFsdWUgdmFsdWU9Iis0OS03Njk1LTAwODU2OTQ1Ii8+PC90ZWxlY29tPjx0ZWxlY29tPjxzeXN0ZW0gdmFsdWU9ImVtYWlsIi8+PHZhbHVlIHZhbHVlPSJ0YW1pbm8uc2NoZWRsZXJAdWxpY3prYS5kZSIvPjwvdGVsZWNvbT48YWRkcmVzcz48dHlwZSB2YWx1ZT0iYm90aCIvPjxsaW5lIHZhbHVlPSJPdmVyZmVsZHdlZyA4MGEiPjxleHRlbnNpb24gdXJsPSJodHRwOi8vaGw3Lm9yZy9maGlyL1N0cnVjdHVyZURlZmluaXRpb24vaXNvMjEwOTAtQURYUC1zdHJlZXROYW1lIj48dmFsdWVTdHJpbmcgdmFsdWU9Ik92ZXJmZWxkd2VnIi8+PC9leHRlbnNpb24+PGV4dGVuc2lvbiB1cmw9Imh0dHA6Ly9obDcub3JnL2ZoaXIvU3RydWN0dXJlRGVmaW5pdGlvbi9pc28yMTA5MC1BRFhQLWhvdXNlTnVtYmVyIj48dmFsdWVTdHJpbmcgdmFsdWU9IjgwYSIvPjwvZXh0ZW5zaW9uPjwvbGluZT48Y2l0eSB2YWx1ZT0iS2xlaW4gSm95Y2VoZWltIi8+PHBvc3RhbENvZGUgdmFsdWU9IjQ2Mzg5Ii8+PGNvdW50cnkgdmFsdWU9IkQiLz48L2FkZHJlc3M+PC9Pcmdhbml6YXRpb24+PC9yZXNvdXJjZT48L2VudHJ5PjxlbnRyeT48ZnVsbFVybCB2YWx1ZT0idXJuOnV1aWQ6MGEyODBiNmYtODhhYi00ZTdlLTlmM2YtOTBlNzk5M2M4MjczIi8+PHJlc291cmNlPjxNZWRpY2F0aW9uPjxpZCB2YWx1ZT0iMGEyODBiNmYtODhhYi00ZTdlLTlmM2YtOTBlNzk5M2M4MjczIi8+PG1ldGE+PHZlcnNpb25JZCB2YWx1ZT0iMSIvPjxwcm9maWxlIHZhbHVlPSJodHRwczovL2ZoaXIua2J2LmRlL1N0cnVjdHVyZURlZmluaXRpb24vS0JWX1BSX0VSUF9NZWRpY2F0aW9uX1BaTnwxLjQiLz48L21ldGE+PGV4dGVuc2lvbiB1cmw9Imh0dHBzOi8vZmhpci5rYnYuZGUvU3RydWN0dXJlRGVmaW5pdGlvbi9LQlZfRVhfQmFzZV9NZWRpY2F0aW9uX1R5cGUiPjx2YWx1ZUNvZGVhYmxlQ29uY2VwdD48Y29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHA6Ly9zbm9tZWQuaW5mby9zY3QiLz48dmVyc2lvbiB2YWx1ZT0iaHR0cDovL3Nub21lZC5pbmZvL3NjdC8xMTAwMDI3NDEwMy92ZXJzaW9uLzIwMjQwNTE1Ii8+PGNvZGUgdmFsdWU9Ijc2MzE1ODAwMyIvPjxkaXNwbGF5IHZhbHVlPSJNZWRpY2luYWwgcHJvZHVjdCAocHJvZHVjdCkiLz48L2NvZGluZz48L3ZhbHVlQ29kZWFibGVDb25jZXB0PjwvZXh0ZW5zaW9uPjxleHRlbnNpb24gdXJsPSJodHRwczovL2ZoaXIua2J2LmRlL1N0cnVjdHVyZURlZmluaXRpb24vS0JWX0VYX0VSUF9NZWRpY2F0aW9uX0NhdGVnb3J5Ij48dmFsdWVDb2Rpbmc+PHN5c3RlbSB2YWx1ZT0iaHR0cHM6Ly9maGlyLmtidi5kZS9Db2RlU3lzdGVtL0tCVl9DU19FUlBfTWVkaWNhdGlvbl9DYXRlZ29yeSIvPjxjb2RlIHZhbHVlPSIwMCIvPjwvdmFsdWVDb2Rpbmc+PC9leHRlbnNpb24+PGV4dGVuc2lvbiB1cmw9Imh0dHBzOi8vZmhpci5rYnYuZGUvU3RydWN0dXJlRGVmaW5pdGlvbi9LQlZfRVhfRVJQX01lZGljYXRpb25fVmFjY2luZSI+PHZhbHVlQm9vbGVhbiB2YWx1ZT0iZmFsc2UiLz48L2V4dGVuc2lvbj48ZXh0ZW5zaW9uIHVybD0iaHR0cDovL2ZoaXIuZGUvU3RydWN0dXJlRGVmaW5pdGlvbi9ub3JtZ3JvZXNzZSI+PHZhbHVlQ29kZSB2YWx1ZT0iTjIiLz48L2V4dGVuc2lvbj48Y29kZT48Y29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHA6Ly9maGlyLmRlL0NvZGVTeXN0ZW0vaWZhL3B6biIvPjxjb2RlIHZhbHVlPSI0Njk5ODY5OSIvPjwvY29kaW5nPjx0ZXh0IHZhbHVlPSJSZWFjdGluZcKuIER1byBMw7ZzdW5nIDg1MCBtZyIvPjwvY29kZT48Zm9ybT48Y29kaW5nPjxzeXN0ZW0gdmFsdWU9Imh0dHBzOi8vZmhpci5rYnYuZGUvQ29kZVN5c3RlbS9LQlZfQ1NfU0ZISVJfS0JWX0RBUlJFSUNIVU5HU0ZPUk0iLz48Y29kZSB2YWx1ZT0iU0FMIi8+PC9jb2Rpbmc+PC9mb3JtPjxhbW91bnQ+PG51bWVyYXRvcj48ZXh0ZW5zaW9uIHVybD0iaHR0cHM6Ly9maGlyLmtidi5kZS9TdHJ1Y3R1cmVEZWZpbml0aW9uL0tCVl9FWF9FUlBfTWVkaWNhdGlvbl9QYWNrYWdpbmdTaXplIj48dmFsdWVTdHJpbmcgdmFsdWU9IjE1Ii8+PC9leHRlbnNpb24+PHVuaXQgdmFsdWU9IlN0ayIvPjwvbnVtZXJhdG9yPjxkZW5vbWluYXRvcj48dmFsdWUgdmFsdWU9IjEiLz48L2Rlbm9taW5hdG9yPjwvYW1vdW50PjxpbmdyZWRpZW50PjxpdGVtQ29kZWFibGVDb25jZXB0Pjx0ZXh0IHZhbHVlPSJJYnUtTHlzaW5IRVhBTMKuIEZpbG10YWJsZXR0ZW4gMTAwIG1nIi8+PC9pdGVtQ29kZWFibGVDb25jZXB0PjxzdHJlbmd0aD48ZXh0ZW5zaW9uIHVybD0iaHR0cDovL2hsNy5vcmcvZmhpci9TdHJ1Y3R1cmVEZWZpbml0aW9uL2RhdGEtYWJzZW50LXJlYXNvbiI+PHZhbHVlQ29kZSB2YWx1ZT0idW5rbm93biIvPjwvZXh0ZW5zaW9uPjwvc3RyZW5ndGg+PC9pbmdyZWRpZW50PjwvTWVkaWNhdGlvbj48L3Jlc291cmNlPjwvZW50cnk+PGVudHJ5PjxmdWxsVXJsIHZhbHVlPSJ1cm46dXVpZDpiY2ViMGUyNy1lNWM4LTQ2ZWQtYjEyMy1lNTM3ZmRmNDQzZjIiLz48cmVzb3VyY2U+PE1lZGljYXRpb25SZXF1ZXN0PjxpZCB2YWx1ZT0iYmNlYjBlMjctZTVjOC00NmVkLWIxMjMtZTUzN2ZkZjQ0M2YyIi8+PG1ldGE+PHZlcnNpb25JZCB2YWx1ZT0iMSIvPjxwcm9maWxlIHZhbHVlPSJodHRwczovL2ZoaXIua2J2LmRlL1N0cnVjdHVyZURlZmluaXRpb24vS0JWX1BSX0VSUF9QcmVzY3JpcHRpb258MS40Ii8+PC9tZXRhPjxleHRlbnNpb24gdXJsPSJodHRwczovL2ZoaXIua2J2LmRlL1N0cnVjdHVyZURlZmluaXRpb24vS0JWX0VYX0ZPUl9TRVIiPjx2YWx1ZUJvb2xlYW4gdmFsdWU9InRydWUiLz48L2V4dGVuc2lvbj48ZXh0ZW5zaW9uIHVybD0iaHR0cHM6Ly9maGlyLmtidi5kZS9TdHJ1Y3R1cmVEZWZpbml0aW9uL0tCVl9FWF9FUlBfRW1lcmdlbmN5U2VydmljZXNGZWUiPjx2YWx1ZUJvb2xlYW4gdmFsdWU9ImZhbHNlIi8+PC9leHRlbnNpb24+PGV4dGVuc2lvbiB1cmw9Imh0dHBzOi8vZmhpci5rYnYuZGUvU3RydWN0dXJlRGVmaW5pdGlvbi9LQlZfRVhfRVJQX011bHRpcGxlX1ByZXNjcmlwdGlvbiI+PGV4dGVuc2lvbiB1cmw9Iktlbm56ZWljaGVuIj48dmFsdWVCb29sZWFuIHZhbHVlPSJmYWxzZSIvPjwvZXh0ZW5zaW9uPjwvZXh0ZW5zaW9uPjxleHRlbnNpb24gdXJsPSJodHRwczovL2ZoaXIua2J2LmRlL1N0cnVjdHVyZURlZmluaXRpb24vS0JWX0VYX0ZPUl9TdGF0dXNDb1BheW1lbnQiPjx2YWx1ZUNvZGluZz48c3lzdGVtIHZhbHVlPSJodHRwczovL2ZoaXIua2J2LmRlL0NvZGVTeXN0ZW0vS0JWX0NTX0ZPUl9TdGF0dXNDb1BheW1lbnQiLz48Y29kZSB2YWx1ZT0iMSIvPjwvdmFsdWVDb2Rpbmc+PC9leHRlbnNpb24+PGV4dGVuc2lvbiB1cmw9Imh0dHA6Ly9pZy5maGlyLmRlL2lncy9tZWRpY2F0aW9uL1N0cnVjdHVyZURlZmluaXRpb24vR2VuZXJhdGVkRG9zYWdlSW5zdHJ1Y3Rpb25zTWV0YSI+PGV4dGVuc2lvbiB1cmw9ImFsZ29yaXRobVZlcnNpb24iPjx2YWx1ZVN0cmluZyB2YWx1ZT0iMS4wLjEiLz48L2V4dGVuc2lvbj48ZXh0ZW5zaW9uIHVybD0ibGFuZ3VhZ2UiPjx2YWx1ZUNvZGUgdmFsdWU9ImRlLURFIi8+PC9leHRlbnNpb24+PC9leHRlbnNpb24+PGV4dGVuc2lvbiB1cmw9Imh0dHA6Ly9obDcub3JnL2ZoaXIvNS4wL1N0cnVjdHVyZURlZmluaXRpb24vZXh0ZW5zaW9uLU1lZGljYXRpb25SZXF1ZXN0LnJlbmRlcmVkRG9zYWdlSW5zdHJ1Y3Rpb24iPjx2YWx1ZU1hcmtkb3duIHZhbHVlPSIzLTItMS0yLTMiLz48L2V4dGVuc2lvbj48ZXh0ZW5zaW9uIHVybD0iaHR0cHM6Ly9maGlyLmtidi5kZS9TdHJ1Y3R1cmVEZWZpbml0aW9uL0tCVl9FWF9FUlBfRG9zYWdlRmxhZyI+PHZhbHVlQm9vbGVhbiB2YWx1ZT0idHJ1ZSIvPjwvZXh0ZW5zaW9uPjxzdGF0dXMgdmFsdWU9ImFjdGl2ZSIvPjxpbnRlbnQgdmFsdWU9Im9yZGVyIi8+PG1lZGljYXRpb25SZWZlcmVuY2U+PHJlZmVyZW5jZSB2YWx1ZT0idXJuOnV1aWQ6MGEyODBiNmYtODhhYi00ZTdlLTlmM2YtOTBlNzk5M2M4MjczIi8+PC9tZWRpY2F0aW9uUmVmZXJlbmNlPjxzdWJqZWN0PjxyZWZlcmVuY2UgdmFsdWU9InVybjp1dWlkOmRlYmI1YWM1LWFmOTgtNDgwNC1hNTg0LTRjNmU0NzEwNDdkOSIvPjwvc3ViamVjdD48YXV0aG9yZWRPbiB2YWx1ZT0iMjAyNi0xMC0xMyIvPjxyZXF1ZXN0ZXI+PHJlZmVyZW5jZSB2YWx1ZT0idXJuOnV1aWQ6MDE2ZDA4NzUtZDhjMS00N2U0LWI0M2MtMzgzZTk4NWQ3NTc1Ii8+PC9yZXF1ZXN0ZXI+PGluc3VyYW5jZT48cmVmZXJlbmNlIHZhbHVlPSJ1cm46dXVpZDoxODYyOTE4Zi05ZjRmLTQzMmYtYTQwNC02NTk1NDc4NGVhM2QiLz48L2luc3VyYW5jZT48ZG9zYWdlSW5zdHJ1Y3Rpb24+PHRleHQgdmFsdWU9IjMtMi0xLTItMyIvPjwvZG9zYWdlSW5zdHJ1Y3Rpb24+PGRpc3BlbnNlUmVxdWVzdD48cXVhbnRpdHk+PHZhbHVlIHZhbHVlPSIxOSIvPjx1bml0IHZhbHVlPSJQYWNrdW5nIi8+PC9xdWFudGl0eT48L2Rpc3BlbnNlUmVxdWVzdD48c3Vic3RpdHV0aW9uPjxhbGxvd2VkQm9vbGVhbiB2YWx1ZT0iZmFsc2UiLz48L3N1YnN0aXR1dGlvbj48L01lZGljYXRpb25SZXF1ZXN0PjwvcmVzb3VyY2U+PC9lbnRyeT48L0J1bmRsZT4KoIIC2zCCAtcwggJ+oAMCAQICAwC14zAKBggqhkjOPQQDAjCBhDELMAkGA1UEBhMCREUxHzAdBgNVBAoMFmdlbWF0aWsgR21iSCBOT1QtVkFMSUQxMjAwBgNVBAsMKUtvbXBvbmVudGVuLUNBIGRlciBUZWxlbWF0aWtpbmZyYXN0cnVrdHVyMSAwHgYDVQQDDBdHRU0uS09NUC1DQTU2IFRFU1QtT05MWTAeFw0yNjAxMTUxMjE1NTJaFw0zMTAxMTQxMjE1NTFaMF8xCzAJBgNVBAYTAkRFMSIwIAYDVQQKDBlJQk0gVEVTVC1PTkxZIC0gTk9ULVZBTElEMRowGAYDVQQFExEwODc0Ny1SVURFVlNJRzAwNjEQMA4GA1UEAwwHZXJlemVwdDBaMBQGByqGSM49AgEGCSskAwMCCAEBBwNCAAR/gYWnkB0BoniiX3Upcq4n6FVc06fOf/KXnAjdADJpt2GDeFm47FsTVombU1X6butImGDNJ/GwD8di87QW2nauo4IBADCB/TAdBgNVHQ4EFgQUWDR4dxnGuIFzYNLWgPzrKPrfs+4w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"/>
+                </signature>
+            </Bundle>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:c8fc2a39-0000-0000-0003-000000000000"/>
+        <resource>
+            <Bundle xmlns="http://hl7.org/fhir">
+                <id value="c8fc2a39-0000-0000-0003-000000000000"/>
+                <meta>
+                    <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Bundle|1.6"/>
+                </meta>
+                <identifier>
+                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                    <value value="200.000.003.746.556.84"/>
+                </identifier>
+                <type value="document"/>
+                <timestamp value="2026-10-13T10:42:20.740+00:00"/>
+                <link>
+                    <relation value="self"/>
+                    <url value="https://erp-dev.zentral.erp.splitdns.ti-dienste.de/Task/200.000.003.746.556.84/$close/"/>
+                </link>
+                <entry>
+                    <fullUrl value="urn:uuid:63ff3114-49c2-47cc-8334-d00ae77d1be8"/>
+                    <resource>
+                        <Composition xmlns="http://hl7.org/fhir">
+                            <id value="63ff3114-49c2-47cc-8334-d00ae77d1be8"/>
+                            <meta>
+                                <profile
+                                        value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Composition|1.6"/>
+                            </meta>
+                            <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_Beneficiary">
+                                <valueIdentifier>
+                                    <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                                    <value value="3-SMC-B-Testkarte--883110000163973"/>
+                                </valueIdentifier>
+                            </extension>
+                            <status value="final"/>
+                            <type>
+                                <coding>
+                                    <system value="https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_DocumentType"/>
+                                    <code value="3"/>
+                                    <display value="Receipt"/>
+                                </coding>
+                            </type>
+                            <date value="2026-10-13T10:42:20.724+00:00"/>
+                            <author>
+                                <reference value="urn:uuid:fdd3c482-5263-4bb5-99dd-f08ff57b83ec"/>
+                            </author>
+                            <title value="Quittung"/>
+                            <event>
+                                <period>
+                                    <start value="2026-10-13T10:42:19.819+00:00"/>
+                                    <end value="2026-10-13T10:42:20.724+00:00"/>
+                                </period>
+                            </event>
+                            <section>
+                                <entry>
+                                    <reference value="urn:uuid:7faf4cd1-c130-42fb-ba85-4641773305d3"/>
+                                </entry>
+                            </section>
+                        </Composition>
+                    </resource>
+                </entry>
+                <entry>
+                    <fullUrl value="urn:uuid:fdd3c482-5263-4bb5-99dd-f08ff57b83ec"/>
+                    <resource>
+                        <Device xmlns="http://hl7.org/fhir">
+                            <id value="1"/>
+                            <meta>
+                                <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Device|1.6"/>
+                            </meta>
+                            <status value="active"/>
+                            <serialNumber value="1.24.0"/>
+                            <deviceName>
+                                <name value="E-Rezept Fachdienst"/>
+                                <type value="user-friendly-name"/>
+                            </deviceName>
+                            <version>
+                                <value value="1.24.0"/>
+                            </version>
+                            <contact>
+                                <system value="email"/>
+                                <value value="betrieb@gematik.de"/>
+                            </contact>
+                        </Device>
+                    </resource>
+                </entry>
+                <entry>
+                    <fullUrl value="urn:uuid:7faf4cd1-c130-42fb-ba85-4641773305d3"/>
+                    <resource>
+                        <Binary xmlns="http://hl7.org/fhir">
+                            <id value="7faf4cd1-c130-42fb-ba85-4641773305d3"/>
+                            <meta>
+                                <versionId value="1"/>
+                                <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Digest|1.6"/>
+                            </meta>
+                            <contentType value="application/octet-stream"/>
+                            <data value="8pl2ui6IkfygW3GleXGKLrxgS8PawTOiOkPrz6Q8wh4="/>
+                        </Binary>
+                    </resource>
+                </entry>
+                <signature>
+                    <type>
+                        <system value="urn:iso-astm:E1762-95:2013"/>
+                        <code value="1.2.840.10065.1.12.1.1"/>
+                    </type>
+                    <when value="2026-10-13T10:42:21.846+00:00"/>
+                    <who>
+                        <reference value="https://erp-dev.zentral.erp.splitdns.ti-dienste.de/Device/1"/>
+                    </who>
+                    <sigFormat value="application/pkcs7-mime"/>
+                    <data value="MIIUSAYJKoZIhvcNAQcCoIIUOTCCFDUCAQUxDTALBglghkgBZQMEAgEwggoeBgkqhkiG9w0BBwGgggoPBIIKCzw/eG1sIHZlcnNpb249IjEuMCIgZW5jb2Rpbmc9InV0Zi04Ij8+CjxCdW5kbGUgeG1sbnM9Imh0dHA6Ly9obDcub3JnL2ZoaXIiPjxpZCB2YWx1ZT0iYzhmYzJhMzktMDAwMC0wMDAwLTAwMDMtMDAwMDAwMDAwMDAwIi8+PG1ldGE+PHByb2ZpbGUgdmFsdWU9Imh0dHBzOi8vZ2VtYXRpay5kZS9maGlyL2VycC9TdHJ1Y3R1cmVEZWZpbml0aW9uL0dFTV9FUlBfUFJfQnVuZGxlfDEuNiIvPjwvbWV0YT48aWRlbnRpZmllcj48c3lzdGVtIHZhbHVlPSJodHRwczovL2dlbWF0aWsuZGUvZmhpci9lcnAvTmFtaW5nU3lzdGVtL0dFTV9FUlBfTlNfUHJlc2NyaXB0aW9uSWQiLz48dmFsdWUgdmFsdWU9IjIwMC4wMDAuMDAzLjc0Ni41NTYuODQiLz48L2lkZW50aWZpZXI+PHR5cGUgdmFsdWU9ImRvY3VtZW50Ii8+PHRpbWVzdGFtcCB2YWx1ZT0iMjAyNi0xMC0xM1QxMDo0MjoyMC43NDArMDA6MDAiLz48bGluaz48cmVsYXRpb24gdmFsdWU9InNlbGYiLz48dXJsIHZhbHVlPSJodHRwczovL2VycC1kZXYuemVudHJhbC5lcnAuc3BsaXRkbnMudGktZGllbnN0ZS5kZS9UYXNrLzIwMC4wMDAuMDAzLjc0Ni41NTYuODQvJGNsb3NlLyIvPjwvbGluaz48ZW50cnk+PGZ1bGxVcmwgdmFsdWU9InVybjp1dWlkOjYzZmYzMTE0LTQ5YzItNDdjYy04MzM0LWQwMGFlNzdkMWJlOCIvPjxyZXNvdXJjZT48Q29tcG9zaXRpb24+PGlkIHZhbHVlPSI2M2ZmMzExNC00OWMyLTQ3Y2MtODMzNC1kMDBhZTc3ZDFiZTgiLz48bWV0YT48cHJvZmlsZSB2YWx1ZT0iaHR0cHM6Ly9nZW1hdGlrLmRlL2ZoaXIvZXJwL1N0cnVjdHVyZURlZmluaXRpb24vR0VNX0VSUF9QUl9Db21wb3NpdGlvbnwxLjYiLz48L21ldGE+PGV4dGVuc2lvbiB1cmw9Imh0dHBzOi8vZ2VtYXRpay5kZS9maGlyL2VycC9TdHJ1Y3R1cmVEZWZpbml0aW9uL0dFTV9FUlBfRVhfQmVuZWZpY2lhcnkiPjx2YWx1ZUlkZW50aWZpZXI+PHN5c3RlbSB2YWx1ZT0iaHR0cHM6Ly9nZW1hdGlrLmRlL2ZoaXIvc2lkL3RlbGVtYXRpay1pZCIvPjx2YWx1ZSB2YWx1ZT0iMy1TTUMtQi1UZXN0a2FydGUtLTg4MzExMDAwMDE2Mzk3MyIvPjwvdmFsdWVJZGVudGlmaWVyPjwvZXh0ZW5zaW9uPjxzdGF0dXMgdmFsdWU9ImZpbmFsIi8+PHR5cGU+PGNvZGluZz48c3lzdGVtIHZhbHVlPSJodHRwczovL2dlbWF0aWsuZGUvZmhpci9lcnAvQ29kZVN5c3RlbS9HRU1fRVJQX0NTX0RvY3VtZW50VHlwZSIvPjxjb2RlIHZhbHVlPSIzIi8+PGRpc3BsYXkgdmFsdWU9IlJlY2VpcHQiLz48L2NvZGluZz48L3R5cGU+PGRhdGUgdmFsdWU9IjIwMjYtMTAtMTNUMTA6NDI6MjAuNzI0KzAwOjAwIi8+PGF1dGhvcj48cmVmZXJlbmNlIHZhbHVlPSJ1cm46dXVpZDpmZGQzYzQ4Mi01MjYzLTRiYjUtOTlkZC1mMDhmZjU3YjgzZWMiLz48L2F1dGhvcj48dGl0bGUgdmFsdWU9IlF1aXR0dW5nIi8+PGV2ZW50PjxwZXJpb2Q+PHN0YXJ0IHZhbHVlPSIyMDI2LTEwLTEzVDEwOjQyOjE5LjgxOSswMDowMCIvPjxlbmQgdmFsdWU9IjIwMjYtMTAtMTNUMTA6NDI6MjAuNzI0KzAwOjAwIi8+PC9wZXJpb2Q+PC9ldmVudD48c2VjdGlvbj48ZW50cnk+PHJlZmVyZW5jZSB2YWx1ZT0idXJuOnV1aWQ6N2ZhZjRjZDEtYzEzMC00MmZiLWJhODUtNDY0MTc3MzMwNWQzIi8+PC9lbnRyeT48L3NlY3Rpb24+PC9Db21wb3NpdGlvbj48L3Jlc291cmNlPjwvZW50cnk+PGVudHJ5PjxmdWxsVXJsIHZhbHVlPSJ1cm46dXVpZDpmZGQzYzQ4Mi01MjYzLTRiYjUtOTlkZC1mMDhmZjU3YjgzZWMiLz48cmVzb3VyY2U+PERldmljZT48aWQgdmFsdWU9IjEiLz48bWV0YT48cHJvZmlsZSB2YWx1ZT0iaHR0cHM6Ly9nZW1hdGlrLmRlL2ZoaXIvZXJwL1N0cnVjdHVyZURlZmluaXRpb24vR0VNX0VSUF9QUl9EZXZpY2V8MS42Ii8+PC9tZXRhPjxzdGF0dXMgdmFsdWU9ImFjdGl2ZSIvPjxzZXJpYWxOdW1iZXIgdmFsdWU9IjEuMjQuMCIvPjxkZXZpY2VOYW1lPjxuYW1lIHZhbHVlPSJFLVJlemVwdCBGYWNoZGllbnN0Ii8+PHR5cGUgdmFsdWU9InVzZXItZnJpZW5kbHktbmFtZSIvPjwvZGV2aWNlTmFtZT48dmVyc2lvbj48dmFsdWUgdmFsdWU9IjEuMjQuMCIvPjwvdmVyc2lvbj48Y29udGFjdD48c3lzdGVtIHZhbHVlPSJlbWFpbCIvPjx2YWx1ZSB2YWx1ZT0iYmV0cmllYkBnZW1hdGlrLmRlIi8+PC9jb250YWN0PjwvRGV2aWNlPjwvcmVzb3VyY2U+PC9lbnRyeT48ZW50cnk+PGZ1bGxVcmwgdmFsdWU9InVybjp1dWlkOjdmYWY0Y2QxLWMxMzAtNDJmYi1iYTg1LTQ2NDE3NzMzMDVkMyIvPjxyZXNvdXJjZT48QmluYXJ5PjxpZCB2YWx1ZT0iN2ZhZjRjZDEtYzEzMC00MmZiLWJhODUtNDY0MTc3MzMwNWQzIi8+PG1ldGE+PHZlcnNpb25JZCB2YWx1ZT0iMSIvPjxwcm9maWxlIHZhbHVlPSJodHRwczovL2dlbWF0aWsuZGUvZmhpci9lcnAvU3RydWN0dXJlRGVmaW5pdGlvbi9HRU1fRVJQX1BSX0RpZ2VzdHwxLjYiLz48L21ldGE+PGNvbnRlbnRUeXBlIHZhbHVlPSJhcHBsaWNhdGlvbi9vY3RldC1zdHJlYW0iLz48ZGF0YSB2YWx1ZT0iOHBsMnVpNklrZnlnVzNHbGVYR0tMcnhnUzhQYXdUT2lPa1ByejZROHdoND0iLz48L0JpbmFyeT48L3Jlc291cmNlPjwvZW50cnk+PC9CdW5kbGU+CqCCAtswggLXMIICfqADAgECAgMAteMwCgYIKoZIzj0EAwIwgYQxCzAJBgNVBAYTAkRFMR8wHQYDVQQKDBZnZW1h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"/>
+                </signature>
+            </Bundle>
+        </resource>
+    </entry>
+</Bundle>

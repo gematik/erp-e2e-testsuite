@@ -23,19 +23,17 @@ package de.gematik.test.erezept.fhir.r4.erp;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
-import de.gematik.test.erezept.fhir.testutil.*;
-import lombok.*;
-import org.junit.jupiter.api.*;
+import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
+import lombok.val;
+import org.junit.jupiter.api.Test;
 
 class ErxConsentBundleTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH = "fhir/valid/erp/1.4.0/consent/";
-
   @Test
   void shouldEncodeSingleConsentBundle() {
-    val fileName = "bundle_6daaade4-6523-4136-94bf-cbc5a247cc7b.json";
+    val fileName = "fhir/valid/consent/handCraftedConsentBundle.xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(fileName);
     val consentBundle = parser.decode(ErxConsentBundle.class, content);
     assertNotNull(consentBundle, "Valid ErxConsentBundle must be parseable");
 
@@ -43,6 +41,6 @@ class ErxConsentBundleTest extends ErpFhirParsingTest {
     assertTrue(consentBundle.getConsent().isPresent());
 
     val consent = consentBundle.getConsent().orElseThrow();
-    assertEquals("CHARGCONS-X110465770", consent.getConsentId());
+    assertEquals("0dcc5d4c-bf24-4c06-b02e-be5bc24587e2", consent.getConsentId());
   }
 }

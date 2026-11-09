@@ -100,7 +100,7 @@ class KbvMedicalOrganizationBuilderTest extends ErpFhirParsingTest {
     val organizationResourceId = "d55c6c01-057b-483d-a1eb-2bd1e182551f";
     val organization =
         KbvMedicalOrganizationBuilder.builder()
-            .version(KbvItaForVersion.V1_1_0)
+            .version(KbvItaForVersion.V1_3_0)
             .setId(organizationResourceId)
             .name("Zahnarztpraxis Meyer")
             .ksn("757299999")

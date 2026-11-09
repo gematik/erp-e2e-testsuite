@@ -20,12 +20,7 @@
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.utils.ResourceLoader;
@@ -39,11 +34,11 @@ import org.junit.jupiter.api.Test;
 class ErxPrescriptionBundleTest extends ErpFhirParsingTest {
 
   private static final String BASE_PATH = "fhir/valid/erp/";
-  private static final String BASE_PATH_1_4 = BASE_PATH + "1.4.0/prescriptionbundle/";
+  private static final String BASE_PATH_1_4 = BASE_PATH + "1.6.0/json/prescriptionBundle/";
 
   @Test
   void shouldEncodeSinglePrescriptionBundle111() {
-    val fileName = "PrescriptionBundle_01.json";
+    val fileName = "prescrBundleByFD.json";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
@@ -51,7 +46,7 @@ class ErxPrescriptionBundleTest extends ErpFhirParsingTest {
 
     val task = prescriptionBundle.getTask();
     assertNotNull(task);
-    assertEquals("160.000.006.886.609.66", task.getPrescriptionId().getValue());
+    assertEquals("160.000.007.552.050.03", task.getPrescriptionId().getValue());
 
     assertFalse(prescriptionBundle.getEvdgaBundle().isPresent());
     val kbvBundleOptional = prescriptionBundle.getKbvBundle();
@@ -59,7 +54,7 @@ class ErxPrescriptionBundleTest extends ErpFhirParsingTest {
     assertTrue(kbvBundleOptional.isPresent());
     val kbvErpBundle = kbvBundleOptional.get();
 
-    assertEquals("160.000.006.886.609.66", kbvErpBundle.getPrescriptionId().getValue());
+    assertEquals("160.000.007.552.050.03", kbvErpBundle.getPrescriptionId().getValue());
     assertEquals(PrescriptionFlowType.FLOW_TYPE_160, kbvErpBundle.getFlowType());
     assertEquals(PrescriptionFlowType.FLOW_TYPE_160, task.getFlowType());
 
@@ -69,7 +64,7 @@ class ErxPrescriptionBundleTest extends ErpFhirParsingTest {
 
   @Test
   void shouldEncodeSinglePrescriptionBundle() {
-    val fileName = "PrescriptionBundle_01.json";
+    val fileName = "prescrBundleByFD.json";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
@@ -77,13 +72,13 @@ class ErxPrescriptionBundleTest extends ErpFhirParsingTest {
 
     val task = prescriptionBundle.getTask();
     assertNotNull(task);
-    assertEquals("160.000.006.886.609.66", task.getPrescriptionId().getValue());
+    assertEquals("160.000.007.552.050.03", task.getPrescriptionId().getValue());
 
     val kbvBundle = prescriptionBundle.getKbvBundle();
     assertNotNull(kbvBundle);
     kbvBundle.ifPresent(
         kbvErpBundle ->
-            assertEquals("160.000.006.886.609.66", kbvErpBundle.getPrescriptionId().getValue()));
+            assertEquals("160.000.007.552.050.03", kbvErpBundle.getPrescriptionId().getValue()));
 
     kbvBundle.ifPresent(
         kbvErpBundle ->
@@ -96,7 +91,7 @@ class ErxPrescriptionBundleTest extends ErpFhirParsingTest {
 
   @Test
   void shouldGetKbvBundleFromPrescriptionBundle120() {
-    val fileName = "PrescriptionBundle_01.json";
+    val fileName = "prescrBundleByFD.json";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
@@ -116,7 +111,7 @@ class ErxPrescriptionBundleTest extends ErpFhirParsingTest {
 
   @Test
   void shouldEncodeSinglePrescriptionBundleJson() {
-    val fileName = "PrescriptionBundle_01.json";
+    val fileName = "prescrBundleByFD.json";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
@@ -124,7 +119,7 @@ class ErxPrescriptionBundleTest extends ErpFhirParsingTest {
 
     val task = prescriptionBundle.getTask();
     assertNotNull(task);
-    assertEquals("160.000.006.886.609.66", task.getPrescriptionId().getValue());
+    assertEquals("160.000.007.552.050.03", task.getPrescriptionId().getValue());
 
     assertEquals(PrescriptionFlowType.FLOW_TYPE_160, task.getFlowType());
 
@@ -134,7 +129,7 @@ class ErxPrescriptionBundleTest extends ErpFhirParsingTest {
 
   @Test
   void shouldFailOnMissingTask() {
-    val fileName = "PrescriptionBundle_01.json";
+    val fileName = "prescrBundleByFD.json";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
@@ -151,7 +146,7 @@ class ErxPrescriptionBundleTest extends ErpFhirParsingTest {
 
   @Test
   void shouldFailOnMissingKbvBundle() {
-    val fileName = "PrescriptionBundle_01.json";
+    val fileName = "prescrBundleByFD.json";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
@@ -168,8 +163,7 @@ class ErxPrescriptionBundleTest extends ErpFhirParsingTest {
 
   @Test
   void shouldFailOnInvalidKbvBundle() {
-    val fileName = "PrescriptionBundle_01.json";
-
+    val fileName = "prescrBundleByFD.json";
     val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
     val prescriptionBundle = parser.decode(ErxPrescriptionBundle.class, content);
 

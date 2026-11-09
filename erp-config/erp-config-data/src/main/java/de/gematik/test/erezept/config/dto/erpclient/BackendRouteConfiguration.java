@@ -20,24 +20,21 @@
 
 package de.gematik.test.erezept.config.dto.erpclient;
 
+import jakarta.annotation.Nullable;
 import lombok.*;
 
 @Data
 public class BackendRouteConfiguration {
 
   private String tslBaseUrl;
-  private String discoveryDocumentUrl;
   private String fdBaseUrl;
   private String subscriptionServiceUrl;
   private String xapiKey;
   private String userAgent;
-
-  /** Client ID required by the IDP Client */
-  private String clientId = "gematikTestPs";
-
-  /** Redirect URL required by the IDP Client */
-  private String redirectUrl = "http://test-ps.gematik.de/erezept";
-
   private String vsdServiceHMacKey;
   private String ocsp;
+  @Nullable private String vauCertificate;
+
+  private IdpCentralConfiguration idp;
+  private IdpSectoralConfiguration secIdp;
 }

@@ -20,50 +20,74 @@
 
 package de.gematik.test.erezept.actions;
 
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
-import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
+import de.gematik.test.erezept.client.usecases.TaskGetByIdCommand;
+import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class GetPrescriptionByIdTest extends ErpFhirBuildingTest {
 
-  private static PharmacyActor pharmacy;
-
   @BeforeAll
   static void setup() {
     CoverageReporter.getInstance().startTestcase("don't care");
-    // init pharmacy
-    pharmacy = new PharmacyActor("Am Flughafen");
-    UseTheErpClient useErpClient = mock(UseTheErpClient.class);
-    pharmacy.can(useErpClient);
   }
 
   @Test
   void shouldPerformCorrectCommandWithoutAuthentication() {
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+    val pharmacyClient = pharmacyMock.getRight();
+
+    val erpResponse =
+        ErpResponseUtil.createErpResponse(
+            new ErxPrescriptionBundle(), ErxPrescriptionBundle.class, 200);
+    when(pharmacyClient.request(any(TaskGetByIdCommand.class))).thenReturn(erpResponse);
+
     val action = GetPrescriptionById.withTaskId(TaskId.from("123")).withoutAuthentication();
-    Assertions.assertDoesNotThrow(() -> action.answeredBy(pharmacy));
+    assertDoesNotThrow(() -> action.answeredBy(pharmacyActor));
   }
 
   @Test
   void shouldPerformCorrectCommandWithAccessCode() {
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+    val pharmacyClient = pharmacyMock.getRight();
+
+    val erpResponse =
+        ErpResponseUtil.createErpResponse(
+            new ErxPrescriptionBundle(), ErxPrescriptionBundle.class, 200);
+    when(pharmacyClient.request(any(TaskGetByIdCommand.class))).thenReturn(erpResponse);
+
     val action =
         GetPrescriptionById.withTaskId(TaskId.from("123")).withAccessCode(AccessCode.from("321"));
-    Assertions.assertDoesNotThrow(() -> action.answeredBy(pharmacy));
+    assertDoesNotThrow(() -> action.answeredBy(pharmacyActor));
   }
 
   @Test
   void shouldPerformCorrectCommandWithSecret() {
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+    val pharmacyClient = pharmacyMock.getRight();
+
+    val erpResponse =
+        ErpResponseUtil.createErpResponse(
+            new ErxPrescriptionBundle(), ErxPrescriptionBundle.class, 200);
+    when(pharmacyClient.request(any(TaskGetByIdCommand.class))).thenReturn(erpResponse);
+
     val action =
         GetPrescriptionById.withTaskId(TaskId.from("123")).withSecret(Secret.from("secret"));
-    Assertions.assertDoesNotThrow(() -> action.answeredBy(pharmacy));
+    assertDoesNotThrow(() -> action.answeredBy(pharmacyActor));
   }
 }

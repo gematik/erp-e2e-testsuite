@@ -1,0 +1,1 @@
+{"resourceType":"Medication","id":"ExampleMedication1-Pomalidomid-T","code":{"coding":[{"system":"http://www.whocc.no/atc","code":"L04AX06","display":"pomalidomide"}]},"form":{"coding":[{"system":"https://fhir.kbv.de/CodeSystem/KBV_CS_SFHIR_KBV_DARREICHUNGSFORM","code":"HKP","display":"Hartkapseln"}]}}

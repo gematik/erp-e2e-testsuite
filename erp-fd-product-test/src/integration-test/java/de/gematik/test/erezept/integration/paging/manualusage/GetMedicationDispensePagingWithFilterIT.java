@@ -59,7 +59,7 @@ class GetMedicationDispensePagingWithFilterIT extends ErpTest {
   @Actor(name = "Am Waldesrand")
   private PharmacyActor pharmacy;
 
-  @TestcaseId("ERP_MEDICATION_DISPENSE_PAGING_PAGING_01")
+  @TestcaseId("ERP_MEDICATION_DISPENSE_PAGING_01")
   @Test
   @DisplayName(
       "Es muss geprüft werden, dass ein Patient beim Abruf seiner MedicationDispense nach equals"

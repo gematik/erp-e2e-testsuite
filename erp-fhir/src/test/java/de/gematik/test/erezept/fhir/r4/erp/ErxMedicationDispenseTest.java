@@ -39,11 +39,11 @@ import org.hl7.fhir.r4.model.Timing;
 import org.junit.jupiter.api.Test;
 
 class ErxMedicationDispenseTest extends ErpFhirParsingTest {
-  private static final String BASE_PATH = "fhir/valid/erp/1.4.0/medicationdispense/";
+  private static final String BASE_PATH = "fhir/valid/erp/1.6.0/xml/";
 
   @Test
   void shouldEncodeSingleMedicationDispense() {
-    val fileName = "MedicationDispense.json";
+    val fileName = "MedicationDispense-Example-MedicationDispense.json.xml";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val medicationDispense = parser.decode(ErxMedicationDispense.class, content);
@@ -56,13 +56,13 @@ class ErxMedicationDispenseTest extends ErpFhirParsingTest {
 
     // Note: expectedHandedOver might change at winter time (written at 05.10.2021)
     val expectedHandedOver =
-        ZonedDateTime.of(LocalDateTime.of(2024, 4, 3, 0, 0), ZoneId.systemDefault());
+        ZonedDateTime.of(LocalDateTime.of(2026, 4, 1, 0, 0), ZoneId.systemDefault());
     assertEquals(expectedHandedOver, medicationDispense.getZonedWhenHandedOver());
   }
 
   @Test
   void shouldCastFromMedicationDispense() {
-    val fileName = "MedicationDispense.json";
+    val fileName = "MedicationDispense-Example-MedicationDispense.json.xml";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     Resource medicationDispense = parser.decode(MedicationDispense.class, content);
@@ -72,7 +72,7 @@ class ErxMedicationDispenseTest extends ErpFhirParsingTest {
 
   @Test
   void shouldGetFromMedicationDispenseTheReedemCode() {
-    val fileName = "MedicationDispense-DiGA-Name-And-PZN.json";
+    val fileName = "MedicationDispense-Example-MedicationDispense-DiGA-Name-And-PZN.json.xml";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
     val erxMedicationDispense = parser.decode(ErxMedicationDispense.class, content);

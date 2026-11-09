@@ -24,10 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
 import de.gematik.test.core.StopwatchProvider;
-import de.gematik.test.erezept.actions.MockActorsUtils;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.ErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.eu.EuConsentDeleteCommand;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,25 +34,21 @@ import org.junit.jupiter.api.Test;
 
 class EuRejectConsentTest {
 
-  private ErpClient erpClientMock;
-  private MockActorsUtils mockUtil;
-  private PatientActor patient;
-
   @BeforeEach
   void setup() {
     StopwatchProvider.init();
-    mockUtil = new MockActorsUtils();
-    val actorStage = mockUtil.actorStage;
-    this.erpClientMock = mockUtil.erpClientMock;
-    this.patient = actorStage.getPatientNamed("Leonie Hütter");
   }
 
   @Test
   void shouldNotFailWithFalseEnsure() {
-    val mockResponse = mockUtil.createErpResponse(null, Resource.class, 204);
-    when(erpClientMock.request(any())).thenReturn(mockResponse);
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
+    val mockResponse = ErpResponseUtil.createErpResponse(null, Resource.class, 204);
+    when(patientClient.request(any())).thenReturn(mockResponse);
 
     val action = new EuRejectConsent(new EuConsentDeleteCommand(), false);
-    assertDoesNotThrow(() -> patient.performs(action));
+    assertDoesNotThrow(() -> patientActor.performs(action));
   }
 }

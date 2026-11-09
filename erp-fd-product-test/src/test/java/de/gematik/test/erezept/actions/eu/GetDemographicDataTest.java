@@ -28,18 +28,13 @@ import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.core.StopwatchProvider;
-import de.gematik.test.erezept.abilities.ProvidePharmacyBaseData;
-import de.gematik.test.erezept.actions.MockActorsUtils;
-import de.gematik.test.erezept.actors.ActorStage;
-import de.gematik.test.erezept.actors.EuPharmacyActor;
-import de.gematik.test.erezept.client.ErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.eu.EuGetPrescriptionPostCommand;
-import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
-import de.gematik.test.erezept.config.dto.actor.EuPharmacyConfiguration;
 import de.gematik.test.erezept.fhir.r4.eu.EuGetPrescriptionInput;
 import de.gematik.test.erezept.fhir.r4.eu.EuPrescriptionBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.EuAccessCode;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,57 +42,54 @@ import org.mockito.ArgumentCaptor;
 
 class GetDemographicDataTest extends ErpFhirBuildingTest {
 
-  private MockActorsUtils mockUtil;
-  private ErpClient erpClientMock;
-  private EuPharmacyActor pharmacy;
-
   @BeforeEach
   void setup() {
     StopwatchProvider.init();
-    this.mockUtil = new MockActorsUtils();
-    ActorStage actorStage = mockUtil.actorStage;
-    this.erpClientMock = mockUtil.erpClientMock;
-    this.pharmacy = actorStage.getEuPharmacyNamed("Hannes Vogt");
-
-    pharmacy.can(UseTheErpClient.with(erpClientMock));
-
-    EuPharmacyConfiguration cfg = new EuPharmacyConfiguration();
-    cfg.setCountryCode("LI");
-    pharmacy.can(ProvidePharmacyBaseData.fromConfiguration(cfg));
   }
 
   @Test
   void shouldBuildCommandWithExpectedInput() {
-    val patient = mockUtil.actorStage.getPatientNamed("Fridolin Straßer");
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+
+    val pharmacyMock = ActorMockUtil.createRandomEuPharmacy("LI");
+    val pharmacyActor = pharmacyMock.getLeft();
+    val pharmacyClient = pharmacyMock.getRight();
 
     val responseBundle = new EuPrescriptionBundle();
-    val mockResponse = mockUtil.createErpResponse(responseBundle, EuPrescriptionBundle.class, 200);
+    val mockResponse =
+        ErpResponseUtil.createErpResponse(responseBundle, EuPrescriptionBundle.class, 200);
 
-    when(erpClientMock.request(any(EuGetPrescriptionPostCommand.class))).thenReturn(mockResponse);
+    when(pharmacyClient.request(any(EuGetPrescriptionPostCommand.class))).thenReturn(mockResponse);
 
-    val action = GetDemographicData.forPatient(patient).withRandomAccessCode();
+    val action = GetDemographicData.forPatient(patientActor).withRandomAccessCode();
 
-    pharmacy.performs(action);
+    pharmacyActor.performs(action);
 
     ArgumentCaptor<EuGetPrescriptionPostCommand> cmdCaptor =
         ArgumentCaptor.forClass(EuGetPrescriptionPostCommand.class);
 
-    verify(erpClientMock, times(1)).request(cmdCaptor.capture());
+    verify(pharmacyClient, times(1)).request(cmdCaptor.capture());
   }
 
   @Test
   void shouldPerformDemographicsRequestSuccessfully() {
+    val pharmacyMock = ActorMockUtil.createRandomEuPharmacy("LI");
+    val pharmacyActor = pharmacyMock.getLeft();
+    val pharmacyClient = pharmacyMock.getRight();
+
     val kvnr = KVNR.random();
     val accessCode = EuAccessCode.random();
 
     val responseBundle = new EuPrescriptionBundle();
-    val mockResponse = mockUtil.createErpResponse(responseBundle, EuPrescriptionBundle.class, 200);
-    when(erpClientMock.request(any(EuGetPrescriptionPostCommand.class))).thenReturn(mockResponse);
+    val mockResponse =
+        ErpResponseUtil.createErpResponse(responseBundle, EuPrescriptionBundle.class, 200);
+    when(pharmacyClient.request(any(EuGetPrescriptionPostCommand.class))).thenReturn(mockResponse);
 
     val action = GetDemographicData.forKvnr(kvnr).withAccessCode(accessCode);
 
-    assertDoesNotThrow(() -> pharmacy.performs(action));
-    verify(erpClientMock, times(1)).request(any(EuGetPrescriptionPostCommand.class));
+    assertDoesNotThrow(() -> pharmacyActor.performs(action));
+    verify(pharmacyClient, times(1)).request(any(EuGetPrescriptionPostCommand.class));
   }
 
   @Test

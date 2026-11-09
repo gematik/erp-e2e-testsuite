@@ -44,13 +44,17 @@ import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvideDispensation;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpProvidePrescription;
 import de.gematik.test.erezept.fhir.builder.erp.ErxMedicationDispenseBuilder;
 import de.gematik.test.erezept.fhir.builder.erp.GemErpMedicationFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.ErxMedicationDispenseBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.MedicationCategory;
+import de.gematik.test.erezept.fhir.valuesets.StandardSize;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Date;
@@ -59,6 +63,7 @@ import lombok.val;
 import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
 import org.hl7.fhir.r4.model.MedicationDispense;
+import org.hl7.fhir.r4.model.MedicationRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -83,16 +88,40 @@ class CheckEpaOpProvidePrescriptionWithTaskTest extends ErpFhirParsingTest {
             ResourceLoader.readFileFromResource(
                 "fhir/valid/parameters/ForTestOnly-Parameters-example-epa-op-provide-prescription-erp-input-parameters-2.json"));
 
-    kbvErpBundle =
-        parser.decode(
-            KbvErpBundle.class,
-            ResourceLoader.readFileFromResource(
-                "fhir/valid/kbv/1.1.0/bundle/manipulated/ManipulatedForUnitTestfe9200db-d503-4a1b-bd13-96ab375f9bab.xml"));
+    kbvErpBundle = createKbvErpBundle();
     epaOpProvideDispensation =
         fhir.decode(
             EpaOpProvideDispensation.class,
             ResourceLoader.readFileFromResource(
                 "fhir/valid/parameters/Parameters-example-epa-op-provide-dispensation-erp-input-parameters-1.json"));
+  }
+
+  /**
+   * KbvErpBundle matching the values of
+   * ForTestOnly-Parameters-example-epa-op-provide-prescription-erp-input-parameters-2.json
+   */
+  private static KbvErpBundle createKbvErpBundle() {
+    val medication =
+        KbvErpMedicationPZNFaker.builder()
+            .withPznMedication(PZN.from("10019621"), "IBU-ratiopharm 400mg akut Schmerztabletten")
+            .withCategory(MedicationCategory.C_00)
+            .withVaccine(false)
+            .withStandardSize(StandardSize.N3)
+            .withSupplyForm(Darreichungsform.TAB)
+            .withAmount(50, "Tablet")
+            .fake();
+
+    return KbvErpBundleFaker.builder()
+        .withPrescriptionId(PRESC_ID)
+        .withKvnr(KVNR.from("E111111113"))
+        .withMedication(medication)
+        .withAuthorDate(testDate_22_01_2025)
+        .withStatus(MedicationRequest.MedicationRequestStatus.ACTIVE)
+        .withIntent("order")
+        .withDosageInstruction("1-0-0-0")
+        .withDispenseQuantity(1)
+        .withSubstitution(true)
+        .fake();
   }
 
   private static ErxMedicationDispenseBundle createMedicationDispenseBundle(

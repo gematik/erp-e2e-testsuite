@@ -22,14 +22,18 @@ package de.gematik.test.erezept.actions;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.actions.chargeitem.PatchChargeItemById;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
+import de.gematik.test.erezept.client.usecases.ChargeItemPatchCommand;
+import de.gematik.test.erezept.fhir.builder.erp.ErxChargeItemFaker;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItem;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.hl7.fhir.r4.model.Parameters;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,14 +41,9 @@ import org.junit.jupiter.api.Test;
 
 class PatchChargeItemByIdTest extends ErpFhirBuildingTest {
 
-  private static PatientActor patient;
-
   @BeforeAll
   static void setup() {
     CoverageReporter.getInstance().startTestcase("don't care");
-    patient = new PatientActor("Sina Hüllmann");
-    UseTheErpClient useErpClient = mock(UseTheErpClient.class);
-    patient.can(useErpClient);
   }
 
   @Test
@@ -62,14 +61,23 @@ class PatchChargeItemByIdTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldPerformCorrectCommand() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
     val patchBody = new Parameters();
     patchBody.addParameter("dummy", "value");
+
+    val erpResponse =
+        ErpResponseUtil.createErpResponse(
+            ErxChargeItemFaker.builder().fake(), ErxChargeItem.class, 200);
+    when(patientClient.request(any(ChargeItemPatchCommand.class))).thenReturn(erpResponse);
 
     val action =
         PatchChargeItemById.withPrescriptionId(PrescriptionId.random())
             .withPatchBody(patchBody)
             .build();
 
-    assertDoesNotThrow(() -> action.answeredBy(patient));
+    assertDoesNotThrow(() -> action.answeredBy(patientActor));
   }
 }

@@ -22,6 +22,7 @@ package de.gematik.test.erezept.fhir.r4.erp;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import lombok.val;
@@ -29,28 +30,25 @@ import org.junit.jupiter.api.Test;
 
 class ErxAcceptBundleTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH = "fhir/valid/erp/";
-  private static final String BASE_PATH_1_4_0 = BASE_PATH + "1.4.0/acceptbundle/";
+  private static final String BASE_PATH_1_6_0 =
+      "fhir/valid/erp/1.6.0/xml/Bundle-Bundle-AcceptOperation.json.xml";
 
   @Test
   void shouldEncodeSingleAcceptBundle120() {
-    val fileName = "2c08c718-3d3b-447e-babc-7afef76f0a48.xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_6_0);
     val acceptBundle = parser.decode(ErxAcceptBundle.class, content);
     assertNotNull(acceptBundle, "Valid ErxAcceptBundle must be parseable");
 
-    val expectedTaskId = "200.000.002.457.470.49";
+    val expectedTaskId = "d70932d1-9e1c-483c-b2d4-b7dced09b35e";
     val erxTask = acceptBundle.getTask();
     assertEquals(expectedTaskId, erxTask.getTaskId().getValue());
 
-    val expectedKbvBundleId = "c87e7f25-0000-0000-0001-000000000000";
+    val expectedKbvBundleId = "PrescriptionBinaryWithMeta";
     assertEquals(expectedKbvBundleId, acceptBundle.getKbvBundleId());
 
-    assertEquals(
-        "0a33a716b71c4dce81a3edbbd6aaf8296a82f0eead6784766ea3c5a6ce7b7ecc",
-        acceptBundle.getSecret().getValue());
+    assertThrows(MissingFieldException.class, () -> acceptBundle.getSecret());
 
-    assertTrue(acceptBundle.hasConsent());
+    assertFalse(acceptBundle.hasConsent());
   }
 }

@@ -20,11 +20,7 @@
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -52,12 +48,12 @@ import org.junitpioneer.jupiter.ClearSystemProperty;
 
 class ErxChargeItemTest extends ErpFhirParsingTest {
 
-  private final String BASE_PATH_140 = "fhir/valid/erp/1.4.0/chargeitembundle/";
+  private static final String BASE_PATH_160 = "fhir/valid/erp/1.6.0/xml/charhgeitembundle/";
 
   @Test
   void shouldEncodeValidErxChargeItem() {
-    val fileName = "bundle_01.json";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_140 + fileName);
+    val fileName = "ChargeItemByFDWithAddedIds.xml";
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_160 + fileName);
     val bundle = parser.decode(ErxChargeItemBundle.class, content);
     val chargeItem = bundle.getChargeItem();
 
@@ -65,17 +61,17 @@ class ErxChargeItemTest extends ErpFhirParsingTest {
     assertFalse(chargeItem.hasInsuranceProvider());
     assertFalse(chargeItem.hasSubsidy());
     assertFalse(chargeItem.hasTaxOffice());
-    assertEquals("200.000.003.355.048.35", chargeItem.getPrescriptionId().getValue());
+    assertEquals("200.000.003.746.556.84", chargeItem.getPrescriptionId().getValue());
     assertEquals(ChargeItem.ChargeItemStatus.BILLABLE, chargeItem.getStatus());
-    assertEquals("X110465770", chargeItem.getSubjectKvnr().getValue());
+    assertEquals("X110614233", chargeItem.getSubjectKvnr().getValue());
     assertEquals(
-        "3-SMC-B-Testkarte-883110000116873", chargeItem.getEntererTelematikId().getValue());
+        "3-SMC-B-Testkarte--883110000163973", chargeItem.getEntererTelematikId().getValue());
   }
 
   @Test
   void shouldEncodeMarkingFlags() {
-    val fileName = "bundle_02.xml";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_140 + fileName);
+    val fileName = "ChargeItemByFDWithAddedIds.xml";
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_160 + fileName);
     val bundle = parser.decode(ErxChargeItemBundle.class, content);
     val chargeItem = bundle.getChargeItem();
 
@@ -86,8 +82,8 @@ class ErxChargeItemTest extends ErpFhirParsingTest {
 
   @Test
   void shouldThrowOnMissingFields() {
-    val fileName = "bundle_02.xml";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_140 + fileName);
+    val fileName = "ChargeItemByFDWithAddedIds.xml";
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_160 + fileName);
     val bundle = parser.decode(ErxChargeItemBundle.class, content);
     val chargeItem = bundle.getChargeItem();
 
@@ -110,7 +106,7 @@ class ErxChargeItemTest extends ErpFhirParsingTest {
 
     val chargeItem =
         ErxChargeItemBuilder.forPrescription(prescriptionId)
-            .version(PatientenrechnungVersion.V1_0_0)
+            .version(PatientenrechnungVersion.V1_1_0)
             .accessCode(AccessCode.random().getValue())
             .status("billable")
             .enterer("606358757")

@@ -47,7 +47,6 @@ import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleBuilder;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestFaker;
-import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
 import de.gematik.test.erezept.fhir.valuesets.DmpKennzeichen;
@@ -334,30 +333,16 @@ class TaskActivateIT extends ErpTest {
                             .setCode(insuranceIdentifierType.getCode()))
                 .withRandomKbvBundle());
 
-    // after reduce Profile Switch also reduce "GKV", "PKV" from exclude-list
-    if (ErpWorkflowVersion.getDefaultVersion().compareTo(ErpWorkflowVersion.V1_4) <= 0) {
-      doctor.attemptsTo(
-          Verify.that(activation)
-              .withOperationOutcome(FhirRequirements.FHIR_VALIDATION_ERROR)
-              .hasResponseWith(returnCode(400))
-              .and(
-                  operationOutcomeContainsInDiagnostics(
-                      "In der Ressource vom Typ Patient ist keine GKV-VersichertenID vorhanden,"
-                          + " diese ist aber eine Pflichtangabe beim Kostentraeger des Typs",
-                      ErpAfos.A_23936))
-              .isCorrect());
-    } else {
-      doctor.attemptsTo(
-          Verify.that(activation)
-              .withOperationOutcome(FhirRequirements.FHIR_VALIDATION_ERROR)
-              .hasResponseWith(returnCode(400))
-              .and(
-                  operationOutcomeContainsInDiagnostics(
-                      "In der Ressource vom Typ Patient ist keine VersichertenID vorhanden, diese"
-                          + " ist aber eine Pflichtangabe bei Kostenträgern des Typs",
-                      ErpAfos.A_23936))
-              .isCorrect());
-    }
+    doctor.attemptsTo(
+        Verify.that(activation)
+            .withOperationOutcome(FhirRequirements.FHIR_VALIDATION_ERROR)
+            .hasResponseWith(returnCode(400))
+            .and(
+                operationOutcomeContainsInDiagnostics(
+                    "In der Ressource vom Typ Patient ist keine VersichertenID vorhanden, diese"
+                        + " ist aber eine Pflichtangabe bei Kostenträgern des Typs",
+                    ErpAfos.A_23936))
+            .isCorrect());
   }
 
   @TestcaseId("ERP_TASK_ACTIVATE_06")

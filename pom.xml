@@ -7,7 +7,7 @@
 
     <groupId>de.gematik.test.erezept</groupId>
     <artifactId>erezept-testsuite</artifactId>
-    <version>1.9.0</version>
+    <version>1.10.0</version>
     <packaging>pom</packaging>
 
     <name>E-Rezept E2E Testsuite</name>
@@ -79,7 +79,7 @@
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 
         <version.serenity>5.4.1</version.serenity>
-        <version.idp-client>30.1.0</version.idp-client>
+        <version.idp-client>30.1.1</version.idp-client>
         <version.jackson.core>3.2.4</version.jackson.core>
         <version.jackson.dataformat>3.2.4</version.jackson.dataformat>
         <version.jackson.jaxrs>3.2.4</version.jackson.jaxrs>
@@ -91,16 +91,19 @@
         <version.wiremock>3.13.2</version.wiremock>
         <version.faker>1.0.2</version.faker>
         <version.lombok>1.18.48</version.lombok>
-        <version.logback>1.6.5</version.logback>
+        <version.logback>1.6.6</version.logback>
         <version.slf4j-api>2.0.20</version.slf4j-api>
-        <version.unirest>4.10.1</version.unirest>
+        <version.unirest>4.10.4</version.unirest>
         <version.zxing>3.5.4</version.zxing>
         <version.jersey>4.0.3</version.jersey>
         <version.poto>3.0.3-215</version.poto>
-        <version.bricks>0.12.1</version.bricks>
+        <version.bricks>0.13.0</version.bricks>
 
         <skip.unittests/>
         <skip.inttests/>
+
+        <!-- javadoc cannot see Lombok-generated types (e.g. @Builder classes); delombok first -->
+        <delombok.output>${project.build.directory}/generated-sources/delombok</delombok.output>
 
         <sonar.exclusions>
             **/*Main.java,
@@ -108,6 +111,7 @@
             **/primsys/PrimSysApplication.java,
             **/test/erezept/cli/cmd/*.java,
             **/primsys/controller/*.java,
+            **/test/erezept/ErpTest.java,
             **/test/erezept/operator/jframe/*.java,
             **/test/erezept/app/questions/*.java,
             **/test/erezept/app/task/*.java,
@@ -145,98 +149,104 @@
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-config-data</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>smartcard</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-client</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.test.erezept</groupId>
+                <artifactId>erp-client</artifactId>
+                <version>1.10.0</version>
+                <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-fhir-fuzzing</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-mock-client</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-fhir</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>epa-fhir</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-bdd-common</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-common</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-common</artifactId>
                 <type>test-jar</type>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-bdd</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
                 <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>erp-cli-common</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-data</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>primsys-rest-client</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </dependency>
             <dependency>
                 <groupId>de.gematik.idp</groupId>
@@ -439,6 +449,16 @@
             </dependency>
             <dependency>
                 <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>gid-plugin-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
+                <artifactId>smartcard-idp-plugin-brick</artifactId>
+                <version>${version.bricks}</version>
+            </dependency>
+            <dependency>
+                <groupId>de.gematik.bbriccs</groupId>
                 <artifactId>crypto-brick</artifactId>
                 <version>${version.bricks}</version>
             </dependency>
@@ -543,7 +563,7 @@
             <dependency>
                 <groupId>com.ibm.icu</groupId>
                 <artifactId>icu4j</artifactId>
-                <version>78.3</version>
+                <version>79.1</version>
             </dependency>
             <dependency>
                 <groupId>info.picocli</groupId>
@@ -553,7 +573,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.55</version>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
@@ -606,12 +626,12 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.18.15</version>
+                <version>1.18.16</version>
             </dependency>
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy-agent</artifactId>
-                <version>1.18.15</version>
+                <version>1.18.16</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -728,7 +748,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.15</version>
+                <version>0.8.16</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -782,7 +802,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.1</version>
                 <configuration>
                     <!--suppress UnresolvedMavenProperty -->
                     <argLine>${surefireArgLine} -Dfile.encoding=UTF-8 -Xms256m -Xmx5g -XX:MaxMetaspaceSize=384m
@@ -906,6 +926,7 @@
                     <bottom>${javadoc.bottom}</bottom>
                     <doclint>none</doclint>
                     <noqualifier>all</noqualifier>
+                    <sourcepath>${delombok.output}</sourcepath>
                 </configuration>
                 <reportSets>
                     <reportSet>
@@ -969,11 +990,44 @@
                         </executions>
                     </plugin>
                     <plugin>
+                        <groupId>org.projectlombok</groupId>
+                        <artifactId>lombok-maven-plugin</artifactId>
+                        <version>1.18.20.0</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${version.lombok}</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                            <outputDirectory>${delombok.output}</outputDirectory>
+                            <!-- only for javadoc; compilation keeps using Lombok directly -->
+                            <addOutputDirectory>false</addOutputDirectory>
+                            <formatPreferences>
+                                <generateDelombokComment>skip</generateDelombokComment>
+                                <javaLangAsFQN>skip</javaLangAsFQN>
+                            </formatPreferences>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>delombok-for-javadoc</id>
+                                <!-- after compilation: running delombok in-process before javac breaks Lombok's annotation processing -->
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>delombok</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>3.12.0</version>
                         <configuration>
                             <doclint>none</doclint>
+                            <sourcepath>${delombok.output}</sourcepath>
                         </configuration>
                         <executions>
                             <execution>

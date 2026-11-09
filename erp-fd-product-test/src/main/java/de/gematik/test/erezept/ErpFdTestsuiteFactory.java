@@ -24,6 +24,7 @@ import static java.text.MessageFormat.format;
 import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 
 import de.gematik.bbriccs.crypto.CryptoSystem;
+import de.gematik.bbriccs.fhir.builder.FakerBrick;
 import de.gematik.bbriccs.fhir.compare.fhirpatch.HapiPatchComparator;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.konnektor.Konnektor;
@@ -33,12 +34,16 @@ import de.gematik.bbriccs.popp.PoppTokenGenerator;
 import de.gematik.bbriccs.rest.UnirestHttpClient;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.bbriccs.vsdm.VsdmService;
+import de.gematik.idp.client.IIdpClient;
+import de.gematik.idp.client.IdpTokenResult;
+import de.gematik.idp.token.JsonWebToken;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.abilities.*;
 import de.gematik.test.erezept.actors.DoctorActor;
 import de.gematik.test.erezept.actors.ErpActor;
 import de.gematik.test.erezept.actors.PharmacyActor;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
+import de.gematik.test.erezept.client.idpclient.InvalidIdpClient;
 import de.gematik.test.erezept.common.apimeasure.ApiCallStopwatch;
 import de.gematik.test.erezept.common.screenplay.abilities.*;
 import de.gematik.test.erezept.config.ConfigurationReader;
@@ -48,12 +53,16 @@ import de.gematik.test.erezept.config.dto.erpclient.BackendRouteConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.config.dto.primsys.PrimsysConfigurationDto;
 import de.gematik.test.erezept.config.exceptions.ConfigurationException;
+import de.gematik.test.erezept.config.exceptions.ConfigurationMappingException;
 import de.gematik.test.erezept.eml.EpaMockClient;
+import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.parser.FhirParser;
 import de.gematik.test.erezept.fhir.parser.ValidatorType;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import de.gematik.test.erezept.trezept.TRegisterMockClient;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
+import javax.annotation.Nullable;
 import kong.unirest.core.Unirest;
 import kong.unirest.jackson.JacksonObjectMapper;
 import lombok.AccessLevel;
@@ -71,6 +80,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
 
   private final PrimsysConfigurationDto dto;
   @Delegate private final SmartcardArchive smartcards;
+  private final ErpClientFactory erpClientFactory;
   private final ApiCallStopwatch stopwatch = StopwatchProvider.getInstance().getStopwatch();
   private static final int GEM_PROXY_PORT = 3128;
 
@@ -91,18 +101,41 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     return PoppTokenGenerator.from(cfg);
   }
 
-  private UseTheErpClient useTheErpClientWithInvalidIdpToken(PatientConfiguration config) {
-
-    return UseTheErpClient.with(
-        ErpClientFactory.createErpClientWithInvalidIdpToken(getActiveEnvironment(), config),
-        stopwatch);
-  }
-
   public <A extends Actor> void equipAsPatientWithInvalidIdpToken(A actor) {
     this.equipAsPatient(actor);
-    val cfg = this.getPatientConfig(actor.getName());
-    val egk = actor.abilityTo(ProvideEGK.class).getEgk();
-    actor.can(useTheErpClientWithInvalidIdpToken(cfg).authenticatingWith(egk));
+    val patient =
+        getConfigOptionally(actor.getName(), dto.getActors().getPatients())
+            .orElseThrow(
+                () ->
+                    new ConfigurationMappingException(
+                        "Patient with invalid IdP token must be configured in the configuration"));
+
+    // Negative test-case setup: the patient shall authenticate with a *syntactically broken* access
+    // token so that the FD rejects the request. This is achieved in two steps:
+    //
+    // 1) tokenManipulator: receives the genuine IdpTokenResult issued by the real IDP and corrupts
+    //    it by appending "invalid" to the raw JWT string. This breaks the signature (and the JWT
+    //    structure itself), so the token can never be verified by the FD.
+    UnaryOperator<IdpTokenResult> tokenManipulator =
+        token -> {
+          val invalidToken = token.getAccessToken().getRawString() + "invalid";
+          token.setAccessToken(new JsonWebToken(invalidToken));
+          return token;
+        };
+
+    // 2) idpClientDelegationFactory: the ErpClientFactory creates the real IIdpClient as usual and
+    //    hands it to this function, which wraps it in an InvalidIdpClient. The wrapper delegates
+    //    the actual login to the real client and then applies the tokenManipulator on the result,
+    //    i.e. the ErpClient sees a valid login flow but ends up using the corrupted token.
+    UnaryOperator<IIdpClient> idpClientDelegationFactory =
+        idp -> new InvalidIdpClient(idp, tokenManipulator);
+
+    val p =
+        erpClientFactory.prepareStagedClientWithDelegatedIdp(patient, idpClientDelegationFactory);
+    val erpClient = p.getLeft();
+    val erpClientAbility = UseTheErpClient.with(erpClient, stopwatch);
+    // now replace the existing ability with the new one that uses the invalid IDP token
+    actor.can(erpClientAbility);
   }
 
   public <A extends Actor> void equipAsDoctor(A actor) {
@@ -110,19 +143,29 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     log.info("Equip Doctor {}", name);
 
     val cfg = this.getDoctorConfig(name);
-    val smcb = this.getSmcbByICCSN(cfg.getSmcbIccsn());
     val hba = this.getHbaByICCSN(cfg.getHbaIccsn());
     val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
 
+    // wire up erp-client with konnektor and SMC-B for external authenticate
+    val erpClientStage = this.erpClientFactory.prepareStagedClientFor(cfg);
+    val smcb = erpClientStage.getSmcb();
+
     val useTheKonnektor =
         UseTheKonnektor.with(smcb).and(hba).and(algorithm).on(instantiateKonnektorClient(cfg));
+
+    // as PS we want always to use external authenticate...
+    val erpClient =
+        erpClientStage.createWithExternalAuthentication(
+            () -> useTheKonnektor.getSmcbAuthCertificate().getPayload(),
+            challenge -> useTheKonnektor.externalAuthenticate(challenge).getPayload());
+
     givenThat(actor)
         .describedAs(cfg.getDescription())
         .whoCan(UseSMCB.itHasAccessTo(smcb))
         .can(UsePoppTokenGenerator.with(getPoppTokenGenerator(), smcb))
         .can(UseHBA.itHasAccessTo(hba))
         .can(useTheKonnektor)
-        .can(useTheErpClientFrom(cfg).authenticatingWith(useTheKonnektor))
+        .can(UseTheErpClient.with(erpClient, stopwatch))
         .can(ManageDoctorsPrescriptions.heIssued())
         .can(ProvideDoctorBaseData.fromConfiguration(cfg, hba.getTelematikId()));
   }
@@ -162,7 +205,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     if (StringUtils.isNotBlank(gemProxy)) {
       builder = builder.proxy(gemProxy, GEM_PROXY_PORT);
     }
-    // Todo reactivate BRICKS Validator if Profiles are fine
+
     val fhirParser = new FhirParser(ValidatorType.BRICKS);
 
     val tregisterMockClient = TRegisterMockClient.withRestClient(builder.withoutTlsVerification());
@@ -175,11 +218,19 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     log.info("Equip Pharmacy {}", name);
 
     val cfg = this.getPharmacyConfig(name);
-    val smcb = this.getSmcbByICCSN(cfg.getSmcbIccsn());
     val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
+
+    val erpClientStage = this.erpClientFactory.prepareStagedClientFor(cfg);
+    val smcb = erpClientStage.getSmcb();
 
     val useTheKonnektor =
         UseTheKonnektor.with(smcb).and(algorithm).on(instantiateKonnektorClient(cfg));
+
+    // as PS we want always to use external authenticate...
+    val erpClient =
+        erpClientStage.createWithExternalAuthentication(
+            () -> useTheKonnektor.getSmcbAuthCertificate().getPayload(),
+            challenge -> useTheKonnektor.externalAuthenticate(challenge).getPayload());
 
     givenThat(actor)
         .describedAs(cfg.getDescription())
@@ -193,7 +244,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
                 .practitionerIdentifier("telematik-id HBA")
                 .organizationIdentifier(smcb)
                 .build())
-        .can(useTheErpClientFrom(cfg).authenticatingWith(useTheKonnektor));
+        .can(UseTheErpClient.with(erpClient, stopwatch));
   }
 
   public <T extends ErpActor> void equipAsEuPharmacy(T actor) {
@@ -201,13 +252,19 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     log.info("Equip EU-Pharmacy {}", name);
 
     val cfg = this.getEuPharmacyConfig(name);
-    val smcb = this.getSmcbByICCSN(cfg.getSmcbIccsn());
+
+    // wire up erp-client with konnektor and SMC-B for external authenticate
+    val erpClientStage = this.erpClientFactory.prepareStagedClientFor(cfg);
+    val smcb = erpClientStage.getSmcb();
+
+    // as EU pharmacy we want always to use IdP directly for authentication
+    val erpClient = erpClientStage.createWithSmcBAuthentication();
 
     givenThat(actor)
         .describedAs(cfg.getDescription())
         .whoCan(UseSMCB.itHasAccessTo(smcb))
         .can(ProvidePharmacyBaseData.fromConfiguration(cfg))
-        .can(useTheErpClientFrom(cfg).authenticatingWith(smcb));
+        .can(UseTheErpClient.with(erpClient, stopwatch));
   }
 
   public <A extends Actor> void equipAsKtr(A actor) {
@@ -215,30 +272,47 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     log.info("Equip KTR {}", name);
 
     val cfg = this.getKtrConfig(name);
-    val smcb = this.getSmcbByICCSN(cfg.getSmcbIccsn());
     val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
+
+    // wire up erp-client with konnektor and SMC-B for external authenticate
+    val erpClientStage = this.erpClientFactory.prepareStagedClientFor(cfg);
+    val smcb = erpClientStage.getSmcb();
 
     val useTheKonnektor =
         UseTheKonnektor.with(smcb).and(algorithm).on(instantiateKonnektorClient(cfg));
+
+    // as KTR we want always to use external authenticate...
+    val erpClient =
+        erpClientStage.createWithExternalAuthentication(
+            () -> useTheKonnektor.getSmcbAuthCertificate().getPayload(),
+            challenge -> useTheKonnektor.externalAuthenticate(challenge).getPayload());
+
     givenThat(actor)
         .describedAs(cfg.getDescription())
         .whoCan(UseSMCB.itHasAccessTo(smcb))
         .can(useTheKonnektor)
         .can(ManagePharmacyPrescriptions.itWorksWith())
         .can(ManageCommunications.heExchanges())
-        .can(useTheErpClientFrom(cfg).authenticatingWith(useTheKonnektor));
+        .can(UseTheErpClient.with(erpClient, stopwatch));
   }
 
   public <A extends Actor> void equipAsPatient(A actor) {
-    val name = actor.getName();
+    val cfg = this.getPatientConfig(actor.getName());
+
+    // the patient might not had have a name assigned before
+    // getPatientConfig might have generated a random name for the patient, so we assign it to the
+    // actor here
+    val name = cfg.getName();
+    actor.assignName(name);
     log.info("Equip Patient {}", name);
 
-    val cfg = this.getPatientConfig(name);
-    val egk = this.getEgkByICCSN(cfg.getEgkIccsn());
+    val p = erpClientFactory.prepareStagedClientFor(cfg);
+    val erpClient = p.getLeft();
+    val egk = p.getRight();
 
     givenThat(actor)
         .describedAs("Ein/e 'E-Rezept-ready' Versicherte/r der E-Rezepte erhalten kann")
-        .whoCan(useTheErpClientFrom(cfg).authenticatingWith(egk))
+        .whoCan(UseTheErpClient.with(erpClient, stopwatch))
         .can(ProvidePatientBaseData.forGkvPatient(KVNR.from(egk.getKvnr()), name))
         .can(ProvideEGK.sheOwns(egk))
         .can(ManageDataMatrixCodes.heGetsPrescribed())
@@ -321,26 +395,8 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
                 .on(instantiateKonnektorClient(cfg.getKonnektor())));
   }
 
-  private <C extends BaseActorConfiguration> UseTheErpClient useTheErpClientFrom(C config) {
-    if (config instanceof PatientConfiguration pcfg) {
-      return UseTheErpClient.with(
-          ErpClientFactory.createErpClient(getActiveEnvironment(), pcfg), stopwatch);
-    } else if (config instanceof PsActorConfiguration pcfg) {
-      return UseTheErpClient.with(
-          ErpClientFactory.createErpClient(getActiveEnvironment(), pcfg), stopwatch);
-    } else if (config instanceof EuPharmacyConfiguration pcfg) {
-      return UseTheErpClient.with(
-          ErpClientFactory.createErpClient(getActiveEnvironment(), pcfg), stopwatch);
-    } else {
-      throw new ConfigurationException(
-          format(
-              "Cannot create erp-client for {0} with configuration {1}",
-              config.getName(), config.getClass().getSimpleName()));
-    }
-  }
-
   public EnvironmentConfiguration getActiveEnvironment() {
-    return this.getConfig(dto.getActiveEnvironment(), dto.getEnvironments());
+    return getConfig(dto.getActiveEnvironment(), dto.getEnvironments());
   }
 
   public String getOcsp() {
@@ -363,8 +419,53 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
     return getConfig(name, dto.getActors().getHealthInsurances());
   }
 
-  public PatientConfiguration getPatientConfig(String name) {
-    return getConfig(name, dto.getActors().getPatients());
+  /**
+   * Resolves the {@link PatientConfiguration} for the given actor name.
+   *
+   * <p><b>Note:</b> this method behaves differently from the other {@code getXXXConfig} methods:
+   *
+   * <ul>
+   *   <li>the other {@code getXXXConfig} methods throw an exception if no configuration with the
+   *       given name exists
+   *   <li>this method does <b>not</b> throw; instead it fakes a {@link PatientConfiguration} with a
+   *       random KVNR and a random eGK-ICCSN
+   *   <li>because the faked ICCSN is unknown to the {@code SmartcardArchive}, the {@code
+   *       ErpClientFactory} will not find a matching eGK and automatically falls back to GID
+   *       authentication for this patient
+   * </ul>
+   *
+   * This allows test-cases to use patients "out of thin air" without declaring them explicitly in
+   * the configuration file.
+   *
+   * @param name the actor name of the patient as declared in the configuration (or any arbitrary
+   *     name for an ad-hoc GID patient)
+   * @return the configured {@link PatientConfiguration}, or a faked one if no configuration with
+   *     the given name exists
+   */
+  public PatientConfiguration getPatientConfig(@Nullable String name) {
+    val patientName =
+        Optional.ofNullable(name).filter(it -> !it.isBlank()).orElse(GemFaker.fakerName());
+
+    return getConfigOptionally(patientName, dto.getActors().getPatients())
+        .orElseGet(
+            () -> {
+              val template = dto.getActors().getPatients().getFirst();
+              val cfg = new PatientConfiguration();
+              val kvnr = KVNR.randomStringValue();
+
+              cfg.setName(patientName);
+              cfg.setDescription(
+                  format("Ad-hoc GID patient ''{0}'' with KVNR {1}", patientName, kvnr));
+              cfg.setKvnr(kvnr);
+              cfg.setEgkIccsn("802768831100001" + FakerBrick.getGerman().regexify("^\\d{5}$"));
+
+              cfg.setAcceptMime(template.getAcceptMime());
+              cfg.setSendMime(template.getSendMime());
+              cfg.setAlgorithm(template.getAlgorithm());
+              cfg.setCountryCode(template.getCountryCode());
+              cfg.setFhirValidator(template.getFhirValidator());
+              return cfg;
+            });
   }
 
   public ApothecaryConfiguration getApothecaryConfig(String name) {
@@ -380,7 +481,7 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
   }
 
   private KonnektorConfiguration getKonnektorConfig(String name) {
-    return this.getConfig(name, dto.getKonnektors());
+    return getConfig(name, dto.getKonnektors());
   }
 
   public static ErpFdTestsuiteFactory create() {
@@ -390,6 +491,18 @@ public class ErpFdTestsuiteFactory extends ConfiguredFactory {
   }
 
   public static ErpFdTestsuiteFactory fromDto(PrimsysConfigurationDto dto, SmartcardArchive sca) {
-    return new ErpFdTestsuiteFactory(dto, sca);
+    val env =
+        dto.getEnvironments().stream()
+            .filter(it -> it.getName().equalsIgnoreCase(dto.getActiveEnvironment()))
+            .findFirst()
+            .orElseThrow(
+                () ->
+                    new ConfigurationException(
+                        format(
+                            "Active environment ''{0}'' not found in configuration",
+                            dto.getActiveEnvironment())));
+    val erpClientFactory = ErpClientFactory.forEnvironment(env).withSmartcardArchive(sca).build();
+
+    return new ErpFdTestsuiteFactory(dto, sca, erpClientFactory);
   }
 }

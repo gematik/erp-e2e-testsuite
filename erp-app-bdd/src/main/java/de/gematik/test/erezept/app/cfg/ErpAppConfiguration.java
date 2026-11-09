@@ -38,11 +38,11 @@ public class ErpAppConfiguration extends ConfiguredFactory {
   }
 
   public ErpActorConfiguration getAppUserByName(String name) {
-    return this.getConfig(name, dto.getUsers());
+    return getConfig(name, dto.getUsers());
   }
 
   public DeviceConfiguration getDeviceByName(String deviceName) {
-    return this.getConfig(deviceName, dto.getDevices());
+    return getConfig(deviceName, dto.getDevices());
   }
 
   public AppConfiguration getAppConfiguration(PlatformType platformType) {
@@ -59,7 +59,7 @@ public class ErpAppConfiguration extends ConfiguredFactory {
   }
 
   public AppiumConfiguration getAppiumConfiguration(String name) {
-    return this.getConfig(name, dto.getAppium());
+    return getConfig(name, dto.getAppium());
   }
 
   public static ErpAppConfiguration fromDto(ErpAppConfigurationBase dto) {

@@ -93,7 +93,7 @@ public class ActorStage {
       doctors.put(name, (DoctorActor) actor);
     } else if (klass.equals(PatientActor.class)) {
       config.equipAsPatient(actor);
-      patients.put(name, (PatientActor) actor);
+      patients.put(actor.getName(), (PatientActor) actor);
     } else if (klass.equals(PharmacyActor.class)) {
       config.equipAsPharmacy(actor);
       pharmacies.put(name, (PharmacyActor) actor);

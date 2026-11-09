@@ -5,7 +5,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.9.0</version>
+        <version>1.10.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -119,12 +119,12 @@
                 <dependency>
                     <groupId>de.gematik.test.erezept</groupId>
                     <artifactId>erp-client-fdv-steps</artifactId>
-                    <version>1.9.0</version>
+                    <version>1.10.0</version>
                 </dependency>
                 <dependency>
                     <groupId>de.gematik.test.erezept</groupId>
                     <artifactId>erp-client-fdv-steps</artifactId>
-                    <version>1.9.0</version>
+                    <version>1.10.0</version>
                     <type>test-jar</type>
                 </dependency>
             </dependencies>
@@ -135,7 +135,7 @@
                 <dependency>
                     <groupId>de.gematik.test.erezept</groupId>
                     <artifactId>erp-remote-fdv-steps</artifactId>
-                    <version>1.9.0</version>
+                    <version>1.10.0</version>
                     <type>test-jar</type>
                     <exclusions>
                         <exclusion>
@@ -147,7 +147,7 @@
                 <dependency>
                     <groupId>de.gematik.test.erezept</groupId>
                     <artifactId>erp-remote-fdv-steps</artifactId>
-                    <version>1.9.0</version>
+                    <version>1.10.0</version>
                     <exclusions>
                         <exclusion>
                             <groupId>jakarta.activation</groupId>
@@ -262,7 +262,7 @@
             <plugin>
                 <groupId>de.gematik.test.erezept</groupId>
                 <artifactId>bdd-javadocs</artifactId>
-                <version>1.9.0</version>
+                <version>1.10.0</version>
             </plugin>
         </plugins>
     </build>

@@ -27,6 +27,7 @@ import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.date.DateConverter;
 import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
 import de.gematik.test.erezept.fhir.profiles.definitions.GemErpEuStructDef;
+import de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
@@ -46,14 +47,13 @@ import org.junit.jupiter.api.Test;
 
 class ErxTaskTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH = "fhir/valid/erp/";
-  private static final String BASE_PATH_1_4_0 = BASE_PATH + "1.4.0/task/";
+  private static final String PATH =
+      "fhir/valid/erp/1.6.0/xml/Task-9b48f82c-9c11-4a57-aa72-a805f9537a82.json.xml";
 
   @Test
   void shouldEncodeSingleTask() {
     val expectedId = "9b48f82c-9c11-4a57-aa72-a805f9537a82";
-    val fileName = expectedId + ".json";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(PATH);
 
     val task = parser.decode(ErxTask.class, content);
     assertNotNull(task, "Valid ErxTask must be parseable");
@@ -70,7 +70,7 @@ class ErxTaskTest extends ErpFhirParsingTest {
         AccessCode.from("777bea0e13cc9c42ceec14aec3ddee2263325dc2c6c699db115f58fe423607ea");
     assertTrue(task.hasAccessCode());
     assertEquals(expectedAccessCode, task.getAccessCode());
-
+    task.getIdentifier().removeIf(ErpWorkflowNamingSystem.SECRET::matches);
     assertFalse(task.hasSecret()); // does not have a secret in Task_01.xml
 
     val expectedStatus = TaskStatus.INPROGRESS;
@@ -93,16 +93,14 @@ class ErxTaskTest extends ErpFhirParsingTest {
 
   @Test
   void shouldEncodeExpiryAndAcceptDates() {
-    val expectedId = "9b48f82c-9c11-4a57-aa72-a805f9537a82";
-    val fileName = expectedId + ".json";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(PATH);
 
     val task = parser.decode(ErxTask.class, content);
     assertNotNull(task, "Valid ErxTask must be parseable");
 
     val dc = DateConverter.getInstance();
-    val expectedExpiry = dc.dateFromIso8601("2022-06-02");
-    val expectedAccept = dc.dateFromIso8601("2022-04-02");
+    val expectedExpiry = dc.dateFromIso8601("2026-04-01");
+    val expectedAccept = dc.dateFromIso8601("2026-04-01");
 
     assertEquals(expectedExpiry, task.getExpiryDate());
     assertEquals(expectedAccept, task.getAcceptDate());
@@ -110,9 +108,7 @@ class ErxTaskTest extends ErpFhirParsingTest {
 
   @Test
   void shouldEncodeSingleTask1() {
-    val fileName = "9b48f82c-9c11-4a57-aa72-a805f9537a82.json";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(PATH);
     val task = parser.decode(ErxTask.class, content);
     assertNotNull(task, "Valid ErxTask must be parseable");
 
@@ -129,7 +125,7 @@ class ErxTaskTest extends ErpFhirParsingTest {
         AccessCode.from("777bea0e13cc9c42ceec14aec3ddee2263325dc2c6c699db115f58fe423607ea");
     assertTrue(task.hasAccessCode());
     assertEquals(expectedAccessCode, task.getOptionalAccessCode().orElseThrow());
-
+    task.getIdentifier().removeIf(ErpWorkflowNamingSystem.SECRET::matches);
     assertFalse(task.hasSecret()); // resource does not have a secret
 
     val expectedStatus = TaskStatus.INPROGRESS;
@@ -144,8 +140,8 @@ class ErxTaskTest extends ErpFhirParsingTest {
     assertEquals(expectedIntent, task.getIntent());
 
     val dc = DateConverter.getInstance();
-    val expectedExpiry = dc.dateFromIso8601("2022-06-02");
-    val expectedAccept = dc.dateFromIso8601("2022-04-02");
+    val expectedExpiry = dc.dateFromIso8601("2026-04-01");
+    val expectedAccept = dc.dateFromIso8601("2026-04-01");
 
     assertEquals(expectedExpiry, task.getExpiryDate());
     assertEquals(expectedAccept, task.getAcceptDate());
@@ -163,13 +159,12 @@ class ErxTaskTest extends ErpFhirParsingTest {
 
   @Test
   void shouldEncodeSingleDraftTask() {
-    val fileName = "607255ed-ce41-47fc-aad3-cfce1c39963f.json";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(PATH);
     val task = parser.decode(ErxTask.class, content);
     assertNotNull(task, "Valid ErxTask must be parseable");
 
-    val expectedId = "607255ed-ce41-47fc-aad3-cfce1c39963f";
+    val expectedId = "9b48f82c-9c11-4a57-aa72-a805f9537a82";
     assertEquals(expectedId, task.getTaskId().getValue());
 
     val expectedPrescriptionID = PrescriptionId.from("160.000.033.491.280.78");
@@ -182,10 +177,10 @@ class ErxTaskTest extends ErpFhirParsingTest {
         AccessCode.from("777bea0e13cc9c42ceec14aec3ddee2263325dc2c6c699db115f58fe423607ea");
     assertTrue(task.hasAccessCode());
     assertEquals(expectedAccessCode, task.getOptionalAccessCode().orElseThrow());
-
+    task.getIdentifier().removeIf(ErpWorkflowNamingSystem.SECRET::matches);
     assertFalse(task.hasSecret()); // resource does not have a secret
 
-    val expectedStatus = TaskStatus.READY;
+    val expectedStatus = TaskStatus.INPROGRESS;
     assertEquals(expectedStatus, task.getStatus());
     assertFalse(task.getForKvnr().isEmpty());
 
@@ -201,9 +196,7 @@ class ErxTaskTest extends ErpFhirParsingTest {
 
   @Test
   void shouldHaveSecret() {
-    val expectedId = "f7942ab3-5d81-4a62-9f7d-d648661c79de";
-    val fileName = expectedId + ".xml";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(PATH);
 
     val expectedSecret =
         Secret.from("77bd0d3fe7c2a4d0b7abca081ee92cd309eab76379c273b31efe624b4aaac239");
@@ -217,25 +210,21 @@ class ErxTaskTest extends ErpFhirParsingTest {
 
   @Test
   void shouldHaveLastMedicationDispenseDate() throws ParseException {
-    val fileName = "9b48f82c-9c11-4a57-aa72-a805f9537a82.json";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(PATH);
     val task = parser.decode(ErxTask.class, content);
     assertNotNull(task, "Valid ErxTask must be parseable");
 
     assertTrue(task.hasLastMedicationDispenseDate());
     val lmd = task.getLastMedicationDispenseDate().orElseThrow();
 
-    val formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
-    val expectation = formatter.parse("2022-05-20T13:28:17+02:00").toInstant();
+    val formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    val expectation = formatter.parse("2026-04-01T16:44:00.434+00:00").toInstant();
     assertEquals(expectation, lmd);
   }
 
   @Test
   void shouldThrowOnMissingFields() {
-    val expectedId = "9b48f82c-9c11-4a57-aa72-a805f9537a82";
-    val fileName = expectedId + ".json";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(PATH);
 
     val task = parser.decode(ErxTask.class, content);
 
@@ -259,9 +248,9 @@ class ErxTaskTest extends ErpFhirParsingTest {
 
   @Test
   void shouldReturnEmptyWhenLastMedicationDispenseDateIsAbsent() {
-    val expectedId = "607255ed-ce41-47fc-aad3-cfce1c39963f";
-    val fileName = expectedId + ".json";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4_0 + fileName);
+    val content =
+        ResourceLoader.readFileFromResource(
+            "fhir/valid/erp/1.6.0/xml/Task-d70932d1-9e1c-483c-b2d4-b7dced09b35e.json.xml");
 
     val task = parser.decode(ErxTask.class, content);
     assertNotNull(task, "Valid ErxTask must be parseable");

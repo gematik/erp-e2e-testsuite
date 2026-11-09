@@ -27,101 +27,112 @@ import static org.mockito.Mockito.*;
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.test.core.StopwatchProvider;
-import de.gematik.test.erezept.actions.MockActorsUtils;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.ErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.eu.EuConsentDeleteCommand;
 import de.gematik.test.erezept.client.usecases.eu.EuConsentGetCommand;
 import de.gematik.test.erezept.client.usecases.eu.EuConsentPostCommand;
 import de.gematik.test.erezept.fhir.builder.eu.EuConsentBuilder;
 import de.gematik.test.erezept.fhir.r4.eu.EuConsent;
 import de.gematik.test.erezept.fhir.r4.eu.EuConsentBundle;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class EuGrantConsentTest {
 
-  private MockActorsUtils mockUtil;
-  private ErpClient erpClientMock;
-  private PatientActor patient;
-
   @BeforeEach
   void setup() {
     StopwatchProvider.init();
-    mockUtil = new MockActorsUtils();
-    val actorStage = mockUtil.actorStage;
-    this.erpClientMock = mockUtil.erpClientMock;
-    this.patient = actorStage.getPatientNamed("Leonie Hütter");
   }
 
   @Test
   void shouldGrantConsentWithDefaultConsent() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
     val mockResponse =
-        mockUtil.createErpResponse(
+        ErpResponseUtil.createErpResponse(
             EuConsentBuilder.forKvnr(KVNR.random()).build(), EuConsent.class, 201);
 
-    when(erpClientMock.request(any(EuConsentPostCommand.class))).thenReturn(mockResponse);
+    when(patientClient.request(any(EuConsentPostCommand.class))).thenReturn(mockResponse);
 
     val action = EuGrantConsent.withKvnrAndDecideIsUnset(KVNR.random(), false).withDefaultConsent();
 
-    assertDoesNotThrow(() -> patient.performs(action));
+    assertDoesNotThrow(() -> patientActor.performs(action));
   }
 
   @Test
   void shouldGrantConsentWithExplicitConsent() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
     val consent = EuConsentBuilder.forKvnr(KVNR.random()).build();
 
-    val mockResponse = mockUtil.createErpResponse(consent, EuConsent.class, 201);
-    when(erpClientMock.request(any(EuConsentPostCommand.class))).thenReturn(mockResponse);
+    val mockResponse = ErpResponseUtil.createErpResponse(consent, EuConsent.class, 201);
+    when(patientClient.request(any(EuConsentPostCommand.class))).thenReturn(mockResponse);
 
     val action = EuGrantConsent.withKvnrAndDecideIsUnset(KVNR.random(), false).withConsent(consent);
 
-    assertDoesNotThrow(() -> patient.performs(action));
+    assertDoesNotThrow(() -> patientActor.performs(action));
   }
 
   @Test
   void shouldGrantConsentForOneSelf() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
     val mockResponse =
-        mockUtil.createErpResponse(
+        ErpResponseUtil.createErpResponse(
             EuConsentBuilder.forKvnr(KVNR.random()).build(), EuConsent.class, 201);
-    when(erpClientMock.request(any(EuConsentPostCommand.class))).thenReturn(mockResponse);
+    when(patientClient.request(any(EuConsentPostCommand.class))).thenReturn(mockResponse);
 
     val action = EuGrantConsent.forOneSelf().withDefaultConsent();
 
-    assertDoesNotThrow(() -> patient.performs(action));
+    assertDoesNotThrow(() -> patientActor.performs(action));
   }
 
   @Test
   void shouldWorkForOneSelf() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
     val mockEuConsentBundle = new EuConsentBundle();
     mockEuConsentBundle.addEntry().setResource(EuConsentBuilder.forKvnr(KVNR.random()).build());
     val mockEuGetConsentResponse =
-        mockUtil.createErpResponse(mockEuConsentBundle, EuConsentBundle.class, 200);
-    val mockResponse = mockUtil.createErpResponse(null, EmptyResource.class, 204);
-    when(erpClientMock.request(any(EuConsentDeleteCommand.class))).thenReturn(mockResponse);
-    when(erpClientMock.request(any(EuConsentGetCommand.class)))
+        ErpResponseUtil.createErpResponse(mockEuConsentBundle, EuConsentBundle.class, 200);
+    val mockResponse = ErpResponseUtil.createErpResponse(null, EmptyResource.class, 204);
+    when(patientClient.request(any(EuConsentDeleteCommand.class))).thenReturn(mockResponse);
+    when(patientClient.request(any(EuConsentGetCommand.class)))
         .thenReturn(mockEuGetConsentResponse);
 
     val action = EuRejectConsent.forOneSelf().build();
-    assertDoesNotThrow(() -> patient.performs(action));
+    assertDoesNotThrow(() -> patientActor.performs(action));
   }
 
   @Test
   void shouldUseProvidedKvnrIfSet() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
     val kvnr = KVNR.random();
     val consent = EuConsentBuilder.forKvnr(kvnr).build();
-    val mockResponse = mockUtil.createErpResponse(consent, EuConsent.class, 201);
-    when(erpClientMock.request(any(EuConsentPostCommand.class))).thenReturn(mockResponse);
+    val mockResponse = ErpResponseUtil.createErpResponse(consent, EuConsent.class, 201);
+    when(patientClient.request(any(EuConsentPostCommand.class))).thenReturn(mockResponse);
 
     val action = EuGrantConsent.withKvnrAndDecideIsUnset(kvnr, false).withConsent(consent);
 
-    assertDoesNotThrow(() -> patient.performs(action));
+    assertDoesNotThrow(() -> patientActor.performs(action));
   }
 
   @Test
   void ShouldSetKvnrAndReturnBuilder() {
-    KVNR kvnr = KVNR.random();
+    val kvnr = KVNR.random();
     EuGrantConsent.EuGrantConsentBuilder builder = new EuGrantConsent.EuGrantConsentBuilder();
 
     EuGrantConsent.EuGrantConsentBuilder result = builder.withKvnr(kvnr);

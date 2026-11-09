@@ -34,6 +34,7 @@ import java.nio.file.Path;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
@@ -48,12 +49,12 @@ public class ErpTestExtension
   private static final String START_TIME = "start time";
 
   @Override
-  public void beforeTestExecution(ExtensionContext context) {
+  public void beforeTestExecution(@NonNull ExtensionContext context) {
     getStore(context).put(START_TIME, System.currentTimeMillis());
     val testMethod = context.getRequiredTestMethod();
     val id = getRequiredAnnotation(testMethod, TestcaseId.class).value();
 
-    log.info(format("# Start Testcase {0} / {1} #", id, context.getDisplayName()));
+    log.info("# Start Testcase {} / {} #", id, context.getDisplayName());
 
     CoverageReporter.getInstance().startTestcase(id);
   }
@@ -66,18 +67,18 @@ public class ErpTestExtension
     long duration = System.currentTimeMillis() - startTime;
 
     CoverageReporter.getInstance().finishTestcase();
-    log.info(format("# Finished Testcase {0} after {1} ms. #", id, duration));
+    log.info("# Finished Testcase {} after {} ms. #", id, duration);
   }
 
   @Override
-  public void beforeAll(ExtensionContext extensionContext) throws Exception {
+  public void beforeAll(@NonNull ExtensionContext extensionContext) {
     StopwatchProvider.init();
   }
 
   @Override
   @SneakyThrows
   @SuppressWarnings({"java:S6300"}) // writing to File by intention; not an issue!
-  public void afterAll(ExtensionContext extensionContext) {
+  public void afterAll(@NonNull ExtensionContext extensionContext) {
     val reporter = CoverageReporter.getInstance();
 
     val outDirPath = Path.of("target", "site", "serenity", "coverage");

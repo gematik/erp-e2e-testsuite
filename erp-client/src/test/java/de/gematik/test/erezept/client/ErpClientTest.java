@@ -43,10 +43,10 @@ import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.bbriccs.rest.fd.FhirBResponseCreator;
 import de.gematik.bbriccs.rest.fd.FhirBResponseCreator.FhirBResponseBuilder;
 import de.gematik.bbriccs.rest.fd.MediaType;
+import de.gematik.bbriccs.rest.idp.IdpTokenHeaderProvider;
 import de.gematik.bbriccs.smartcards.Smartcard;
 import de.gematik.bbriccs.smartcards.SmartcardCertificate;
 import de.gematik.idp.client.IdpClient;
-import de.gematik.idp.client.IdpClientRuntimeException;
 import de.gematik.idp.client.IdpTokenResult;
 import de.gematik.idp.token.JsonWebToken;
 import de.gematik.test.erezept.client.usecases.TaskActivateCommand;
@@ -55,7 +55,7 @@ import de.gematik.test.erezept.client.vau.VauClient;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
-import java.security.cert.X509Certificate;
+import java.util.List;
 import lombok.val;
 import org.hl7.fhir.r4.model.Resource;
 import org.junit.jupiter.api.AfterEach;
@@ -76,38 +76,6 @@ class ErpClientTest {
   @AfterEach
   void resetMocks() {
     reset(mockVau, mockIdp);
-  }
-
-  @Test
-  void shouldCatchNpeFromIdpClientOnAuthenticateWithSmartcard() {
-    val mockSmartcard = mock(Smartcard.class);
-    when(mockIdp.initialize()).thenThrow(NullPointerException.class);
-
-    val erpClient = ErpClient.builder().idpClient(mockIdp).vauClient(mockVau).build();
-    assertThrows(IdpClientRuntimeException.class, () -> erpClient.authenticateWith(mockSmartcard));
-  }
-
-  @Test
-  void shouldCatchNpeFromIdpClientOnAuthenticateWithChallenge() {
-    val mockCert = mock(X509Certificate.class);
-
-    when(mockIdp.initialize()).thenThrow(NullPointerException.class);
-
-    val erpClient = ErpClient.builder().idpClient(mockIdp).vauClient(mockVau).build();
-    assertThrows(
-        IdpClientRuntimeException.class, () -> erpClient.authenticateWith(mockCert, (p) -> p));
-  }
-
-  @Test
-  void shouldCatchNpeFromIdpClientOnLogin() {
-    val mockSmartcard = mock(Smartcard.class);
-
-    when(mockIdp.login(any())).thenThrow(NullPointerException.class);
-
-    val erpClient = ErpClient.builder().idpClient(mockIdp).vauClient(mockVau).build();
-    erpClient.authenticateWith(mockSmartcard);
-    val cmd = new TaskGetCommand();
-    assertThrows(IdpClientRuntimeException.class, () -> erpClient.request(cmd));
   }
 
   @Test
@@ -138,16 +106,17 @@ class ErpClientTest {
     val fhirMock = mock(FhirCodec.class);
     when(fhirMock.encode(any(), any(), anyBoolean())).thenReturn("");
 
+    val idpPlugin = IdpTokenHeaderProvider.using(() -> mockIdp.login(null));
+
     val erpClient =
         ErpClient.builder()
-            .idpClient(mockIdp)
             .vauClient(mockVau)
+            .requestCustomizers(List.of(idpPlugin))
             .responseFactory(mockResponseFactory)
             .fhir(fhirMock)
             .acceptMime(MediaType.FHIR_XML)
             .sendMime(MediaType.FHIR_JSON)
             .build();
-    erpClient.authenticateWith(mockSmartcard);
 
     val cmd = new TaskGetCommand();
     assertDoesNotThrow(() -> erpClient.request(cmd));
@@ -190,16 +159,17 @@ class ErpClientTest {
     val fhirMock = mock(FhirCodec.class);
     when(fhirMock.encode(any(), any(), anyBoolean())).thenReturn("");
 
+    val idpPlugin = IdpTokenHeaderProvider.using(() -> mockIdp.login(null));
+
     val erpClient =
         ErpClient.builder()
-            .idpClient(mockIdp)
             .vauClient(mockVau)
+            .requestCustomizers(List.of(idpPlugin))
             .responseFactory(mockResponseFactory)
             .fhir(fhirMock)
             .acceptMime(MediaType.FHIR_XML)
             .sendMime(MediaType.FHIR_JSON)
             .build();
-    erpClient.authenticateWith(mockSmartcard);
 
     // second call will have a token which is still valid
     when(mockToken.getExpiresIn()).thenReturn(200);
@@ -239,14 +209,12 @@ class ErpClientTest {
 
     val erpClient =
         ErpClient.builder()
-            .idpClient(mockIdp)
             .vauClient(mockVau)
             .validateRequest(true)
             .fhir(mockFhir)
             .acceptMime(MediaType.FHIR_XML)
             .sendMime(MediaType.FHIR_JSON)
             .build();
-    erpClient.authenticateWith(mockSmartcard);
 
     val cmd =
         new TaskActivateCommand(TaskId.from("123"), AccessCode.random(), "hello world".getBytes());

@@ -35,7 +35,7 @@ class MarkingFlagTest extends ErpFhirParsingTest {
   @ParameterizedTest
   @EnumSource(
       value = PatientenrechnungVersion.class,
-      names = {"V1_1_0", "V1_0_0"})
+      names = {"V1_1_0"})
   void shouldGenerateAsParameters(PatientenrechnungVersion version) {
     val flags = MarkingFlag.with(true, false, true);
     val parameters = flags.asParameters(version);

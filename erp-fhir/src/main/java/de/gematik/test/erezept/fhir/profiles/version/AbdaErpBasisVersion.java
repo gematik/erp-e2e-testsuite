@@ -28,7 +28,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum AbdaErpBasisVersion implements ProfileVersion {
+  @Deprecated(forRemoval = true)
   V1_3_1("1.3.1"),
+  @Deprecated(forRemoval = true)
   V1_4("1.4.2"),
   V1_5("1.5.2"),
   ;

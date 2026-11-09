@@ -20,12 +20,8 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static de.gematik.test.erezept.fhir.profiles.systems.CommonCodeSystem.UCUM;
-
 import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.GematikIngredientComponentBuilder;
-import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.GemErpIngredientComponent;
-import lombok.val;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Ratio;
 
@@ -52,13 +48,7 @@ public class GemErpIngredientComponentBuilder
   @Override
   public GemErpIngredientComponentBuilder ingredientStrength(
       Quantity numerator, Quantity demoninator) {
-    val cachedStrength = new Ratio().setNumerator(numerator).setDenominator(demoninator);
-    // old behavior needs System and code
-    if (ErpWorkflowVersion.getDefaultVersion().isSmallerThanOrEqualTo(ErpWorkflowVersion.V1_4)) {
-      cachedStrength.getNumerator().setSystem(UCUM.getCanonicalUrl()).setCode("mg");
-      cachedStrength.getDenominator().setSystem(UCUM.getCanonicalUrl()).setCode("ml");
-    }
-    this.strength = cachedStrength;
+    this.strength = new Ratio().setNumerator(numerator).setDenominator(demoninator);
     return self();
   }
 }

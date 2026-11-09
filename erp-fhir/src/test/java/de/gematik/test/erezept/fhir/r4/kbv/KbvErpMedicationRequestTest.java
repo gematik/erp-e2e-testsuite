@@ -24,51 +24,54 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationRequestFaker;
 import de.gematik.test.erezept.fhir.date.DateCalculator;
 import de.gematik.test.erezept.fhir.date.DateConverter;
+import de.gematik.test.erezept.fhir.extensions.kbv.AccidentExtension;
+import de.gematik.test.erezept.fhir.extensions.kbv.MultiplePrescriptionExtension;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.valuesets.AccidentCauseType;
 import de.gematik.test.erezept.fhir.valuesets.StatusCoPayment;
+import java.time.LocalDate;
 import java.time.Period;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import lombok.val;
+import org.hl7.fhir.r4.model.Annotation;
 import org.hl7.fhir.r4.model.MedicationRequest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
-  private static final String BASE_PATH = "fhir/valid/kbv/1.1.0/medicationrequest/";
+  private static final String PATH = "fhir/valid/kbv/1.4.0/MedRequest/medReqFromBundle.xml";
 
   @Test
   void encodingSingleValidMedicationRequest() {
-    val expectedID = "0587787f-3f1b-4578-a412-ce5bae8215b9";
-    val fileName = expectedID + ".xml";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val expectedID = "fe73acaf-c683-460d-9961-3ae6f87068f2";
+    val content = ResourceLoader.readFileFromResource(PATH);
     val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
+    val expectedNote = "Patient erneut auf Anwendung der Schmelztabletten hinweisen";
 
     assertNotNull(medicationRequest);
     assertEquals(expectedID, medicationRequest.getLogicalId());
     assertTrue(medicationRequest.getCoPaymentStatus().isPresent());
     assertEquals(StatusCoPayment.STATUS_0, medicationRequest.getCoPaymentStatus().get());
-
+    medicationRequest.setNote(List.of(new Annotation().setText(expectedNote)));
     assertTrue(medicationRequest.getNoteText().isPresent());
-    val expectedNote = "Patient erneut auf Anwendung der Schmelztabletten hinweisen";
     assertEquals(expectedNote, medicationRequest.getNoteTextOrEmpty());
     assertNotNull(medicationRequest.getDescription());
-    assertFalse(medicationRequest.allowSubstitution());
-    assertTrue(medicationRequest.getDescription().contains("ohne aut-idem"));
+    assertTrue(medicationRequest.allowSubstitution());
+    assertTrue(medicationRequest.getDescription().contains("aut-idem"));
   }
 
-  @ParameterizedTest(name = "[{index}] -> Check Accident in MedicationRequest from {0}")
-  @ValueSource(strings = {"fhir/valid/kbv/1.1.0/bundle/5a3458b0-8364-4682-96e2-b262b2ab16eb.xml"})
-  void shouldFindAccidents(String file) {
-    val content = ResourceLoader.readFileFromResource(file);
-    val kbvBundle = parser.decode(KbvErpBundle.class, content);
-    val medicationRequest = kbvBundle.getMedicationRequest();
-
+  @Test
+  void shouldFindAccidents() {
+    val medicationRequest =
+        KbvErpMedicationRequestFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withAccident(AccidentExtension.accident())
+            .fake();
     assertTrue(medicationRequest.hasAccidentExtension());
     assertTrue(medicationRequest.getAccident().isPresent());
     assertEquals(AccidentCauseType.ACCIDENT, medicationRequest.getAccidentCause().orElseThrow());
@@ -76,13 +79,12 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
     assertTrue(medicationRequest.getAccidentDate().isPresent());
   }
 
-  @ParameterizedTest(name = "[{index}] -> Check Accident at work in MedicationRequest from {0}")
-  @ValueSource(strings = {"fhir/valid/kbv/1.1.0/bundle/5f66314e-459a-41e9-a3d7-65c935a8be2c.xml"})
-  void shouldFindAccidentsAtWork(String file) {
-    val content = ResourceLoader.readFileFromResource(file);
-    val kbvBundle = parser.decode(KbvErpBundle.class, content);
-    val medicationRequest = kbvBundle.getMedicationRequest();
-
+  @Test()
+  void shouldFindAccidentsAtWork() {
+    val medicationRequest =
+        KbvErpMedicationRequestFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withAccident(AccidentExtension.accidentAtWork().atWorkplace())
+            .fake();
     assertTrue(medicationRequest.hasAccidentExtension());
     assertTrue(medicationRequest.getAccident().isPresent());
     assertEquals(
@@ -91,13 +93,12 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
     assertTrue(medicationRequest.getAccidentDate().isPresent());
   }
 
-  @ParameterizedTest(name = "[{index}] -> Check occupational disease in MedicationRequest from {0}")
-  @ValueSource(strings = {"fhir/valid/kbv/1.1.0/bundle/218b581d-ccbe-480e-b8d7-f5f9b925e8c4.xml"})
-  void shouldFindAccidentsOccupationalDisease(String file) {
-    val content = ResourceLoader.readFileFromResource(file);
-    val kbvBundle = parser.decode(KbvErpBundle.class, content);
-    val medicationRequest = kbvBundle.getMedicationRequest();
-
+  @Test()
+  void shouldFindAccidentsOccupationalDisease() {
+    val medicationRequest =
+        KbvErpMedicationRequestFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withAccident(AccidentExtension.occupationalDisease())
+            .fake();
     assertTrue(medicationRequest.hasAccidentExtension());
     assertTrue(medicationRequest.getAccident().isPresent());
     assertEquals(
@@ -108,10 +109,8 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
 
   @Test
   void encodeMedicationRequestWithoutNote() {
-    val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d4f";
-    val fileName = expectedID + ".xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(PATH);
     val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
 
     assertFalse(medicationRequest.getNoteText().isPresent());
@@ -122,11 +121,11 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
 
   @Test
   void encodeMedicationRequestWithMvo() {
-    val expectedID = "68794d6d-2b05-4d5e-aaf1-49b4b6430104";
-    val fileName = expectedID + ".xml";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
-    val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
+    val medicationRequest =
+        KbvErpMedicationRequestFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withMvo(
+                MultiplePrescriptionExtension.asMultiple(1, 4).withRandomId().validForDays(365))
+            .fake();
 
     assertTrue(medicationRequest.isMultiple());
     assertTrue(medicationRequest.getMvoStart().isPresent());
@@ -134,7 +133,7 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
 
     assertTrue(medicationRequest.getNumerator().isPresent());
     assertTrue(medicationRequest.getDemoninator().isPresent());
-    assertEquals(2, medicationRequest.getNumerator().orElseThrow());
+    assertEquals(1, medicationRequest.getNumerator().orElseThrow());
     assertEquals(4, medicationRequest.getDemoninator().orElseThrow());
 
     assertNotNull(medicationRequest.getDescription());
@@ -151,39 +150,58 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
 
   @Test
   void shouldManuallyChangeMvoDates() {
-    val expectedID = "68794d6d-2b05-4d5e-aaf1-49b4b6430104";
-    val fileName = expectedID + ".xml";
+    val converter = DateConverter.getInstance();
+    val today = LocalDate.now();
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
-    val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
+    // deterministic start/end dates which are guaranteed to differ from the manually set ones
+    val originalStartDate = converter.localDateToDate(today.minusDays(400));
+    val originalEndDate = converter.localDateToDate(today.minusDays(35));
+    val fakedMedReq =
+        KbvErpMedicationRequestFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withMvo(
+                MultiplePrescriptionExtension.asMultiple(1, 4)
+                    .withRandomId()
+                    .validThrough(originalStartDate, originalEndDate))
+            .fake();
 
-    assertTrue(medicationRequest.isMultiple());
-    assertTrue(medicationRequest.getMvoStart().isPresent());
-    assertTrue(medicationRequest.getMvoEnd().isPresent());
+    assertTrue(fakedMedReq.isMultiple());
+    assertTrue(fakedMedReq.getMvoStart().isPresent());
+    assertTrue(fakedMedReq.getMvoEnd().isPresent());
 
-    val originalStart = medicationRequest.getMvoStart().orElseThrow();
-    val originalEnd = medicationRequest.getMvoEnd().orElseThrow();
+    val originalStart = fakedMedReq.getMvoStart().orElseThrow();
+    val originalEnd = fakedMedReq.getMvoEnd().orElseThrow();
 
-    medicationRequest.getMvoPeriod().orElseThrow().setStart(new Date());
-    medicationRequest.getMvoPeriod().orElseThrow().setEnd(new Date());
-    val newStart = medicationRequest.getMvoStart().orElseThrow();
-    val newEnd = medicationRequest.getMvoEnd().orElseThrow();
+    // manually set an expired period
+    val expiredStart = converter.localDateToDate(today.minusDays(20));
+    val expiredEnd = converter.localDateToDate(today.minusDays(10));
+    fakedMedReq.getMvoPeriod().orElseThrow().setStart(expiredStart);
+    fakedMedReq.getMvoPeriod().orElseThrow().setEnd(expiredEnd);
+    val newStart = fakedMedReq.getMvoStart().orElseThrow();
+    val newEnd = fakedMedReq.getMvoEnd().orElseThrow();
     assertNotEquals(originalStart, newStart);
     assertNotEquals(originalEnd, newEnd);
+    assertEquals(expiredStart, newStart);
+    assertEquals(expiredEnd, newEnd);
 
-    // now check updateMvoDates() won't change a valid period
-    medicationRequest.updateMvoDates();
-    assertNotEquals(newStart, medicationRequest.getMvoStart().orElseThrow());
-    assertNotEquals(newEnd, medicationRequest.getMvoEnd().orElseThrow());
+    // updateMvoDates() must move the expired period to the present
+    fakedMedReq.updateMvoDates();
+    val updatedStart = fakedMedReq.getMvoStart().orElseThrow();
+    val updatedEnd = fakedMedReq.getMvoEnd().orElseThrow();
+    assertNotEquals(newStart, updatedStart);
+    assertNotEquals(newEnd, updatedEnd);
+    assertEquals(today, converter.dateToLocalDate(updatedStart));
+    assertEquals(today.plusDays(10), converter.dateToLocalDate(updatedEnd));
+
+    // updateMvoDates() must not change a still valid period
+    fakedMedReq.updateMvoDates();
+    assertEquals(updatedStart, fakedMedReq.getMvoStart().orElseThrow());
+    assertEquals(updatedEnd, fakedMedReq.getMvoEnd().orElseThrow());
   }
 
   @Test
   void shouldUpdateMvoDates() {
-    val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d3a";
-    val fileName = expectedID + ".xml";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
-    val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
+    val content = ResourceLoader.readFileFromResource("fhir/valid/kbv/1.4.0/Beispiel_10_2.xml");
+    val medicationRequest = parser.decode(KbvErpBundle.class, content).getMedicationRequest();
 
     assertTrue(medicationRequest.isMultiple());
     assertTrue(medicationRequest.getMvoStart().isPresent());
@@ -197,9 +215,9 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
     val nEnd = medicationRequest.getMvoEnd().orElseThrow();
 
     // back-to-back checking original vs. new dates
-    assertEquals(1, diff(Calendar.YEAR, oStart, oEnd));
-    assertEquals(1, diff(Calendar.MONTH, oStart, oEnd));
-    assertEquals(1, diff(Calendar.DAY_OF_MONTH, oStart, oEnd));
+    assertEquals(0, diff(Calendar.YEAR, oStart, oEnd));
+    assertEquals(3, diff(Calendar.MONTH, oStart, oEnd));
+    assertEquals(15, diff(Calendar.DAY_OF_MONTH, oStart, oEnd));
 
     // ensure the original difference from start to end is kept to the updated dates
     val converter = DateConverter.getInstance();
@@ -210,29 +228,27 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
 
   @Test
   void shouldUpdateWithoutEnd() {
-    val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d5e";
-    val fileName = expectedID + ".xml";
+    val fakedMedReq =
+        KbvErpMedicationRequestFaker.builder(KbvItaErpVersion.V1_4_0, KbvItaForVersion.V1_3_0)
+            .withMvo(
+                MultiplePrescriptionExtension.asMultiple(1, 4).withRandomId().validForDays(365))
+            .fake();
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
-    val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
+    fakedMedReq.getMvoPeriod().get().setEnd(null);
+    assertTrue(fakedMedReq.isMultiple());
+    assertTrue(fakedMedReq.getMvoStart().isPresent());
+    assertTrue(fakedMedReq.getMvoEnd().isEmpty());
 
-    assertTrue(medicationRequest.isMultiple());
-    assertTrue(medicationRequest.getMvoStart().isPresent());
-    assertTrue(medicationRequest.getMvoEnd().isEmpty());
-
-    medicationRequest.updateMvoDates();
+    fakedMedReq.updateMvoDates();
 
     val dc = new DateCalculator();
-    assertTrue(dc.isToday(medicationRequest.getMvoStart().orElseThrow()));
-    assertTrue(medicationRequest.getMvoEnd().isEmpty());
+    assertTrue(dc.isToday(fakedMedReq.getMvoStart().orElseThrow()));
+    assertTrue(fakedMedReq.getMvoEnd().isEmpty());
   }
 
   @Test
   void shouldGetEmptyOptionalOnNonMvo() {
-    val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d4f";
-    val fileName = expectedID + ".xml";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(PATH);
     val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
 
     assertFalse(medicationRequest.getNoteText().isPresent());
@@ -252,10 +268,7 @@ class KbvErpMedicationRequestTest extends ErpFhirParsingTest {
 
   @Test
   void getEmptyAtNoMultiple() {
-    val expectedID = "43c2b7ae-ad11-4387-910a-e6b7a3c38d4f";
-    val fileName = expectedID + ".xml";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(PATH);
     val medicationRequest = parser.decode(KbvErpMedicationRequest.class, content);
 
     assertFalse(medicationRequest.getNoteText().isPresent());

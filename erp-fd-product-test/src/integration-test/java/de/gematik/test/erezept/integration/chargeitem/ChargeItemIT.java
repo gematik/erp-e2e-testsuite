@@ -64,8 +64,8 @@ public class ChargeItemIT extends ErpTest {
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
 
-  @Actor(name = "Sina Hüllmann")
-  private PatientActor sina;
+  @Actor(name = "Fridolin Straßer")
+  private PatientActor patient;
 
   @Actor(name = "Am Flughafen")
   private PharmacyActor flughafenApo;
@@ -89,13 +89,13 @@ public class ChargeItemIT extends ErpTest {
   void validateChargeItemId() {
 
     // patient preset behavior
-    sina.changePatientInsuranceType(InsuranceTypeDe.PKV);
-    sina.performs(GrantConsent.forOneSelf().withDefaultConsent());
+    patient.changePatientInsuranceType(InsuranceTypeDe.PKV);
+    patient.performs(GrantConsent.forOneSelf().withDefaultConsent());
 
     // Doc behavior
     val task =
         doctor
-            .performs(IssuePrescription.forPatient(sina).withRandomKbvBundle())
+            .performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
             .getExpectedResponse();
 
     // pharma behavior
@@ -105,18 +105,18 @@ public class ChargeItemIT extends ErpTest {
     val davAbgabedatenBundle = DavPkvAbgabedatenFaker.builder(task.getPrescriptionId()).fake();
     flughafenApo
         .performs(
-            PostChargeItem.forPatient(sina)
+            PostChargeItem.forPatient(patient)
                 .davBundle(davAbgabedatenBundle)
                 .withAcceptBundle(acceptation))
         .getExpectedResponse();
 
     // patients verification
     val chargeItem =
-        sina.performs(
+        patient.performs(
             GetChargeItemById.withPrescriptionId(task.getPrescriptionId())
                 .withAccessCode(task.getAccessCode()));
 
-    sina.attemptsTo(
+    patient.attemptsTo(
         Verify.that(chargeItem)
             .withExpectedType()
             .hasResponseWith(returnCode(200))
@@ -133,17 +133,17 @@ public class ChargeItemIT extends ErpTest {
   void validateChargeItemIdAndFail() {
 
     // patient preset behavior
-    sina.changePatientInsuranceType(InsuranceTypeDe.PKV);
-    sina.performs(GrantConsent.forOneSelf().ensureConsentIsUnset(true).withDefaultConsent());
+    patient.changePatientInsuranceType(InsuranceTypeDe.PKV);
+    patient.performs(GrantConsent.forOneSelf().ensureConsentIsUnset(true).withDefaultConsent());
 
     // Doc behavior
     val task1 =
         doctor
-            .performs(IssuePrescription.forPatient(sina).withRandomKbvBundle())
+            .performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
             .getExpectedResponse();
     val task2 =
         doctor
-            .performs(IssuePrescription.forPatient(sina).withRandomKbvBundle())
+            .performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
             .getExpectedResponse();
 
     // flughafenapo accept / close
@@ -159,7 +159,7 @@ public class ChargeItemIT extends ErpTest {
 
     val pharmaciesChargeItem =
         flughafenApo.performs(
-            PostChargeItem.forPatient(sina)
+            PostChargeItem.forPatient(patient)
                 .davBundle(davAbgabedatenBundleForTask1)
                 .withCustomValue(
                     task2.getPrescriptionId(),
@@ -184,17 +184,17 @@ public class ChargeItemIT extends ErpTest {
   void validateChargeItemIdAndFailWhileWrongBundleReference() {
 
     // patient preset behavior
-    sina.changePatientInsuranceType(InsuranceTypeDe.PKV);
-    sina.performs(GrantConsent.forOneSelf().ensureConsentIsUnset(true).withDefaultConsent());
+    patient.changePatientInsuranceType(InsuranceTypeDe.PKV);
+    patient.performs(GrantConsent.forOneSelf().ensureConsentIsUnset(true).withDefaultConsent());
 
     // Doc behavior
     val task1 =
         doctor
-            .performs(IssuePrescription.forPatient(sina).withRandomKbvBundle())
+            .performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
             .getExpectedResponse();
     val task2 =
         doctor
-            .performs(IssuePrescription.forPatient(sina).withRandomKbvBundle())
+            .performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
             .getExpectedResponse();
 
     // pharma behavior
@@ -205,7 +205,7 @@ public class ChargeItemIT extends ErpTest {
 
     val pharmaciesChargeItem =
         flughafenApo.performs(
-            PostChargeItem.forPatient(sina)
+            PostChargeItem.forPatient(patient)
                 .davBundle(davAbgabedatenBundle)
                 .withCustomValue(
                     acceptation.getTask().getPrescriptionId(),
@@ -219,11 +219,11 @@ public class ChargeItemIT extends ErpTest {
             .isCorrect());
 
     val chargeItem =
-        sina.performs(
+        patient.performs(
             GetChargeItemById.withPrescriptionId(task1.getPrescriptionId())
                 .withAccessCode(task1.getAccessCode()));
 
-    sina.attemptsTo(
+    patient.attemptsTo(
         Verify.that(chargeItem)
             .withExpectedType()
             .hasResponseWith(returnCode(200))
@@ -245,13 +245,13 @@ public class ChargeItemIT extends ErpTest {
       String description, NamedEnvelope<FuzzingMutator<ErxChargeItem>> chargeItemMutators) {
 
     // patient preset behavior
-    sina.changePatientInsuranceType(InsuranceTypeDe.PKV);
-    sina.performs(GrantConsent.forOneSelf().withDefaultConsent());
+    patient.changePatientInsuranceType(InsuranceTypeDe.PKV);
+    patient.performs(GrantConsent.forOneSelf().withDefaultConsent());
 
     // Doc behavior
     val task =
         doctor
-            .performs(IssuePrescription.forPatient(sina).withRandomKbvBundle())
+            .performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
             .getExpectedResponse();
 
     // pharma behavior
@@ -262,7 +262,7 @@ public class ChargeItemIT extends ErpTest {
 
     val pharmaciesChargeItem =
         flughafenApo.performs(
-            PostChargeItem.forPatient(sina)
+            PostChargeItem.forPatient(patient)
                 .davBundle(davAbgabedatenBundle)
                 .withCustomStructureAndVersion(chargeItemMutators)
                 .withAcceptBundle(acceptation));
@@ -275,11 +275,11 @@ public class ChargeItemIT extends ErpTest {
 
     // patients verification
     val chargeItem =
-        sina.performs(
+        patient.performs(
             GetChargeItemById.withPrescriptionId(task.getPrescriptionId())
                 .withAccessCode(task.getAccessCode()));
 
-    sina.attemptsTo(
+    patient.attemptsTo(
         Verify.that(chargeItem)
             .withExpectedType()
             .hasResponseWith(returnCode(200))
@@ -301,31 +301,33 @@ public class ChargeItemIT extends ErpTest {
       NamedEnvelope<FuzzingMutator<ErxChargeItem>> supportingInformMutator) {
 
     // patient preset behavior
-    sina.changePatientInsuranceType(InsuranceTypeDe.PKV);
-    sina.performs(GrantConsent.forOneSelf().ensureConsentIsUnset(true).withDefaultConsent())
-        .getExpectedResponse();
+    patient.changePatientInsuranceType(InsuranceTypeDe.PKV);
 
     // Doc behavior
     val task =
         doctor
-            .performs(IssuePrescription.forPatient(sina).withRandomKbvBundle())
+            .performs(IssuePrescription.forPatient(patient).withRandomKbvBundle())
             .getExpectedResponse();
 
     // pharma behavior
     val acceptation =
         flughafenApo.performs(AcceptPrescription.forTheTask(task)).getExpectedResponse();
     flughafenApo.performs(ClosePrescription.acceptedWith(acceptation));
+
     val davAbgabedatenBundle = DavPkvAbgabedatenFaker.builder(task.getPrescriptionId()).fake();
+    patient
+        .performs(GrantConsent.forOneSelf().ensureConsentIsUnset(true).withDefaultConsent())
+        .getExpectedResponse();
 
     flughafenApo
         .performs(
-            PostChargeItem.forPatient(sina)
+            PostChargeItem.forPatient(patient)
                 .davBundle(davAbgabedatenBundle)
                 .withAcceptBundle(acceptation))
         .getExpectedResponse();
 
     val patientsChargeItemBundle =
-        sina.performs(
+        patient.performs(
             GetChargeItemById.withPrescriptionId(task.getPrescriptionId()).withoutAccessCode());
     val referencedChargeItem = patientsChargeItemBundle.getExpectedResponse().getChargeItem();
     flughafenApo.attemptsTo(

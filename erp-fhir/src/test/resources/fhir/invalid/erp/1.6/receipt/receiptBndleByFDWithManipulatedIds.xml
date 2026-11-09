@@ -1,0 +1,109 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="a0343c73-0000-0000-0003-000000000000"/>
+    <meta>
+        <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Bundle|1.6"/>
+    </meta>
+    <identifier>
+        <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+        <value value="160.000.007.552.052.94"/>
+    </identifier>
+    <type value="document"/>
+    <timestamp value="2026-10-28T16:09:10.433+00:00"/>
+    <link>
+        <relation value="self"/>
+        <url value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/Task/160.000.007.552.052.94/$close/"/>
+    </link>
+    <entry>
+        <fullUrl value="urn:uuid:ac4bbea9-9838-4410-9ec8-02f172250069"/>
+        <resource>
+            <Composition>
+                <id value="ac4bbea9-9838-4410-9ec8-02f172250069"/>
+                <meta>
+                    <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Composition|1.6"/>
+                </meta>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_Beneficiary">
+                    <valueIdentifier>
+                        <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                        <value value="3-SMC-B-Testkarte--883110000163973"/>
+                    </valueIdentifier>
+                </extension>
+                <status value="final"/>
+                <type>
+                    <coding>
+                        <system value="https://gematik.de/fhir/erp/CodeSystem/GEM_ERP_CS_DocumentType"/>
+                        <code value="3"/>
+                        <display value="Receipt"/>
+                    </coding>
+                </type>
+                <date value="2026-10-28T16:09:10.413+00:00"/>
+                <author>
+                    <reference value="urn:uuid:b17ba706-21ec-43b9-845c-cfac6df63189"/>
+                </author>
+                <title value="Quittung"/>
+                <event>
+                    <period>
+                        <start value="2026-10-28T16:09:09.388+00:00"/>
+                        <end value="2026-10-28T16:09:10.413+00:00"/>
+                    </period>
+                </event>
+                <section>
+                    <entry>
+                        <reference value="urn:uuid:adce4d2a-7376-4cfb-b402-d92504038c57"/>
+                    </entry>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:b17ba706-21ec-43b9-845c-cfac6df63189"/>
+        <resource>
+            <Device>
+                <id value="1"/>
+                <meta>
+                    <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Device|1.6"/>
+                </meta>
+                <status value="active"/>
+                <serialNumber value="1.23.0"/>
+                <deviceName>
+                    <name value="E-Rezept Fachdienst"/>
+                    <type value="user-friendly-name"/>
+                </deviceName>
+                <version>
+                    <value value="1.23.0"/>
+                </version>
+                <contact>
+                    <system value="email"/>
+                    <value value="betrieb@gematik.de"/>
+                </contact>
+            </Device>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="adce4d2a-7376-4cfb-b402-d92504038c57"/>
+        <resource>
+            <Binary>
+                <id value="adce4d2a-7376-4cfb-b402-d92504038c57"/>
+                <meta>
+                    <versionId value="1"/>
+                    <profile value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_Digest|1.6"/>
+                </meta>
+                <contentType value="application/octet-stream"/>
+                <data value="qNA5VQigM9v+K5Q7E7kK8PVl766sp/JEseZ8fRBfItQ="/>
+            </Binary>
+        </resource>
+    </entry>
+    <signature>
+        <type>
+            <system value="urn:iso-astm:E1762-95:2013"/>
+            <code value="1.2.840.10065.1.12.1.1"/>
+        </type>
+        <when value="2026-10-28T16:09:10.436+00:00"/>
+        <who>
+            <reference value="urn:uuid:b17ba706-21ec-43b9-845c-cfac6df63189"/>
+        </who>
+        <sigFormat value="application/pkcs7-mime"/>
+        <data value="MIIURgYJKoZIhvcNAQcCoIIUNzCCFDMCAQUxDTALBglghkgBZQMEAgEwggofBgkqhkiG9w0BBwGgggoQBIIKDDw/eG1sIHZlcnNpb249IjEuMCIgZW5jb2Rpbmc9InV0Zi04Ij8+CjxCdW5kbGUgeG1sbnM9Imh0dHA6Ly9obDcub3JnL2ZoaXIiPjxpZCB2YWx1ZT0iYTAzNDNjNzMtMDAwMC0wMDAwLTAwMDMtMDAwMDAwMDAwMDAwIi8+PG1ldGE+PHByb2ZpbGUgdmFsdWU9Imh0dHBzOi8vZ2VtYXRpay5kZS9maGlyL2VycC9TdHJ1Y3R1cmVEZWZpbml0aW9uL0dFTV9FUlBfUFJfQnVuZGxlfDEuNiIvPjwvbWV0YT48aWRlbnRpZmllcj48c3lzdGVtIHZhbHVlPSJodHRwczovL2dlbWF0aWsuZGUvZmhpci9lcnAvTmFtaW5nU3lzdGVtL0dFTV9FUlBfTlNfUHJlc2NyaXB0aW9uSWQiLz48dmFsdWUgdmFsdWU9IjE2MC4wMDAuMDA3LjU1Mi4wNTIuOTQiLz48L2lkZW50aWZpZXI+PHR5cGUgdmFsdWU9ImRvY3VtZW50Ii8+PHRpbWVzdGFtcCB2YWx1ZT0iMjAyNi0xMC0yOFQxNjowOToxMC40MzMrMDA6MDAiLz48bGluaz48cmVsYXRpb24gdmFsdWU9InNlbGYiLz48dXJsIHZhbHVlPSJodHRwczovL2VycC10ZXN0LnplbnRyYWwuZXJwLnNwbGl0ZG5zLnRpLWRpZW5zdGUuZGUvVGFzay8xNjAuMDAwLjAwNy41NTIuMDUyLjk0LyRjbG9zZS8iLz48L2xpbms+PGVudHJ5PjxmdWxsVXJsIHZhbHVlPSJ1cm46dXVpZDphYzRiYmVhOS05ODM4LTQ0MTAtOWVjOC0wMmYxNzIyNTAwNjkiLz48cmVzb3VyY2U+PENvbXBvc2l0aW9uPjxpZCB2YWx1ZT0iYWM0YmJlYTktOTgzOC00NDEwLTllYzgtMDJmMTcyMjUwMDY5Ii8+PG1ldGE+PHByb2ZpbGUgdmFsdWU9Imh0dHBzOi8vZ2VtYXRpay5kZS9maGlyL2VycC9TdHJ1Y3R1cmVEZWZpbml0aW9uL0dFTV9FUlBfUFJfQ29tcG9zaXRpb258MS42Ii8+PC9tZXRhPjxleHRlbnNpb24gdXJsPSJodHRwczovL2dlbWF0aWsuZGUvZmhpci9lcnAvU3RydWN0dXJlRGVmaW5pdGlvbi9HRU1fRVJQX0VYX0JlbmVmaWNpYXJ5Ij48dmFsdWVJZGVudGlmaWVyPjxzeXN0ZW0gdmFsdWU9Imh0dHBzOi8vZ2VtYXRpay5kZS9maGlyL3NpZC90ZWxlbWF0aWstaWQiLz48dmFsdWUgdmFsdWU9IjMtU01DLUItVGVzdGthcnRlLS04ODMxMTAwMDAxNjM5NzMiLz48L3ZhbHVlSWRlbnRpZmllcj48L2V4dGVuc2lvbj48c3RhdHVzIHZhbHVlPSJmaW5hbCIvPjx0eXBlPjxjb2Rpbmc+PHN5c3RlbSB2YWx1ZT0iaHR0cHM6Ly9nZW1hdGlrLmRlL2ZoaXIvZXJwL0NvZGVTeXN0ZW0vR0VNX0VSUF9DU19Eb2N1bWVudFR5cGUiLz48Y29kZSB2YWx1ZT0iMyIvPjxkaXNwbGF5IHZhbHVlPSJSZWNlaXB0Ii8+PC9jb2Rpbmc+PC90eXBlPjxkYXRlIHZhbHVlPSIyMDI2LTEwLTI4VDE2OjA5OjEwLjQxMyswMDowMCIvPjxhdXRob3I+PHJlZmVyZW5jZSB2YWx1ZT0idXJuOnV1aWQ6YjE3YmE3MDYtMjFlYy00M2I5LTg0NWMtY2ZhYzZkZjYzMTg5Ii8+PC9hdXRob3I+PHRpdGxlIHZhbHVlPSJRdWl0dHVuZyIvPjxldmVudD48cGVyaW9kPjxzdGFydCB2YWx1ZT0iMjAyNi0xMC0yOFQxNjowOTowOS4zODgrMDA6MDAiLz48ZW5kIHZhbHVlPSIyMDI2LTEwLTI4VDE2OjA5OjEwLjQxMyswMDowMCIvPjwvcGVyaW9kPjwvZXZlbnQ+PHNlY3Rpb24+PGVudHJ5PjxyZWZlcmVuY2UgdmFsdWU9InVybjp1dWlkOmFkY2U0ZDJhLTczNzYtNGNmYi1iNDAyLWQ5MjUwNDAzOGM1NyIvPjwvZW50cnk+PC9zZWN0aW9uPjwvQ29tcG9zaXRpb24+PC9yZXNvdXJjZT48L2VudHJ5PjxlbnRyeT48ZnVsbFVybCB2YWx1ZT0idXJuOnV1aWQ6YjE3YmE3MDYtMjFlYy00M2I5LTg0NWMtY2ZhYzZkZjYzMTg5Ii8+PHJlc291cmNlPjxEZXZpY2U+PGlkIHZhbHVlPSIxIi8+PG1ldGE+PHByb2ZpbGUgdmFsdWU9Imh0dHBzOi8vZ2VtYXRpay5kZS9maGlyL2VycC9TdHJ1Y3R1cmVEZWZpbml0aW9uL0dFTV9FUlBfUFJfRGV2aWNlfDEuNiIvPjwvbWV0YT48c3RhdHVzIHZhbHVlPSJhY3RpdmUiLz48c2VyaWFsTnVtYmVyIHZhbHVlPSIxLjIzLjAiLz48ZGV2aWNlTmFtZT48bmFtZSB2YWx1ZT0iRS1SZXplcHQgRmFjaGRpZW5zdCIvPjx0eXBlIHZhbHVlPSJ1c2VyLWZyaWVuZGx5LW5hbWUiLz48L2RldmljZU5hbWU+PHZlcnNpb24+PHZhbHVlIHZhbHVlPSIxLjIzLjAiLz48L3ZlcnNpb24+PGNvbnRhY3Q+PHN5c3RlbSB2YWx1ZT0iZW1haWwiLz48dmFsdWUgdmFsdWU9ImJldHJpZWJAZ2VtYXRpay5kZSIvPjwvY29udGFjdD48L0RldmljZT48L3Jlc291cmNlPjwvZW50cnk+PGVudHJ5PjxmdWxsVXJsIHZhbHVlPSJ1cm46dXVpZDphZGNlNGQyYS03Mzc2LTRjZmItYjQwMi1kOTI1MDQwMzhjNTciLz48cmVzb3VyY2U+PEJpbmFyeT48aWQgdmFsdWU9ImFkY2U0ZDJhLTczNzYtNGNmYi1iNDAyLWQ5MjUwNDAzOGM1NyIvPjxtZXRhPjx2ZXJzaW9uSWQgdmFsdWU9IjEiLz48cHJvZmlsZSB2YWx1ZT0iaHR0cHM6Ly9nZW1hdGlrLmRlL2ZoaXIvZXJwL1N0cnVjdHVyZURlZmluaXRpb24vR0VNX0VSUF9QUl9EaWdlc3R8MS42Ii8+PC9tZXRhPjxjb250ZW50VHlwZSB2YWx1ZT0iYXBwbGljYXRpb24vb2N0ZXQtc3RyZWFtIi8+PGRhdGEgdmFsdWU9InFOQTVWUWlnTTl2K0s1UTdFN2tLOFBWbDc2NnNwL0pFc2VaOGZSQmZJdFE9Ii8+PC9CaW5hcnk+PC9yZXNvdXJjZT48L2VudHJ5PjwvQnVuZGxlPgqgggLZMIIC1TCCAnugAwIBAgIDALXkMAoGCCqGSM49BAMCMIGEMQswCQYDVQQGEwJERTEfMB0GA1UECgwWZ2Vt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"/>
+    </signature>
+</Bundle>
+
+
