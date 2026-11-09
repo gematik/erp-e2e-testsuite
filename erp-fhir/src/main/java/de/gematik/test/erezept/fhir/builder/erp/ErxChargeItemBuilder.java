@@ -44,12 +44,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.function.Function;
 import lombok.val;
-import org.hl7.fhir.r4.model.Binary;
-import org.hl7.fhir.r4.model.ChargeItem;
-import org.hl7.fhir.r4.model.DateTimeType;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.*;
 
 public class ErxChargeItemBuilder extends ResourceBuilder<ErxChargeItem, ErxChargeItemBuilder> {
 
@@ -188,10 +183,7 @@ public class ErxChargeItemBuilder extends ResourceBuilder<ErxChargeItem, ErxChar
 
     chargeItem.setIdentifier(identifiers);
 
-    val ns =
-        version.isSmallerThanOrEqualTo(PatientenrechnungVersion.V1_0_0)
-            ? DeBasisProfilNamingSystem.KVID_PKV_SID
-            : DeBasisProfilNamingSystem.KVID_GKV_SID;
+    val ns = DeBasisProfilNamingSystem.KVID_GKV_SID;
     val kvnrIdentifier = kvnr.asIdentifier(ns, false);
     kvnrIdentifier.getAssigner().setDisplay(kvnrAssignerName);
     chargeItem.setSubject(new Reference().setIdentifier(kvnrIdentifier));

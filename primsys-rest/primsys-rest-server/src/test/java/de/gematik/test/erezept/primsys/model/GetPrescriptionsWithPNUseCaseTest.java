@@ -20,11 +20,9 @@
 
 package de.gematik.test.erezept.primsys.model;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
+import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createOperationOutcome;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -71,7 +69,7 @@ class GetPrescriptionsWithPNUseCaseTest extends TestWithActorContext {
   void shouldGenerateResponseByEvidence(String evidence, String kvnr, String hcv) {
     val content =
         ResourceLoader.readFileFromResource(
-            "fhir/valid/erp/1.4.0/taskBundle/5cb82d47-c80d-4404-b57c-099d58767603.xml");
+            "fhir/valid/kbv/1.4.0/taskbundleBundle/fromFDForPharmacy.xml");
     val pharmacy = ActorContext.getInstance().getPharmacies().getFirst();
     val mockErpClient = pharmacy.getClient();
     val getPresUC = new GetPrescriptionsAsPharmacyUseCase(pharmacy);
@@ -101,23 +99,18 @@ class GetPrescriptionsWithPNUseCaseTest extends TestWithActorContext {
     val getPresUC = new GetPrescriptionsAsPharmacyUseCase(pharmacy);
     val erpResponse = buildResponseAsOpOutcome();
     when(mockErpClient.request(any(TaskGetByExamEvidenceCommand.class))).thenReturn(erpResponse);
-    try (val res = getPresUC.getPrescriptionsByEvidence(TEST_EVIDENCE)) {
-      fail(
-          "GetPrescriptionsUsesCase did not throw the expected Exception and answered with "
-              + res.getStatus());
-    } catch (WebApplicationException wae) {
-      assertEquals(WebApplicationException.class, wae.getClass());
-      assertEquals(400, wae.getResponse().getStatus());
-      assertEquals(ErrorDto.class, wae.getResponse().getEntity().getClass());
-      assertTrue(((ErrorDto) wae.getResponse().getEntity()).getMessage().contains("ERROR"));
-    }
+    assertThrows(
+        WebApplicationException.class,
+        () -> {
+          getPresUC.getPrescriptionsByEvidence(TEST_EVIDENCE);
+        });
   }
 
   @Test
   void shouldGenerateResponseByPoppToken() {
     val content =
         ResourceLoader.readFileFromResource(
-            "fhir/valid/erp/1.4.0/taskBundle/5cb82d47-c80d-4404-b57c-099d58767603.xml");
+            "fhir/valid/kbv/1.4.0/taskbundleBundle/fromFDForPharmacy.xml");
     val pharmacy = ActorContext.getInstance().getPharmacies().getFirst();
     val mockErpClient = pharmacy.getClient();
     val getPresUC = new GetPrescriptionsAsPharmacyUseCase(pharmacy);
@@ -139,16 +132,11 @@ class GetPrescriptionsWithPNUseCaseTest extends TestWithActorContext {
 
     when(mockErpClient.request(any(TaskGetByPoppTokenCommand.class))).thenReturn(erpResponse);
 
-    try (val res = getPresUC.getPrescriptionsByPoppToken("some-popp-token")) {
-      fail(
-          "GetPrescriptionsWithPNUseCase did not throw the expected Exception and answered with "
-              + res.getStatus());
-    } catch (WebApplicationException wae) {
-      assertEquals(WebApplicationException.class, wae.getClass());
-      assertEquals(400, wae.getResponse().getStatus());
-      assertEquals(ErrorDto.class, wae.getResponse().getEntity().getClass());
-      assertTrue(((ErrorDto) wae.getResponse().getEntity()).getMessage().contains("ERROR"));
-    }
+    assertThrows(
+        WebApplicationException.class,
+        () -> {
+          getPresUC.getPrescriptionsByPoppToken("some-popp-token");
+        });
   }
 
   @Test

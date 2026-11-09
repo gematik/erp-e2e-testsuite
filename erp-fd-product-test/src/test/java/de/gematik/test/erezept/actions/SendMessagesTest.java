@@ -28,9 +28,7 @@ import static org.mockito.Mockito.when;
 
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.actions.communication.SendMessages;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.client.ErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.CommunicationPostCommand;
 import de.gematik.test.erezept.fhir.builder.erp.ErxCommunicationBuilder;
 import de.gematik.test.erezept.fhir.extensions.erp.SupplyOptionsType;
@@ -43,6 +41,7 @@ import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.fhir.valuesets.PrescriptionFlowType;
 import de.gematik.test.fuzzing.erx.ErxCommunicationPayloadManipulatorFactory;
+import de.gematik.test.utils.ActorMockUtil;
 import java.util.UUID;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,24 +49,17 @@ import org.junit.jupiter.api.Test;
 
 class SendMessagesTest {
 
-  private ErpClient erpClientMock;
-  private MockActorsUtils mockUtil;
-  private PharmacyActor pharmacyActor;
-  private PatientActor patientActor;
-
   @BeforeEach
   void init() {
     StopwatchProvider.init();
-    this.mockUtil = new MockActorsUtils();
-
-    val actorStage = mockUtil.actorStage;
-    this.erpClientMock = mockUtil.erpClientMock;
-    pharmacyActor = actorStage.getPharmacyNamed("Stadtapotheke");
-    patientActor = actorStage.getPatientNamed("Leonie Hütter");
   }
 
   @Test
   void shouldBuildDispenseRequest() {
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+    val pharmacyClient = pharmacyMock.getRight();
+    val patientActor = ActorMockUtil.createRandomPatient().getLeft();
 
     val communicationDisReqMessage =
         CommunicationDisReqMessage.forV1()
@@ -90,9 +82,9 @@ class SendMessagesTest {
             .receiver(patientActor.getKvnr().getValue())
             .build();
 
-    val res = mockUtil.createErpResponse(payload, ErxCommunication.class);
+    val res = ErpResponseUtil.createErpResponse(payload, ErxCommunication.class);
 
-    when(erpClientMock.request(any(CommunicationPostCommand.class))).thenReturn(res);
+    when(pharmacyClient.request(any(CommunicationPostCommand.class))).thenReturn(res);
 
     val com =
         SendMessages.to(pharmacyActor)
@@ -109,6 +101,13 @@ class SendMessagesTest {
 
   @Test
   void shouldBuildCommunicationReply() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+
     val communicationReplyMessage =
         CommunicationReplyMessage.forV1()
             .supplyOptionsType(SupplyOptionsType.ON_PREMISE)
@@ -125,9 +124,9 @@ class SendMessagesTest {
             .receiver(pharmacyActor.getTelematikId().getValue())
             .build();
 
-    val res = mockUtil.createErpResponse(payload, ErxCommunication.class);
+    val res = ErpResponseUtil.createErpResponse(payload, ErxCommunication.class);
 
-    when(erpClientMock.request(any(CommunicationPostCommand.class))).thenReturn(res);
+    when(patientClient.request(any(CommunicationPostCommand.class))).thenReturn(res);
 
     val com =
         SendMessages.to(patientActor)
@@ -146,6 +145,13 @@ class SendMessagesTest {
 
   @Test
   void shouldBuildCommunicationReplyWithSupplyOption() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+
     val testReply =
         CommunicationReplyMessage.forV1()
             .supplyOptionsType(SupplyOptionsType.ON_PREMISE)
@@ -163,8 +169,8 @@ class SendMessagesTest {
             .supplyOptions(SupplyOptionsType.ON_PREMISE)
             .build();
 
-    val res = mockUtil.createErpResponse(payload, ErxCommunication.class);
-    when(erpClientMock.request(any(CommunicationPostCommand.class))).thenReturn(res);
+    val res = ErpResponseUtil.createErpResponse(payload, ErxCommunication.class);
+    when(patientClient.request(any(CommunicationPostCommand.class))).thenReturn(res);
 
     val sentReplyComm =
         SendMessages.to(patientActor).forTask(tsk).asReply(testReply, pharmacyActor);
@@ -175,6 +181,13 @@ class SendMessagesTest {
 
   @Test
   void shouldSendWithCustomCommunication() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+
     val reply =
         CommunicationReplyMessage.forV1()
             .supplyOptionsType(SupplyOptionsType.ON_PREMISE)
@@ -188,8 +201,8 @@ class SendMessagesTest {
             .supplyOptions(SupplyOptionsType.ON_PREMISE)
             .build();
 
-    val res = mockUtil.createErpResponse(payload, ErxCommunication.class);
-    when(erpClientMock.request(any(CommunicationPostCommand.class))).thenReturn(res);
+    val res = ErpResponseUtil.createErpResponse(payload, ErxCommunication.class);
+    when(patientClient.request(any(CommunicationPostCommand.class))).thenReturn(res);
 
     val sentReplyComm = SendMessages.withCommunication(payload);
     val interActionComm = sentReplyComm.answeredBy(patientActor);
@@ -198,6 +211,13 @@ class SendMessagesTest {
 
   @Test
   void shouldSendWithCustomTaskValues() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+
     val testReply =
         CommunicationReplyMessage.forV1()
             .supplyOptionsType(SupplyOptionsType.ON_PREMISE)
@@ -215,8 +235,8 @@ class SendMessagesTest {
             .supplyOptions(SupplyOptionsType.ON_PREMISE)
             .build();
 
-    val res = mockUtil.createErpResponse(payload, ErxCommunication.class);
-    when(erpClientMock.request(any(CommunicationPostCommand.class))).thenReturn(res);
+    val res = ErpResponseUtil.createErpResponse(payload, ErxCommunication.class);
+    when(patientClient.request(any(CommunicationPostCommand.class))).thenReturn(res);
 
     val sentReplyComm =
         SendMessages.to(patientActor)
@@ -229,6 +249,8 @@ class SendMessagesTest {
 
   @Test
   void shouldBuildSendMessageWithCustomCommunicationAndWFVersion() {
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
 
     val communicationDisReqMessage =
         CommunicationDisReqMessage.forV1()

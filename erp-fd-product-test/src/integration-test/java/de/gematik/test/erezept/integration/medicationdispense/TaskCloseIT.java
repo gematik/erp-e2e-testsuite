@@ -66,8 +66,7 @@ class TaskCloseIT extends ErpTest {
   @Actor(name = "Adelheid Ulmenwald")
   private DoctorActor doctor;
 
-  @Actor(name = "Sina Hüllmann")
-  private PatientActor patient;
+  @Actor private PatientActor patient;
 
   @Actor(name = "Am Flughafen")
   private PharmacyActor pharmacy;

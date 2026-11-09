@@ -20,10 +20,7 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.builder.FakerBrick;
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
@@ -59,11 +56,11 @@ class GemErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
     val gemMedCompounding =
         GemErpMedicationCompoundingBuilder.forCompounding()
             .ask(ASK.from(code))
-            .version(ErpWorkflowVersion.V1_4)
+            .version(ErpWorkflowVersion.V1_6)
             .build();
     assertTrue(parser.isValid(gemMedCompounding));
     assertEquals(code, gemMedCompounding.getCode().getCodingFirstRep().getCode());
-    assertTrue(gemMedCompounding.getMeta().getProfile().get(0).getValue().endsWith("1.4"));
+    assertTrue(gemMedCompounding.getMeta().getProfile().get(0).getValue().endsWith("1.6"));
   }
 
   @Test
@@ -333,7 +330,7 @@ class GemErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
     val gemMedCompounding =
         GemErpMedicationCompoundingBuilder.forCompounding()
             .ask(ASK.from(askCode))
-            .version(ErpWorkflowVersion.V1_4)
+            .version(ErpWorkflowVersion.V1_6)
             .isVaccine(true)
             .category(EpaDrugCategory.C_00)
             .ingredientComponent(askIngredient)
@@ -358,7 +355,7 @@ class GemErpMedicationCompoundingBuilderTest extends ErpFhirParsingTest {
             .getValueAsPrimitive()
             .getValueAsString());
     assertEquals(askCode, gemMedCompounding.getCode().getCodingFirstRep().getCode());
-    assertTrue(gemMedCompounding.getMeta().getProfile().get(0).getValue().endsWith("1.4"));
+    assertTrue(gemMedCompounding.getMeta().getProfile().get(0).getValue().endsWith("1.6"));
     assertEquals(EpaDrugCategory.C_00, gemMedCompounding.getCategory().get());
     assertEquals(askCode, gemMedCompounding.getCode().getCodingFirstRep().getCode());
     assertEquals(EpaDrugCategory.C_00, gemMedCompounding.getCategory().get());

@@ -64,7 +64,7 @@ class ErxMedicationDispenseBundleBuilderTest extends ErpFhirParsingTest {
     val performerId = "3-SMC-B-Testkarte-883110000116873";
     val prescriptionId = PrescriptionId.from("160.000.006.741.854.62");
     val bundle =
-        ErxMedicationDispenseBundleFaker.build(ErpWorkflowVersion.V1_4)
+        ErxMedicationDispenseBundleFaker.build(ErpWorkflowVersion.V1_6)
             .withAmount(2)
             .withKvnr(kvnr)
             .withPerformerId(performerId)

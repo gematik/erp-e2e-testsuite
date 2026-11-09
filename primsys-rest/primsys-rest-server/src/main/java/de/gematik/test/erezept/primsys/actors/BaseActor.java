@@ -31,16 +31,9 @@ import de.gematik.bbriccs.fhir.validation.ProfileExtractor;
 import de.gematik.bbriccs.konnektor.Konnektor;
 import de.gematik.bbriccs.konnektor.requests.GetCardHandleRequest;
 import de.gematik.bbriccs.rest.fd.FhirBResponse;
-import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.bbriccs.smartcards.SmcB;
 import de.gematik.test.erezept.client.ErpClient;
-import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.client.usecases.ErpBaseCommand;
-import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
-import de.gematik.test.erezept.config.dto.actor.HealthInsuranceConfiguration;
-import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
-import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
-import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import de.gematik.test.erezept.primsys.data.actors.ActorDto;
 import de.gematik.test.erezept.primsys.data.actors.ActorType;
 import de.gematik.test.erezept.primsys.rest.response.ErrorResponseBuilder;
@@ -66,51 +59,31 @@ public abstract class BaseActor {
   private final SmcB smcb;
   private final ActorDto actorInfo;
 
+  // this holds the time until the IDP token from the last request is valid.
+  // It is updated on every request to the Fachdienst.
+  private Instant idpTokenValidUntil = Instant.now();
+
   protected final Konnektor konnektor;
   protected final CardInfo smcbHandle;
 
   protected BaseActor(
-      DoctorConfiguration cfg,
-      EnvironmentConfiguration env,
-      Konnektor konnektor,
-      SmartcardArchive sca) {
-    this(ActorType.DOCTOR, cfg, env, konnektor, sca);
-  }
-
-  protected BaseActor(
-      PharmacyConfiguration cfg,
-      EnvironmentConfiguration env,
-      Konnektor konnektor,
-      SmartcardArchive sca) {
-    this(ActorType.PHARMACY, cfg, env, konnektor, sca);
-  }
-
-  protected BaseActor(
-      HealthInsuranceConfiguration cfg,
-      EnvironmentConfiguration env,
-      Konnektor konnektor,
-      SmartcardArchive sca) {
-    this(ActorType.HEALTH_INSURANCE, cfg, env, konnektor, sca);
-  }
-
-  private BaseActor(
       ActorType actorType,
-      PsActorConfiguration cfg,
-      EnvironmentConfiguration env,
-      Konnektor konnektor,
-      SmartcardArchive sca) {
-    this.name = cfg.getName();
+      String name,
+      SmcB smcb,
+      ErpClient client,
+      CryptoSystem algorithm,
+      Konnektor konnektor) {
+    this.name = name;
     this.identifier = createIdentifier(this.name);
     this.type = actorType;
-    this.smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn());
+    this.smcb = smcb;
     this.konnektor = konnektor;
 
     this.smcbHandle =
         konnektor.execute(GetCardHandleRequest.forSmartcard(this.getSmcb())).getPayload();
 
-    this.client = ErpClientFactory.createErpClient(env, cfg);
-    this.client.authenticateWith(smcb);
-    this.algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
+    this.client = client;
+    this.algorithm = algorithm;
     this.actorInfo = this.initActorSummary();
   }
 
@@ -122,6 +95,7 @@ public abstract class BaseActor {
 
   public final <R extends Resource> FhirBResponse<R> erpRequest(final ErpBaseCommand<R> command) {
     val response = this.getClient().request(command);
+    recordIdpTokenValidUntil(response);
     if (response.isOperationOutcome() || response.getStatusCode() > 299) {
       ErrorResponseBuilder.throwFachdienstError(response);
     }
@@ -131,10 +105,17 @@ public abstract class BaseActor {
   // Note: when throw an error anyway in erpRequest, why not unpacking the response directly?
   public final <R extends Resource> R erpRequest2(final ErpBaseCommand<R> command) {
     val response = this.getClient().request(command);
+    recordIdpTokenValidUntil(response);
     if (response.isOperationOutcome() || response.getStatusCode() > 299) {
       ErrorResponseBuilder.throwFachdienstError(response);
     }
     return response.getExpectedResource();
+  }
+
+  private void recordIdpTokenValidUntil(FhirBResponse<?> response) { // NOSONAR
+    // NOTE: this is just a workaround, parse the usedJwt from the response and extract the
+    // expiration time from it. For now, we just set it to 3 minutes in the future.
+    this.idpTokenValidUntil = Instant.now().plus(Duration.ofMinutes(3));
   }
 
   public <T extends Resource> T decode(Class<T> expectedClass, final String content) {
@@ -160,9 +141,10 @@ public abstract class BaseActor {
   }
 
   public ActorDto getActorSummary() {
-    val validUntil = this.getClient().getIdpTokenValidUntil();
-    val ttl = Duration.between(Instant.now(), validUntil);
-    return actorInfo.setIdpValidUntil(validUntil.toString()).setIdpTimeToLive(ttl.toString());
+    val ttl = Duration.between(Instant.now(), idpTokenValidUntil);
+    return actorInfo
+        .setIdpValidUntil(idpTokenValidUntil.toString())
+        .setIdpTimeToLive(ttl.toString());
   }
 
   private ActorDto initActorSummary() {

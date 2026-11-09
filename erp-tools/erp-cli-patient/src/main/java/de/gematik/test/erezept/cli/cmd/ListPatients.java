@@ -24,7 +24,6 @@ import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.bbriccs.smartcards.SmartcardType;
 import de.gematik.test.erezept.cli.param.ExclusiveEgkIdentifierGroup;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -55,22 +54,13 @@ public class ListPatients implements Callable<Integer> {
   public Integer call() {
     val sca = SmartcardArchive.fromResources();
 
-    val smartcards =
-        hasFilter()
-            ? egkIdentifier.getEgks(sca)
-            : sca.getConfigsFor(SmartcardType.EGK).stream()
-                .map(cfg -> sca.getEgkByICCSN(cfg.getIccsn()))
-                .toList();
+    val smartcards = egkIdentifier.getKvnrs(sca).stream().map(sca::getEgkByKvnr).toList();
 
     smartcards.stream()
         .filter(egk -> !FILTER_ICCSNS.contains(egk.getIccsn()))
         .forEach(this::printInformation);
 
     return 0;
-  }
-
-  private boolean hasFilter() {
-    return egkIdentifier != null && (egkIdentifier.hasKvnrs() || egkIdentifier.hasIccsns());
   }
 
   private void printInformation(Egk egk) {

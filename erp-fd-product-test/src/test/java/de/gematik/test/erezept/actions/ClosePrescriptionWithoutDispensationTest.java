@@ -20,21 +20,18 @@
 
 package de.gematik.test.erezept.actions;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
-import de.gematik.test.erezept.actors.PharmacyActor;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.CloseTaskCommand;
-import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.fhir.r4.erp.ErxReceipt;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.Secret;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -43,33 +40,28 @@ import org.junitpioneer.jupiter.ClearSystemProperty;
 
 class ClosePrescriptionWithoutDispensationTest extends ErpFhirBuildingTest {
 
-  private static PharmacyActor pharmacy;
-  private static UseTheErpClient useErpClient;
-
   @BeforeAll
   static void setup() {
     CoverageReporter.getInstance().startTestcase("don't care");
-    // init pharmacy
-    pharmacy = new PharmacyActor("Am Flughafen");
-    useErpClient = mock(UseTheErpClient.class);
-    pharmacy.can(useErpClient);
   }
 
   @ParameterizedTest
   @ValueSource(strings = {"1.4.0", "1.5.0"})
   @ClearSystemProperty(key = "erp.fhir.profile")
   void shouldPerformClosePrescription(String version) {
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+    val pharmacyClient = pharmacyMock.getRight();
+
     System.setProperty("erp.fhir.profile", version);
     val task = new ErxTask();
     task.setId("123456");
     val secret = Secret.from("123456789");
     val action = ClosePrescriptionWithoutDispensation.forTheTask(task, secret);
     val resource = new ErxReceipt();
-    val response =
-        FhirBResponse.forPayload(ErxReceipt.class, resource)
-            .withStatusCode(200)
-            .andValidationResult(createEmptyValidationResult());
-    when(useErpClient.request(any(CloseTaskCommand.class))).thenReturn(response);
-    assertDoesNotThrow(() -> pharmacy.performs(action));
+    val response = ErpResponseUtil.createErpResponse(resource, ErxReceipt.class, 200);
+
+    when(pharmacyClient.request(any(CloseTaskCommand.class))).thenReturn(response);
+    assertDoesNotThrow(() -> pharmacyActor.performs(action));
   }
 }

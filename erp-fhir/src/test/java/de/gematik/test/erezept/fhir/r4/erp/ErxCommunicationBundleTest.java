@@ -20,6 +20,7 @@
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,27 +32,26 @@ import org.junit.jupiter.api.Test;
 
 class ErxCommunicationBundleTest extends ErpFhirParsingTest {
 
-  private final String BASE_PATH = "fhir/valid/erp/1.4.0/communicationbundle/";
-
   @Test
   void shouldEncodeSingleCommunicationBundle() {
-    val fileName = "CommunicationBundle_01.json";
+    String path =
+        "fhir/valid/erp/1.5.0/communicationbundle/Bundle-3102c63c-1f98-41b7-96e2-4e4b7dc2a8b9.xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(path);
     val communicationBundle = parser.decode(ErxCommunicationBundle.class, content);
+
     assertNotNull(communicationBundle, "Valid ErxCommunicationBundle must be parseable");
-
-    assertEquals(38, communicationBundle.getCommunications().size());
-    assertEquals(18, communicationBundle.getCommunicationsFromSender("X110614233").size());
-    assertEquals(20, communicationBundle.getCommunicationsForReceiver("X110614233").size());
-
+    assertEquals(6, communicationBundle.getCommunications().size());
+    assertEquals(0, communicationBundle.getCommunicationsFromSender("X110614233").size());
+    assertEquals(6, communicationBundle.getCommunicationsForReceiver("X110614233").size());
     assertEquals(
-        4, communicationBundle.getCommunicationsFromSender("5-2-KH-APO-Waldesrand-01").size());
+        6, communicationBundle.getCommunicationsFromSender("5-2-KH-APO-Waldesrand-01").size());
     assertEquals(
-        4, communicationBundle.getCommunicationsForReceiver("5-2-KH-APO-Waldesrand-01").size());
+        0, communicationBundle.getCommunicationsForReceiver("5-2-KH-APO-Waldesrand-01").size());
+    assertDoesNotThrow(communicationBundle::toString);
 
-    val com = communicationBundle.getCommunications().get(17);
-    assertEquals(CommunicationType.DISP_REQ, com.getType());
-    assertTrue(com.getMessage().contains("nope, we´ll get SMOK!"));
+    val com = communicationBundle.getCommunications().get(2);
+    assertEquals(CommunicationType.REPLY, com.getType());
+    assertTrue(com.getMessage().contains("how much is the fish"));
   }
 }

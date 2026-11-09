@@ -21,15 +21,14 @@
 package de.gematik.test.erezept.app.task.ios;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.Environment;
 import de.gematik.test.erezept.app.mobile.elements.*;
 import de.gematik.test.erezept.app.task.*;
+import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.common.screenplay.task.BillingInformationConsent;
 import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
-import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -40,9 +39,8 @@ import net.serenitybdd.screenplay.Task;
 @RequiredArgsConstructor
 public class SetUpIosDevice implements Task {
 
-  private final EnvironmentConfiguration environment;
   private final InsuranceTypeDe insuranceType;
-  private final SmartcardArchive sca;
+  private final ErpClientFactory erpClientFactory;
 
   @Override
   public <T extends Actor> void performAs(T actor) {
@@ -57,9 +55,10 @@ public class SetUpIosDevice implements Task {
       actor.attemptsTo(CreateNewProfile.fromSettingsMenu());
       actor.attemptsTo(
           ChangeTheEnvironment.bySwitchInTheDebugMenuTo(
-              Environment.fromString(environment.getName())));
+              Environment.fromString(erpClientFactory.getEnv().getName())));
 
       if (userConfig.useVirtualEgk()) {
+        val sca = erpClientFactory.getSmartcards();
         val egk = sca.getEgkByICCSN(userConfig.getEgkIccsn());
         actor.attemptsTo(SetVirtualEgkOnIOS.withEgk(egk));
       }
@@ -71,7 +70,7 @@ public class SetUpIosDevice implements Task {
     }
 
     actor.attemptsTo(
-        EquipWithProvidePatientBaseDataAndErpClient.forInput(environment, insuranceType, sca));
+        EquipWithProvidePatientBaseDataAndErpClient.forInput(insuranceType, erpClientFactory));
 
     actor.attemptsTo(BillingInformationConsent.revokeConsent());
     actor.attemptsTo(EnsureThatTheEUConsent.isRevoked());

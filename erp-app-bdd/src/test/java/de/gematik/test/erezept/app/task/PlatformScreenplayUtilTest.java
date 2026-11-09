@@ -28,7 +28,6 @@ import de.gematik.test.erezept.app.exceptions.UnsupportedPlatformException;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.task.android.SetUpAndroidDevice;
 import de.gematik.test.erezept.app.task.ios.SetUpIosDevice;
-import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
@@ -36,21 +35,18 @@ class PlatformScreenplayUtilTest {
 
   @Test
   void chooseTaskForPlatform() {
-    val environment = new EnvironmentConfiguration();
-    environment.setName("RU");
-
     val androidTask =
         PlatformScreenplayUtil.chooseTaskForPlatform(
             PlatformType.ANDROID,
             () -> new SetUpAndroidDevice(InsuranceTypeDe.GKV, null),
-            () -> new SetUpIosDevice(environment, InsuranceTypeDe.BG, null));
+            () -> new SetUpIosDevice(InsuranceTypeDe.BG, null));
     assertSame(SetUpAndroidDevice.class, androidTask.getClass());
 
     val iosTask =
         PlatformScreenplayUtil.chooseTaskForPlatform(
             PlatformType.IOS,
             () -> new SetUpAndroidDevice(InsuranceTypeDe.GKV, null),
-            () -> new SetUpIosDevice(environment, InsuranceTypeDe.BG, null));
+            () -> new SetUpIosDevice(InsuranceTypeDe.BG, null));
     assertSame(SetUpIosDevice.class, iosTask.getClass());
 
     assertThrows(
@@ -59,6 +55,6 @@ class PlatformScreenplayUtilTest {
             PlatformScreenplayUtil.chooseTaskForPlatform(
                 PlatformType.DESKTOP,
                 () -> new SetUpAndroidDevice(InsuranceTypeDe.GKV, null),
-                () -> new SetUpIosDevice(environment, InsuranceTypeDe.BG, null)));
+                () -> new SetUpIosDevice(InsuranceTypeDe.BG, null)));
   }
 }

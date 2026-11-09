@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 
 import de.gematik.bbriccs.fhir.de.value.TelematikID;
 import de.gematik.bbriccs.rest.fd.FhirBResponse;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.TaskAbortCommand;
 import de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil;
 import de.gematik.test.erezept.primsys.TestWithActorContext;
@@ -94,9 +95,7 @@ class AbortUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val mockResponse =
-        FhirBResponse.forPayload(Resource.class, createOperationOutcome())
-            .withStatusCode(500)
-            .andValidationResult(createEmptyValidationResult());
+        ErpResponseUtil.createErpResponse(createOperationOutcome(), Resource.class, 500);
     doThrow(ErrorResponseBuilder.createFachdienstErrorException(mockResponse))
         .when(mockClient)
         .request(any(TaskAbortCommand.class));
@@ -118,9 +117,7 @@ class AbortUseCaseTest extends TestWithActorContext {
     val mockClient = pharmacy.getClient();
 
     val mockResponse =
-        FhirBResponse.forPayload(Resource.class, createOperationOutcome())
-            .withStatusCode(400)
-            .andValidationResult(createEmptyValidationResult());
+        ErpResponseUtil.createErpResponse(createOperationOutcome(), Resource.class, 400);
     doThrow(ErrorResponseBuilder.createFachdienstErrorException(mockResponse))
         .when(mockClient)
         .request(any(TaskAbortCommand.class));

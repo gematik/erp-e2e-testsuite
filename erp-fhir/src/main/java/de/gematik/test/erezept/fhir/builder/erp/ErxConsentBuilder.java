@@ -76,11 +76,7 @@ public class ErxConsentBuilder extends ResourceBuilder<ErxConsent, ErxConsentBui
     // kvnr system hardcoded because we need to ensure first, a proper KVNR is always given!
     // same issue as in ErxChargeItemBuilder.checkPrerequisites
 
-    if (version.isSmallerThanOrEqualTo(PatientenrechnungVersion.V1_0_0)) {
-      consent.setPatient(kvnr.asReference(DeBasisProfilNamingSystem.KVID_PKV_SID, false));
-    } else {
-      consent.setPatient(kvnr.asReference(DeBasisProfilNamingSystem.KVID_GKV_SID, false));
-    }
+    consent.setPatient(kvnr.asReference(DeBasisProfilNamingSystem.KVID_GKV_SID, false));
 
     consent.setPolicyRule(policyRule.asCodeableConcept());
     consent.setStatus(status);

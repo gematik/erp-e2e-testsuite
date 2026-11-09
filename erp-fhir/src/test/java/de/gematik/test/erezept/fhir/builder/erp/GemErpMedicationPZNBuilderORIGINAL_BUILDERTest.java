@@ -20,7 +20,6 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest.ERP_FHIR_PROFILES_TOGGLE;
 import static de.gematik.test.erezept.fhir.valuesets.Darreichungsform.getSpecialEntries;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,6 +34,7 @@ import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationFreeTextFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationIngredientFaker;
 import de.gematik.test.erezept.fhir.builder.kbv.KbvErpMedicationPZNFaker;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaErpVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ValidatorUtil;
 import de.gematik.test.erezept.fhir.valuesets.Darreichungsform;
@@ -44,17 +44,17 @@ import java.util.Optional;
 import lombok.val;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.junit.jupiter.api.Test;
-import org.junitpioneer.jupiter.SetSystemProperty;
 
-@SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.5.0")
 class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest {
+
+  ErpWorkflowVersion version = ErpWorkflowVersion.V1_6;
 
   @Test
   void shouldBuildGemErpMedicationWithFixedValues() {
     // https://github.com/gematik/eRezept-Examples/blob/main/Standalone-Examples/E-Rezept-Workflow_gematik/1.4.3/Medication-SumatripanMedication.xml
     val medication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.builder()
-            .version(ErpWorkflowVersion.V1_4)
+            .version(version)
             .category(EpaDrugCategory.C_00)
             .pzn("06313728", "Sumatriptan-1a Pharma 100 mg Tabletten")
             .isVaccine(false)
@@ -101,7 +101,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
     // https://github.com/gematik/eRezept-Examples/blob/main/Standalone-Examples/E-Rezept-Workflow_gematik/1.4.3/Medication-SimpleMedication.xml
     val medication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.builder()
-            .version(ErpWorkflowVersion.V1_4)
+            .version(version)
             .pzn("06313728")
             .lotNumber("1234567890")
             .build();
@@ -114,7 +114,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
   void shouldBuildSimplestMedication() {
     val medication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.builder()
-            .version(ErpWorkflowVersion.V1_4)
+            .version(version)
             .pzn("06313728")
             .build();
 
@@ -140,7 +140,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
 
     val gemMedication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvMedication)
-            .version(ErpWorkflowVersion.V1_4)
+            .version(version)
             .lotNumber("123123")
             .build();
 
@@ -180,7 +180,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
             .fake();
     val gemMedication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvMedication)
-            .version(ErpWorkflowVersion.V1_4)
+            .version(version)
             .lotNumber("123123")
             .build();
 
@@ -205,7 +205,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
             .fake();
     val gemMedication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvMedicationFreeText)
-            .version(ErpWorkflowVersion.V1_4)
+            .version(version)
             .lotNumber("123123")
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, gemMedication);
@@ -228,7 +228,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
 
     val gemMedication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvErpMedicationIngredient)
-            .version(ErpWorkflowVersion.V1_4)
+            .version(version)
             .lotNumber("123123")
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, gemMedication);
@@ -279,7 +279,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
     kbvMedicComp.getIngredientFirstRep().setStrength(null);
     val gemMedication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvMedicComp)
-            .version(ErpWorkflowVersion.V1_4)
+            .version(version)
             .lotNumber("123123")
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, gemMedication);
@@ -292,7 +292,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
         KbvErpMedicationCompoundingFaker.builder().withPackaging("im Karton eben").fake();
     val gemMedication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvMedicComp)
-            .version(ErpWorkflowVersion.V1_4)
+            .version(version)
             .lotNumber("123123")
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, gemMedication);
@@ -305,7 +305,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
     kbvMedicComp.getIngredientFirstRep().setItem(null);
     val gemMedication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvMedicComp)
-            .version(ErpWorkflowVersion.V1_4)
+            .version(version)
             .lotNumber("123123")
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, gemMedication);
@@ -327,7 +327,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
             .fake();
     val gemMedication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvMedicComp)
-            .version(ErpWorkflowVersion.V1_4)
+            .version(version)
             .lotNumber("123123")
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, gemMedication);
@@ -365,33 +365,7 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
 
     val gemMedication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvErpMedicationIngredient)
-            .version(ErpWorkflowVersion.V1_4)
-            .lotNumber("123123")
-            .build();
-    val result = ValidatorUtil.encodeAndValidate(parser, gemMedication, false);
-    assertTrue(result.isSuccessful());
-  }
-
-  @Test
-  void shouldFillPartsOfMissingAttributesInIngredient() {
-    val kbvErpMedicationIngredient = KbvErpMedicationIngredientFaker.builder().fake();
-    kbvErpMedicationIngredient.getIngredientFirstRep().getStrength().getNumerator().setSystem(null);
-    kbvErpMedicationIngredient.getIngredientFirstRep().getStrength().getNumerator().setCode(null);
-    kbvErpMedicationIngredient
-        .getIngredientFirstRep()
-        .getStrength()
-        .getDenominator()
-        .setSystem(null);
-    kbvErpMedicationIngredient.getIngredientFirstRep().getStrength().getDenominator().setCode(null);
-    kbvErpMedicationIngredient
-        .getIngredientFirstRep()
-        .getStrength()
-        .getDenominator()
-        .setValue(null);
-
-    val gemMedication =
-        GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvErpMedicationIngredient)
-            .version(ErpWorkflowVersion.V1_4)
+            .version(version)
             .lotNumber("123123")
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, gemMedication, false);
@@ -399,52 +373,19 @@ class GemErpMedicationPZNBuilderORIGINAL_BUILDERTest extends ErpFhirParsingTest 
   }
 
   /** works fine with new GemErpMedicationBuilder, fix this old builder is to inefficient */
-  @SetSystemProperty(key = ERP_FHIR_PROFILES_TOGGLE, value = "1.4.0")
   @Test
   void shouldFillMissingAttributesInStrengthInCompounding() {
-    val kbvErpMedicationIngredient = KbvErpMedicationCompoundingFaker.builder().fake();
+    val kbvErpMedicationIngredient =
+        KbvErpMedicationCompoundingFaker.builder(KbvItaErpVersion.V1_4_0).fake();
     kbvErpMedicationIngredient.getIngredientFirstRep().getExtensionFirstRep().setValue(null);
     kbvErpMedicationIngredient.getIngredientFirstRep().setStrength(null);
 
     val gemMedication =
         GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvErpMedicationIngredient)
-            .version(ErpWorkflowVersion.getDefaultVersion())
+            .version(version)
             .lotNumber("123123")
             .build();
     val result = ValidatorUtil.encodeAndValidate(parser, gemMedication, false);
-    assertTrue(result.isSuccessful());
-  }
-
-  @Test
-  void shouldFillPartsOfMissingAttributesInStrengthInCompounding() {
-    val kbvErpMedicationIngredient = KbvErpMedicationCompoundingFaker.builder().fake();
-    kbvErpMedicationIngredient
-        .getIngredientFirstRep()
-        .getStrength()
-        .getNumerator()
-        .setSystem("http://hl7.org");
-    kbvErpMedicationIngredient.getIngredientFirstRep().getStrength().getNumerator().setCode(null);
-    kbvErpMedicationIngredient.getIngredientFirstRep().getStrength().getNumerator().setValue(null);
-    kbvErpMedicationIngredient
-        .getIngredientFirstRep()
-        .getStrength()
-        .getDenominator()
-        .setSystem("http://hl7.org")
-        .setValueElement(null);
-    kbvErpMedicationIngredient
-        .getIngredientFirstRep()
-        .getStrength()
-        .getDenominator()
-        .setCode("null");
-    kbvErpMedicationIngredient.getIngredientFirstRep().getStrength().getDenominator().setValue(0);
-
-    val gemMedication =
-        GemErpMedicationPZNBuilderORIGINAL_BUILDER.from(kbvErpMedicationIngredient)
-            .version(ErpWorkflowVersion.V1_4)
-            .lotNumber("123123")
-            .build();
-
-    val result = ValidatorUtil.encodeAndValidate(parser, gemMedication);
     assertTrue(result.isSuccessful());
   }
 

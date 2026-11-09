@@ -51,8 +51,7 @@ class TaskBundleVerifierTest extends ErpFhirParsingTest {
 
   ErxTaskBundle bundle =
       getDecodedFromPath(
-          ErxTaskBundle.class,
-          "fhir/valid/erp/1.4.0/taskBundle/erpFdResponse_manipulatedToOneEntry.json");
+          ErxTaskBundle.class, "fhir/valid/erp/1.6.0/xml/taskbundlesearchset/fromFD.xml");
 
   @BeforeEach
   void setupReporter() {
@@ -131,7 +130,7 @@ class TaskBundleVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldValidateAuthoredOnDateCorrectInSearchSetBundles() {
-    val step = authoredOnDateIsEqual(LocalDate.of(2024, Month.NOVEMBER, 25));
+    val step = authoredOnDateIsEqual(LocalDate.of(2025, Month.OCTOBER, 14));
     assertDoesNotThrow(() -> step.apply(bundle));
   }
 
@@ -143,7 +142,7 @@ class TaskBundleVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldThrowWileValidateAuthoredOnDateCorrectInSearchSetBundles() {
-    val testDate = LocalDate.of(2024, Month.NOVEMBER, 25);
+    val testDate = LocalDate.of(2025, Month.OCTOBER, 14);
     val step =
         verifyAuthoredOnDateWithPredicate(
             ld -> !ld.isEqual(testDate),

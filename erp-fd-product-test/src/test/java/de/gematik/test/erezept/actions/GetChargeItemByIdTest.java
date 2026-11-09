@@ -21,43 +21,58 @@
 package de.gematik.test.erezept.actions;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.erezept.actions.chargeitem.GetChargeItemById;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
+import de.gematik.test.erezept.client.usecases.ChargeItemGetByIdCommand;
+import de.gematik.test.erezept.fhir.r4.erp.ErxChargeItemBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class GetChargeItemByIdTest extends ErpFhirBuildingTest {
 
-  private static PatientActor patient;
-
   @BeforeAll
   static void setup() {
     CoverageReporter.getInstance().startTestcase("don't care");
-    // init pharmacy
-    patient = new PatientActor("Sina Hüllmann");
-    UseTheErpClient useErpClient = mock(UseTheErpClient.class);
-    patient.can(useErpClient);
   }
 
   @Test
   void shouldPerformCorrectCommandWithoutAccessCode() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
+    val response =
+        ErpResponseUtil.createErpResponse(
+            new ErxChargeItemBundle(), ErxChargeItemBundle.class, 200);
+    when(patientClient.request(any(ChargeItemGetByIdCommand.class))).thenReturn(response);
+
     val action = GetChargeItemById.withPrescriptionId(PrescriptionId.random()).withoutAccessCode();
-    assertDoesNotThrow(() -> action.answeredBy(patient));
+    assertDoesNotThrow(() -> action.answeredBy(patientActor));
   }
 
   @Test
   void shouldPerformCorrectCommandWithAccessCode() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
+    val response =
+        ErpResponseUtil.createErpResponse(
+            new ErxChargeItemBundle(), ErxChargeItemBundle.class, 200);
+    when(patientClient.request(any(ChargeItemGetByIdCommand.class))).thenReturn(response);
+
     val action =
         GetChargeItemById.withPrescriptionId(PrescriptionId.random())
             .withAccessCode(AccessCode.random());
-    assertDoesNotThrow(() -> action.answeredBy(patient));
+    assertDoesNotThrow(() -> action.answeredBy(patientActor));
   }
 }

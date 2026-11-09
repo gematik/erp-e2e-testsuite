@@ -46,9 +46,9 @@ class EgkParameterTest {
     val cmdline = new CommandLine(egkp);
     assertDoesNotThrow(() -> cmdline.parseArgs("--kvnr", egk.getKvnr()));
 
-    val chosen = egkp.getEgks(sca);
+    val chosen = egkp.getKvnrs(sca);
     assertEquals(1, chosen.size());
-    assertEquals(egk, chosen.get(0));
+    assertEquals(egk.getKvnr(), chosen.getFirst());
   }
 
   @Test
@@ -62,10 +62,10 @@ class EgkParameterTest {
     assertDoesNotThrow(
         () -> cmdline.parseArgs("--kvnr", format("{0},{1}", egk1.getKvnr(), egk2.getKvnr())));
 
-    val chosen = egkp.getEgks(sca);
+    val chosen = egkp.getKvnrs(sca);
     assertEquals(2, chosen.size());
-    assertEquals(egk1, chosen.get(0));
-    assertEquals(egk2, chosen.get(1));
+    assertEquals(egk1.getKvnr(), chosen.get(0));
+    assertEquals(egk2.getKvnr(), chosen.get(1));
   }
 
   @Test
@@ -77,9 +77,9 @@ class EgkParameterTest {
     val cmdline = new CommandLine(egkp);
     assertDoesNotThrow(() -> cmdline.parseArgs("--iccsn", egk.getIccsn()));
 
-    val chosen = egkp.getEgks(sca);
+    val chosen = egkp.getKvnrs(sca);
     assertEquals(1, chosen.size());
-    assertEquals(egk, chosen.get(0));
+    assertEquals(egk.getKvnr(), chosen.getFirst());
   }
 
   @Test
@@ -93,10 +93,10 @@ class EgkParameterTest {
     assertDoesNotThrow(
         () -> cmdline.parseArgs("--iccsn", format("{0},{1}", egk1.getIccsn(), egk2.getIccsn())));
 
-    val chosen = egkp.getEgks(sca);
+    val chosen = egkp.getKvnrs(sca);
     assertEquals(2, chosen.size());
-    assertEquals(egk1, chosen.get(0));
-    assertEquals(egk2, chosen.get(1));
+    assertEquals(egk1.getKvnr(), chosen.get(0));
+    assertEquals(egk2.getKvnr(), chosen.get(1));
   }
 
   @Test

@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import de.gematik.test.core.StopwatchProvider;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.TaskAcceptCommand;
 import de.gematik.test.erezept.common.screenplay.abilities.ManagePharmacyPrescriptions;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAcceptBundle;
@@ -32,36 +33,36 @@ import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class AcceptPrescriptionTest extends ErpFhirBuildingTest {
 
-  private MockActorsUtils mockUtil;
-
   @BeforeEach
   void init() {
     StopwatchProvider.init();
-    this.mockUtil = new MockActorsUtils();
   }
 
   @Test
   void shouldRememberAcceptedPrescription() {
-    val erpClientMock = mockUtil.erpClientMock;
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+    val pharmacyClient = pharmacyMock.getRight();
+
     val acceptBundle = spy(new ErxAcceptBundle());
     val task = mock(ErxTask.class);
     doReturn(task).when(acceptBundle).getTask();
     when(task.getTaskId()).thenReturn(TaskId.random());
     when(task.getAccessCode()).thenReturn(AccessCode.random());
 
-    val mockResponse = mockUtil.createErpResponse(acceptBundle, ErxAcceptBundle.class, 200);
-    when(erpClientMock.request(any(TaskAcceptCommand.class))).thenReturn(mockResponse);
+    val mockResponse = ErpResponseUtil.createErpResponse(acceptBundle, ErxAcceptBundle.class, 200);
+    when(pharmacyClient.request(any(TaskAcceptCommand.class))).thenReturn(mockResponse);
 
-    val pharmacy = mockUtil.actorStage.getPharmacyNamed("Am Flughafen");
-    assertDoesNotThrow(() -> pharmacy.performs(AcceptPrescription.forTheTask(task)));
+    assertDoesNotThrow(() -> pharmacyActor.performs(AcceptPrescription.forTheTask(task)));
     val accepted =
-        pharmacy
+        pharmacyActor
             .abilityTo(ManagePharmacyPrescriptions.class)
             .getAcceptedPrescriptions()
             .getRawList();

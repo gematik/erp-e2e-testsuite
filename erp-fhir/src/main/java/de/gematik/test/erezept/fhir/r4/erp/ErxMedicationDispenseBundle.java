@@ -171,7 +171,9 @@ public class ErxMedicationDispenseBundle extends Bundle {
    *
    * @param prescriptionId of the prescription for which the dispensation was performed
    * @return a list of pairs of MedicationDispense and KbvErpMedication
+   * @deprecated (use {@link #getEuDispensePairBy(PrescriptionId)} instead for newer Profiles )
    */
+  @Deprecated(forRemoval = true)
   public List<Pair<ErxMedicationDispense, KbvErpMedication>> unpackDispensePairBy(
       PrescriptionId prescriptionId) {
     return this.getMedicationDispenses().stream()

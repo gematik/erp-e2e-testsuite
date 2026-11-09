@@ -20,10 +20,7 @@
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.utils.ResourceLoader;
@@ -35,7 +32,7 @@ import org.junit.jupiter.api.Test;
 
 class ErxMedicationDispenseDiGATest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH = "fhir/valid/erp/1.4.0/medicationdispense/";
+  private static final String BASE_PATH = "fhir/valid/erp/1.6.0/json/MedicationDispense-Example-";
 
   @Test
   void shouldDecodeSingleDiGAMedicationDispense() {
@@ -45,7 +42,7 @@ class ErxMedicationDispenseDiGATest extends ErpFhirParsingTest {
     val medicationDispense = parser.decode(ErxMedicationDispenseDiGA.class, content);
     assertTrue(medicationDispense.isDiGA());
     assertEquals(
-        PrescriptionId.from("162.000.033.491.280.69"), medicationDispense.getPrescriptionId());
+        PrescriptionId.from("162.000.033.491.280.78"), medicationDispense.getPrescriptionId());
   }
 
   @Test

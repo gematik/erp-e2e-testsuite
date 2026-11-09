@@ -32,6 +32,7 @@ import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.values.AccessCode;
 import de.gematik.test.erezept.fhir.values.TaskId;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Stream;
@@ -48,12 +49,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class ErxCommunicationTest extends ErpFhirParsingTest {
 
-  private final String basePath140 = "fhir/valid/erp/1.4.0/communication/";
+  private final String basePath140 = "fhir/valid/erp/1.6.0/json/communication";
 
   @Test
   void shouldEncodeSingleCommunicationDispReq() {
-    val resourceId = "2be1c6ac-5d10-47f6-84ee-8318b2c22c76";
-    val fileName = resourceId + ".json";
+    val fileName = "/Communication-2be1c6ac-5d10-47f6-84ee-8318b2c22c76.json";
     val content = ResourceLoader.readFileFromResource(basePath140 + fileName);
     val communication = parser.decode(ErxCommunication.class, content);
     assertNotNull(communication, "Valid ErxCommunicationDispReq must be parseable");
@@ -65,9 +65,9 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
     val expectedRecipientId = "8-SMC-B-Testkarte-883110000123465";
     val expectedStatus = Communication.CommunicationStatus.UNKNOWN;
     val expectedDate =
-        ZonedDateTime.parse("2025-01-15T15:29:00.434+00:00")
+        ZonedDateTime.parse("2026-04-01T17:29:00.434+00:00")
             .toInstant()
-            .atZone(ZoneId.systemDefault())
+            .atZone(ZoneOffset.UTC)
             .toLocalDateTime();
 
     assertFalse(communication.hasAboutReference());
@@ -83,43 +83,39 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
   }
 
   @Test
-  void shouldEncodeSingleCommunicationInfoReq() {
-    val resourceId = "8ca3c379-ac86-470f-bc12-178c9008f5c9";
-    val fileName = resourceId + ".json";
+  void shouldEncodeSingleCommunicationReply() {
+
+    val fileName = "/Communication-7977a4ab-97a9-4d95-afb3-6c4c1e2ac596.json";
+
     val content = ResourceLoader.readFileFromResource(basePath140 + fileName);
 
     val communication = parser.decode(ErxCommunication.class, content);
     assertNotNull(communication, "Valid ErxCommunicationInfoReq must be parseable");
 
     val expectedTaskId = TaskId.from("160.000.033.491.280.78");
-    val expectedAboutRef = "#SumatripanMedication";
-    val expectedSenderKvid = "X234567890";
-    val expectedRecipientId = "3-SMC-B-Testkarte-883110000123465";
-    val expectedMessage =
-        "Hallo, ich wollte gern fragen, ob das Medikament bei Ihnen vorraetig ist.";
+    val expectedSenderKvid = "3-SMC-B-Testkarte-883110000123465";
+    val expectedRecipientId = "X234567890";
+    val expectedMessage = "Eisern";
     val expectedStatus = Communication.CommunicationStatus.UNKNOWN;
     val expectedDate =
-        ZonedDateTime.parse("2025-01-15T15:29:00.434+00:00")
+        ZonedDateTime.parse("2026-04-01T17:29:00.434+00:00")
             .toInstant()
-            .atZone(ZoneId.systemDefault())
+            .atZone(ZoneOffset.UTC)
             .toLocalDateTime();
 
-    assertEquals(CommunicationType.INFO_REQ, communication.getType());
+    assertEquals(CommunicationType.REPLY, communication.getType());
     assertEquals(expectedTaskId, communication.getBasedOnReferenceId());
-    assertTrue(communication.hasAboutReference());
-    assertEquals(expectedAboutRef, communication.getAboutReference().orElseThrow());
+    assertFalse(communication.hasAboutReference());
     assertEquals(expectedSenderKvid, communication.getSenderId());
     assertEquals(expectedRecipientId, communication.getRecipientId());
     assertTrue(communication.getMessage().contains(expectedMessage));
     assertEquals(expectedStatus, communication.getStatus());
     assertEquals(expectedDate, communication.getSentDate());
-    assertFalse(communication.isSubstitutionAllowed());
   }
 
   @Test
-  void shouldEncodeSingleCommunicationReply() {
-    val resourceId = "7977a4ab-97a9-4d95-afb3-6c4c1e2ac596";
-    val fileName = resourceId + ".json";
+  void shouldEncodeSingleCommunicationReply2() {
+    val fileName = "/Communication-7977a4ab-97a9-4d95-afb3-6c4c1e2ac596.json";
     val content = ResourceLoader.readFileFromResource(basePath140 + fileName);
 
     val communication = parser.decode(ErxCommunication.class, content);
@@ -128,12 +124,10 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
     val expectedTaskId = TaskId.from("160.000.033.491.280.78");
     val expectedRecipientKvid = "X234567890";
     val expectedSenderId = "3-SMC-B-Testkarte-883110000123465";
-    val expectedMessage =
-        "Hallo, wir haben das Medikament vorrätig. Kommen Sie gern in die Filiale oder"
-            + " wir schicken einen Boten.";
+    val expectedMessage = "Eisern";
     val expectedStatus = Communication.CommunicationStatus.UNKNOWN;
     val expectedDate =
-        ZonedDateTime.parse("2025-01-15T15:29:00.434+00:00")
+        ZonedDateTime.parse("2026-04-01T15:29:00.434+00:00")
             .toInstant()
             .atZone(ZoneId.systemDefault())
             .toLocalDateTime();
@@ -166,7 +160,7 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
 
   @Test
   void shouldMatchBasedOnReference() {
-    List.of("a218a36e-f2fd-4603-ba67-c827acfef01b.json")
+    List.of("/Communication-a218a36e-f2fd-4603-ba67-c827acfef01b.json")
         .forEach(
             fileName -> {
               val content =
@@ -234,7 +228,6 @@ class ErxCommunicationTest extends ErpFhirParsingTest {
 
   static Stream<Arguments> expectedKvidNamingSystemPatientenrechnungVersion() {
     return Stream.of(
-        Arguments.of(DeBasisProfilNamingSystem.KVID_PKV_SID, PatientenrechnungVersion.V1_0_0),
         Arguments.of(DeBasisProfilNamingSystem.KVID_GKV_SID, PatientenrechnungVersion.V1_1_0));
   }
 

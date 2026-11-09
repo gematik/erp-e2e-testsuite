@@ -20,10 +20,7 @@
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.fhir.de.valueset.ConsentScope;
@@ -37,13 +34,12 @@ import org.junit.jupiter.api.Test;
 
 class ErxConsentTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH_1_4 = "fhir/valid/erp/1.4.0/consent/";
+  private static final String BASE_PATH_1_4 = "fhir/valid/consent/handCraftedConsentBundle.xml";
 
   @Test
   void shouldEncodeSingleConsent() {
-    val fileName = "Consent_01.xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
+    val content = ResourceLoader.readFileFromResource("fhir/valid/consent/consent.xml");
     val consent = parser.decode(ErxConsent.class, content);
     assertNotNull(consent, "Valid ErxConsent must be parseable");
 
@@ -55,10 +51,10 @@ class ErxConsentTest extends ErpFhirParsingTest {
 
   @Test
   void shouldThrowOnMissingConsentType() {
-    val fileName = "Consent_01.xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
-    val consent = parser.decode(ErxConsent.class, content);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4);
+    val consBundle = parser.decode(ErxConsentBundle.class, content);
+    val consent = consBundle.getConsent().get();
     assertNotNull(consent, "Valid ErxConsent must be parseable");
 
     consent.setCategory(List.of()); // remove all categories with the given consent type
@@ -67,10 +63,9 @@ class ErxConsentTest extends ErpFhirParsingTest {
 
   @Test
   void shouldThrowInvalidConsentTypeSystems() {
-    val fileName = "Consent_01.xml";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
-    val consent = parser.decode(ErxConsent.class, content);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4);
+    val consBundle = parser.decode(ErxConsentBundle.class, content);
+    val consent = consBundle.getConsent().get();
     assertNotNull(consent, "Valid ErxConsent must be parseable");
 
     consent
@@ -89,18 +84,15 @@ class ErxConsentTest extends ErpFhirParsingTest {
 
   @Test
   void shouldGetConsentTypes() {
-    val fileName = "bundle_6daaade4-6523-4136-94bf-cbc5a247cc7b.json";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
-    val consentBundle = parser.decode(ErxConsentBundle.class, content);
-    assertNotNull(consentBundle, "Valid ErxConsentBundle must be parseable");
-
-    assertTrue(consentBundle.getConsent().isPresent());
-    val consent = consentBundle.getConsent().orElseThrow();
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4);
+    val consBundle = parser.decode(ErxConsentBundle.class, content);
+    assertNotNull(consBundle, "Valid ErxConsentBundle must be parseable");
+    assertTrue(consBundle.getConsent().isPresent());
+    val consent = consBundle.getConsent().orElseThrow();
 
     assertEquals(Consent.ConsentState.ACTIVE, consent.getStatus());
     assertEquals(ConsentType.CHARGCONS, consent.getConsentType());
     assertEquals(ConsentScope.PATIENT_PRIVACY, consent.getConsentScope());
-    assertEquals("X110465770", consent.getPatientKvid());
+    assertEquals("U136787649", consent.getPatientKvid());
   }
 }

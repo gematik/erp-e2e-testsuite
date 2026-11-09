@@ -20,10 +20,7 @@
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.utils.ResourceLoader;
@@ -39,14 +36,14 @@ import org.junit.jupiter.api.Test;
 class ErxReceiptTest extends ErpFhirParsingTest {
 
   private static final String BASE_PATH = "fhir/valid/erp/";
-  private static final String BASE_PATH_1_4 = BASE_PATH + "1.4.0/receiptbundle/";
-  private static final String CONCRETE_1_4_BUNDLE =
-      BASE_PATH_1_4 + "dffbfd6a-5712-4798-bdc8-07201eb77ab8.json";
+  private static final String BASE_PATH_1_5 = BASE_PATH + "1.5.0/receipt/";
+  private static final String CONCRETE_1_5_BUNDLE =
+      BASE_PATH_1_5 + "Bundle-dffbfd6a-5712-4798-bdc8-07201eb77ab8--25320898.xml";
 
   @Test
   void shouldEncodeSingleReceipt() {
-    val fileName = "dffbfd6a-5712-4798-bdc8-07201eb77ab8.json";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
+    val fileName = "Bundle-dffbfd6a-5712-4798-bdc8-07201eb77ab8--25320898.xml";
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_5 + fileName);
     val receipt = parser.decode(ErxReceipt.class, content);
     assertNotNull(receipt, "Valid ErxReceipt must be parseable");
     val exppid = PrescriptionId.from("160.000.033.491.280.78");
@@ -56,8 +53,8 @@ class ErxReceiptTest extends ErpFhirParsingTest {
 
   @Test
   void shouldCreateFromResource() {
-    val fileName = "dffbfd6a-5712-4798-bdc8-07201eb77ab8.json";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
+    val fileName = "Bundle-dffbfd6a-5712-4798-bdc8-07201eb77ab8--25320898.xml";
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_5 + fileName);
     Resource receiptResource = parser.decode(Bundle.class, content);
     assertNotNull(receiptResource, "Valid ErxReceipt must be parseable");
 
@@ -68,8 +65,8 @@ class ErxReceiptTest extends ErpFhirParsingTest {
 
   @Test
   void shouldThrowMissingFieldException() {
-    val fileName = "dffbfd6a-5712-4798-bdc8-07201eb77ab8.json";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
+    val fileName = "Bundle-dffbfd6a-5712-4798-bdc8-07201eb77ab8--25320898.xml";
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_5 + fileName);
     val receiptResource = parser.decode(ErxReceipt.class, content);
     receiptResource.getComposition().setType(null);
     assertThrows(MissingFieldException.class, receiptResource::getDocumentType);
@@ -77,7 +74,7 @@ class ErxReceiptTest extends ErpFhirParsingTest {
 
   @Test
   void getDocumentTypeShouldWork() {
-    val content = ResourceLoader.readFileFromResource(CONCRETE_1_4_BUNDLE);
+    val content = ResourceLoader.readFileFromResource(CONCRETE_1_5_BUNDLE);
     val receipt = parser.decode(ErxReceipt.class, content);
     assertNotNull(receipt.getDocumentType());
     assertEquals(DocumentType.RECEIPT, receipt.getDocumentType());
@@ -85,7 +82,7 @@ class ErxReceiptTest extends ErpFhirParsingTest {
 
   @Test
   void getCompositionShouldWork() {
-    val content = ResourceLoader.readFileFromResource(CONCRETE_1_4_BUNDLE);
+    val content = ResourceLoader.readFileFromResource(CONCRETE_1_5_BUNDLE);
     val receipt = parser.decode(ErxReceipt.class, content);
     assertNotNull(receipt.getComposition());
     assertEquals(Composition.CompositionStatus.FINAL, receipt.getComposition().getStatus());
@@ -93,7 +90,7 @@ class ErxReceiptTest extends ErpFhirParsingTest {
 
   @Test
   void getAuthorShouldWork() {
-    val content = ResourceLoader.readFileFromResource(CONCRETE_1_4_BUNDLE);
+    val content = ResourceLoader.readFileFromResource(CONCRETE_1_5_BUNDLE);
     val receipt = parser.decode(ErxReceipt.class, content);
     assertNotNull(receipt.getAuthor());
     assertTrue(receipt.getAuthor().getReference().startsWith("urn:uuid:"));
@@ -101,7 +98,7 @@ class ErxReceiptTest extends ErpFhirParsingTest {
 
   @Test
   void getSectionShouldWork() {
-    val content = ResourceLoader.readFileFromResource(CONCRETE_1_4_BUNDLE);
+    val content = ResourceLoader.readFileFromResource(CONCRETE_1_5_BUNDLE);
     val receipt = parser.decode(ErxReceipt.class, content);
     assertNotNull(receipt.getQesDigestRefInComposSect());
     assertTrue(
@@ -114,7 +111,7 @@ class ErxReceiptTest extends ErpFhirParsingTest {
 
   @Test
   void getPrescriptionDigitShouldWork() {
-    val content = ResourceLoader.readFileFromResource(CONCRETE_1_4_BUNDLE);
+    val content = ResourceLoader.readFileFromResource(CONCRETE_1_5_BUNDLE);
     val bundle = parser.decode(ErxReceipt.class, content);
     val qes = bundle.getQesDigestBinary();
     assertEquals("tJg8c5ZtdhzEEhJ0ZpAsUVFx5dKuYgQFs5oKgthi17M=", qes.getContentAsBase64());

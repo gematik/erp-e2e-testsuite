@@ -31,23 +31,15 @@ import de.gematik.bbriccs.rest.fd.FhirBResponseCreator;
 import de.gematik.bbriccs.rest.fd.FhirClient;
 import de.gematik.bbriccs.rest.fd.MediaType;
 import de.gematik.bbriccs.rest.headers.HttpHeader;
-import de.gematik.bbriccs.smartcards.Smartcard;
-import de.gematik.idp.client.IIdpClient;
-import de.gematik.idp.client.IdpClientRuntimeException;
-import de.gematik.idp.client.IdpTokenResult;
-import de.gematik.idp.crypto.model.PkiIdentity;
+import de.gematik.bbriccs.rest.plugins.HttpBRequestCustomizer;
 import de.gematik.test.erezept.client.rest.ValidationResultHelper;
 import java.nio.charset.StandardCharsets;
-import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Objects;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -69,87 +61,12 @@ public class ErpClient implements FhirClient {
   private final boolean validateRequest;
 
   // client capabilities
-  private final IIdpClient idpClient;
   private final FhirCodec fhir;
   private final FhirBResponseCreator responseFactory;
   private final HttpBClient vauClient;
 
-  // client state
-  private IdpTokenResult idpToken;
-  private Supplier<IdpTokenResult> authentication;
-  @Default private Instant idpTokenValidUntil = Instant.now();
-
-  /**
-   * Initializes the ERP-Client to use vau client and idp client. Beforehand, the authentication
-   * method via connector or via smartcard must be selected.
-   */
-  public void initialize() {
-    Objects.requireNonNull(authentication);
-    vauClient.init();
-    try {
-      idpClient.initialize();
-    } catch (NullPointerException npe) {
-      // rewrap the NPE to an IdpClientRuntimeException will show tests as compromised instead of
-      // broken!
-      log.warn("Something went wrong during initialization of IDP-Client");
-      throw new IdpClientRuntimeException("Caught NullPointer from IDP-Client", npe);
-    }
-  }
-
-  /**
-   * Authenticates the ERP-Client via smartcard. A konnektor isn't required.
-   *
-   * @param smartcard is the smartcard which will be used for authentication with the IDP
-   */
-  public void authenticateWith(final Smartcard smartcard) {
-    authentication =
-        () -> {
-          val autCertificate = smartcard.getAutCertificate();
-          val pki =
-              PkiIdentity.builder()
-                  .certificate(autCertificate.getX509Certificate())
-                  .privateKey(autCertificate.getPrivateKey())
-                  .build();
-          return idpClient.login(pki);
-        };
-    this.initialize();
-  }
-
-  /**
-   * Authenticates the ERP client via konnektor which can sign the idp server challenge.
-   *
-   * @param authPubCert is the C.AUT certificate of a smartcard, which can readout with the
-   *     connector operation ReadCardCertificate
-   * @param challenge is the IDP server challenge that have to be signed. The connector operation
-   *     ExternalAuthenticate can be used for this.
-   */
-  public void authenticateWith(
-      final X509Certificate authPubCert, final UnaryOperator<byte[]> challenge) {
-    authentication = () -> idpClient.login(authPubCert, challenge);
-    this.initialize();
-  }
-
-  public void refreshIdpToken() {
-    if (needsIdpTokenRefresh()) {
-      log.info("Refresh the IDP Token");
-      try {
-        idpToken = authentication.get();
-        idpTokenValidUntil = Instant.now().plus(idpToken.getExpiresIn(), ChronoUnit.SECONDS);
-      } catch (NullPointerException npe) {
-        // rewrap the NPE to an IdpClientRuntimeException will show tests as compromised instead of
-        // broken!
-        log.warn("Something went wrong during authentication on IDP");
-        throw new IdpClientRuntimeException("Caught NullPointer from IDP-Client", npe);
-      }
-    } else {
-      log.info("IDP Token is still valid, no need to refresh");
-    }
-  }
-
-  private boolean needsIdpTokenRefresh() {
-    val refreshInstant = idpTokenValidUntil.minus(120, ChronoUnit.SECONDS);
-    return Instant.now().isAfter(refreshInstant);
-  }
+  @Builder.Default
+  private final List<HttpBRequestCustomizer> requestCustomizers = new LinkedList<>();
 
   @Override
   public String encode(Resource resource) {
@@ -188,14 +105,12 @@ public class ErpClient implements FhirClient {
   @Override
   public <T extends Resource, R extends Resource> FhirBResponse<R> request(
       FhirBRequest<T, R> command) {
-    this.refreshIdpToken(); // make sure before each request that the IDP token is not outdated
 
     val reqBody = this.encode(command.getRequestBody(), sendMime.toFhirEncoding());
     this.validateRequestFhirContent(reqBody);
 
-    val accessToken = idpToken.getAccessToken().getRawString();
-
-    val innerHttpRequest = createInnerHttpRequest(command, accessToken, reqBody);
+    val innerHttpRequest = createInnerHttpRequest(command, reqBody);
+    val accessToken = innerHttpRequest.getBearerToken().orElse("");
 
     val start = Instant.now();
     val response = vauClient.send(innerHttpRequest);
@@ -217,10 +132,9 @@ public class ErpClient implements FhirClient {
   }
 
   private <R extends Resource> HttpBRequest createInnerHttpRequest(
-      FhirBRequest<?, R> command, String accessToken, String body) {
+      FhirBRequest<?, R> command, String body) {
     val headersMap = command.getHeaderParameters();
     headersMap.put("Accept-Charset", acceptCharset);
-    headersMap.put("Authorization", "Bearer " + accessToken);
     headersMap.put("Accept", acceptMime.asString());
     headersMap.put("Content-Type", sendMime.asString());
     headersMap.put("Content-Length", String.valueOf(body.getBytes(StandardCharsets.UTF_8).length));
@@ -230,9 +144,13 @@ public class ErpClient implements FhirClient {
             .map(es -> new HttpHeader(es.getKey(), es.getValue()))
             .collect(Collectors.toList()); // VAU-client will add its own headers as well
 
-    return HttpBRequest.method(command.getMethod())
-        .urlPath(command.getRequestLocator())
-        .headers(headers)
-        .withPayload(body);
+    val request =
+        HttpBRequest.method(command.getMethod())
+            .urlPath(command.getRequestLocator())
+            .headers(headers)
+            .withPayload(body);
+
+    this.requestCustomizers.forEach(it -> it.customize(request));
+    return request;
   }
 }

@@ -30,6 +30,7 @@ import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.Date;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -40,6 +41,12 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 public class VauCertificateGenerator {
+
+  @SneakyThrows
+  public static String generateRandomVauCertificateAsBase64() {
+    val cert = generateRandomVauCertificate();
+    return Base64.getEncoder().encodeToString(cert.getEncoded());
+  }
 
   @SneakyThrows
   public static X509Certificate generateRandomVauCertificate() {

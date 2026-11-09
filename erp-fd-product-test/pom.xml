@@ -7,7 +7,7 @@
     <parent>
         <artifactId>erezept-testsuite</artifactId>
         <groupId>de.gematik.test.erezept</groupId>
-        <version>1.9.0</version>
+        <version>1.10.0</version>
     </parent>
 
     <artifactId>erp-fd-product-test</artifactId>
@@ -83,6 +83,12 @@
         </dependency>
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
+            <artifactId>erp-client</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-fhir</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
@@ -105,7 +111,7 @@
         <dependency>
             <groupId>de.gematik.test.erezept</groupId>
             <artifactId>erp-t-rezept</artifactId>
-            <version>1.9.0</version>
+            <version>1.10.0</version>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>

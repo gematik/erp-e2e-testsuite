@@ -27,33 +27,29 @@ import static org.mockito.Mockito.when;
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.actions.communication.DeleteMessages;
-import de.gematik.test.erezept.actors.ActorStage;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.ErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.CommunicationDeleteCommand;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class DeleteMessagesTest extends ErpFhirBuildingTest {
-  private ErpClient erpClientMock;
-  private MockActorsUtils mockUtil;
-  private PatientActor patientActor;
 
   @BeforeEach
   void init() {
     StopwatchProvider.init();
-    this.mockUtil = new MockActorsUtils();
-    ActorStage actorStage = mockUtil.actorStage;
-    this.erpClientMock = mockUtil.erpClientMock;
-    patientActor = actorStage.getPatientNamed("Leonie Hütter");
   }
 
   @Test
   void shouldGetCommunication() {
-    val mockResponse = mockUtil.createErpResponse(null, EmptyResource.class, 200);
-    when(erpClientMock.request(any(CommunicationDeleteCommand.class))).thenReturn(mockResponse);
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
+    val mockResponse = ErpResponseUtil.createErpResponse(null, EmptyResource.class, 200);
+    when(patientClient.request(any(CommunicationDeleteCommand.class))).thenReturn(mockResponse);
 
     assertDoesNotThrow(
         () ->

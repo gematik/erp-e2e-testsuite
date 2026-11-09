@@ -25,14 +25,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
 import de.gematik.test.eml.tasks.CheckErpDoesNotProvidePrescriptionCancellationToEpa;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.abilities.UseTheEpaMockClient;
 import de.gematik.test.erezept.actors.GemaTestActor;
-import de.gematik.test.erezept.eml.fhir.EpaFhirFactory;
 import de.gematik.test.erezept.eml.fhir.r4.EpaOpCancelPrescription;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
 import de.gematik.test.erezept.fhir.r4.erp.ErxPrescriptionBundle;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvErpBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -52,13 +51,7 @@ class CheckErpDoesNotProvidePrescriptionCancellationToEpaTest extends ErpFhirPar
   static void setup() {
     OnStage.setTheStage(new Cast() {});
     CoverageReporter.getInstance().startTestcase("not needed");
-    val fhir = EpaFhirFactory.create();
-
-    kbvErpBundle =
-        parser.decode(
-            KbvErpBundle.class,
-            ResourceLoader.readFileFromResource(
-                "fhir/valid/kbv/1.1.0/bundle/manipulated/ManipulatedForUnitTestfe9200db-d503-4a1b-bd13-96ab375f9bab.xml"));
+    kbvErpBundle = KbvErpBundleFaker.builder().fake();
   }
 
   @AfterEach

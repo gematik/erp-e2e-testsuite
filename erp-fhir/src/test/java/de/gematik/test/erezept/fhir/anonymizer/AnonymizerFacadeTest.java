@@ -39,12 +39,14 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class AnonymizerFacadeTest extends ErpFhirParsingTest {
 
+  private static final String PATH =
+      "fhir/valid/kbv/1.4.4/Beispiel_70_TRp_Flag_true_Dos_existant_Positiv.xml";
+
   @ParameterizedTest
   @MethodSource
   void shouldAnonymizeCompleteBundle(String path, AnonymizationType type, MaskingStrategy blacker) {
     val content = ResourceLoader.readFileFromResource(path);
     val bundle = parser.decode(KbvErpBundle.class, content);
-
     val anonymizer = new AnonymizerFacade(type, blacker);
 
     val anonymization = assertDoesNotThrow(() -> anonymizer.anonymize(bundle));
@@ -53,22 +55,13 @@ class AnonymizerFacadeTest extends ErpFhirParsingTest {
 
   static Stream<Arguments> shouldAnonymizeCompleteBundle() {
     return Stream.of(
-        Arguments.of(
-            "fhir/valid/kbv/1.1.0/bundle/3a1c45f8-d959-43f0-8ac4-9959be746188.xml",
-            AnonymizationType.REPLACING,
-            new CharReplacementStrategy()),
-        Arguments.of(
-            "fhir/valid/kbv/1.1.0/bundle/3a1c45f8-d959-43f0-8ac4-9959be746188.xml",
-            AnonymizationType.BLACKING,
-            new CharReplacementStrategy()),
-        Arguments.of(
-            "fhir/valid/kbv/1.1.0/bundle/3a1c45f8-d959-43f0-8ac4-9959be746188.xml",
-            AnonymizationType.REPLACING,
-            new BlackingStrategy()));
+        Arguments.of(PATH, AnonymizationType.REPLACING, new CharReplacementStrategy()),
+        Arguments.of(PATH, AnonymizationType.BLACKING, new CharReplacementStrategy()),
+        Arguments.of(PATH, AnonymizationType.REPLACING, new BlackingStrategy()));
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"fhir/valid/kbv/1.1.0/bundle/3a1c45f8-d959-43f0-8ac4-9959be746188.xml"})
+  @ValueSource(strings = {PATH})
   void shouldAnonymizePatient(String path) {
     val content = ResourceLoader.readFileFromResource(path);
     val bundle = parser.decode(KbvErpBundle.class, content);
@@ -98,7 +91,7 @@ class AnonymizerFacadeTest extends ErpFhirParsingTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"fhir/valid/kbv/1.1.0/bundle/3a1c45f8-d959-43f0-8ac4-9959be746188.xml"})
+  @ValueSource(strings = {PATH})
   void shouldAnonymizeWithoutFamilyNameExtensions(String path) {
     val content = ResourceLoader.readFileFromResource(path);
     val bundle = parser.decode(KbvErpBundle.class, content);
@@ -117,7 +110,7 @@ class AnonymizerFacadeTest extends ErpFhirParsingTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"fhir/valid/kbv/1.1.0/bundle/5f66314e-459a-41e9-a3d7-65c935a8be2c.xml"})
+  @ValueSource(strings = {PATH})
   void shouldAnonymizePractitioner(String path) {
     val content = ResourceLoader.readFileFromResource(path);
     val bundle = parser.decode(KbvErpBundle.class, content);

@@ -26,15 +26,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.bbriccs.smartcards.Egk;
-import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.HandleAppAuthentication;
 import de.gematik.test.erezept.app.abilities.UseAndroidApp;
 import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.mobile.PlatformType;
 import de.gematik.test.erezept.app.mobile.elements.Debug;
 import de.gematik.test.erezept.app.task.SetUpDevice;
-import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
+import de.gematik.test.erezept.client.cfg.ErpClientFactory;
+import de.gematik.test.erezept.client.cfg.ErpClientFactoryUtil;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.operator.UIProvider;
@@ -51,16 +50,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(SerenityJUnit5Extension.class)
 class SetUpAndroidDeviceTest extends ErpFhirBuildingTest {
-  private final SmartcardArchive smartcards = SmartcardArchive.fromResources();
-  private Egk egk;
-  private EnvironmentConfiguration environment;
+
+  private ErpClientFactory erpClientFactory;
 
   @BeforeEach
   void init() {
     OnStage.setTheStage(new Cast() {});
-    this.egk = smartcards.getEgk(0);
-    this.environment = new EnvironmentConfiguration();
-    this.environment.setName("TU");
+    this.erpClientFactory = ErpClientFactoryUtil.createMockedErpClientFactory();
   }
 
   @AfterEach
@@ -87,15 +83,16 @@ class SetUpAndroidDeviceTest extends ErpFhirBuildingTest {
   void shouldSetupAndroidDeviceWithVirtualEgk() {
     val theAppUser = createActor();
 
+    val egk = erpClientFactory.getSmartcards().getEgk(0);
     val userConfigAbility = mock(UseConfigurationData.class);
     when(userConfigAbility.getEgkIccsn()).thenReturn(egk.getIccsn());
     when(userConfigAbility.useVirtualEgk()).thenReturn(true);
     theAppUser.can(userConfigAbility);
 
-    SetUpDevice.forEnvironment(environment)
-        .withInsuranceType(InsuranceTypeDe.GKV)
-        .byMappingVirtualEgkFrom(smartcards)
+    SetUpDevice.forInsuranceType(InsuranceTypeDe.GKV)
+        .byMappingVirtualEgkFrom(erpClientFactory)
         .performAs(theAppUser);
+
     val baseData = theAppUser.abilityTo(ProvidePatientBaseData.class);
     val expectedKvnr = egk.getKvnr();
     assertNotNull(baseData);
@@ -121,9 +118,8 @@ class SetUpAndroidDeviceTest extends ErpFhirBuildingTest {
           .when(() -> UIProvider.getQuestionResult("What is the Name on the eGK?"))
           .thenReturn("Alice");
       val task =
-          SetUpDevice.forEnvironment(environment)
-              .withInsuranceType(InsuranceTypeDe.GKV)
-              .byMappingVirtualEgkFrom(smartcards);
+          SetUpDevice.forInsuranceType(InsuranceTypeDe.GKV)
+              .byMappingVirtualEgkFrom(erpClientFactory);
       theAppUser.attemptsTo(task);
     }
 

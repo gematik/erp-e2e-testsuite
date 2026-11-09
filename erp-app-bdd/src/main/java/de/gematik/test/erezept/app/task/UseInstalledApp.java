@@ -23,15 +23,14 @@ package de.gematik.test.erezept.app.task;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.UseConfigurationData;
 import de.gematik.test.erezept.app.abilities.UseIOSApp;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.mobile.elements.DebugSettings;
 import de.gematik.test.erezept.app.mobile.elements.Settings;
 import de.gematik.test.erezept.app.task.ios.SetVirtualEgkOnIOS;
+import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
-import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -44,9 +43,8 @@ import net.serenitybdd.screenplay.Task;
 public class UseInstalledApp implements Task {
 
   private final Actor deviceOwner;
-  private final EnvironmentConfiguration environment;
   private final InsuranceTypeDe insuranceKind;
-  private final SmartcardArchive sca;
+  private final ErpClientFactory erpClientFactory;
 
   @Override
   @Step("{0} erstellt sich ein Benutzerprofil in der App von #deviceOwner")
@@ -60,6 +58,7 @@ public class UseInstalledApp implements Task {
 
     app.tap(Settings.DEBUG_BUTTON);
     // co-user of an App will always use their virtual eGK
+    val sca = erpClientFactory.getSmartcards();
     actor.attemptsTo(SetVirtualEgkOnIOS.withEgk(sca.getEgkByICCSN(userConfig.getEgkIccsn())));
     app.tap(DebugSettings.LEAVE_BUTTON);
 
@@ -75,7 +74,7 @@ public class UseInstalledApp implements Task {
     }
 
     actor.attemptsTo(
-        EquipWithProvidePatientBaseDataAndErpClient.forInput(environment, insuranceKind, sca));
+        EquipWithProvidePatientBaseDataAndErpClient.forInput(insuranceKind, erpClientFactory));
   }
 
   public static Builder ownedBy(Actor deviceOwner) {
@@ -86,7 +85,6 @@ public class UseInstalledApp implements Task {
   public static class Builder {
 
     private final Actor deviceOwner;
-    private EnvironmentConfiguration environment;
     private InsuranceTypeDe insuranceKind;
 
     public Builder withInsuranceType(String insuranceKind) {
@@ -98,14 +96,9 @@ public class UseInstalledApp implements Task {
       return this;
     }
 
-    public Builder forEnvironment(EnvironmentConfiguration environment) {
-      this.environment = environment;
-      return this;
-    }
-
-    public UseInstalledApp byMappingVirtualEgkFrom(SmartcardArchive sca) {
+    public UseInstalledApp byMappingVirtualEgkFrom(ErpClientFactory erpClientFactory) {
       return Instrumented.instanceOf(UseInstalledApp.class)
-          .withProperties(deviceOwner, environment, insuranceKind, sca);
+          .withProperties(deviceOwner, insuranceKind, erpClientFactory);
     }
   }
 }

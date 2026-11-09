@@ -49,35 +49,44 @@ public class PrimSysBddFactory extends ConfiguredFactory {
 
   @Getter private final PrimsysConfigurationDto dto;
   private final SmartcardArchive sca;
+  @Getter private final EnvironmentConfiguration activeEnvironment;
+  private final ErpClientFactory erpClientFactory;
 
   public PrimSysBddFactory(PrimsysConfigurationDto dto, SmartcardArchive sca) {
     this.dto = dto;
     this.sca = sca;
-  }
-
-  public EnvironmentConfiguration getActiveEnvironment() {
-    return this.getConfig(dto.getActiveEnvironment(), dto.getEnvironments());
+    this.activeEnvironment = getConfig(dto.getActiveEnvironment(), dto.getEnvironments());
+    this.erpClientFactory =
+        ErpClientFactory.forEnvironment(activeEnvironment).withSmartcardArchive(sca).build();
   }
 
   public void equipAsDoctor(Actor theDoctor) {
     val name = theDoctor.getName();
-    val cfg = this.getConfig(name, dto.getActors().getDoctors());
-    val smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn());
+    val cfg = getConfig(name, dto.getActors().getDoctors());
     val hba = sca.getHbaByICCSN(cfg.getHbaIccsn());
     val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
+
+    // wire up erp-client with konnektor and SMC-B for external authenticate
+    val erpClientStage = this.erpClientFactory.prepareStagedClientFor(cfg);
+    val smcb = erpClientStage.getSmcb();
 
     val useTheKonnektor =
         UseTheKonnektor.with(smcb)
             .and(hba)
             .and(algorithm)
             .on(instantiateKonnektor(cfg.getKonnektor()));
-    val erpClient = ErpClientFactory.createErpClient(this.getActiveEnvironment(), cfg);
+
+    // as PS we want always to use external authenticate...
+    val erpClient =
+        erpClientStage.createWithExternalAuthentication(
+            () -> useTheKonnektor.getSmcbAuthCertificate().getPayload(),
+            challenge -> useTheKonnektor.externalAuthenticate(challenge).getPayload());
 
     // equip the doctor with abilities
     givenThat(theDoctor)
         .describedAs(cfg.getDescription())
         .whoCan(useTheKonnektor)
-        .can(UseTheErpClient.with(erpClient).authenticatingWith(useTheKonnektor))
+        .can(UseTheErpClient.with(erpClient))
         .can(UseSMCB.itHasAccessTo(smcb))
         .can(ProvideDoctorBaseData.fromConfiguration(cfg, hba.getTelematikId()))
         .can(ManageDoctorsPrescriptions.sheIssued());
@@ -85,18 +94,26 @@ public class PrimSysBddFactory extends ConfiguredFactory {
 
   public void equipAsPharmacy(Actor thePharmacy) {
     val name = thePharmacy.getName();
-    val cfg = this.getConfig(name, dto.getActors().getPharmacies());
-    val smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn());
+    val cfg = getConfig(name, dto.getActors().getPharmacies());
     val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
+
+    // wire up erp-client with konnektor and SMC-B for external authenticate
+    val erpClientStage = this.erpClientFactory.prepareStagedClientFor(cfg);
+    val smcb = erpClientStage.getSmcb();
 
     val useTheKonnektor =
         UseTheKonnektor.with(smcb).and(algorithm).on(instantiateKonnektor(cfg.getKonnektor()));
-    val erpClient = ErpClientFactory.createErpClient(this.getActiveEnvironment(), cfg);
+
+    // as PS we want always to use external authenticate...
+    val erpClient =
+        erpClientStage.createWithExternalAuthentication(
+            () -> useTheKonnektor.getSmcbAuthCertificate().getPayload(),
+            challenge -> useTheKonnektor.externalAuthenticate(challenge).getPayload());
 
     givenThat(thePharmacy)
         .describedAs(cfg.getDescription())
         .whoCan(useTheKonnektor)
-        .can(UseTheErpClient.with(erpClient).authenticatingWith(useTheKonnektor))
+        .can(UseTheErpClient.with(erpClient))
         .can(UseSubscriptionService.use())
         .can(UseSMCB.itHasAccessTo(smcb))
         .can(ManagePharmacyPrescriptions.itWorksWith())
@@ -106,17 +123,25 @@ public class PrimSysBddFactory extends ConfiguredFactory {
 
   public void equipAsKtr(Actor ktr) {
     val name = ktr.getName();
-    val cfg = this.getConfig(name, dto.getActors().getHealthInsurances());
-    val smcb = sca.getSmcbByICCSN(cfg.getSmcbIccsn());
+    val cfg = getConfig(name, dto.getActors().getHealthInsurances());
     val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
+
+    // wire up erp-client with konnektor and SMC-B for external authenticate
+    val erpClientStage = this.erpClientFactory.prepareStagedClientFor(cfg);
+    val smcb = erpClientStage.getSmcb();
 
     val useTheKonnektor =
         UseTheKonnektor.with(smcb).and(algorithm).on(instantiateKonnektor(cfg.getKonnektor()));
-    val erpClient = ErpClientFactory.createErpClient(this.getActiveEnvironment(), cfg);
+
+    // as PS we want always to use external authenticate...
+    val erpClient =
+        erpClientStage.createWithExternalAuthentication(
+            () -> useTheKonnektor.getSmcbAuthCertificate().getPayload(),
+            challenge -> useTheKonnektor.externalAuthenticate(challenge).getPayload());
 
     givenThat(ktr)
         .whoCan(useTheKonnektor)
-        .can(UseTheErpClient.with(erpClient).authenticatingWith(useTheKonnektor))
+        .can(UseTheErpClient.with(erpClient))
         .can(UseSubscriptionService.use())
         .can(UseSMCB.itHasAccessTo(smcb))
         .can(ManagePharmacyPrescriptions.itWorksWith())
@@ -125,7 +150,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
 
   public void equipAsApothecary(Actor theApothecary) {
     val name = theApothecary.getName();
-    val cfg = this.getConfig(name, dto.getActors().getApothecaries());
+    val cfg = getConfig(name, dto.getActors().getApothecaries());
     val hba = sca.getHbaByICCSN(cfg.getHbaIccsn());
     val algorithm = CryptoSystem.fromString(cfg.getAlgorithm());
 
@@ -144,7 +169,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
    */
   public void equipAsPatientForVsdm(Actor thePatient, String insuranceType) {
     val name = thePatient.getName();
-    val cfg = this.getConfig(name, dto.getActors().getPatients());
+    val cfg = getConfig(name, dto.getActors().getPatients());
     val egkConfig =
         sca.getConfigsFor(SmartcardType.EGK).stream()
             .filter(c -> c.getIccsn().equals(cfg.getEgkIccsn()))
@@ -163,8 +188,11 @@ public class PrimSysBddFactory extends ConfiguredFactory {
 
   public void equipAsPatient(Actor thePatient, String insuranceType) {
     val name = thePatient.getName();
-    val cfg = this.getConfig(name, dto.getActors().getPatients());
-    val egk = sca.getEgkByICCSN(cfg.getEgkIccsn());
+    val cfg = getConfig(name, dto.getActors().getPatients());
+
+    val p = erpClientFactory.prepareStagedClientFor(cfg);
+    val erpClient = p.getLeft();
+    val egk = p.getRight();
 
     this.equipAsBasePatient(thePatient, egk, insuranceType);
     givenThat(thePatient)
@@ -173,9 +201,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
                 "Ein {0} Krankenversicherter der E-Rezepte verschrieben bekommt und in Apotheken"
                     + " einlöst",
                 insuranceType))
-        .can(
-            UseTheErpClient.with(ErpClientFactory.createErpClient(this.getActiveEnvironment(), cfg))
-                .authenticatingWith(egk));
+        .can(UseTheErpClient.with(erpClient));
   }
 
   private void equipAsBasePatient(Actor thePatient, Egk egk, String insuranceType) {
@@ -196,7 +222,7 @@ public class PrimSysBddFactory extends ConfiguredFactory {
   }
 
   private Konnektor instantiateKonnektor(String name) {
-    return Konnektor.create(this.getConfig(name, dto.getKonnektors()));
+    return Konnektor.create(getConfig(name, dto.getKonnektors()));
   }
 
   public static PrimSysBddFactory fromDto(PrimsysConfigurationDto dto, SmartcardArchive sca) {

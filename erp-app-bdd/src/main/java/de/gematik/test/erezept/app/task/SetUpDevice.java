@@ -23,14 +23,13 @@ package de.gematik.test.erezept.app.task;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
-import de.gematik.bbriccs.smartcards.SmartcardArchive;
 import de.gematik.test.erezept.app.abilities.UseTheApp;
 import de.gematik.test.erezept.app.mobile.Environment;
 import de.gematik.test.erezept.app.mobile.elements.BottomNav;
 import de.gematik.test.erezept.app.task.android.SetUpAndroidDevice;
 import de.gematik.test.erezept.app.task.ios.SetUpIosDevice;
+import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
-import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -43,9 +42,8 @@ import net.serenitybdd.screenplay.Task;
 public class SetUpDevice implements Task {
 
   private final Environment environment; // required for @Step-Annotation!!
-  private final EnvironmentConfiguration environmentConfiguration;
   private final InsuranceTypeDe insuranceKind;
-  private final SmartcardArchive sca;
+  private final ErpClientFactory erpClientFactory;
 
   @Override
   @Step("{0} installiert als #insuranceKind Patient/in die E-Rezept App für #environment")
@@ -60,35 +58,30 @@ public class SetUpDevice implements Task {
     val platformTask =
         PlatformScreenplayUtil.chooseTaskForPlatform(
             app.getPlatformType(),
-            () -> new SetUpAndroidDevice(insuranceKind, sca),
-            () -> new SetUpIosDevice(environmentConfiguration, insuranceKind, sca));
+            () -> new SetUpAndroidDevice(insuranceKind, erpClientFactory.getSmartcards()),
+            () -> new SetUpIosDevice(insuranceKind, erpClientFactory));
     platformTask.performAs(actor);
 
     app.tap(BottomNav.PRESCRIPTION_BUTTON);
   }
 
-  public static Builder forEnvironment(EnvironmentConfiguration environment) {
-    return new Builder(environment);
+  public static Builder forInsuranceType(String insuranceKind) {
+    return forInsuranceType(InsuranceTypeDe.fromCode(insuranceKind));
+  }
+
+  public static Builder forInsuranceType(InsuranceTypeDe insuranceType) {
+    return new Builder(insuranceType);
   }
 
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
   public static class Builder {
-    private final EnvironmentConfiguration environmentConfiguration;
-    private InsuranceTypeDe insuranceKind;
+    private final InsuranceTypeDe insuranceKind;
 
-    public Builder withInsuranceType(String insuranceKind) {
-      return withInsuranceType(InsuranceTypeDe.fromCode(insuranceKind));
-    }
+    public SetUpDevice byMappingVirtualEgkFrom(ErpClientFactory erpClientFactory) {
+      val environment = Environment.fromString(erpClientFactory.getEnv().getName());
 
-    public Builder withInsuranceType(InsuranceTypeDe insuranceKind) {
-      this.insuranceKind = insuranceKind;
-      return this;
-    }
-
-    public SetUpDevice byMappingVirtualEgkFrom(SmartcardArchive sca) {
-      val environment = Environment.fromString(environmentConfiguration.getName());
       return Instrumented.instanceOf(SetUpDevice.class)
-          .withProperties(environment, environmentConfiguration, insuranceKind, sca);
+          .withProperties(environment, insuranceKind, erpClientFactory);
     }
   }
 }

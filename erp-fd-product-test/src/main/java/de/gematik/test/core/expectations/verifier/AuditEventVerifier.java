@@ -77,7 +77,8 @@ public class AuditEventVerifier {
         auditEventBundle ->
             auditEventBundle.getAuditEvents().stream()
                 .filter(
-                    ae -> ae.getEntity().get(0).getDescription().equals(prescriptionId.getValue()))
+                    ae ->
+                        ae.getPrescriptionId().map(pId -> pId.equals(prescriptionId)).orElse(false))
                 .toList()
                 .stream()
                 .anyMatch(ae -> ae.getFirstText().contains(logContent));
@@ -98,7 +99,8 @@ public class AuditEventVerifier {
         auditEventBundle ->
             auditEventBundle.getAuditEvents().stream()
                 .filter(
-                    ae -> ae.getEntity().get(0).getDescription().equals(prescriptionId.getValue()))
+                    ae ->
+                        ae.getPrescriptionId().map(pId -> pId.equals(prescriptionId)).orElse(false))
                 .toList()
                 .stream()
                 .noneMatch(ae -> ae.getFirstText().contains(logContent));

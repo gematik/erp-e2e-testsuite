@@ -108,6 +108,9 @@ public class ProfileFhirParserFactory {
           ResourceTypeHint.forStructure(ErpWorkflowStructDef.COM_REPLY)
               .forAllVersionsFrom(ErpWorkflowVersion.class)
               .mappingTo(ErxCommunication.class),
+          ResourceTypeHint.forStructure(ErpWorkflowStructDef.COM_DIGA)
+              .forAllVersionsFrom(ErpWorkflowVersion.class)
+              .mappingTo(ErxCommunication.class),
           ResourceTypeHint.forStructure(ErpWorkflowStructDef.COM_REPRESENTATIVE)
               .forAllVersionsFrom(ErpWorkflowVersion.class)
               .mappingTo(ErxCommunication.class),

@@ -23,6 +23,7 @@ package de.gematik.test.erezept.cli.param;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.test.erezept.cli.exceptions.CliException;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import picocli.CommandLine;
@@ -60,9 +61,24 @@ class ExclusiveEgkIdentifierGroupTest {
     assertTrue(eegkip.hasKvnrs());
     assertTrue(eegkip.hasIccsns());
 
-    val chosen = eegkip.getEgks(sca);
+    val chosen = eegkip.getKvnrs(sca);
     assertEquals(2, chosen.size());
-    assertEquals(egk1, chosen.get(0));
-    assertEquals(egk2, chosen.get(1));
+    assertEquals(egk1.getKvnr(), chosen.get(0));
+    assertEquals(egk2.getKvnr(), chosen.get(1));
+  }
+
+  @Test
+  void shouldThrowIfIccsnDoesNotMatchInSmartcardArchive() {
+    val sca = SmartcardArchive.fromResources();
+    val iccsnNotInArchive = "12345678901234567890";
+
+    val eegkip = new ExclusiveEgkIdentifierGroup();
+    val cmdline = new CommandLine(eegkip);
+    assertDoesNotThrow(() -> cmdline.parseArgs("--iccsn", iccsnNotInArchive));
+
+    assertThrows(
+        CliException.class,
+        () -> eegkip.getKvnrs(sca),
+        "Should throw if ICCSN is not found in SmartcardArchive");
   }
 }

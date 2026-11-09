@@ -33,7 +33,7 @@ class ErxMedicationDispenseDiGAFakerTest extends ErpFhirParsingTest {
 
   @Test
   void shouldFakeDiGAMedicationDispense() {
-    val medDispense = ErxMedicationDispenseDiGAFaker.builder(ErpWorkflowVersion.V1_4).fake();
+    val medDispense = ErxMedicationDispenseDiGAFaker.builder(ErpWorkflowVersion.V1_6).fake();
     val result = ValidatorUtil.encodeAndValidate(parser, medDispense);
     assertTrue(result.isSuccessful());
   }
@@ -46,7 +46,7 @@ class ErxMedicationDispenseDiGAFakerTest extends ErpFhirParsingTest {
     val deepLink = "https://gematico.de?redeemCode=DE12345678901234";
 
     val medDispense =
-        ErxMedicationDispenseDiGAFaker.builder(ErpWorkflowVersion.V1_4)
+        ErxMedicationDispenseDiGAFaker.builder(ErpWorkflowVersion.V1_6)
             .withPzn(pzn, digaName)
             .withRedeemCode(redeemCode)
             .withDeepLink(deepLink)

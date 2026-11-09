@@ -21,26 +21,18 @@
 package de.gematik.test.erezept.common;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 
 import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.test.erezept.client.ErpClient;
-import de.gematik.test.erezept.client.cfg.ErpClientFactory;
+import de.gematik.test.erezept.client.cfg.ErpClientFactoryUtil;
 import de.gematik.test.erezept.common.screenplay.abilities.*;
 import de.gematik.test.erezept.config.ConfigurationReader;
-import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
-import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.screenplay.abilities.*;
 import lombok.val;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
-import net.serenitybdd.screenplay.actors.Cast;
-import net.serenitybdd.screenplay.actors.OnStage;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import net.serenitybdd.screenplay.Actor;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -49,88 +41,64 @@ import org.junit.jupiter.params.provider.EnumSource;
 @ExtendWith(SerenityJUnit5Extension.class)
 class PrimSysBddFactoryTest extends ErpFhirParsingTest {
 
-  private SmartcardArchive sca;
-  private PrimSysBddFactory factory;
+  private static final SmartcardArchive SMARTCARD_ARCHIVE = SmartcardArchive.fromResources();
+  private static PrimSysBddFactory factory;
 
-  @BeforeEach
-  void setup() {
-    OnStage.setTheStage(new Cast() {});
-    sca = SmartcardArchive.fromResources();
+  @BeforeAll
+  static void setupFactory() {
+    val cfg = ConfigurationReader.forPrimSysConfiguration().create();
     factory =
-        ConfigurationReader.forPrimSysConfiguration()
-            .wrappedBy(dto -> PrimSysBddFactory.fromDto(dto, sca));
-  }
-
-  @AfterEach
-  void tearDown() {
-    OnStage.drawTheCurtain();
+        ErpClientFactoryUtil.callInMockedStaticContext(
+            cfg,
+            SMARTCARD_ARCHIVE,
+            parser,
+            () -> PrimSysBddFactory.fromDto(cfg, SMARTCARD_ARCHIVE));
   }
 
   @Test
   void shouldEquipAsDoctor() {
-    val name = factory.getDto().getActors().getDoctors().get(0).getName();
-    val doctor = OnStage.theActorCalled(name);
+    val name = factory.getDto().getActors().getDoctors().getFirst().getName();
+    val doctor = new Actor(name);
 
-    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
-      val erpClient = mock(ErpClient.class);
-      erpClientFactoryMockedStatic
-          .when(() -> ErpClientFactory.createErpClient(any(), any(PsActorConfiguration.class)))
-          .thenReturn(erpClient);
-
-      assertDoesNotThrow(() -> factory.equipAsDoctor(doctor));
-      assertNotNull(doctor.abilityTo(UseTheKonnektor.class));
-      assertNotNull(doctor.abilityTo(UseTheErpClient.class));
-      assertNotNull(doctor.abilityTo(ProvideDoctorBaseData.class));
-      assertNotNull(doctor.abilityTo(ManageDoctorsPrescriptions.class));
-    }
+    assertDoesNotThrow(() -> factory.equipAsDoctor(doctor));
+    assertNotNull(doctor.abilityTo(UseTheKonnektor.class));
+    assertNotNull(doctor.abilityTo(UseTheErpClient.class));
+    assertNotNull(doctor.abilityTo(ProvideDoctorBaseData.class));
+    assertNotNull(doctor.abilityTo(ManageDoctorsPrescriptions.class));
   }
 
   @Test
   void shouldEquipAsPharmacy() {
-    val name = factory.getDto().getActors().getPharmacies().get(0).getName();
-    val pharmacy = OnStage.theActorCalled(name);
+    val name = factory.getDto().getActors().getPharmacies().getFirst().getName();
+    val pharmacy = new Actor(name);
 
-    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
-      val erpClient = mock(ErpClient.class);
-      erpClientFactoryMockedStatic
-          .when(() -> ErpClientFactory.createErpClient(any(), any(PsActorConfiguration.class)))
-          .thenReturn(erpClient);
-
-      assertDoesNotThrow(() -> factory.equipAsPharmacy(pharmacy));
-      assertNotNull(pharmacy.abilityTo(UseTheKonnektor.class));
-      assertNotNull(pharmacy.abilityTo(UseTheErpClient.class));
-      assertNotNull(pharmacy.abilityTo(UseSubscriptionService.class));
-      assertNotNull(pharmacy.abilityTo(UseSMCB.class));
-      assertNotNull(pharmacy.abilityTo(ManagePharmacyPrescriptions.class));
-      assertNotNull(pharmacy.abilityTo(ManageCommunications.class));
-      assertNotNull(pharmacy.abilityTo(ProvideApoVzdInformation.class));
-    }
+    assertDoesNotThrow(() -> factory.equipAsPharmacy(pharmacy));
+    assertNotNull(pharmacy.abilityTo(UseTheKonnektor.class));
+    assertNotNull(pharmacy.abilityTo(UseTheErpClient.class));
+    assertNotNull(pharmacy.abilityTo(UseSubscriptionService.class));
+    assertNotNull(pharmacy.abilityTo(UseSMCB.class));
+    assertNotNull(pharmacy.abilityTo(ManagePharmacyPrescriptions.class));
+    assertNotNull(pharmacy.abilityTo(ManageCommunications.class));
+    assertNotNull(pharmacy.abilityTo(ProvideApoVzdInformation.class));
   }
 
   @Test
   void shouldEquipAsKtrInstitution() {
-    val name = factory.getDto().getActors().getHealthInsurances().get(0).getName();
-    val lei = OnStage.theActorCalled(name);
+    val name = factory.getDto().getActors().getHealthInsurances().getFirst().getName();
+    val lei = new Actor(name);
 
-    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
-      val erpClient = mock(ErpClient.class);
-      erpClientFactoryMockedStatic
-          .when(() -> ErpClientFactory.createErpClient(any(), any(PsActorConfiguration.class)))
-          .thenReturn(erpClient);
-
-      assertDoesNotThrow(() -> factory.equipAsKtr(lei));
-      assertNotNull(lei.abilityTo(UseTheKonnektor.class));
-      assertNotNull(lei.abilityTo(UseTheErpClient.class));
-      assertNotNull(lei.abilityTo(UseSMCB.class));
-      assertNotNull(lei.abilityTo(ManagePharmacyPrescriptions.class));
-      assertNotNull(lei.abilityTo(ManageCommunications.class));
-    }
+    assertDoesNotThrow(() -> factory.equipAsKtr(lei));
+    assertNotNull(lei.abilityTo(UseTheKonnektor.class));
+    assertNotNull(lei.abilityTo(UseTheErpClient.class));
+    assertNotNull(lei.abilityTo(UseSMCB.class));
+    assertNotNull(lei.abilityTo(ManagePharmacyPrescriptions.class));
+    assertNotNull(lei.abilityTo(ManageCommunications.class));
   }
 
   @Test
   void shouldEquipAsApothecary() {
-    val name = factory.getDto().getActors().getApothecaries().get(0).getName();
-    val apothecary = OnStage.theActorCalled(name);
+    val name = factory.getDto().getActors().getApothecaries().getFirst().getName();
+    val apothecary = new Actor(name);
 
     assertDoesNotThrow(() -> factory.equipAsApothecary(apothecary));
     assertNotNull(apothecary.abilityTo(UseTheKonnektor.class));
@@ -141,30 +109,23 @@ class PrimSysBddFactoryTest extends ErpFhirParsingTest {
       value = InsuranceTypeDe.class,
       names = {"GKV", "PKV"})
   void shouldEquipAsGkvPatient(InsuranceTypeDe insuranceType) {
-    val name = factory.getDto().getActors().getPatients().get(0).getName();
-    val patient = OnStage.theActorCalled(name);
+    val name = factory.getDto().getActors().getPatients().getFirst().getName();
+    val patient = new Actor(name);
 
-    try (val erpClientFactoryMockedStatic = mockStatic(ErpClientFactory.class)) {
-      val erpClient = mock(ErpClient.class);
-      erpClientFactoryMockedStatic
-          .when(() -> ErpClientFactory.createErpClient(any(), any(PatientConfiguration.class)))
-          .thenReturn(erpClient);
+    assertDoesNotThrow(() -> factory.equipAsPatient(patient, insuranceType.getCode()));
+    assertNotNull(patient.abilityTo(UseTheErpClient.class));
+    assertNotNull(patient.abilityTo(ProvideEGK.class));
+    assertNotNull(patient.abilityTo(ManageDataMatrixCodes.class));
+    assertNotNull(patient.abilityTo(ReceiveDispensedDrugs.class));
+    assertNotNull(patient.abilityTo(ProvidePatientBaseData.class));
+    assertNotNull(patient.abilityTo(ManagePatientPrescriptions.class));
+    assertNotNull(patient.abilityTo(ManageCommunications.class));
+    assertNotNull(patient.abilityTo(DecideUserBehaviour.class));
 
-      assertDoesNotThrow(() -> factory.equipAsPatient(patient, insuranceType.getCode()));
-      assertNotNull(patient.abilityTo(UseTheErpClient.class));
-      assertNotNull(patient.abilityTo(ProvideEGK.class));
-      assertNotNull(patient.abilityTo(ManageDataMatrixCodes.class));
-      assertNotNull(patient.abilityTo(ReceiveDispensedDrugs.class));
-      assertNotNull(patient.abilityTo(ProvidePatientBaseData.class));
-      assertNotNull(patient.abilityTo(ManagePatientPrescriptions.class));
-      assertNotNull(patient.abilityTo(ManageCommunications.class));
-      assertNotNull(patient.abilityTo(DecideUserBehaviour.class));
-
-      if (insuranceType.equals(InsuranceTypeDe.PKV)) {
-        assertNotNull(patient.abilityTo(ManageChargeItems.class));
-      } else {
-        assertNull(patient.abilityTo(ManageChargeItems.class));
-      }
+    if (insuranceType.equals(InsuranceTypeDe.PKV)) {
+      assertNotNull(patient.abilityTo(ManageChargeItems.class));
+    } else {
+      assertNull(patient.abilityTo(ManageChargeItems.class));
     }
   }
 
@@ -173,8 +134,8 @@ class PrimSysBddFactoryTest extends ErpFhirParsingTest {
       value = InsuranceTypeDe.class,
       names = {"GKV", "PKV"})
   void shouldEquipAsGkvPatientForVsdm(InsuranceTypeDe insuranceType) {
-    val name = factory.getDto().getActors().getPatients().get(0).getName();
-    val patient = OnStage.theActorCalled(name);
+    val name = factory.getDto().getActors().getPatients().getFirst().getName();
+    val patient = new Actor(name);
 
     assertDoesNotThrow(() -> factory.equipAsPatientForVsdm(patient, insuranceType.getCode()));
 

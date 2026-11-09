@@ -23,7 +23,6 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import static de.gematik.test.erezept.fhir.profiles.systems.ErpWorkflowNamingSystem.ORDER_ID;
 
 import de.gematik.test.erezept.fhir.profiles.definitions.ErpWorkflowStructDef;
-import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.r4.erp.CommunicationType;
 import de.gematik.test.erezept.fhir.r4.erp.ErxCommunication;
 import java.util.List;
@@ -55,19 +54,14 @@ public class ErxComDispReqBuilder extends ErxComPrescriptionBuilder<ErxComDispRe
             s ->
                 com.setSender(
                     CommunicationType.DISP_REQ.getSenderReference(s, this.erpWorkflowVersion)));
-
     Optional.ofNullable(orderId).ifPresent(oid -> com.addIdentifier(ORDER_ID.asIdentifier(oid)));
+    com.addExtension(flowType.asExtension());
 
-    if (this.erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4) >= 0) {
-      com.addExtension(flowType.asExtension());
-    }
     return com;
   }
 
   private void checkRequired() {
-    if (this.erpWorkflowVersion.compareTo(ErpWorkflowVersion.V1_4) >= 0) {
-      this.checkRequired(
-          flowType, "A Dispense Request Communication requires a Flow-Type of the Prescription");
-    }
+    this.checkRequired(
+        flowType, "A Dispense Request Communication requires a Flow-Type of the Prescription");
   }
 }

@@ -67,11 +67,6 @@ public class ActorsController {
     log.info("GET actor with ID {}", actorId);
     return ctx.getActors().stream()
         .filter(actor -> actor.getIdentifier().equals(actorId))
-        .peek(
-            actor -> {
-              log.info("Refresh IDP Token for actor {}", actor.getActorInfo().getId());
-              actor.getClient().refreshIdpToken();
-            })
         .map(BaseActor::getActorSummary)
         .findFirst()
         .orElseThrow(

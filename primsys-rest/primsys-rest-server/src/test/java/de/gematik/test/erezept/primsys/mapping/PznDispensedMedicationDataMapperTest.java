@@ -31,9 +31,9 @@ import org.junitpioneer.jupiter.SetSystemProperty;
 
 class PznDispensedMedicationDataMapperTest extends ErpFhirParsingTest {
 
-  @SetSystemProperty(key = "erp.fhir.profile", value = "1.4.0")
+  @SetSystemProperty(key = "erp.fhir.profile", value = "1.6.0")
   @RepeatedTest(value = 5)
-  void shouldGenerateRandomlyProfileVersion_1_4_() {
+  void shouldGenerateRandomlyProfileVersion_1_6_0() {
     val mapper = PznDispensedMedicationDataMapper.random();
     val medicationDispense = mapper.convert(GemErpMedicationFaker.forPznMedication().fake());
     val vr = ValidatorUtil.encodeAndValidate(parser, medicationDispense);

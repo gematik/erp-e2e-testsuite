@@ -31,17 +31,18 @@ import org.junit.jupiter.api.Test;
 class ErxAuditEventBundleRelationsTest extends ErpFhirParsingTest {
 
   private static final String VALID_BUNDLE_PATH =
-      "fhir/valid/erp/1.4.0/auditeventbundle/f9c1d812-1ccb-4e4e-b62c-4d51a67ea4b7.json";
-  private static final String INVALID_BUNDLE_PATH = "fhir/invalid/erp/AuditEventBundle.json";
+      "fhir/valid/erp/1.6.0/xml/auditEvent/auditEventBundleByFD.xml";
+  private static final String INVALID_BUNDLE_PATH =
+      "fhir/invalid/erp/1.6/auditEvents/AuditEventBundleByFD.xml";
   private static ErxAuditEventBundle erxAuditEventBundle;
-  private static ErxAuditEventBundle invaliErxAuditEventBundle;
+  private static ErxAuditEventBundle invalidErxAuditEventBundle;
 
   @BeforeAll
   static void prepare() {
     erxAuditEventBundle =
         parser.decode(
             ErxAuditEventBundle.class, ResourceLoader.readFileFromResource(VALID_BUNDLE_PATH));
-    invaliErxAuditEventBundle =
+    invalidErxAuditEventBundle =
         parser.decode(
             ErxAuditEventBundle.class, ResourceLoader.readFileFromResource(INVALID_BUNDLE_PATH));
   }
@@ -73,27 +74,27 @@ class ErxAuditEventBundleRelationsTest extends ErpFhirParsingTest {
 
   @Test
   void shouldDetectNoNextRelation() {
-    assertFalse(invaliErxAuditEventBundle.hasNextRelation());
+    assertFalse(invalidErxAuditEventBundle.hasNextRelation());
   }
 
   @Test
   void shouldDetectNoPreviousRelation() {
-    assertFalse(invaliErxAuditEventBundle.hasPreviousRelation());
+    assertFalse(invalidErxAuditEventBundle.hasPreviousRelation());
   }
 
   @Test
   void shouldDetectNoFirstRelation() {
-    assertFalse(invaliErxAuditEventBundle.hasFirstRelation());
+    assertFalse(invalidErxAuditEventBundle.hasFirstRelation());
   }
 
   @Test
   void shouldDetectNoLastRelation() {
-    assertFalse(invaliErxAuditEventBundle.hasLastRelation());
+    assertFalse(invalidErxAuditEventBundle.hasLastRelation());
   }
 
   @Test
   void shouldDetectNoSelfRelation() {
-    assertFalse(invaliErxAuditEventBundle.hasSelfRelation());
+    assertFalse(invalidErxAuditEventBundle.hasSelfRelation());
   }
 
   @Test
@@ -119,7 +120,7 @@ class ErxAuditEventBundleRelationsTest extends ErpFhirParsingTest {
   @Test
   void shouldDetectOffsetCorrectAtNonsense() {
     assertEquals(
-        Optional.empty(), invaliErxAuditEventBundle.getOffsetValueOfRelationLink("nonsense"));
+        Optional.empty(), invalidErxAuditEventBundle.getOffsetValueOfRelationLink("nonsense"));
   }
 
   @Test

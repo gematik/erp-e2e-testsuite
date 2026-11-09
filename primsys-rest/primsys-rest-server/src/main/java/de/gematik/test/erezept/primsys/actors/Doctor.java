@@ -23,14 +23,15 @@ package de.gematik.test.erezept.primsys.actors;
 import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.cardterminal.CardInfo;
+import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.konnektor.Konnektor;
 import de.gematik.bbriccs.konnektor.requests.GetCardHandleRequest;
 import de.gematik.bbriccs.konnektor.requests.SignXMLDocumentRequest;
 import de.gematik.bbriccs.smartcards.Hba;
-import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.test.erezept.config.dto.actor.DoctorConfiguration;
-import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
+import de.gematik.bbriccs.smartcards.SmcB;
+import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.fhir.r4.kbv.KbvBaseBundle;
+import de.gematik.test.erezept.primsys.data.actors.ActorType;
 import de.gematik.test.erezept.primsys.data.actors.DoctorDto;
 import de.gematik.test.erezept.primsys.data.actors.DoctorNumber;
 import lombok.Getter;
@@ -42,13 +43,15 @@ public class Doctor extends BaseActor {
   private final CardInfo hbaHandle;
 
   public Doctor(
-      DoctorConfiguration cfg,
-      EnvironmentConfiguration env,
-      Konnektor konnektor,
-      SmartcardArchive sca) {
-    super(cfg, env, konnektor, sca);
+      String name,
+      SmcB smcb,
+      Hba hba,
+      ErpClient client,
+      CryptoSystem algorithm,
+      Konnektor konnektor) {
+    super(ActorType.DOCTOR, name, smcb, client, algorithm, konnektor);
 
-    this.hba = sca.getHbaByICCSN(cfg.getHbaIccsn());
+    this.hba = hba;
     this.hbaHandle = konnektor.execute(GetCardHandleRequest.forSmartcard(hba)).getPayload();
   }
 

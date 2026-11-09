@@ -45,7 +45,7 @@ class ErpTPrescriptionCarbonCopyTest extends ErpFhirParsingTest {
     erpTPrescriptionCarbonCopy = new ErpTPrescriptionCarbonCopy();
     erpTPrescriptionCarbonCopy
         .getMeta()
-        .addProfile(GemErpTPrescStructDef.CARBON_COPY.getVersionedUrl(TPrescrVersion.V1_1));
+        .addProfile(GemErpTPrescStructDef.CARBON_COPY.getVersionedUrl(TPrescrVersion.V1_2));
     erpTPrescriptionCarbonCopy.addParameter("rxPrescription", 0);
     erpTPrescriptionCarbonCopy.addParameter("rxDispensation", 1);
     erpTPrescriptionCarbonCopy

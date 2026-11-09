@@ -30,12 +30,11 @@ import org.junit.jupiter.api.Test;
 
 class ErxTaskBundleTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH_1_4 = "fhir/valid/erp/1.4.0/tasksearchbundle/";
+  private static final String PATH = "fhir/valid/erp/1.6.0/xml/taskbundlesearchset/fromFD.xml";
 
   @Test
   void shouldGetAllTasksFromBundle() {
-    val fileName = "TaskSearchBundle_01.json";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
+    val content = ResourceLoader.readFileFromResource(PATH);
     val bundle = parser.decode(ErxTaskBundle.class, content);
 
     assertNotNull(bundle, "Valid ErxTaskBundle must be parseable");
@@ -44,12 +43,11 @@ class ErxTaskBundleTest extends ErpFhirParsingTest {
 
   @Test
   void shouldGetLatestTask() {
-    val fileName = "TaskSearchBundle_01.json";
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_4 + fileName);
+    val content = ResourceLoader.readFileFromResource(PATH);
     val bundle = parser.decode(ErxTaskBundle.class, content);
 
     assertNotNull(bundle, "Valid ErxTaskBundle must be parseable");
     val latestTask = bundle.getLatestTask();
-    assertEquals("160.000.103.086.734.08", latestTask.getPrescriptionId().getValue());
+    assertEquals("200.000.000.276.367.29", latestTask.getPrescriptionId().getValue());
   }
 }

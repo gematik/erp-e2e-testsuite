@@ -50,6 +50,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class GemOperationInputParameterBuilderTest extends ErpFhirParsingTest {
 
+  ErpWorkflowVersion version = ErpWorkflowVersion.V1_6;
+
   @Test
   void shouldNotInstantiateUtilityClass() {
     assertTrue(
@@ -73,7 +75,6 @@ class GemOperationInputParameterBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldBuildCloseOperationForMultipleDiGAMedicationDispense() {
-    val version = ErpWorkflowVersion.V1_4;
 
     val medDispense = ErxMedicationDispenseDiGAFaker.builder(version).fake();
     val medDispense2 = ErxMedicationDispenseDiGAFaker.builder(version).fake();
@@ -93,7 +94,6 @@ class GemOperationInputParameterBuilderTest extends ErpFhirParsingTest {
   @MethodSource("pharmaceuticalsParameterBuilderProvider")
   void shouldBuildInputOperationParametersForPharmaceuticalMedicationDispense(
       Supplier<GemDispenseCloseOperationPharmaceuticalsBuilder<?>> builderSupplier) {
-    val version = ErpWorkflowVersion.V1_4;
 
     val medication = GemErpMedicationFaker.forPznMedication(version).fake();
     val medDispense = ErxMedicationDispenseFaker.builder(version).withMedication(medication).fake();
@@ -109,7 +109,6 @@ class GemOperationInputParameterBuilderTest extends ErpFhirParsingTest {
   @MethodSource("pharmaceuticalsParameterBuilderProvider")
   void shouldBuildInputOperationParametersForSplittedPharmaceuticalMedicationDispense(
       Supplier<GemDispenseCloseOperationPharmaceuticalsBuilder<?>> builderSupplier) {
-    val version = ErpWorkflowVersion.V1_4;
 
     val builder = builderSupplier.get();
 
@@ -130,8 +129,6 @@ class GemOperationInputParameterBuilderTest extends ErpFhirParsingTest {
 
   @Test
   void shouldBuildEmptyCloseOperationForPharmaceuticals() {
-    val version = ErpWorkflowVersion.getDefaultVersion();
-
     val closeOperation =
         GemOperationInputParameterBuilder.forClosingPharmaceuticals().version(version).build();
 

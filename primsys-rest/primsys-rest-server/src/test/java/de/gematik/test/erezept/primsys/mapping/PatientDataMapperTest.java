@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
+import de.gematik.test.erezept.fhir.profiles.version.KbvItaForVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import lombok.val;
 import org.junit.jupiter.api.RepeatedTest;
@@ -46,7 +47,7 @@ class PatientDataMapperTest extends ErpFhirBuildingTest {
 
   @RepeatedTest(5)
   void shouldNotMissAnyFields() {
-    val patient = KbvPatientFaker.builder().fake();
+    val patient = KbvPatientFaker.builder(KbvItaForVersion.V1_3_0).fake();
     val mapper = PatientDataMapper.from(patient);
     val dto = mapper.getDto();
 

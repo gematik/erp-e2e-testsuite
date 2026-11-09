@@ -24,33 +24,31 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
 import de.gematik.test.core.StopwatchProvider;
-import de.gematik.test.erezept.actions.MockActorsUtils;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.ErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.eu.EuConsentGetCommand;
 import de.gematik.test.erezept.fhir.r4.eu.EuConsentBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class EuReadConsentTest extends ErpFhirBuildingTest {
-  private ErpClient erpClientMock;
-  private MockActorsUtils mockUtil;
-  private PatientActor patientActor;
 
   @BeforeEach
   void setup() {
     StopwatchProvider.init();
-    mockUtil = new MockActorsUtils();
-    this.erpClientMock = mockUtil.erpClientMock;
-    this.patientActor = mockUtil.actorStage.getPatientNamed("Leonie Hütter");
   }
 
   @Test
   void shouldReadConsentSuccessfully() {
-    val response = mockUtil.createErpResponse(new EuConsentBundle(), EuConsentBundle.class, 200);
-    when(erpClientMock.request(any(EuConsentGetCommand.class))).thenReturn(response);
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
+    val response =
+        ErpResponseUtil.createErpResponse(new EuConsentBundle(), EuConsentBundle.class, 200);
+    when(patientClient.request(any(EuConsentGetCommand.class))).thenReturn(response);
 
     assertDoesNotThrow(() -> patientActor.performs(EuReadConsent.forOneSelf()));
   }

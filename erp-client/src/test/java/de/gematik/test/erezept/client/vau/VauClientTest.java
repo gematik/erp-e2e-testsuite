@@ -73,7 +73,7 @@ class VauClientTest {
     try (val unirestMock = mockStatic(Unirest.class, Answers.RETURNS_DEEP_STUBS)) {
       unitRestMock = mock(UnirestInstance.class, Answers.RETURNS_DEEP_STUBS);
       when(Unirest.spawnInstance()).thenReturn(unitRestMock);
-      return new VauClient(fdBaseUrl, clientType, vauCertificate, xApiKey, userAgent);
+      return new VauClient(fdBaseUrl, vauCertificate, xApiKey, userAgent);
     }
   }
 
@@ -206,8 +206,7 @@ class VauClientTest {
 
   @Test
   void shouldThrowOnMissingTlsContext() {
-    val vauClient =
-        new VauClient("https://erp", ClientType.PS, vauCertificate, "testApiKey", "testAgent");
+    val vauClient = new VauClient("https://erp", vauCertificate, "testApiKey", "testAgent");
 
     try (val mockSslContext = mockStatic(SSLContext.class)) {
       mockSslContext

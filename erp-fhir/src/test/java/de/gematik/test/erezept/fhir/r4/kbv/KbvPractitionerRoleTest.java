@@ -20,9 +20,7 @@
 
 package de.gematik.test.erezept.fhir.r4.kbv;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.utils.ResourceLoader;
@@ -32,14 +30,14 @@ import org.junit.jupiter.api.Test;
 
 class KbvPractitionerRoleTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH_1_1 = "fhir/valid/kbv_evdga/1.1/";
+  private static final String BASE_PATH_1_2 = "fhir/valid/kbv_evdga/1.2/";
 
   @Test
   void shouldGetAsvTeamNumber() {
-    val bundleName = "EVDGA_Bundle_Krankenhaus";
+    val bundleName = "EVDGA_Bundle_Krankenhaus_Standortnummer";
     val fileName = bundleName + ".xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_2 + fileName);
     val bundle = parser.decode(KbvEvdgaBundle.class, content);
     val practitionerRole = bundle.getPractitionerRole().orElseThrow();
 
@@ -49,10 +47,10 @@ class KbvPractitionerRoleTest extends ErpFhirParsingTest {
 
   @Test
   void shouldThrowOnMissingTeamNumber01() {
-    val bundleName = "EVDGA_Bundle_Krankenhaus";
+    val bundleName = "EVDGA_Bundle_Krankenhaus_Standortnummer";
     val fileName = bundleName + ".xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_2 + fileName);
     val bundle = parser.decode(KbvEvdgaBundle.class, content);
     val practitionerRole = bundle.getPractitionerRole().orElseThrow();
 
@@ -62,10 +60,10 @@ class KbvPractitionerRoleTest extends ErpFhirParsingTest {
 
   @Test
   void shouldThrowOnMissingTeamNumber02() {
-    val bundleName = "EVDGA_Bundle_Krankenhaus";
+    val bundleName = "EVDGA_Bundle_Krankenhaus_Standortnummer";
     val fileName = bundleName + ".xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_1 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_2 + fileName);
     val bundle = parser.decode(KbvEvdgaBundle.class, content);
     val practitionerRole = bundle.getPractitionerRole().orElseThrow();
 

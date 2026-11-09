@@ -20,11 +20,7 @@
 
 package de.gematik.test.erezept.fhir.r4.erp;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.coding.exceptions.MissingFieldException;
 import de.gematik.bbriccs.utils.ResourceLoader;
@@ -34,35 +30,36 @@ import org.junit.jupiter.api.Test;
 
 class ErxChargeItemBundleTest extends ErpFhirParsingTest {
 
-  private final String basePathValid = "fhir/valid/erp/1.4.0/chargeitembundle/";
+  private final String basePathValid = "fhir/valid/erp/1.6.0/xml/charhgeitembundle/";
 
   @Test
   void getChargeItemAsPharmacy() {
-    val fileName = "bundle_02.xml";
+
+    val fileName = "ChargeItemBundleByApiDescription.xml";
 
     val content = ResourceLoader.readFileFromResource(basePathValid + fileName);
     val bundle = parser.decode(ErxChargeItemBundle.class, content);
     assertNotNull(bundle, "Valid ErxTaskBundle must be parseable");
     assertNotNull(bundle.getChargeItem());
-    assertEquals("200.086.824.605.539.20", bundle.getChargeItem().getPrescriptionId().getValue());
+    assertEquals("200.000.000.000.000.01", bundle.getChargeItem().getPrescriptionId().getValue());
     assertTrue(bundle.getChargeItem().getAccessCode().isEmpty());
     assertDoesNotThrow(bundle::getAbgabedatenBundle);
   }
 
   @Test
   void getChargeItemAsPatient() {
-    val fileName = "bundle_01.json";
+    val fileName = "ChargeItemByFDWithAddedIds.xml";
 
     val content = ResourceLoader.readFileFromResource(basePathValid + fileName);
     val bundle = parser.decode(ErxChargeItemBundle.class, content);
     assertNotNull(bundle, "Valid ErxTaskBundle must be parseable");
     assertNotNull(bundle.getChargeItem());
-    assertEquals("200.000.003.355.048.35", bundle.getChargeItem().getPrescriptionId().getValue());
+    assertEquals("200.000.003.746.556.84", bundle.getChargeItem().getPrescriptionId().getValue());
     assertEquals(
-        "418e5b1acff2b9133cfabbdee9bd80a10b88a9a609b203f046b442a2bbdffb4c",
+        "5702e3a8e80944b196bcd371c370cdba94c2b32f35bfce54dd6f86bd05f83c8e",
         bundle.getChargeItem().getAccessCode().orElseThrow().getValue());
     assertEquals(
-        "urn:uuid:c8a83133-0000-0000-0003-000000000000",
+        "urn:uuid:c8fc2a39-0000-0000-0003-000000000000",
         bundle.getChargeItem().getReceiptReference().orElseThrow());
     assertTrue(bundle.getReceipt().isPresent());
   }

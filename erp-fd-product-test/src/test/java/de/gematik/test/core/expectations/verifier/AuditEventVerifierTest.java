@@ -22,7 +22,6 @@ package de.gematik.test.core.expectations.verifier;
 
 import static de.gematik.test.core.expectations.verifier.AuditEventVerifier.*;
 import static de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil.createErxAuditEvent;
-import static net.serenitybdd.screenplay.GivenWhenThen.givenThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -32,16 +31,12 @@ import de.gematik.bbriccs.vsdm.VsdmExamEvidenceResult;
 import de.gematik.bbriccs.vsdm.VsdmService;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
-import de.gematik.test.erezept.ErpFdTestsuiteFactory;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.actors.PharmacyActor;
-import de.gematik.test.erezept.common.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEvent.Representation;
 import de.gematik.test.erezept.fhir.r4.erp.ErxAuditEventBundle;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import de.gematik.test.erezept.fhir.testutil.ErxFhirTestResourceUtil;
 import de.gematik.test.erezept.fhir.values.PrescriptionId;
-import de.gematik.test.erezept.screenplay.abilities.ProvideEGK;
+import de.gematik.test.utils.ActorMockUtil;
 import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -56,62 +51,58 @@ import org.junit.jupiter.params.provider.EnumSource;
 class AuditEventVerifierTest extends ErpFhirParsingTest {
 
   private static final String AUDIT_EVENT_BUNDLE_PATH_FROM_XML =
-      "fhir/valid/erp/1.4.0/auditeventbundle/561f4a7e-0616-4c92-b6d5-91217aea136f.xml";
+      "fhir/valid/erp/1.6.0/xml/auditEvent/AEBByFD58c1f701-c3b4-416b-b32d-381ec396d194.xml";
   private static final String AUDIT_EVENT_BUNDLE_PATH_FROM_JSON =
-      "fhir/valid/erp/1.4.0/auditeventbundle/561f4a7e-0616-4c92-b6d5-91217aea136f.json";
-  private PatientActor patient;
+      "fhir/valid/erp/1.6.0/json/auditEventBundle/AEBByFD58c1f701-c3b4-416b-b32d-381ec396d194.json";
 
-  private PharmacyActor pharmacy;
-
-  private ErxAuditEventBundle firstErxAuditEventBundle;
-  private ErxAuditEventBundle secondErxAuditEventBundle;
+  private final ErxAuditEventBundle firstErxAuditEventBundle =
+      getDecodedFromPath(ErxAuditEventBundle.class, AUDIT_EVENT_BUNDLE_PATH_FROM_XML);
+  private final ErxAuditEventBundle secondErxAuditEventBundle =
+      getDecodedFromPath(ErxAuditEventBundle.class, AUDIT_EVENT_BUNDLE_PATH_FROM_JSON);
 
   @BeforeEach
   void setupReporter() {
     CoverageReporter.getInstance().startTestcase("not needed");
     StopwatchProvider.init();
-    val config = ErpFdTestsuiteFactory.create();
-    pharmacy = new PharmacyActor("Am Flughafen");
-    val pharmacyConfig = config.getPharmacyConfig(pharmacy.getName());
-    val smcb = config.getSmcbByICCSN(pharmacyConfig.getSmcbIccsn());
-    val useSmcb = UseSMCB.itHasAccessTo(smcb);
-    pharmacy.can(useSmcb);
-
-    patient = new PatientActor("Hanna Bäcker");
-    val patientConfig = config.getPatientConfig(patient.getName());
-    val egk = config.getEgkByICCSN(patientConfig.getEgkIccsn());
-    givenThat(patient).can(ProvideEGK.sheOwns(egk));
-    firstErxAuditEventBundle =
-        getDecodedFromPath(ErxAuditEventBundle.class, AUDIT_EVENT_BUNDLE_PATH_FROM_XML);
-    secondErxAuditEventBundle =
-        getDecodedFromPath(ErxAuditEventBundle.class, AUDIT_EVENT_BUNDLE_PATH_FROM_JSON);
   }
 
   @ParameterizedTest
   @EnumSource(Representation.class)
   void shouldDetectAllRepresentations(Representation rep) {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+
     val checksum =
-        VsdmExamEvidence.asOnlineMode(VsdmService.instantiateWithTestKey(), patient.getEgk())
+        VsdmExamEvidence.asOnlineMode(VsdmService.instantiateWithTestKey(), patientActor.getEgk())
             .build(VsdmExamEvidenceResult.NO_UPDATES)
             .getCheckDigit()
             .orElseThrow();
 
-    val verifier = AuditEventVerifier.forPharmacy(pharmacy).withChecksum(checksum).build();
+    val verifier = AuditEventVerifier.forPharmacy(pharmacyActor).withChecksum(checksum).build();
     val testData =
         ErxFhirTestResourceUtil.createErxAuditEventBundle(
-            pharmacy.getTelematikId(), pharmacy.getCommonName());
+            pharmacyActor.getTelematikId(), pharmacyActor.getCommonName());
     verifier.contains(rep, Instant.now()).apply(testData);
   }
 
   @Test
   void shouldFailWhileDetectingWithEmptyAuditEventBundle() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+
     val checksum =
-        VsdmExamEvidence.asOnlineMode(VsdmService.instantiateWithTestKey(), patient.getEgk())
+        VsdmExamEvidence.asOnlineMode(VsdmService.instantiateWithTestKey(), patientActor.getEgk())
             .build(VsdmExamEvidenceResult.NO_UPDATES)
             .getCheckDigit()
             .orElseThrow();
 
-    val verifier = AuditEventVerifier.forPharmacy(pharmacy).withChecksum(checksum).build();
+    val verifier = AuditEventVerifier.forPharmacy(pharmacyActor).withChecksum(checksum).build();
 
     val testData = new ErxAuditEventBundle();
 
@@ -121,13 +112,19 @@ class AuditEventVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldFailWhileDetectingWithWrongAuditEventBundle() {
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+
     val checksum =
-        VsdmExamEvidence.asOnlineMode(VsdmService.instantiateWithTestKey(), patient.getEgk())
+        VsdmExamEvidence.asOnlineMode(VsdmService.instantiateWithTestKey(), patientActor.getEgk())
             .build(VsdmExamEvidenceResult.NO_UPDATES)
             .getCheckDigit()
             .orElseThrow();
 
-    val verifier = AuditEventVerifier.forPharmacy(pharmacy).withChecksum(checksum).build();
+    val verifier = AuditEventVerifier.forPharmacy(pharmacyActor).withChecksum(checksum).build();
     val erxAuditEventBundle = new ErxAuditEventBundle();
     erxAuditEventBundle.addEntry(
         new Bundle.BundleEntryComponent()
@@ -160,9 +157,9 @@ class AuditEventVerifierTest extends ErpFhirParsingTest {
   void shouldVerifyContainedText() {
     val step =
         bundleContainsLogFor(
-            PrescriptionId.from("160.000.006.746.135.23"),
-            "Praxis Blôch-BauerTEST-ONLY hat das Rezept mit der ID\n"
-                + "                        160.000.006.746.135.23 eingestellt.");
+            PrescriptionId.from("160.000.006.746.134.26"),
+            "Apotheke am FlughafenTEST-ONLY hat das Rezept mit der ID\n"
+                + "                        160.000.006.746.134.26 angenommen.");
     assertDoesNotThrow(() -> step.apply(firstErxAuditEventBundle));
   }
 
@@ -187,9 +184,9 @@ class AuditEventVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldNotContainLogForAnotherPrescriptionId() {
-    val prescriptionId = PrescriptionId.from("160.000.023.898.863.48");
+    val prescriptionId = PrescriptionId.from("160.123.456.789.123.58");
     val logContent =
-        "Die Löschinformation zum E-Rezept konnte nicht in die Patientenakte übermittelt werden.";
+        "Ihre Apotheke um die Ecke,Hauptstraße 1 hat ein E-Rezept 160.123.456.789.123.58 beliefert";
     val step = bundleDoesNotContainLogFor(prescriptionId, logContent);
 
     assertDoesNotThrow(() -> step.apply(secondErxAuditEventBundle));

@@ -36,10 +36,9 @@ class DeleteChargeItemByIdTest extends ErpFhirBuildingTest {
 
   @Test
   void shouldPerformCorrectCommand() {
-    PatientActor patient;
     CoverageReporter.getInstance().startTestcase("don't care");
-    // init pharmacy
-    patient = new PatientActor("Sina Hüllmann");
+
+    val patient = new PatientActor("Sina Hüllmann");
     UseTheErpClient useErpClient = mock(UseTheErpClient.class);
     patient.can(useErpClient);
     val action = DeleteChargeItemById.withId(PrescriptionId.random());

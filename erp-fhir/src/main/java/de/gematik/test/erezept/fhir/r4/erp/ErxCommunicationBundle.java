@@ -49,4 +49,9 @@ public class ErxCommunicationBundle extends ErxBundle {
         .filter(com -> com.getRecipientId().equals(receiverId))
         .toList();
   }
+
+  @Override
+  public String toString() {
+    return "ErxCommunicationBundle{" + "communications=" + this.getEntry().size() + '}';
+  }
 }

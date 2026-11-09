@@ -22,12 +22,12 @@ package de.gematik.test.erezept.cli.cmd;
 
 import de.gematik.bbriccs.smartcards.Egk;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.test.erezept.cli.cfg.ConfigurationFactory;
 import de.gematik.test.erezept.cli.param.EgkParameter;
 import de.gematik.test.erezept.cli.param.EnvironmentParameter;
 import de.gematik.test.erezept.cli.printer.ResourcePrinter;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.client.cfg.ErpClientFactory;
+import de.gematik.test.erezept.config.dto.actor.PatientConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
 import java.util.concurrent.Callable;
 import lombok.val;
@@ -44,14 +44,16 @@ public abstract class BaseRemoteCommand implements Callable<Integer> {
   @Override
   public final Integer call() {
     val sca = SmartcardArchive.fromResources();
-    val egks = egkParameter.getEgks(sca);
     val env = this.getEnvironment();
+    val factory = ErpClientFactory.forEnvironment(env).withSmartcardArchive(sca).build();
 
-    egks.forEach(
-        egk -> {
-          val patientConfig = ConfigurationFactory.createPatientConfigurationFor(egk);
-          val erpClient = ErpClientFactory.createErpClient(env, patientConfig);
-          erpClient.authenticateWith(egk);
+    val kvnrs = egkParameter.getKvnrs(sca);
+    kvnrs.forEach(
+        kvnr -> {
+          val p = factory.prepareStagedClientFor(createPatientConfigurationFor(kvnr));
+
+          val erpClient = p.getLeft();
+          val egk = p.getRight();
           this.performFor(egk, erpClient);
         });
     return 0;
@@ -66,4 +68,12 @@ public abstract class BaseRemoteCommand implements Callable<Integer> {
   }
 
   public abstract void performFor(Egk egk, ErpClient erpClient);
+
+  public static PatientConfiguration createPatientConfigurationFor(String kvnr) {
+    val pcfg = new PatientConfiguration();
+    //    pcfg.setName(egk.getOwnerData().getGivenName());
+    pcfg.setFhirValidator("NONE");
+    pcfg.setKvnr(kvnr);
+    return pcfg;
+  }
 }

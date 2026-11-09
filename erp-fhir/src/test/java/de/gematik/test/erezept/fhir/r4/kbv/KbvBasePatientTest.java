@@ -20,26 +20,27 @@
 
 package de.gematik.test.erezept.fhir.r4.kbv;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import de.gematik.bbriccs.utils.ResourceLoader;
+import de.gematik.bbriccs.fhir.de.value.KVNR;
+import de.gematik.bbriccs.fhir.de.valueset.InsuranceTypeDe;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvErpBundleFaker;
+import de.gematik.test.erezept.fhir.builder.kbv.KbvPatientFaker;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
 class KbvBasePatientTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH = "fhir/valid/kbv/1.1.0/patient/";
-
   @Test
   void encodeErwinFischer() {
     val expectedID = "93866fdc-3e50-4902-a7e9-891b54737b5e";
-    val fileName = expectedID + ".xml";
-
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
-    val patient = parser.decode(KbvPatient.class, content);
+    val patient =
+        KbvPatientFaker.builder()
+            .withName("Ludger", "Königsstein")
+            .withKvnrAndInsuranceType(KVNR.from("K220635158"), InsuranceTypeDe.GKV)
+            .fake();
+    patient.setId(expectedID);
     assertNotNull(patient);
 
     assertEquals(expectedID, patient.getLogicalId());
@@ -53,11 +54,9 @@ class KbvBasePatientTest extends ErpFhirParsingTest {
 
   @Test
   void shouldGetKbvPatientFromResource() {
-    val expectedID = "93866fdc-3e50-4902-a7e9-891b54737b5e";
-    val fileName = expectedID + ".xml";
+    val bundle = KbvErpBundleFaker.builder().fake();
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
-    val patient = parser.decode(content);
+    val patient = bundle.getPatient();
     assertNotNull(patient);
     assertEquals(KbvPatient.class, patient.getClass());
 

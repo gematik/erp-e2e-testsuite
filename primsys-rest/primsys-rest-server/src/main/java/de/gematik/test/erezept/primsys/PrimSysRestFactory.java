@@ -20,8 +20,10 @@
 
 package de.gematik.test.erezept.primsys;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.konnektor.Konnektor;
 import de.gematik.bbriccs.smartcards.SmartcardArchive;
+import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.config.dto.ConfiguredFactory;
 import de.gematik.test.erezept.config.dto.actor.PsActorConfiguration;
 import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
@@ -32,40 +34,72 @@ import de.gematik.test.erezept.primsys.actors.Pharmacy;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 @Slf4j
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class PrimSysRestFactory extends ConfiguredFactory {
 
   private final PrimsysConfigurationDto dto;
+  private final ErpClientFactory erpClientFactory;
   private final SmartcardArchive sca;
 
+  private PrimSysRestFactory(PrimsysConfigurationDto dto, ErpClientFactory erpClientFactory) {
+    this.dto = dto;
+    this.erpClientFactory = erpClientFactory;
+    this.sca = erpClientFactory.getSmartcards();
+  }
+
   public EnvironmentConfiguration getActiveEnvironment() {
-    return this.getConfig(dto.getActiveEnvironment(), dto.getEnvironments());
+    return getConfig(dto.getActiveEnvironment(), dto.getEnvironments());
   }
 
   public List<Doctor> createDoctorActors() {
-    val activeEnv = this.getActiveEnvironment();
     return dto.getActors().getDoctors().stream()
-        .map(d -> new Doctor(d, activeEnv, instantiateKonnektor(d), sca))
+        .map(
+            d -> {
+              val name = d.getName();
+              val builder = erpClientFactory.prepareStagedClientFor(d);
+              val smcb = builder.getSmcb();
+              val hba = sca.getHbaByICCSN(d.getHbaIccsn());
+              val client = builder.createWithSmcBAuthentication();
+              val cs = CryptoSystem.fromString(d.getAlgorithm());
+              val kon = instantiateKonnektor(d);
+
+              return new Doctor(name, smcb, hba, client, cs, kon);
+            })
         .toList();
   }
 
   public List<Pharmacy> createPharmacyActors() {
-    val activeEnv = this.getActiveEnvironment();
     return dto.getActors().getPharmacies().stream()
-        .map(d -> new Pharmacy(d, activeEnv, instantiateKonnektor(d), sca))
+        .map(
+            d -> {
+              val name = d.getName();
+              val builder = erpClientFactory.prepareStagedClientFor(d);
+              val smcb = builder.getSmcb();
+              val client = builder.createWithSmcBAuthentication();
+              val cs = CryptoSystem.fromString(d.getAlgorithm());
+              val kon = instantiateKonnektor(d);
+
+              return new Pharmacy(name, smcb, client, cs, kon);
+            })
         .toList();
   }
 
   public List<HealthInsurance> createHealthInsuranceActors() {
-    val activeEnv = this.getActiveEnvironment();
     return dto.getActors().getHealthInsurances().stream()
-        .map(d -> new HealthInsurance(d, activeEnv, instantiateKonnektor(d), sca))
+        .map(
+            d -> {
+              val name = d.getName();
+              val builder = erpClientFactory.prepareStagedClientFor(d);
+              val smcb = builder.getSmcb();
+              val client = builder.createWithSmcBAuthentication();
+              val cs = CryptoSystem.fromString(d.getAlgorithm());
+              val kon = instantiateKonnektor(d);
+
+              return new HealthInsurance(name, smcb, client, cs, kon);
+            })
         .toList();
   }
 
@@ -75,10 +109,18 @@ public class PrimSysRestFactory extends ConfiguredFactory {
 
   private Konnektor instantiateKonnektorClient(@Nullable String name) {
     val konName = Optional.ofNullable(name).orElse("Soft-Konn");
-    return Konnektor.create(this.getConfig(konName, dto.getKonnektors()));
+    return Konnektor.create(getConfig(konName, dto.getKonnektors()));
   }
 
   public static PrimSysRestFactory fromDto(PrimsysConfigurationDto dto, SmartcardArchive sca) {
-    return new PrimSysRestFactory(dto, sca);
+    val activeEnv = getConfig(dto.getActiveEnvironment(), dto.getEnvironments());
+    val erpClientFactory =
+        ErpClientFactory.forEnvironment(activeEnv).withSmartcardArchive(sca).build();
+    return from(dto, erpClientFactory);
+  }
+
+  public static PrimSysRestFactory from(
+      PrimsysConfigurationDto dto, ErpClientFactory erpClientFactory) {
+    return new PrimSysRestFactory(dto, erpClientFactory);
   }
 }

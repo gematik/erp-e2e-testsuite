@@ -52,7 +52,7 @@ public class InfoResponseBuilder {
     val ti = new TelematikInfoDto();
     ti.setEnvironment(ctx.getEnvironment().getName());
     ti.setFachdienst(ctx.getEnvironment().getTi().getFdBaseUrl());
-    ti.setDiscoveryDocument(ctx.getEnvironment().getTi().getDiscoveryDocumentUrl());
+    ti.setDiscoveryDocument(ctx.getEnvironment().getTi().getIdp().getDiscoveryDocument());
     ti.setTsl(ctx.getEnvironment().getTi().getTslBaseUrl());
     info.setTi(ti);
 

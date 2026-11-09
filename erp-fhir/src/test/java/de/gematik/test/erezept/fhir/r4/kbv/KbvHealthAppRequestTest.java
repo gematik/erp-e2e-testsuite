@@ -20,11 +20,7 @@
 
 package de.gematik.test.erezept.fhir.r4.kbv;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.date.DateConverter;
@@ -38,14 +34,14 @@ import org.junit.jupiter.api.Test;
 
 class KbvHealthAppRequestTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH_1_0_0 = "fhir/valid/kbv_evdga/1.1/";
+  private static final String BASE_PATH_1_2_0 = "fhir/valid/kbv_evdga/1.2/";
 
   @Test
   void shouldGetHealthAppRequestFromBundle() {
     val expectedID = "EVDGA_Bundle";
     val fileName = expectedID + ".xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_0_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_2_0 + fileName);
     val bundle = parser.decode(KbvEvdgaBundle.class, content);
     val appRequest = bundle.getHealthAppRequest();
     assertNotNull(appRequest);
@@ -63,7 +59,7 @@ class KbvHealthAppRequestTest extends ErpFhirParsingTest {
     val expectedID = "EVDGA_Bundle_BG_Arbeitsunfall_3";
     val fileName = expectedID + ".xml";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_0_0 + fileName);
+    val content = ResourceLoader.readFileFromResource(BASE_PATH_1_2_0 + fileName);
     val bundle = parser.decode(KbvEvdgaBundle.class, content);
     val appRequest = bundle.getHealthAppRequest();
     assertNotNull(appRequest);

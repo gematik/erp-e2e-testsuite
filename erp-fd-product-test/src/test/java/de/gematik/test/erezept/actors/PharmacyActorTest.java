@@ -23,13 +23,12 @@ package de.gematik.test.erezept.actors;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.test.core.StopwatchProvider;
-import de.gematik.test.erezept.ErpFdTestsuiteFactory;
-import de.gematik.test.erezept.common.screenplay.abilities.UseSMCB;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.values.json.CommunicationPayloadValidation;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage.PaymentMethod;
 import de.gematik.test.erezept.fhir.valuesets.DeliveryStatus;
 import de.gematik.test.erezept.fhir.valuesets.ReadyForCollecting;
+import de.gematik.test.utils.ActorMockUtil;
 import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
@@ -48,15 +47,12 @@ class PharmacyActorTest {
   @Test
   void shouldProvideCorrectData() {
     StopwatchProvider.init();
-    val config = ErpFdTestsuiteFactory.create();
-    val pharmacy = new PharmacyActor("Am Flughafen");
-    val pharmacyConfig = config.getPharmacyConfig(pharmacy.getName());
-    val smcb = config.getSmcbByICCSN(pharmacyConfig.getSmcbIccsn());
 
-    val useSmcb = UseSMCB.itHasAccessTo(smcb);
-    pharmacy.can(useSmcb);
-    assertNotNull(pharmacy.getCommonName());
-    assertNotNull(pharmacy.getTelematikId());
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+
+    assertNotNull(pharmacyActor.getCommonName());
+    assertNotNull(pharmacyActor.getTelematikId());
   }
 
   @Test

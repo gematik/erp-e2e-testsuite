@@ -20,27 +20,25 @@
 
 package de.gematik.test.erezept.primsys.actors;
 
+import de.gematik.bbriccs.crypto.CryptoSystem;
 import de.gematik.bbriccs.konnektor.Konnektor;
 import de.gematik.bbriccs.konnektor.requests.GetCardHandleRequest;
 import de.gematik.bbriccs.konnektor.requests.ReadVsdRequest;
 import de.gematik.bbriccs.konnektor.requests.SignXMLDocumentRequest;
 import de.gematik.bbriccs.smartcards.Egk;
-import de.gematik.bbriccs.smartcards.SmartcardArchive;
-import de.gematik.test.erezept.config.dto.actor.PharmacyConfiguration;
-import de.gematik.test.erezept.config.dto.erpclient.EnvironmentConfiguration;
+import de.gematik.bbriccs.smartcards.SmcB;
+import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.fhir.builder.dav.PharmacyOrganizationFaker;
 import de.gematik.test.erezept.fhir.r4.dav.PharmacyOrganization;
+import de.gematik.test.erezept.primsys.data.actors.ActorType;
 import java.util.Base64;
 import lombok.val;
 
 public class Pharmacy extends BaseActor {
 
   public Pharmacy(
-      PharmacyConfiguration cfg,
-      EnvironmentConfiguration env,
-      Konnektor konnektor,
-      SmartcardArchive sca) {
-    super(cfg, env, konnektor, sca);
+      String name, SmcB smcb, ErpClient client, CryptoSystem algorithm, Konnektor konnektor) {
+    super(ActorType.PHARMACY, name, smcb, client, algorithm, konnektor);
   }
 
   public byte[] signDocument(String document) {

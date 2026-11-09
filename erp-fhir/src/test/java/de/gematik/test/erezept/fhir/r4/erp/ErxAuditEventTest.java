@@ -21,10 +21,7 @@
 package de.gematik.test.erezept.fhir.r4.erp;
 
 import static java.text.MessageFormat.format;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.EncodingType;
 import de.gematik.bbriccs.fhir.de.DeBasisProfilNamingSystem;
@@ -39,7 +36,7 @@ import org.junit.jupiter.api.Test;
 
 class ErxAuditEventTest extends ErpFhirParsingTest {
 
-  private final String BASE_PATH = "fhir/valid/erp/1.4.0/auditevent/";
+  private static final String BASE_PATH = "fhir/valid/erp/1.6.0/xml/auditEvent/";
 
   @Test
   void representationTextDoesNotThrow() {
@@ -48,7 +45,7 @@ class ErxAuditEventTest extends ErpFhirParsingTest {
 
   @Test
   void shouldEncodeSingleAuditEvent() {
-    val fileName = "9361863d-fec0-4ba9-8776-7905cf1b0cfa.json";
+    val fileName = "AuditEvent-9361863d-fec0-4ba9-8776-7905cf1b0cfa.json.xml";
     val originalEncoding = EncodingType.JSON;
     val flippedEncoding = originalEncoding.flipEncoding();
 

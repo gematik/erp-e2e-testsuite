@@ -22,6 +22,7 @@ package de.gematik.test.erezept;
 
 import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_CONFIG;
 import static de.gematik.test.erezept.fhir.parser.ProfileFhirParserFactory.ERP_FHIR_PROFILES_TOGGLE;
+import static java.text.MessageFormat.format;
 
 import de.gematik.bbriccs.fhir.conf.ProfilesConfigurator;
 import de.gematik.bbriccs.toggle.FeatureConfiguration;
@@ -41,9 +42,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public abstract class ErpTest {
 
   protected static final FeatureConfiguration featureConf = new FeatureConfiguration();
-
-  protected final ActorStage stage;
   protected final ErpFdTestsuiteFactory config;
+  protected final ActorStage stage;
 
   protected ErpTest() {
     this.stage = new ActorStage();
@@ -164,13 +164,22 @@ public abstract class ErpTest {
   @SneakyThrows
   @SuppressWarnings({"java:S3011", "unchecked"})
   private void instrumentActorField(Field field) {
-    val name = field.getAnnotation(Actor.class).name();
 
     Class<? extends ErpActor> actorType;
     if (!field.getType().getSuperclass().equals(ErpActor.class)) {
       throw new NotAnActorException(field);
     } else {
       actorType = (Class<? extends ErpActor>) field.getType();
+    }
+
+    val name = field.getAnnotation(Actor.class).name();
+
+    // name is optional for PatientActor but not the other actors
+    if (name.isBlank() && !actorType.equals(PatientActor.class)) {
+      throw new IllegalArgumentException(
+          format(
+              "Actor ''{0}'' is missing a name. Please provide a name via @Actor(name = \"NAME\")",
+              actorType.getSimpleName()));
     }
 
     val actor = stage.instrumentNewActor(actorType, name);

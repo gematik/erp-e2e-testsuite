@@ -23,6 +23,7 @@ package de.gematik.test.erezept.config.dto;
 import de.gematik.bbriccs.cfg.NamedConfigurationElement;
 import de.gematik.test.erezept.config.exceptions.ConfigurationMappingException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This base class is required to mark BaseConfigurationWrappers (and restrict for the
@@ -31,10 +32,13 @@ import java.util.List;
  */
 public abstract class ConfiguredFactory {
 
-  protected <T extends NamedConfigurationElement> T getConfig(String name, List<T> configs) {
-    return configs.stream()
-        .filter(actor -> actor.getName().equalsIgnoreCase(name))
-        .findFirst()
+  protected static <T extends NamedConfigurationElement> T getConfig(String name, List<T> configs) {
+    return getConfigOptionally(name, configs)
         .orElseThrow(() -> new ConfigurationMappingException(name, configs));
+  }
+
+  protected static <T extends NamedConfigurationElement> Optional<T> getConfigOptionally(
+      String name, List<T> configs) {
+    return configs.stream().filter(actor -> actor.getName().equalsIgnoreCase(name)).findFirst();
   }
 }

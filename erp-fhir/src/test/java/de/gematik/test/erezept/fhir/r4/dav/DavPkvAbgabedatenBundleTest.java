@@ -20,9 +20,7 @@
 
 package de.gematik.test.erezept.fhir.r4.dav;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.utils.ResourceLoader;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
@@ -38,7 +36,7 @@ import org.junit.jupiter.api.Test;
 
 class DavPkvAbgabedatenBundleTest extends ErpFhirParsingTest {
 
-  private final String BASE_PATH = "fhir/valid/dav/";
+  private static final String BASE_PATH = "fhir/valid/dav/";
 
   @Test
   void testEncodeSingleValidBundle() {
@@ -80,7 +78,7 @@ class DavPkvAbgabedatenBundleTest extends ErpFhirParsingTest {
 
   @Test
   void shouldDecodeWithoutExpectedType() {
-    val expectedID = "ad80703d-8c62-44a3-b12b-2ea66eda0aa2";
+    val expectedID = "f548dde3-a319-486b-8624-6176ff41ad90";
     val fileName = expectedID + ".xml";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
@@ -91,7 +89,7 @@ class DavPkvAbgabedatenBundleTest extends ErpFhirParsingTest {
 
   @Test
   void shouldCastFromResource() {
-    val expectedID = "ad80703d-8c62-44a3-b12b-2ea66eda0aa2";
+    val expectedID = "f548dde3-a319-486b-8624-6176ff41ad90";
     val fileName = expectedID + ".xml";
 
     val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);

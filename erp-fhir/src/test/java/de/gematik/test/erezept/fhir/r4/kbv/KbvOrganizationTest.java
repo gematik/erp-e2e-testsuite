@@ -32,23 +32,21 @@ import org.junit.jupiter.api.Test;
 
 class KbvOrganizationTest extends ErpFhirParsingTest {
 
-  private static final String BASE_PATH = "fhir/valid/kbv/1.1.0/bundle/";
+  private static final String PATH =
+      "fhir/valid/kbv/1.4.4/Beispiel_70_TRp_Flag_true_Dos_existant_Positiv.xml";
 
   @Test
   void testEncodingOrganizationFromKbvBundle() {
-    val kbvId = "5a3458b0-8364-4682-96e2-b262b2ab16eb";
-    val fileName = kbvId + ".xml";
-
-    val expBsnr = new BSNR("724444400");
-    val expName = "Hausarztpraxis";
-    val expPhone = "030321654987";
-    val expMail = "hausarztpraxis@e-mail.de";
+    val expBsnr = new BSNR("723333300");
+    val expName = "Praxis für Psychiatrie und Psychotherapie";
+    val expPhone = "030369258147";
+    val expMail = "therapiepraxis@e-mail.de";
     val expCity = "Berlin";
     val expPostal = "10623";
     val expCountry = Country.D;
-    val expStreet = "Herbert-Lewin-Platz 2 Erdgeschoss";
+    val expStreet = "Herbert-Lewin-Platz 2";
 
-    val content = ResourceLoader.readFileFromResource(BASE_PATH + fileName);
+    val content = ResourceLoader.readFileFromResource(PATH);
     val kbvBundle = parser.decode(KbvErpBundle.class, content);
     val organization = kbvBundle.getMedicalOrganization();
 

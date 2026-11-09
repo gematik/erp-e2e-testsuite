@@ -41,6 +41,7 @@ import de.gematik.test.erezept.app.task.SetUpDevice;
 import de.gematik.test.erezept.app.task.SetVirtualEgk;
 import de.gematik.test.erezept.app.task.SkipOnboarding;
 import de.gematik.test.erezept.app.task.UseInstalledApp;
+import de.gematik.test.erezept.client.cfg.ErpClientFactory;
 import de.gematik.test.erezept.common.PrimSysBddFactory;
 import de.gematik.test.erezept.common.screenplay.abilities.ManageDataMatrixCodes;
 import de.gematik.test.erezept.common.screenplay.util.SafeAbility;
@@ -64,6 +65,7 @@ public class AppInitializationSteps {
   private static SmartcardArchive smartcards;
   private static ErpAppConfiguration config;
   private static PrimSysBddFactory primsysConfig;
+  private static ErpClientFactory erpClientFactory;
   /* the actor who is responsible for reporting the test result to the LDF */
   private Actor testReporter;
 
@@ -77,6 +79,11 @@ public class AppInitializationSteps {
     primsysConfig =
         ConfigurationReader.forPrimSysConfiguration()
             .wrappedBy(dto -> PrimSysBddFactory.fromDto(dto, smartcards));
+
+    erpClientFactory =
+        ErpClientFactory.forEnvironment(primsysConfig.getActiveEnvironment())
+            .withSmartcardArchive(smartcards)
+            .build();
   }
 
   @Before
@@ -131,9 +138,7 @@ public class AppInitializationSteps {
     // walk through onboarding
     givenThat(theAppUser)
         .attemptsTo(
-            SetUpDevice.forEnvironment(primsysConfig.getActiveEnvironment())
-                .withInsuranceType(insuranceType)
-                .byMappingVirtualEgkFrom(smartcards));
+            SetUpDevice.forInsuranceType(insuranceType).byMappingVirtualEgkFrom(erpClientFactory));
   }
 
   @Angenommen(
@@ -155,9 +160,8 @@ public class AppInitializationSteps {
     givenThat(theAppUser)
         .attemptsTo(
             UseInstalledApp.ownedBy(deviceOwner)
-                .forEnvironment(primsysConfig.getActiveEnvironment())
                 .withInsuranceType(insuranceType)
-                .byMappingVirtualEgkFrom(smartcards));
+                .byMappingVirtualEgkFrom(erpClientFactory));
   }
 
   @Angenommen(

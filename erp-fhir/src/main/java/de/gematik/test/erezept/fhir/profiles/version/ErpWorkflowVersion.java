@@ -29,7 +29,6 @@ import lombok.experimental.Accessors;
 @Getter
 @RequiredArgsConstructor
 public enum ErpWorkflowVersion implements ProfileVersion {
-  V1_4("1.4.3"),
   V1_5("1.5.2"),
   V1_6("1.6.2"),
   ;

@@ -28,9 +28,10 @@ import de.gematik.bbriccs.fhir.fuzzing.impl.log.FuzzingSessionLogbook;
 import de.gematik.test.core.StopwatchProvider;
 import de.gematik.test.erezept.ErpInteraction;
 import de.gematik.test.erezept.actions.ErpAction;
-import de.gematik.test.erezept.actions.MockActorsUtils;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.TaskCreateCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxTask;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import net.serenitybdd.screenplay.Actor;
 import org.hl7.fhir.r4.model.Bundle;
@@ -58,9 +59,10 @@ class UseHapiFuzzerTest {
   @ValueSource(booleans = {true, false})
   void shouldUseFuzzerWhenApplied(boolean shouldThrowOnReporting) {
     StopwatchProvider.init();
-    val mockUtil = new MockActorsUtils();
-    val actorStage = mockUtil.actorStage;
-    val pharmacyActor = actorStage.getPharmacyNamed("Stadtapotheke");
+
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+    val pharmacyClient = pharmacyMock.getRight();
 
     val sessionLogbook = mock(FuzzingSessionLogbook.class);
     if (shouldThrowOnReporting) {
@@ -74,8 +76,8 @@ class UseHapiFuzzerTest {
     pharmacyActor.can(UseHapiFuzzer.withFuzzingEngine(engine));
 
     val payload = new ErxTask();
-    val res = mockUtil.createErpResponse(payload, ErxTask.class);
-    when(mockUtil.erpClientMock.request(any(TaskCreateCommand.class))).thenReturn(res);
+    val res = ErpResponseUtil.createErpResponse(payload, ErxTask.class);
+    when(pharmacyClient.request(any(TaskCreateCommand.class))).thenReturn(res);
 
     assertDoesNotThrow(() -> pharmacyActor.performs(new TestErpAction()));
     verify(engine, times(1)).fuzz(any(Parameters.class));

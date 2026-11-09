@@ -23,26 +23,14 @@ package de.gematik.test.erezept.fhir.builder.erp;
 import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.builder.exceptions.BuilderException;
-import de.gematik.bbriccs.fhir.de.value.ASK;
-import de.gematik.test.erezept.eml.fhir.builder.componentbuilder.GemEpaIngredientComponentBuilder;
 import de.gematik.test.erezept.eml.fhir.valuesets.EpaDrugCategory;
 import de.gematik.test.erezept.fhir.builder.GemFaker;
 import de.gematik.test.erezept.fhir.profiles.version.ErpWorkflowVersion;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirParsingTest;
 import lombok.val;
-import org.hl7.fhir.r4.model.Medication;
-import org.hl7.fhir.r4.model.Quantity;
 import org.junit.jupiter.api.Test;
 
 class GemErpMedFreeTextBuilderTest extends ErpFhirParsingTest {
-
-  Medication.MedicationIngredientComponent ingredient =
-      GemEpaIngredientComponentBuilder.builder()
-          .ask(ASK.from("askCode"))
-          .ingredientStrength(new Quantity(3), new Quantity(1), "ml")
-          .darreichungsform("im Einer")
-          .ingredientCodingText("falls kein Code zur Hand hier was passendes rein schreiben")
-          .build();
 
   @Test
   void shouldBuildMedicationWithCodeText() {
@@ -91,7 +79,7 @@ class GemErpMedFreeTextBuilderTest extends ErpFhirParsingTest {
   void shouldBuildMedicationWithAllAvailableValues() {
     val builder = GemErpMedicationBuilder.forFreeText();
 
-    val version = ErpWorkflowVersion.V1_4;
+    val version = ErpWorkflowVersion.V1_6;
     val category = EpaDrugCategory.C_00;
     val lotNumber = "TestLotNumber";
     val codeText = "TestCodeText";
@@ -110,7 +98,7 @@ class GemErpMedFreeTextBuilderTest extends ErpFhirParsingTest {
 
     assertNotNull(medication);
 
-    assertTrue(medication.getMeta().getProfile().get(0).getValue().endsWith("1.4"));
+    assertTrue(medication.getMeta().getProfile().get(0).getValue().endsWith("1.6"));
     assertEquals(category, medication.getCategory().orElseThrow());
     assertTrue(medication.isVaccine());
     assertEquals(lotNumber, medication.getBatch().getLotNumber());

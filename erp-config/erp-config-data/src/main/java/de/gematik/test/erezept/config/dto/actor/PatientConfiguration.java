@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 public class PatientConfiguration extends BaseActorConfiguration {
 
   private String egkIccsn;
+  private String kvnr; // kvnr and iccsn is mutually exclusive, only one of them should be set
 
   // overrides the xml-defaults from ActorConfiguration
   private String acceptMime = "application/fhir+json";

@@ -25,33 +25,29 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import de.gematik.test.core.StopwatchProvider;
-import de.gematik.test.erezept.actors.PatientActor;
-import de.gematik.test.erezept.client.ErpClient;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.ConsentGetCommand;
 import de.gematik.test.erezept.fhir.r4.erp.ErxConsentBundle;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ReadConsentTest {
-  private ErpClient erpClientMock;
-  private MockActorsUtils mockUtil;
-
-  private PatientActor patientActor;
 
   @BeforeEach
   void init() {
     StopwatchProvider.init();
-    this.mockUtil = new MockActorsUtils();
-    val actorStage = mockUtil.actorStage;
-    this.erpClientMock = mockUtil.erpClientMock;
-    patientActor = actorStage.getPatientNamed("Leonie Hütter");
   }
 
   @Test
   void shouldGetConsent() {
-    val mockResponse = mockUtil.createErpResponse(null, ErxConsentBundle.class, 200);
-    when(erpClientMock.request(any(ConsentGetCommand.class))).thenReturn(mockResponse);
+    val patientMock = ActorMockUtil.createRandomPatient();
+    val patientActor = patientMock.getLeft();
+    val patientClient = patientMock.getRight();
+
+    val mockResponse = ErpResponseUtil.createErpResponse(null, ErxConsentBundle.class, 200);
+    when(patientClient.request(any(ConsentGetCommand.class))).thenReturn(mockResponse);
     assertDoesNotThrow(() -> patientActor.performs(ReadConsent.forOneSelf()));
   }
 }

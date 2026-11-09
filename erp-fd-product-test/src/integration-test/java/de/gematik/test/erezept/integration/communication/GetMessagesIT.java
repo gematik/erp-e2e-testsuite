@@ -20,9 +20,7 @@
 
 package de.gematik.test.erezept.integration.communication;
 
-import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.containsCommunicationWithId;
-import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.containsCountOfCommunication;
-import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.onlySenderWith;
+import static de.gematik.test.core.expectations.verifier.CommunicationBundleVerifier.*;
 import static de.gematik.test.core.expectations.verifier.CommunicationVerifier.emptyReceivedElement;
 import static de.gematik.test.core.expectations.verifier.CommunicationVerifier.presentReceivedElement;
 import static de.gematik.test.core.expectations.verifier.ErpResponseVerifier.returnCode;
@@ -55,8 +53,8 @@ import de.gematik.test.erezept.fhir.values.json.CommunicationDisReqMessage;
 import de.gematik.test.erezept.fhir.values.json.CommunicationReplyMessage;
 import de.gematik.test.erezept.screenplay.util.PrescriptionAssignmentKind;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.serenitybdd.annotations.WithTag;
 import net.serenitybdd.junit5.SerenityJUnit5Extension;
@@ -67,7 +65,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-@Slf4j
 @ExtendWith(SerenityJUnit5Extension.class)
 @DisplayName("Communication Get Tests")
 @Tag("Communication")
@@ -80,6 +77,8 @@ class GetMessagesIT extends ErpTest {
 
   @Actor(name = "Sina Hüllmann")
   private PatientActor sina;
+
+  @Actor() private PatientActor randomPatient;
 
   @Actor(name = "Dr. Schraßer")
   private DoctorActor doc;
@@ -254,21 +253,28 @@ class GetMessagesIT extends ErpTest {
   void shouldGetCorrectCountOfNewCommunicationsAsPatient(
       PrescriptionAssignmentKind assignmentKind,
       SupplyOptionsType supplyOptionsType,
-      InsuranceTypeDe insuranceType) {
-    sina.changePatientInsuranceType(insuranceType);
-    val task = prescribe(assignmentKind, sina);
+      InsuranceTypeDe insuranceType)
+      throws InterruptedException {
+    randomPatient.changePatientInsuranceType(insuranceType);
+    val task = prescribe(assignmentKind, randomPatient);
     val communicationCount =
-        sina.performs(GetMessages.fromServerWith(CommunicationSearch.getNewCommunications()))
+        randomPatient
+            .performs(GetMessages.fromServerWith(CommunicationSearch.getNewCommunications()))
             .getExpectedResponse()
             .getCommunications()
             .size();
     int noOfSendMessages = 5;
     val expactation = communicationCount + noOfSendMessages;
-    sendMultipleReplyAndCount(airportApo, sina, task, supplyOptionsType, noOfSendMessages);
-    val updatedMessages =
-        sina.performs(GetMessages.fromServerWith(CommunicationSearch.getNewCommunications()));
+    sendMultipleReplyAndCount(airportApo, randomPatient, task, supplyOptionsType, noOfSendMessages);
 
-    sina.attemptsTo(
+    // for the moment we need to wait a bit until the messages are ready to become available
+    TimeUnit.MILLISECONDS.sleep(500); // NOSONAR
+
+    val updatedMessages =
+        randomPatient.performs(
+            GetMessages.fromServerWith(CommunicationSearch.getNewCommunications()));
+
+    randomPatient.attemptsTo(
         Verify.that(updatedMessages)
             .withExpectedType()
             .hasResponseWith(returnCode(200))

@@ -1,0 +1,472 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <id value="00aefbfd-fdb4-4314-be0e-a066abd04afd"/>
+    <type value="searchset"/>
+    <timestamp value="2026-10-27T10:12:52.633+00:00"/>
+    <total value="0"/>
+    <entry>
+        <fullUrl value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.011.583.25"/>
+        <resource>
+            <MedicationDispense xmlns="http://hl7.org/fhir">
+                <id value="162.000.000.011.583.25"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"/>
+                </meta>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink">
+                    <valueUrl value="www.ivan-derr.net?code=B0000DHCZT"/>
+                </extension>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode">
+                    <valueString value="B0002SUQUY"/>
+                </extension>
+                <identifier>
+                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                    <value value="162.000.000.011.583.25"/>
+                </identifier>
+                <status value="completed"/>
+                <medicationReference>
+                    <identifier>
+                        <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                        <value value="15741877"/>
+                    </identifier>
+                    <display value="Aerified"/>
+                </medicationReference>
+                <subject>
+                    <identifier>
+                        <type>
+                            <coding>
+                                <system value="http://fhir.de/CodeSystem/identifier-type-de-basis"/>
+                                <code value="KVZ10"/>
+                            </coding>
+                        </type>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110670787"/>
+                    </identifier>
+                </subject>
+                <performer>
+                    <actor>
+                        <identifier>
+                            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                            <value value="8-SMC-B-Testkarte--883110000163954"/>
+                        </identifier>
+                    </actor>
+                </performer>
+                <whenPrepared value="2026-10-23"/>
+                <whenHandedOver value="2026-10-24"/>
+                <note>
+                    <text value="Lorraine. My density has brought me to you."/>
+                </note>
+            </MedicationDispense>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.011.584.22"/>
+        <resource>
+            <MedicationDispense xmlns="http://hl7.org/fhir">
+                <id value="162.000.000.011.584.22"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"/>
+                </meta>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink">
+                    <valueUrl value="www.linn-mallmann.ch?code=B000ML8E7I"/>
+                </extension>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode">
+                    <valueString value="B000MW7MJ8"/>
+                </extension>
+                <identifier>
+                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                    <value value="162.000.000.011.584.22"/>
+                </identifier>
+                <status value="completed"/>
+                <medicationReference>
+                    <identifier>
+                        <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                        <value value="44540571"/>
+                    </identifier>
+                    <display value="Y-find"/>
+                </medicationReference>
+                <subject>
+                    <identifier>
+                        <type>
+                            <coding>
+                                <system value="http://fhir.de/CodeSystem/identifier-type-de-basis"/>
+                                <code value="KVZ10"/>
+                            </coding>
+                        </type>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110670787"/>
+                    </identifier>
+                </subject>
+                <performer>
+                    <actor>
+                        <identifier>
+                            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                            <value value="8-SMC-B-Testkarte--883110000163954"/>
+                        </identifier>
+                    </actor>
+                </performer>
+                <whenPrepared value="2026-10-23"/>
+                <whenHandedOver value="2026-10-24"/>
+                <note>
+                    <text value="Next saturday night we're sending you back to the future!"/>
+                </note>
+            </MedicationDispense>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.011.603.62"/>
+        <resource>
+            <MedicationDispense xmlns="http://hl7.org/fhir">
+                <id value="162.000.000.011.603.62"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"/>
+                </meta>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink">
+                    <valueUrl value="www.vivienne-kock.com?code=B000662ADI"/>
+                </extension>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode">
+                    <valueString value="B0002EZWRK"/>
+                </extension>
+                <identifier>
+                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                    <value value="162.000.000.011.603.62"/>
+                </identifier>
+                <status value="completed"/>
+                <medicationReference>
+                    <identifier>
+                        <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                        <value value="62172562"/>
+                    </identifier>
+                    <display value="Stringtough"/>
+                </medicationReference>
+                <subject>
+                    <identifier>
+                        <type>
+                            <coding>
+                                <system value="http://fhir.de/CodeSystem/identifier-type-de-basis"/>
+                                <code value="KVZ10"/>
+                            </coding>
+                        </type>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110670787"/>
+                    </identifier>
+                </subject>
+                <performer>
+                    <actor>
+                        <identifier>
+                            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                            <value value="8-SMC-B-Testkarte--883110000163954"/>
+                        </identifier>
+                    </actor>
+                </performer>
+                <whenPrepared value="2026-10-23"/>
+                <whenHandedOver value="2026-10-24"/>
+                <note>
+                    <text value="I have your car towed all the way to your house and all you got for me is lite beer?"/>
+                </note>
+            </MedicationDispense>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.011.604.59"/>
+        <resource>
+            <MedicationDispense xmlns="http://hl7.org/fhir">
+                <id value="162.000.000.011.604.59"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"/>
+                </meta>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink">
+                    <valueUrl value="www.timothy-lausecker.org?code=B000HB4E90"/>
+                </extension>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode">
+                    <valueString value="B00004YKMI"/>
+                </extension>
+                <identifier>
+                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                    <value value="162.000.000.011.604.59"/>
+                </identifier>
+                <status value="completed"/>
+                <medicationReference>
+                    <identifier>
+                        <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                        <value value="91516689"/>
+                    </identifier>
+                    <display value="Zontrax"/>
+                </medicationReference>
+                <subject>
+                    <identifier>
+                        <type>
+                            <coding>
+                                <system value="http://fhir.de/CodeSystem/identifier-type-de-basis"/>
+                                <code value="KVZ10"/>
+                            </coding>
+                        </type>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110670787"/>
+                    </identifier>
+                </subject>
+                <performer>
+                    <actor>
+                        <identifier>
+                            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                            <value value="8-SMC-B-Testkarte--883110000163954"/>
+                        </identifier>
+                    </actor>
+                </performer>
+                <whenPrepared value="2026-10-23"/>
+                <whenHandedOver value="2026-10-24"/>
+                <note>
+                    <text value="Yeah, well, history is gonna change."/>
+                </note>
+            </MedicationDispense>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.011.592.95"/>
+        <resource>
+            <MedicationDispense xmlns="http://hl7.org/fhir">
+                <id value="162.000.000.011.592.95"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"/>
+                </meta>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink">
+                    <valueUrl value="www.alex-schlicht.ch?code=B000GWIHF2"/>
+                </extension>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode">
+                    <valueString value="B00026IESC"/>
+                </extension>
+                <identifier>
+                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                    <value value="162.000.000.011.592.95"/>
+                </identifier>
+                <status value="completed"/>
+                <medicationReference>
+                    <identifier>
+                        <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                        <value value="04837769"/>
+                    </identifier>
+                    <display value="Tin"/>
+                </medicationReference>
+                <subject>
+                    <identifier>
+                        <type>
+                            <coding>
+                                <system value="http://fhir.de/CodeSystem/identifier-type-de-basis"/>
+                                <code value="KVZ10"/>
+                            </coding>
+                        </type>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110670787"/>
+                    </identifier>
+                </subject>
+                <performer>
+                    <actor>
+                        <identifier>
+                            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                            <value value="8-SMC-B-Testkarte--883110000163954"/>
+                        </identifier>
+                    </actor>
+                </performer>
+                <whenPrepared value="2026-10-23"/>
+                <whenHandedOver value="2026-10-24"/>
+                <note>
+                    <text value="Save the clock tower!"/>
+                </note>
+            </MedicationDispense>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.011.624.96"/>
+        <resource>
+            <MedicationDispense xmlns="http://hl7.org/fhir">
+                <id value="162.000.000.011.624.96"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"/>
+                </meta>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink">
+                    <valueUrl value="www.miriam-bickel.info?code=B000IAQ8YO"/>
+                </extension>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode">
+                    <valueString value="B000HKQS6I"/>
+                </extension>
+                <identifier>
+                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                    <value value="162.000.000.011.624.96"/>
+                </identifier>
+                <status value="completed"/>
+                <medicationReference>
+                    <identifier>
+                        <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                        <value value="03760639"/>
+                    </identifier>
+                    <display value="Stronghold"/>
+                </medicationReference>
+                <subject>
+                    <identifier>
+                        <type>
+                            <coding>
+                                <system value="http://fhir.de/CodeSystem/identifier-type-de-basis"/>
+                                <code value="KVZ10"/>
+                            </coding>
+                        </type>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110670787"/>
+                    </identifier>
+                </subject>
+                <performer>
+                    <actor>
+                        <identifier>
+                            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                            <value value="8-SMC-B-Testkarte--883110000163954"/>
+                        </identifier>
+                    </actor>
+                </performer>
+
+                <whenPrepared value="2026-10-23"/>
+                <whenHandedOver value="2026-10-24"/>
+                <note>
+                    <text value="If my calculations are correct, when this baby hits 88 miles per hour... you're gonna see some serious shit."/>
+                </note>
+            </MedicationDispense>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.011.612.35"/>
+        <resource>
+            <MedicationDispense xmlns="http://hl7.org/fhir">
+                <id value="162.000.000.011.612.35"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"/>
+                </meta>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink">
+                    <valueUrl value="www.maximilian-pichlmaier.ch?code=B000BOIITU"/>
+                </extension>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode">
+                    <valueString value="B000IT4T96"/>
+                </extension>
+                <identifier>
+                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                    <value value="162.000.000.011.612.35"/>
+                </identifier>
+                <status value="completed"/>
+                <medicationReference>
+                    <identifier>
+                        <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                        <value value="97553527"/>
+                    </identifier>
+                    <display value="Aerified"/>
+                </medicationReference>
+                <subject>
+                    <identifier>
+                        <type>
+                            <coding>
+                                <system value="http://fhir.de/CodeSystem/identifier-type-de-basis"/>
+                                <code value="KVZ10"/>
+                            </coding>
+                        </type>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110670787"/>
+                    </identifier>
+                </subject>
+                <performer>
+                    <actor>
+                        <identifier>
+                            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                            <value value="8-SMC-B-Testkarte--883110000163954"/>
+                        </identifier>
+                    </actor>
+                </performer>
+
+                <whenPrepared value="2026-10-23"/>
+                <whenHandedOver value="2026-10-24"/>
+                <note>
+                    <text value="There's that word again. 'Heavy.' Why are things so heavy in the future? Is there a problem with the Earth's gravitational pull?"/>
+                </note>
+            </MedicationDispense>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+    <entry>
+        <fullUrl value="https://erp-test.zentral.erp.splitdns.ti-dienste.de/MedicationDispense/162.000.000.011.623.02"/>
+        <resource>
+            <MedicationDispense xmlns="http://hl7.org/fhir">
+                <id value="162.000.000.011.623.02"/>
+                <meta>
+                    <profile
+                            value="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_PR_MedicationDispense_DiGA|1.6"/>
+                </meta>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_DeepLink">
+                    <valueUrl value="www.lennard-kick.net?code=B0009PC1XA"/>
+                </extension>
+                <extension url="https://gematik.de/fhir/erp/StructureDefinition/GEM_ERP_EX_RedeemCode">
+                    <valueString value="B000Q7F1OW"/>
+                </extension>
+                <identifier>
+                    <system value="https://gematik.de/fhir/erp/NamingSystem/GEM_ERP_NS_PrescriptionId"/>
+                    <value value="162.000.000.011.623.02"/>
+                </identifier>
+                <status value="completed"/>
+                <medicationReference>
+                    <identifier>
+                        <system value="http://fhir.de/CodeSystem/ifa/pzn"/>
+                        <value value="53563878"/>
+                    </identifier>
+                    <display value="Home Ing"/>
+                </medicationReference>
+                <subject>
+                    <identifier>
+                        <type>
+                            <coding>
+                                <system value="http://fhir.de/CodeSystem/identifier-type-de-basis"/>
+                                <code value="KVZ10"/>
+                            </coding>
+                        </type>
+                        <system value="http://fhir.de/sid/gkv/kvid-10"/>
+                        <value value="X110670787"/>
+                    </identifier>
+                </subject>
+                <performer>
+                    <actor>
+                        <identifier>
+                            <system value="https://gematik.de/fhir/sid/telematik-id"/>
+                            <value value="8-SMC-B-Testkarte--883110000163954"/>
+                        </identifier>
+                    </actor>
+                </performer>
+                <whenPrepared value="2026-10-23"/>
+                <whenHandedOver value="2026-10-24"/>
+                <note>
+                    <text value="Are you telling me that this sucker is nuclear?"/>
+                </note>
+            </MedicationDispense>
+        </resource>
+        <search>
+            <mode value="match"/>
+        </search>
+    </entry>
+</Bundle>

@@ -45,12 +45,12 @@ import org.junit.jupiter.api.Test;
 
 class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
 
-  private final LocalDate testDate = LocalDate.of(2025, Month.SEPTEMBER, 6);
+  private final LocalDate testDate = LocalDate.of(2026, Month.OCTOBER, 24);
   ErxMedicationDispenseBundle validMedDisp =
       parser.decode(
           ErxMedicationDispenseBundle.class,
           ResourceLoader.readFileFromResource(
-              "fhir/valid/erp/1.4.0/medicationdispensebundle/Bundle-MultipleMedicationDispenseBundle.json"));
+              "fhir/valid/erp/1.6.0/xml/medDispBundle/medDispBundleByFD.xml"));
   ErxMedicationDispenseBundle simpleEuMedDispBundle =
       parser.decode(
           ErxMedicationDispenseBundle.class,
@@ -80,7 +80,7 @@ class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
   void shouldVerifyWhenHandedOverCorrect2() {
     val step =
         verifyWhenHandedOverWithPredicate(
-            ld -> ld.isEqual(testDate), "is halt so..." + testDate + "enthalten");
+            ld -> ld.isEqual(testDate), "is halt so..." + testDate + " enthalten");
     assertDoesNotThrow(() -> step.apply(validMedDisp));
   }
 
@@ -88,7 +88,7 @@ class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
   void shouldThrowWhileVerifyWhenHandedOver() {
     val step =
         verifyWhenHandedOverWithPredicate(
-            ld -> !ld.isEqual(testDate), "is halt so..." + testDate + "enthalten");
+            ld -> !ld.isEqual(testDate), "is halt so..." + testDate + " enthalten");
     assertThrows(AssertionError.class, () -> step.apply(validMedDisp));
   }
 
@@ -104,7 +104,7 @@ class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
   void shouldThrowWhileVerifyWhenPreparedIsNotEquals() {
     val step =
         verifyWhenPreparedWithPredicate(
-            ld -> !ld.isEqual(testDate), "is halt so..." + testDate + "enthalten");
+            ld -> !ld.isEqual(testDate.minusDays(1)), "is halt so..." + testDate + "enthalten");
     assertThrows(AssertionError.class, () -> step.apply(validMedDisp));
   }
 
@@ -124,13 +124,13 @@ class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldThrowWhileVerifyWhenPreparedIsBeforeMatchingTheDate() {
-    val step = verifyWhenPreparedIsBefore(testDate);
+    val step = verifyWhenPreparedIsBefore(testDate.minusDays(2));
     assertThrows(AssertionError.class, () -> step.apply(validMedDisp));
   }
 
   @Test
   void shouldVerifyPerformerIdsCorrect() {
-    val step = verifyAllPerformerIdsAre(TelematikID.from("3-SMC-B-Testkarte-883110000095957"));
+    val step = verifyAllPerformerIdsAre(TelematikID.from("8-SMC-B-Testkarte--883110000163954"));
     assertDoesNotThrow(() -> step.apply(validMedDisp));
   }
 
@@ -147,7 +147,7 @@ class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
             parser.decode(
                 ErxMedicationDispenseBundle.class,
                 ResourceLoader.readFileFromResource(
-                    "fhir/valid/erp/1.4.0/medicationdispensebundle/Bundle-MultipleMedicationDispenseBundle_HandedOverDateAscending.json"));
+                    "fhir/valid/erp/1.6.0/xml/medDispBundle/medDispBundleByFD.xml"));
     val step = verifyWhenHandedOverIsSortedSerialAscend();
     assertDoesNotThrow(() -> step.apply(medDispBundle));
   }
@@ -158,7 +158,7 @@ class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
         parser.decode(
             ErxMedicationDispenseBundle.class,
             ResourceLoader.readFileFromResource(
-                "fhir/valid/erp/1.4.0/medicationdispensebundle/Bundle-MultipleMedicationDispenseBundle_HandedOverDateDescending.json"));
+                "fhir/valid/erp/1.6.0/json/medicationdispenseBundle/medDispBundleByFDUnsorted.json"));
     val step = verifyWhenHandedOverIsSortedSerialAscend();
     assertThrows(AssertionError.class, () -> step.apply(medDispBundle));
   }
@@ -238,7 +238,7 @@ class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
 
   @Test
   void shouldDetectCorrectCountOfContainedMedicationDispenses() {
-    val step = verifyCountOfContainedMedication(2);
+    val step = verifyCountOfContainedMedication(8);
     assertDoesNotThrow(() -> step.apply(validMedDisp));
   }
 
@@ -252,7 +252,7 @@ class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
       parser.decode(
           ErxMedicationDispenseBundle.class,
           ResourceLoader.readFileFromResource(
-              "fhir/valid/erp/1.4.0/medicationdispensebundle/Bundle-SimpleMedicationDispenseBundle.json"));
+              "fhir/valid/erp/1.6.0/json/medicationdispenseBundle/medDispBundleByFD.json"));
 
   @Test
   void shouldDetectCorrectContainedMedicationDispensesForNewProfiles() {
@@ -324,7 +324,7 @@ class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
   @Test
   void shouldDetectContainedErxMedicationAndGemDispense() {
     val step =
-        containsErxMedicationAndGemMedDispense(PrescriptionId.from("160.000.000.000.000.01"));
+        containsErxMedicationAndGemMedDispense(PrescriptionId.from("160.000.125.863.684.32"));
     assertDoesNotThrow(() -> step.apply(simpleMedDispBundle));
   }
 
@@ -340,10 +340,13 @@ class MedicationDispenseBundleVerifierTest extends ErpFhirParsingTest {
     List<ErxReceipt> dispensations = new ArrayList<>();
     dispensations.add(
         (ErxReceipt)
-            new ErxReceipt().setIdentifier(new Identifier().setValue("160.000.000.000.000.02")));
+            new ErxReceipt().setIdentifier(new Identifier().setValue("162.000.000.011.583.25")));
     dispensations.add(
         (ErxReceipt)
-            new ErxReceipt().setIdentifier(new Identifier().setValue("160.000.000.000.000.01")));
+            new ErxReceipt().setIdentifier(new Identifier().setValue("162.000.000.011.603.62")));
+    dispensations.add(
+        (ErxReceipt)
+            new ErxReceipt().setIdentifier(new Identifier().setValue("162.000.000.011.592.95")));
 
     val step = containsIdsOf(dispensations, ErpAfos.A_24442);
     assertDoesNotThrow(() -> step.apply(validMedDisp));

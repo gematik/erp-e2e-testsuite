@@ -20,42 +20,36 @@
 
 package de.gematik.test.erezept.actions;
 
-import static de.gematik.bbriccs.fhir.codec.utils.FhirTestResourceUtil.createEmptyValidationResult;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
-import de.gematik.bbriccs.rest.fd.FhirBResponse;
 import de.gematik.test.core.expectations.requirements.CoverageReporter;
-import de.gematik.test.erezept.actors.PharmacyActor;
+import de.gematik.test.erezept.client.testutils.ErpResponseUtil;
 import de.gematik.test.erezept.client.usecases.DispensePrescriptionCommand;
-import de.gematik.test.erezept.common.screenplay.abilities.UseTheErpClient;
 import de.gematik.test.erezept.fhir.r4.erp.GemDispenseOperationParameters;
 import de.gematik.test.erezept.fhir.testutil.ErpFhirBuildingTest;
 import de.gematik.test.erezept.fhir.values.Secret;
 import de.gematik.test.erezept.fhir.values.TaskId;
+import de.gematik.test.utils.ActorMockUtil;
 import lombok.val;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class DispensePrescriptionNewTest extends ErpFhirBuildingTest {
 
-  private static PharmacyActor pharmacy;
-  private static UseTheErpClient useErpClient;
-
   @BeforeAll
   static void setup() {
     CoverageReporter.getInstance().startTestcase("DispensePrescriptionNew");
-
-    pharmacy = new PharmacyActor("Am Flughafen");
-    useErpClient = mock(UseTheErpClient.class);
-    pharmacy.can(useErpClient);
   }
 
   @Test
   void shouldDispensePrescriptionWithMedicationDispense() {
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+    val pharmacyClient = pharmacyMock.getRight();
+
     val taskId = TaskId.from("123456789");
     val secret = Secret.from("accessCode");
 
@@ -63,31 +57,29 @@ class DispensePrescriptionNewTest extends ErpFhirBuildingTest {
         DispensePrescriptionNew.withCredentials(taskId, secret)
             .withParameters(new GemDispenseOperationParameters());
 
-    val response =
-        FhirBResponse.forPayload(EmptyResource.class, null)
-            .withStatusCode(204)
-            .andValidationResult(createEmptyValidationResult());
+    val response = ErpResponseUtil.createErpResponse(null, EmptyResource.class, 204);
 
-    doReturn(response).when(useErpClient).request(any(DispensePrescriptionCommand.class));
+    doReturn(response).when(pharmacyClient).request(any(DispensePrescriptionCommand.class));
 
-    assertDoesNotThrow(() -> pharmacy.performs(action));
+    assertDoesNotThrow(() -> pharmacyActor.performs(action));
   }
 
   @Test
   void shouldDispensePrescriptionWithParameters() {
+    val pharmacyMock = ActorMockUtil.createRandomPharmacy();
+    val pharmacyActor = pharmacyMock.getLeft();
+    val pharmacyClient = pharmacyMock.getRight();
+
     val taskId = TaskId.from("987654321");
     val secret = Secret.from("accessCode");
 
     val params = new GemDispenseOperationParameters();
     val action = DispensePrescriptionNew.withCredentials(taskId, secret).withParameters(params);
 
-    val response =
-        FhirBResponse.forPayload(EmptyResource.class, null)
-            .withStatusCode(204)
-            .andValidationResult(createEmptyValidationResult());
+    val response = ErpResponseUtil.createErpResponse(null, EmptyResource.class, 204);
 
-    doReturn(response).when(useErpClient).request(any(DispensePrescriptionCommand.class));
+    doReturn(response).when(pharmacyClient).request(any(DispensePrescriptionCommand.class));
 
-    assertDoesNotThrow(() -> pharmacy.performs(action));
+    assertDoesNotThrow(() -> pharmacyActor.performs(action));
   }
 }

@@ -25,7 +25,6 @@ import static java.text.MessageFormat.format;
 import de.gematik.bbriccs.fhir.codec.EmptyResource;
 import de.gematik.bbriccs.rest.fd.FhirBRequest;
 import de.gematik.bbriccs.rest.fd.FhirBResponse;
-import de.gematik.bbriccs.smartcards.Smartcard;
 import de.gematik.test.erezept.client.ErpClient;
 import de.gematik.test.erezept.common.apimeasure.ApiCallStopwatch;
 import de.gematik.test.erezept.common.apimeasure.LoggingStopwatch;
@@ -62,22 +61,6 @@ public class UseTheErpClient implements Ability {
 
   public static UseTheErpClient with(ErpClient client, ApiCallStopwatch stopwatch) {
     return new UseTheErpClient(client, stopwatch);
-  }
-
-  public UseTheErpClient authenticatingWith(UseTheKonnektor konnektor) {
-    this.authenticateWith(konnektor);
-    return this;
-  }
-
-  public UseTheErpClient authenticatingWith(Smartcard smartcard) {
-    this.authenticateWith(smartcard);
-    return this;
-  }
-
-  public void authenticateWith(UseTheKonnektor withKonnektor) {
-    this.client.authenticateWith(
-        withKonnektor.getSmcbAuthCertificate().getPayload(),
-        challenge -> withKonnektor.externalAuthenticate(challenge).getPayload());
   }
 
   public <T extends Resource, R extends Resource> FhirBResponse<R> request(

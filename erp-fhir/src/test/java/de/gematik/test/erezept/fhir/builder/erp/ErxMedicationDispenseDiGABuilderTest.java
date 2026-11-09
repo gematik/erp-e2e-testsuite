@@ -20,10 +20,7 @@
 
 package de.gematik.test.erezept.fhir.builder.erp;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import de.gematik.bbriccs.fhir.de.value.KVNR;
 import de.gematik.bbriccs.fhir.de.value.PZN;
@@ -49,7 +46,7 @@ class ErxMedicationDispenseDiGABuilderTest extends ErpFhirParsingTest {
 
     val medicationDispense =
         ErxMedicationDispenseDiGABuilder.forKvnr(kvnr)
-            .version(ErpWorkflowVersion.V1_4)
+            .version(ErpWorkflowVersion.V1_6)
             .performerId(telematikId)
             .prescriptionId(prescriptionId)
             .medication(medication)

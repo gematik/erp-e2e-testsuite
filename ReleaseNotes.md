@@ -1,10 +1,19 @@
 # Release Notes ERP E2E Testsuite
 
+## Release 1.10.0
+
+* erp-fhir:
+    - delete de.gematik.erezept-workflow.r4-1.3 & 1.4 cause they died a year ago
+        - depended Profile, depended examples and depended switches are deleted
+* erp-client
+    - implement authentication with Gesundheits-ID for FdV clients
+
 ## Release 1.9.0
 
 * erp-fd-product-test:
     - implement a generic PollingWrapper to Poll e. g. auditevents to stabilize Testruns
-
+    - implement negative testcases for reply v3 communication
+    - implement negative testcases for dispReq v3 communication
 
 ## Release 1.8.0
 

@@ -163,6 +163,7 @@ class DispenseDgmpIT extends ErpTest {
             .isCorrect());
   }
 
+  @Tag("VeryBigDosageObject")
   @TestcaseId("DISPENSE_DOSAGE_DGMP_2")
   @ParameterizedTest(name = "[{index}]: many DosageDgMPs were integrated in: {0} ")
   @ValueSource(strings = {"Prescription", "CloseInputResource"})
